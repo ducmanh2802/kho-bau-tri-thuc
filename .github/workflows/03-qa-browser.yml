@@ -65,7 +65,11 @@ jobs:
       # không lọt vào, lại một `while read` mỗi dòng một annotation nên thứ tự bị xáo. Lần này cắt
       # đúng hai khối: tổng hợp `errors`/`failedAt`/tên bước, và đuôi log thô, mỗi khối **một**
       # annotation nối dòng bằng `%0A` để thứ tự không đổi nghĩa.
-      # Không đổi code probe: chỉ làm nguyên nhân thật trở nên quan sát được.
+      # Bài học lần 2 (check-run 125458270068 trên `08eacc7`): kênh đã đúng nhưng `errors` chỉ còn
+      # `EXCEPTION: locator.click: Timeout 12000ms exceeded.` vì probe cắt lấy dòng đầu của
+      # exception ⇒ không biết **nút nào** bấm không được. Nay `qa/golden-path.mjs` giữ 8 dòng
+      # "Call log" của Playwright và trần mỗi annotation là 3000 ký tự để log đó sống sót;
+      # vẫn không đổi assertions của probe, chỉ đổi lượng thông tin nó ghi khi chạy hỏng.
       - name: Đưa lỗi probe lên annotation (đọc public được)
         if: failure()
         env:
@@ -88,7 +92,7 @@ jobs:
           emit() {
             m="$1"
             m="${m//$'\r'/}"; m="${m//%/%25}"; m="${m//#/%23}"; m="${m//$'\n'/%0A}"
-            echo "::error file=.github/workflows/03-qa-browser.yml,line=55::$PROBE :: ${m:0:1600}"
+            echo "::error file=.github/workflows/03-qa-browser.yml,line=55::$PROBE :: ${m:0:3000}"
           }
           emit "$summ"
           emit "$(tail -c 900 probe-run.log) || $ctx"

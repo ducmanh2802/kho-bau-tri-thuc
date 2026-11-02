@@ -44,7 +44,15 @@ export default async function run(page, ui) {
   try {
     await body(page, ui);
   } catch (e) {
-    const msg = e && e.message ? String(e.message).split('\n')[0] : String(e);
+    // Playwright ném `locator.click: Timeout` kèm "Call log": dòng đầu là thao tác, dòng
+    // "waiting for getByRole(...)" chỉ rõ **nút nào**, còn vì sao bấm không được ("intercepts
+    // pointer events", "element is not visible") lại nằm ở CUỐI log. Cắt một dòng thì CI chỉ còn
+    // "Timeout 12000ms exceeded" — không đủ dữ liệu để sửa, nên giữ cả đầu lẫn đuôi.
+    const lines = String((e && e.message) || e)
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const msg = lines.length > 12 ? lines.slice(0, 6).concat(['…'], lines.slice(-6)).join(' | ') : lines.join(' | ');
     state.errors.push('EXCEPTION: ' + msg);
     state.failedAt = state.steps.length ? state.steps[state.steps.length - 1].step : 'start';
   }
