@@ -14,7 +14,7 @@ thì để trống và ghi lý do — không viết "sẽ làm".
 | Lớp | Nội dung | Artifact / lệnh |
 |---|---|---|
 | Deliverable | BRD (6 mục tiêu nghiệp vụ + 8 rủi ro), SRS (88 FR · 25 NFR · 19 DC), RTM hai chiều | [`../specs/BRD.md`](../specs/BRD.md) · [`../specs/SRS.md`](../specs/SRS.md) · [`../specs/RTM.md`](../specs/RTM.md) |
-| Quality gate | Không FR nào được ghi mà không trỏ được tới file; RTM §7 đếm **0 test mồ côi** | `grep -c "^| FR-" docs/specs/SRS.md` = 88 · RTM §7 |
+| Quality gate | Không FR nào được ghi mà không trỏ được tới file; RTM §7 đếm **0 test mồ côi** | `grep -c "^\| FR-" docs/specs/SRS.md` = 88 · RTM §7 |
 | AI Level | **Mức 2** — AI viết nháp toàn bộ đặc tả, người giữ repo duyệt và cắt yêu cầu | nhật sử: `docs/plan/TASK_PLAN.md` §II |
 | RACI | R: agent viết spec · A: người giữ repo · C: giáo viên lớp 1 (nguồn dữ liệu nội dung) · I: phụ huynh thử | `BRD.md` §1 |
 | Metrics | FR có bằng chứng tự động 82/88 · NFR đạt 24/25 · 1 yêu cầu không đo được (BG-01) | RTM §8 (đo 2026-11-02) |
@@ -57,7 +57,7 @@ thì để trống và ghi lý do — không viết "sẽ làm".
 | Quality gate | Exit criteria: tag `vX.Y.Z` + golden-path 0 lỗi (`TEST_PLAN.md` §10) | — |
 | AI Level | **Mức 1** — AI chạy lệnh, người ký go/no-go; AI **không** ký | `07_RELEASE_OPERATIONS.md` §3 |
 | RACI | A: người giữ repo | — |
-| Metrics | **Đo ngày 2026-11-03:** `git tag \| wc -l` = **1** (`v1.1.0` đã ở `origin`) ⇒ pha này là **Pass một phần**, không còn `NotRun`. Năm điều kiện No-Go đã gỡ: `## [1.1.0] - 2026-11-02` trong `CHANGELOG.md`, `package.json` = `1.1.0`, cổng máy xanh trên HEAD được tag, `npm ci` hết lệch npm 10, hai workflow chặn merge (`1. Quality`, `2. Build + artifact`) **success trên runner**. Còn mở: `3. Browser QA` đỏ ở bước `QA probe` (job không chặn — `continue-on-error`), chữ ký Go/No-Go trống, chưa có người lớn đọc to ≥1 bài/môn | `git tag \| wc -l` = 1 · `node scripts/release-notes.mjs 1.1.0 \| wc -l` = 875 · `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?per_page=8` |
+| Metrics | **Đo ngày 2026-11-03:** `git tag \| wc -l` = **1** (`4f75f5d` → `77d90ce`) **và release thật đã tồn tại** (`curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/releases/tags/v1.1.0` ⇒ id `431754261`, `draft false`, asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải) ⇒ pha này **Pass một phần**, không còn `NotRun`. Sáu điều kiện No-Go đã gỡ: `## [1.1.0] - 2026-11-02` trong `CHANGELOG.md`, `package.json` = `1.1.0`, cổng máy xanh trên chính commit được tag (`npm run verify` ⇒ EXIT=0 / `Duration 21.84s`), `npm ci` hết lệch semantics npm 10, `1. Quality` + `2. Build + artifact` **success trên runner**, và `4. Release` **success cả 9 bước** (run 41490669966). Còn mở: `3. Browser QA` đỏ ở bước `QA probe` (job không chặn — `continue-on-error`), chữ ký Go/No-Go trống, chưa có người lớn đọc to ≥1 bài/môn, chưa ai giải nén zip trên máy thật | `git tag \| wc -l` = 1 · `git for-each-ref refs/tags/v1.1.0 --format='%(objectname:short) %(*objectname:short)'` · `node scripts/release-notes.mjs 1.1.0 \| wc -l` = 875 · `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/releases/tags/v1.1.0` · `curl -s …/actions/runs?per_page=6` |
 
 ### Pha 6 — Maintenance (Duy trì & tiến hoá)
 

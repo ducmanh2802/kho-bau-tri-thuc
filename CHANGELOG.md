@@ -10,8 +10,11 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
 ## [Unreleased]
 
 *(trống — toàn bộ mục dưới đây đã chốt cho bản `1.1.0`, **đã tag và đẩy `v1.1.0` lên `origin`
-ngày 2026-11-02/03**; chữ ký Go/No-Go của người giữ repo và UAT người đọc to vẫn chưa có,
-xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
+ngày 2026-11-02/03**, và workflow `4. Release` đã tạo đối tượng release thật
+(`curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/releases/tags/v1.1.0` ⇒ id `431754261`,
+asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện hành `4f75f5d` đóng trên
+`77d90ce`; tag đầu `6687667` ở `7d92246` đã xoá vì CI đỏ ở Install. Chữ ký Go/No-Go của người giữ repo
+và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
 ## [1.1.0] - 2026-11-02
 
@@ -280,6 +283,18 @@ xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
   Linux lần đầu tiên. Chưa đọc được dòng lỗi (API log trả `403 Must have admin rights to Repository`).
   `continue-on-error: true` vẫn giữ nguyên theo ghi chú trong file: cần nó xanh liên tiếp vài lần
   trên `main` trước khi cho phép chặn merge. Bằng chứng: `evidence/2026-11-02-KBT-ISSUE-43/ci-runs.txt`.
+- **Tag `v1.1.0` treo trên commit mà CI đỏ:** lần tag đầu đóng ở `7d92246`, tức commit mà cả 4 workflow
+  vừa chết ở Install — `git tag` tồn tại dễ bị đọc nhầm thành "bản này phát hành được" trong khi chưa
+  có release nào. Xoá tag ở cả `origin` và máy cục bộ, chạy lại cổng trên HEAD mới, rồi tag lại:
+  `npm run verify` trên `77d90ce` ⇒ **EXIT=0** · `89` test file · `1278` test · `Duration 21.84s` ·
+  `index-B6au8G63.js = 204.2 kB → PASS` (cùng entry hash với `7d92246` — hai commit chỉ khác tài liệu).
+  `4. Release` run 41490669966 **success cả 9 bước** ⇒ release thật id `431754261`, ghi chú 80 435 byte,
+  asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, **0 lượt tải**. Cũng trên commit này `npm ci` +
+  toàn bộ gate chạy **xanh trên Ubuntu runner**, không chỉ Windows. Tag hiện hành:
+  `git for-each-ref refs/tags/v1.1.0 --format='%(objectname) %(*objectname)'` ⇒ `4f75f5d` / `77d90ce`.
+  Vẫn mở: `3. Browser QA` đỏ ở `QA probe` (lần thứ hai, cùng bước ⇒ tái lập chứ không trượt nhất thời),
+  chữ ký Go/No-Go trống, chưa ai giải nén zip trên máy thật. Bằng chứng:
+  `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt`.
 - **Lớp phủ "Đang tạm dừng" không nói gì với bộ đọc màn hình (review 4 lớp, finding #6):** màn che
   chỉ là `div` trang trí ⇒ bé dùng trình đọc màn hình bấm tạm rồi không biết mình đang ở trạng thái
   nào. Thêm `role="status"` + `aria-live="polite"` + `aria-label="Đang tạm dừng"`

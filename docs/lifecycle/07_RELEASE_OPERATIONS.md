@@ -3,9 +3,12 @@
 
 **Owner:** người giữ repo (`ducmanh2802`) · **Ngày chốt:** 2026-11-02 · commit `d54f341`
 **Trạng thái pha:** **`Đã phát hành`** — tag `v1.1.0` tồn tại trên `origin` (`git tag | wc -l` = **1**,
-đo 2026-11-02; `git ls-remote --tags origin` trả `refs/tags/v1.1.0` = tag object `6687667` đóng trên
-commit `7d92246`). Tài liệu này mô tả cả quy trình *đã chạy* lẫn những gì **vẫn mở**: chữ ký Go/No-Go
-của người giữ repo và quan sát workflow phía server.
+đo 2026-11-03; `git for-each-ref refs/tags/v1.1.0 --format='%(objectname) %(*objectname)'` trả tag
+object `4f75f5d` đóng trên commit `77d90ce`) **và đối tượng GitHub Release thật đã tồn tại**
+(`curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/releases/tags/v1.1.0` ⇒ id
+`431754261`, `draft false`, asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte — mục 3.4).
+Tài liệu này mô tả cả quy trình *đã chạy* lẫn những gì **vẫn mở**: chữ ký Go/No-Go
+của người giữ repo, `3. Browser QA` đỏ trên runner, và nghiệm thu người dùng.
 
 **Cập nhật cùng ngày (hồ sơ bản `1.1.0` đã đóng trên nhánh):** ba điều kiện No-Go trong §3 mà hồ sơ
 này tự chặn đã gỡ — `CHANGELOG.md` `[Unreleased]` **đã chuyển thành** `## [1.1.0] - 2026-11-02`
@@ -23,17 +26,26 @@ nó là biên bản lúc chuẩn bị.** Phần agent *không* làm được: ch
 người giữ repo) và đọc to ≥1 bài/môn cho bé; vì vậy release này là **phát hành kỹ thuật**, nghiệm thu
 người dùng vẫn `NotRun`.
 
+**Đo lại 2026-11-03 — tag đã đổi chỗ, release thì có thật.** Tag `v1.1.0` đầu tiên đóng ở `7d92246`
+bị **xoá khỏi `origin`** vì cả 4 workflow của nó đỏ ở bước Install (`npm ci` + lockfile lệch semantics
+npm 10 — biên bản ở `evidence/2026-11-02-KBT-ISSUE-43/ci-install-red.txt`) và workflow `4. Release`
+chết trước bước "Create GitHub Release" ⇒ tag tồn tại nhưng release thì không. Sau hai sửa
+(`1b8dadd` regenerate lock bằng `npx --yes npm@10 install --package-lock-only`, `66e0fea` workflow 03
+tự build `dist/` thay vì download artefact của run khác), tag được tạo lại trên HEAD **đã chạy lại
+cổng máy** `77d90ce` và `4. Release` 41490669966 **success** ⇒ đối tượng release thật
+(id `431754261`) hiện trên GitHub. Số đo đầy đủ: `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt`.
+
 ---
 
 ## 1. Release and Operate Loop — 6 trạm
 
 | # | Trạm | Việc | Đã có | Còn thiếu |
 |---|---|---|---|---|
-| 1 | **RC commit** | chốt commit sẽ phát hành, tag `vX.Y.Z` trên **đúng** commit đã qua V&V gate | workflow `04-release.yml` trigger `push: tags v*.*.*` + `workflow_dispatch` | chưa có commit nào được tag |
+| 1 | **RC commit** | chốt commit sẽ phát hành, tag `vX.Y.Z` trên **đúng** commit đã qua V&V gate | workflow `04-release.yml` trigger `push: tags v*.*.*` + `workflow_dispatch` | **đã tag** (2026-11-03): `77d90ce` mang `v1.1.0` = tag object `4f75f5d`; tag đầu `7d92246` bị xoá vì CI đỏ ở Install |
 | 2 | **Verdict** | mọi AC của **hai** lát cắt ở `TEST_CASES.md` §2 (6 US × 3 nhánh) + toàn bộ exit criteria `TEST_PLAN.md` §10 | 42/42 TC Pass (`TEST_CASES.md` §3) | phần lớn FR chưa xuống tầng TC — **không ghi con số "còn 83 FR"**: tổng FR khai báo (88) lệch số dòng FR thật trong `SRS.md` (89), xem `RTM.md` §9 rule 5 |
 | 3 | **Go/No-Go** | người chịu trách nhiệm ký; AI **không** ký | mục §3 dưới đây | chưa có phiên ký nào |
 | 4 | **Sẵn sàng vận hành** | expand/contract migration, restore drill, SLI/SLO, incident | ADR-02 + `MIGRATIONS` chain (`storage.ts:111`) | §5, §6 |
-| 5 | **Phát hành** | build → zip `dist/` → GitHub Release, note lấy từ `CHANGELOG.md` | workflow 04 làm đủ 3 bước | chạy lần đầu |
+| 5 | **Phát hành** | build → zip `dist/` → GitHub Release, note lấy từ `CHANGELOG.md` | workflow 04 làm đủ 3 bước | **đã chạy xanh lần đầu** (2026-11-03): run `41490669966` success 9 bước ⇒ release id `431754261` + asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte; còn thiếu: **0 lượt tải** và chưa ai mở zip trên máy thật |
 | 6 | **Sau phát hành** | smoke, theo dõi SLI, kế hoạch rollback | `qa/golden-path.mjs` dùng được làm smoke | không có telemetry ⇒ chỉ theo dõi được ở máy người dùng |
 
 ## 2. Mọi bằng chứng gắn một commit
@@ -45,7 +57,8 @@ Quy tắc: một artifact chỉ chứng nhận cho commit nó được tạo ra.
 | `d54f341` | 2026-11-02 | `evidence/2026-11-02-T41C/` — verify log, 3 probe JSON, 2 ảnh, 3 log ablation/baseline | **Pass** cho V&V · **NotRun** cho Release |
 | `675be7e`+`af2d56a`+`494cce2`+`a61920b`+`fae661c`+`c8a3725`+tip review (nhánh `feature/43-game-pause`, chưa merge vào `main`) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/` — `red-before-fix.txt` (24 test FAIL), `verify.txt` (EXIT=0, 88 file / 1272 test / `Duration 21.55s`), `probe-game-pause.json` (12 bước, 0 lỗi), 3 ảnh, 3 log ablation M3/M4/M5 | **Pass** cho V&V · **NotRun** cho Release (CI chưa chạy — repo chưa có tag, `workflow_dispatch` chưa bật; xem §4) |
 | `3d06930` (RC: `origin/main` `09511d3` merge vào tip nhánh) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt` (EXIT=0, 89 file / 1277 test / `Duration 23.85s`, entry `index-B6au8G63.js` 204.2 kB) + `probe-qa-smoke-rc.txt` + `probe-qa-games-rc.txt` + `probe-game-pause-rc.json` | **Pass** cho V&V trên RC · Release xem dòng §3.4 |
-| `7365830` → `7d92246` (HEAD `main` lúc đóng tag `v1.1.0`) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` (EXIT=0, 89 file / 1278 test / `Duration 23.64s`), `verify-release-head.txt` (chạy lại đúng HEAD tag, EXIT=0 / `22.57s`), `repro-fatigue-midnight.txt` (RED trước – GREEN sau khi sửa flake) | **Pass** cho V&V **và** là commit mang tag — Release **đã phát hành**; CI phía server vẫn chưa quan sát được (§3.4) |
+| `7365830` → `7d92246` (HEAD `main` lúc đóng tag `v1.1.0` **đầu tiên**) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` (EXIT=0, 89 file / 1278 test / `Duration 23.64s`), `verify-release-head.txt` (chạy lại đúng HEAD tag, EXIT=0 / `22.57s`), `repro-fatigue-midnight.txt` (RED trước – GREEN sau khi sửa flake) | **Pass** cho V&V trên máy phát triển, **Fail** cho Release phía server: `npm ci` của CI (npm 10) đỏ ở Install ⇒ workflow `4. Release` chết trước bước "Create GitHub Release", tag có thật nhưng release thì không. **Tag này đã bị xoá khỏi `origin`** (`ci-install-red.txt`) |
+| `77d90ce` (HEAD `main` mang tag `v1.1.0` **hiện hành** = tag object `4f75f5d`) | 2026-11-03 | `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt` — cổng máy chạy lại đúng commit được tag (EXIT=0, 89 file / 1278 test / `Duration 21.84s`, entry `index-B6au8G63.js` 204.2 kB) + 4 run CI phía server đọc qua API công khai + đối tượng release thật | **Pass** V&V **và** Pass Release kỹ thuật: `1. Quality` 41490451023 · `2. Build + artifact` 41490451085 · `4. Release` 41490669966 success ⇒ release id `431754261` có asset. **Vẫn mở:** `3. Browser QA` 41490451074 đỏ ở bước "QA probe", chữ ký Go/No-Go trống, nghiệm thu người dùng `NotRun` |
 
 Không được lấy log của `7c60066` để nói `d54f341` an toàn.
 
@@ -84,9 +97,10 @@ Căn cứ            : <dán output verify + golden-path + số TC NotRun còn l
 | Probe riêng của lát cắt | `node qa/run-one.mjs qa/game-pause.mjs` ⇒ `QA PASS — 12 step(s), 0 errors`, `ok: true` | như trên, sau `npm run build` |
 | CI trên máy chủ, lần 1 (`7d92246` = tag `v1.1.0` đầu tiên) | `1. Quality` run 41485714651 · `2. Build + artifact` 41485714641 · `4. Release` 41486056746 **đỏ đúng bước Install** (`npm error code EUSAGE`, thiếu `@emnapi/core@1.11.3` + `@emnapi/runtime@1.11.3` trong lock); `3. Browser QA` 41485714640 báo `run success` nhưng job `failure` vì `continue-on-error`. `4. Release` dừng ở bước 5 ⇒ "Create GitHub Release" `skipped`, **chưa có release nào** | `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/<id>/jobs` — bảng đầy đủ ở `evidence/2026-11-02-KBT-ISSUE-43/ci-runs.txt`, nguyên nhân + lệnh tái lập ở `ci-install-red.txt` |
 | CI sau hai sửa (`1b8dadd` lockfile + `66e0fea` workflow 03) | `1. Quality` 41488045169 **success** (17:07:08→17:07:39) · `2. Build + artifact` 41488045172 **success** (→17:07:27) · `3. Browser QA` 41488045102: Install · Build · Install Chromium success, **bước 7 `QA probe` failure** — probe lần đầu thực chạy trên runner Linux; chưa đọc được dòng lỗi (log API trả `403 Must have admin rights to Repository`) | mở run 41488045102 → job "golden path trên Chromium" → bước 7 (chỉ người giữ repo xem được) |
-| Điều kiện No-Go còn mở | **`Đã chạy`: CI trên GitHub** — hai cổng chặn merge `1. Quality` và `2. Build + artifact` **success** trên `66e0fea` (mục trên); `3. Browser QA` đỏ ở bước `QA probe` nhưng job không chặn (`continue-on-error: true`, `03-qa-browser.yml:30`). **`NotRun`: chưa có người lớn đọc to ≥1 bài/môn** trên bản phát hành. Còn 2 ô `NotRun` nữa trong `docs/plan/TEST_CASES.md` §5 (ảnh khoảnh `locked`, kiểm bằng bộ đọc màn hình) | `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?per_page=8` + tab Actions |
+| **CI trên commit được tag thật `77d90ce` + release đã tạo** | `1. Quality` 41490451023 **success** · `2. Build + artifact` 41490451085 **success** · `3. Browser QA` 41490451074 job failure ở bước 7 `QA probe` (run vẫn báo success vì `continue-on-error`) · **`4. Release` 41490669966 success** cả 9 bước (17:23:23Z→17:24:09Z) ⇒ đối tượng release thật: id `431754261` · tên "Kho Báu Tri Thức v1.1.0" · `draft false` · `prerelease false` · publish `2026-11-02T17:24:04Z` · ghi chú 80 435 byte sinh từ `scripts/release-notes.mjs` · asset `kho-bau-tri-thuc-1.1.0.zip` **1 369 166 byte**, **0 lượt tải**. Cũng trên commit này, `npm ci` + toàn bộ `npm run verify` **xanh trên Ubuntu runner** (bước 5+6 của workflow 04), không chỉ trên Windows | `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/releases/tags/v1.1.0` · `curl -s …/actions/runs/41490669966/jobs` — toàn bộ ở `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt` |
+| Điều kiện No-Go còn mở | **`Đã chạy`: CI trên GitHub** — cả ba cổng chặn merge `1. Quality` / `2. Build + artifact` / `4. Release` **success** trên `77d90ce` (mục trên); `3. Browser QA` đỏ ở bước `QA probe` nhưng job không chặn (`continue-on-error: true`, `03-qa-browser.yml:30`) và **dòng lỗi chưa đọc được** — API log trả `403 Must have admin rights to Repository`, chỉ người giữ repo mở được. **`NotRun`: chưa có người lớn đọc to ≥1 bài/môn** trên bản phát hành, và **chưa ai giải nén zip** `kho-bau-tri-thuc-1.1.0.zip` trên máy thật (0 lượt tải). Còn 2 ô `NotRun` nữa trong `docs/plan/TEST_CASES.md` §5 (ảnh khoảnh `locked`, kiểm bằng bộ đọc màn hình) | `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?per_page=8` + tab Actions |
 | Việc của người ký *(ghi trước khi ủy quyền — giữ nguyên làm biên bản)* | (1) mở PR `main` ← `feature/43-game-pause` (link ở `docs/issues/43-game-pause.md` §7), (2) squash-merge khi CI xanh, (3) tag **đúng HEAD của `main`** | `git fetch && git checkout main && git pull && git log -1 --format=%H && git tag -a v1.1.0 -m "Kho Báu Tri Thức — Lớp 1, bản 1.1.0 (KBT-ISSUE-43)" && git push origin v1.1.0` |
-| Hai bước (2)(3) đã làm thay ai, và bằng chứng nào gánh | Người dùng ra "tự động chọn khi tôi không ở đây" ⇒ agent merge `--no-ff` vào `main` (`7365830`), sửa flake làm cổng đỏ trên HEAD merge (`7d92246`), rồi tag. **Không đổi quyền ký:** §3 vẫn ghi người giữ repo là duy nhất ký Go/No-Go, mục "Biên mẫu (chưa ký lần nào)" vẫn trống. Release này là **phát hành kỹ thuật**: cổng máy + cổng CI chặn merge xanh, phần nghiệm thu người dùng vẫn mở | `git tag \| wc -l` = **1** · `git for-each-ref refs/tags/v1.1.0 --format='%(objectname) %(*objectname)'` · `git ls-remote --tags origin` |
+| Hai bước (2)(3) đã làm thay ai, và bằng chứng nào gánh | Người dùng ra "tự động chọn khi tôi không ở đây" ⇒ agent merge `--no-ff` vào `main` (`7365830`), sửa flake làm cổng đỏ trên HEAD merge (`7d92246`), tag lần đầu ở đó, rồi **xoá tag và tag lại** trên `77d90ce` sau khi hai sửa CI (`1b8dadd`, `66e0fea`) làm `4. Release` xanh. **Không đổi quyền ký:** §3 vẫn ghi người giữ repo là duy nhất ký Go/No-Go, mục "Biên mẫu (chưa ký lần nào)" vẫn trống. Release này là **phát hành kỹ thuật**: cổng máy xanh + `1`/`2` (hai job chặn merge) xanh + `4` (phát hành) xanh, phần nghiệm thu người dùng vẫn mở | `git tag \| wc -l` = **1** · `git for-each-ref refs/tags/v1.1.0 --format='%(objectname) %(*objectname)'` ⇒ `4f75f5d` / `77d90ce` · `git ls-remote --tags origin` |
 
 ## 4. Expand / Contract — đã có, đo được
 

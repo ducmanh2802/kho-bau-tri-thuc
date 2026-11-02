@@ -1,0 +1,55 @@
+BẰNG CHỨNG · release `v1.1.0` đã tồn tại trên GitHub (đo 2026-11-03, từ phiên đóng tag)
+
+1) TAG
+   `git tag | wc -l` = **1**
+   `git for-each-ref refs/tags/v1.1.0 --format='%(objectname) %(*objectname)'`
+     ⇒ tag object `4f75f5d3f65d7ad2fdf7d41ff71d823514046a6b` · commit `77d90ceb5440e6606c9b74f540b6fcef0d48a827`
+   `git ls-remote --tags origin` ⇒ `refs/tags/v1.1.0` = `4f75f5d…`, `refs/tags/v1.1.0^{}` = `77d90ce…`
+   Đây là **tag thứ hai** cho tên `v1.1.0`. Tag đầu (`6687667` → `7d92246`) đã xoá khỏi `origin`
+   vì CI của nó đỏ ở bước Install và workflow `4. Release` chưa tạo release nào — xem `ci-runs.txt`.
+
+2) CỔNG MÁY TRÊN ĐÚNG COMMIT ĐƯỢC TAG
+   `npm run verify` ⇒ **EXIT=0** · `Test Files 89 passed (89)` · `Tests 1278 passed (1278)` ·
+   `Duration 21.84s` · `Main chunk: index-B6au8G63.js = 204.2 kB → PASS (meets 450 kB goal)`
+   (cùng entry hash với `verify-release-head.txt` đo trên `7d92246`; hai commit chỉ khác tài liệu).
+
+3) CI PHÍA MÁY CHỦ TRÊN `77d90ce` — đọc qua API công khai, không cần `gh`
+   `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?per_page=6`
+     RUN 41490451023 | 1. Quality          | push | main   | completed/success
+     RUN 41490451085 | 2. Build + artifact | push | main   | completed/success
+     RUN 41490451074 | 3. Browser QA       | push | main   | completed/success  ← xem mục 4
+     RUN 41490669966 | 4. Release          | push | v1.1.0 | completed/success
+
+   `curl -s …/actions/runs/41490669966/jobs` — job "build và phát hành" => **success**
+   (17:23:23Z -> 17:24:09Z), từng bước:
+     2 Checkout (toàn bộ lịch sử để đọc CHANGELOG) => success
+     3 Resolve tag                                  => success
+     4 Setup Node                                   => success
+     5 Install                                      => success
+     6 Full gate (typecheck + tests + build + bundle budget) => success
+     7 Package dist                                 => success
+     8 Release notes from CHANGELOG                 => success
+     9 Create GitHub Release                        => success
+   ⇒ `npm ci` + toàn bộ `npm run verify` cũng chạy **xanh trên Ubuntu runner**, không chỉ trên Windows.
+
+4) Ô VẪN ĐỎ: `3. Browser QA`
+   `curl -s …/actions/runs/41490451074/jobs` ⇒ job "golden path trên Chromium" => **failure**
+   (17:21:51Z -> 17:23:35Z), bước 7 "QA probe" failure, các bước Install · Build · Install Chromium
+   success. Run vẫn kết luận `success` vì `continue-on-error: true` (`03-qa-browser.yml:30`).
+   Dòng lỗi cụ thể của probe **không đọc được** từ phiên này:
+   `GET …/actions/runs/41490451074/logs` ⇒ `403 Must have admin rights to Repository.`
+   Không sửa gì dựa trên suy đoán; việc cần làm là mở
+   https://github.com/ducmanh2802/kho-bau-tri-thuc/actions/runs/41490451074 → bước 7.
+
+5) ĐỐI TƯỢNG RELEASE THẬT (không còn là "chuẩn bị hồ sơ")
+   `curl -s …/releases/tags/v1.1.0`
+     id 431754261 · tag v1.1.0 · name "Kho Báu Tri Thức v1.1.0" · draft **false** · prerelease **false**
+     published_at 2026-11-02T17:24:04Z · target_commitish main
+     html_url https://github.com/ducmanh2802/kho-bau-tri-thuc/releases/tag/v1.1.0
+     body 80 435 byte (sinh từ `scripts/release-notes.mjs` theo workflow)
+     asset: `kho-bau-tri-thuc-1.1.0.zip` · **1 369 166 byte** · downloads 0
+
+6) NHỮNG GÌ RELEASE NÀY CHƯA CÓ
+   Chữ ký Go/No-Go trong `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3 vẫn **trống** (AI không có quyền
+   ký); `3. Browser QA` đỏ trên runner; UAT "người lớn đọc to ≥1 bài/môn" và 2 ô `NotRun` trong
+   `docs/plan/TEST_CASES.md` §5 vẫn mở. Phát hành này là **pass kỹ thuật**, chưa phải pass nghiệm thu.
