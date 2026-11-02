@@ -204,6 +204,25 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   `git show "99edd29:<đường-dẫn>"` (xem `docs/MASTER_ROADMAP.md` §"Cấu trúc docs/ sau khi gỡ prompt").
 
 ### Fixed
+- **Đồng hồ của DecisionEngine/LearningOS đọc giờ tường và UTC thay vì đồng hồ caller + lịch
+  địa phương (đợt T41B):** ba chỗ hỏng cùng một họ.
+  (1) `computeSubjectBalanceBoost` tự gọi `Date.now()` để cắt cửa sổ 14 ngày trong khi
+  `decide({ now })` đã nhận `now` từ caller ⇒ hợp đồng tất định (§32) bị phá: cùng một bộ bằng
+  liệu cho hai kết quả khác nhau ở hai thời điểm đọc, và test khoá `now` cố định thành ra vô nghĩa.
+  Nay hàm nhận `now: number` (và được `export` để test đồng hồ gọi trực tiếp), `decide()` truyền
+  `now` xuống.
+  (2) Báo cáo Ba Mẹ đóng khoá ngày bằng `new Date(now).toISOString().slice(0, 10)` — tức **UTC**,
+  trong khi `analytics.todayDate` do `storage.ts` ghi bằng `localDateKey`. Ở UTC+7 đồng hồ UTC
+  sang ngày mới lúc 07:00 giờ Việt Nam, nên bé học lúc 06:30 thì báo cáo vẫn tính vào hôm trước,
+  và "phút hôm nay" rơi về 0 dù vừa học xong (nhánh fallback `getAnalytics()` cũng so sai khoá).
+  `buildParentReport` và trường `today` nay dùng `localDateKey`, cùng quy tắc T01/B8 mà
+  `dateUtils.ts` đã ghi.
+  (3) Dòng "Hạn ôn tiếp theo:" trong phần giải thích cũng in `toISOString().slice(0, 10)` ⇒ một
+  hạn ôn buổi sáng hiển thị thành ngày hôm trước; đã đổi sang `localDateKey`.
+  Ngoài ra `LearningOS.generateDailyPlan` nhận `dateString` là ngày địa phương nhưng lại chấm
+  điểm và ghi `generatedAt` bằng `Date.now()` tự đọc ⇒ thêm tham số `now` (mặc định `Date.now()`),
+  `StorageService.refreshDailyPlan` đọc đồng hồ **một lần** rồi truyền cho cả nhãn ngày lẫn điểm
+  kỹ năng đến hạn, để kế hoạch tái lập được từng byte khi test cùng `now`.
 - **Công tắc "Toàn Bộ Phần Thưởng" của ba mẹ chặn không đều, và màn kết quả hứa sai (đợt T41A):**
   tắt quỹ thưởng mà bé vẫn tiêu được sao ở một số đường vào. `storage.ts` nay kiểm tra
   `areRewardsEnabled()` ở **mọi** chỗ phát tài nguyên — `completeLesson` (bài mới + luyện lại +5 XP),
@@ -482,6 +501,21 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
     `memory-card`, `karaoke-read-all` và `answer-option` + `data-correct` cho `spelling_duel`.
 
 ### Tests
+- `tests/t41b-decision-clock.test.ts` — **12 test** cho đồng hồ, ghim `process.env.TZ =
+  'Asia/Ho_Chi_Minh'` trong `beforeAll` (khôi tạo ở `afterAll`) để ngày địa phương có nghĩa:
+  cửa sổ 14 ngày của `computeSubjectBalanceBoost` tính từ `now` của caller (30 ngày trước ⇒ không
+  tăng cờ; mốc 13 vs 15 ngày biên giới cửa sổ), `decide` chạy lại hai lần cho kết quả từng byte
+  giống nhau và chỉ gắn `SUBJECT_BALANCE` cho môn bị bỏ đói, `parentReport.today` của mốc
+  00:30 sáng Việt Nam là ngày máy chứ không phải ngày UTC trước đó, "phút hôm nay" lấy được từ
+  `analytics` khi cùng ngày địa phương **dù** UTC còn là hôm trước, phiên tối qua (lịch VN) không
+  bị tính vào hôm nay, dòng "Hạn ôn tiếp theo:" in ngày địa phương, `plan.generatedFrom.generatedAt`
+  đúng bằng `now` truyền vào và một phiếu ôn đến hạn biến mất khi lùi `now` 9 ngày, cùng ba hợp
+  đồng nguồn chặn `Date.now() - 14 * DAY_MS`, `toISOString().slice(0, 10)`/`.split('T')[0]` và
+  `generateDailyPlan` tự đọc giờ tường.
+- `tests/decision-engine.test.ts` — thay test tautology của P39 (`expect(hasBalance === true ||
+  hasBalance === false)`) bằng **2 test thật**: một môn bị bỏ đói phải nhận `SUBJECT_BALANCE` khi
+  `now` rơi trong cửa sổ, và **không** nhận khi `now` tiến 30 ngày so với timestamp của bằng liệu. Test cũ luôn xanh vì mốc
+  `now = 2026-10-06` đã nằm ngoài cửa sổ 14 ngày tính theo giờ tường của máy.
 - `tests/t41a-parent-controls.test.ts` — **14 test** cho quyền kiểm soát của ba mẹ và luồng học:
   `completeLesson` trả `LessonAward` đúng tài nguyên thật (bài mới đủ XP/Sao/Vé, học lại chỉ +5 XP,
   không cấp lại Sao/Vé), **mọi** đường vào tài nguyên đều tôn trọng công tắc (bài học, rương chủ đề, rương

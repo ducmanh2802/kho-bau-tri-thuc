@@ -727,9 +727,13 @@ export class LearningOS {
     dateString: string = localDateKey(),
     fatigue?: SessionFatigueState,
     policyVersion: string = LEARNING_OS_POLICY.POLICY_VERSION,
-    trackActions: LearningAction[] = []
+    trackActions: LearningAction[] = [],
+    now: number = Date.now()
   ): DailyPlan {
-    const actions = this.getNextBestActions(knowledgeMap, fatigue, Date.now(), trackActions);
+    // `now` do caller truyền (T41B): kế hoạch gắn nhãn ngày `dateString` mà lại
+    // chấm điểm theo giờ tường thì kế hoạch hôm qua và hôm nay khác nhau chỉ vì
+    // thời điểm đọc, và `generatedAt` làm hỏng khả năng tái lập từng byte.
+    const actions = this.getNextBestActions(knowledgeMap, fatigue, now, trackActions);
 
     const selectedItems: DailyPlanItem[] = [];
     let totalMinutes = 0;
@@ -785,7 +789,7 @@ export class LearningOS {
       generatedFrom: {
         knowledgeVersion: 1,
         policyVersion,
-        generatedAt: Date.now(),
+        generatedAt: now,
       },
     };
   }

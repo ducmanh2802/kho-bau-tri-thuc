@@ -14,8 +14,10 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1202 test / 85 file,
-   203.4 kB entry + 417.8 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-02** — lần cuối ngay sau
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1215 test / 86 file,
+   203.5 kB entry + 417.8 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-02** — lần cuối ngay sau
+   T41B (DecisionEngine + LearningOS chỉ dùng đồng hồ do caller truyền: cửa sổ cân bằng
+   môn 14 ngày tính từ `now`, báo cáo Ba Mẹ dùng ngày lịch địa phương thay vì ngày UTC),
    T41A (công tắc phần thưởng của ba mẹ chặn đúng tài nguyên ở tầng service, màn kết quả
    in đúng phần thưởng vừa cấp, CTA trang Chủ mở thẳng bài được gợi ý, "Vì sao gợi ý này?"
    tới tab Phân Tích, đồng hồ thời lượng màn hình không tính lúc tab ẩn),

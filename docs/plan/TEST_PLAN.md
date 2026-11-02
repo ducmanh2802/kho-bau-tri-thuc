@@ -5,9 +5,9 @@
 > coi là xanh**. Danh sách yêu cầu cần kiểm: [`SRS.md`](../specs/SRS.md); ánh xạ
 > yêu cầu ↔ test ↔ probe ↔ gate: [`RTM.md`](../specs/RTM.md); quy trình: [`../SDLC.md`](../SDLC.md).
 >
-> **Số liệu chốt 2026-11-02** (đo lại sau T41A — công tắc phần thưởng chặn đúng tài nguyên, màn kết quả in đúng phần thưởng thật, CTA trang Chủ mở thẳng bài gợi ý; trước đó là T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, T39 cắt lần tải đầu): 85 file test / 1202 test ·
-> 29 probe (28 `.mjs` + 1 `.cjs`) · 4 workflow CI · 3 git hook · main chunk `index-NKVSigwn.js`
-> 203.4 kB / trần 600 kB / **mục tiêu 450 kB đã đạt**; đồ thị chặn lần vẽ đầu 417.8 kB (trần 500 kB
+> **Số liệu chốt 2026-11-02** (đo lại sau T41B — cửa sổ cân bằng môn và nhãn ngày trong báo cáo Ba Mẹ theo đồng hồ của caller + lịch địa phương; trước đó là T41A công tắc phần thưởng chặn đúng tài nguyên, T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, T39 cắt lần tải đầu): 86 file test / 1215 test ·
+> 29 probe (28 `.mjs` + 1 `.cjs`) · 4 workflow CI · 3 git hook · main chunk `index-3JbOfu7h.js`
+> 203.5 kB / trần 600 kB / **mục tiêu 450 kB đã đạt**; đồ thị chặn lần vẽ đầu 417.8 kB (trần 500 kB
 > do `tests/t39-first-load-graph.test.ts` giữ); vendor ngoài entry và ngoài boot graph: `three-vendor` 572.6 kB, `firebase-vendor` 723.0 kB.
 
 ---
@@ -36,7 +36,7 @@ Lớp 5  Người lớn đọc to + beta trẻ thật          → §11   (2 phi
 Lớp 4  Thiết bị thật: Android/iOS, offline, audio → §7    (qa/mobile.mjs + tay người)
 Lớp 3  Probe trình duyệt trên dist/ (29 probe)    → §6    (npm run qa:smoke)
 Lớp 2  Build + ngân sách + precache               → §9    (npm run build && npm run check:budget)
-Lớp 1  Unit/integration Vitest (1202 test)        → §5    (npm run test:ci)
+Lớp 1  Unit/integration Vitest (1215 test)        → §5    (npm run test:ci)
 ────────────────────────────────────────────────────────────────────────────────────────────
               npm run verify = typecheck + Lớp 1 + Lớp 2   ← cổng duy nhất
 ```
@@ -195,6 +195,7 @@ không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại 
 | Field lạ | payload có key không có trong schema ⇒ sanitizer loại bỏ, phần hợp lệ giữ nguyên | `tests/kidbox-learning-os.test.ts`, `tests/t14c-storage.test.ts` |
 | Migration | `P28-v1` và `P29-v2` đọc lên `P43-v1`; `schemaVersion` được ghi lại đúng; **không** tính lại mastery; khoá `rf_rf_*` được gộp an toàn về `rf_*` | `tests/exam-fidelity.test.ts:84`+, `tests/t18a-motivation.test.ts`, `tests/reading-fluency.test.ts`, `tests/t40-parent-facing-ids.test.ts` |
 | Ngày ảo | `2026-13-99` bị `isRealDateKey` loại (first-seen / tree-water / review-days) | `tests/t14c-storage.test.ts` |
+| Đồng hồ & tất định | cửa sổ 14 ngày của cân bằng môn tính theo `now` của caller (13 ngày ⇒ không tăng cờ, 15 ngày ⇒ có); `decide` lặp lại cho kết quả từng byte giống nhau; mọi nhãn ngày dùng lịch địa phương (UTC+7), không `toISOString()` | `tests/t41b-decision-clock.test.ts` |
 | Idempotency 5 tầng | evidence id lặp; first-seen; nonce; completion; reward delta | `tests/personas-and-learning-os.test.ts`, `tests/lesson-completion.test.ts`, `tests/game-rewards.test.ts` |
 | Cap bộ nhớ | `recentEvidences` ≤ 200; `examResults` có trần | `tests/fatigue-reset.test.ts`, `tests/competition-readiness.test.ts` |
 | Quota đầy | **CHƯA có test** — task B6 | — |
@@ -213,7 +214,7 @@ không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại 
 | Precache | `tests/sw-precache.test.ts`, `qa/offline-pwa.mjs` | manifest đủ `/assets/*`; placeholder dev ⇒ danh sách rỗng nhưng SW vẫn sống | — |
 | Loại trừ | `node_modules`, `.git`, `dist` không vào manifest | — | — |
 
-**Số đo gần nhất (2026-11-02, sau T41A):** `index-NKVSigwn.js = 203.4 kB` → PASS trần 600 kB và **đã đạt** mục tiêu 450 kB (T39). Boot graph: 417.8 kB (3 file).
+**Số đo gần nhất (2026-11-02, sau T41B):** `index-3JbOfu7h.js = 203.5 kB` → PASS trần 600 kB và **đã đạt** mục tiêu 450 kB (T39). Boot graph: 417.8 kB (3 file).
 
 ---
 
@@ -259,6 +260,7 @@ không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại 
 | Đáp án MC luôn nằm ở `options[0]` (exploit "chọn A") | `placeAnswer` round-robin (`P36`) | `tests/competition-p36.test.ts` |
 | Đọc số 70 sai ("muoi" → "mươi") | sửa data Toán | `tests/math-t11c.test.tsx`, `tests/math-typography.test.ts` |
 | Ngày ảo `2026-13-99` lọt vào first-seen/tree/review | `isRealDateKey` | `tests/t14c-storage.test.ts` |
+| Hạn ôn và ngày báo cáo Ba Mẹ lệch một ngày vì `toISOString().split('T')[0]` (ở UTC+7, ngày mới bắt đầu từ 07:00); cửa sổ cân bằng môn đọc giờ tường nên `decide({now})` không tái lập | `localDateKey` + tham số `now` của caller xuyên qua `decisionEngine.ts` / `learningOS.ts` | `tests/t41b-decision-clock.test.ts` |
 | `run-one.mjs` exit 1 cả khi probe sạch | chỉ exit khi `errors[]`/`ok:false` | chạy thật `node qa/run-one.mjs qa/t02-smoke.mjs` |
 | Cạnh dưới bàn cờ 3D bị cắt, nhãn "sông" nhoè | padding `.ct-scene`, nhãn ra lớp HTML | screenshot + `docs/cotuong.md` |
 

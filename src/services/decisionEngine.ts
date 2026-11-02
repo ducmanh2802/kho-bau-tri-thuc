@@ -58,6 +58,7 @@ import { getAllSkills } from '../data/curriculum';
 import { buildKidBoxActions, getCurrentUnit, getKnowledgeSnapshot, getContentSourceSummary, KIDBOX_TRACK_ID } from './kidBoxEngine';
 import { KidBoxStore } from './kidBoxStore';
 import { StorageService } from './storage';
+import { localDateKey } from './dateUtils';
 import { CompetitionEngine } from './competitionEngine';
 import { findLessonById } from '../data/curriculum';
 import { getBlueprintById } from '../data/competitionBlueprints';
@@ -512,7 +513,9 @@ function buildExplanation(
       `Trạng thái: ${describeKnowledgeStatus(skillState.status)} · Dữ liệu: ${describeEvidenceQuality(skillState.quality)} · Độ mới: ${describeEvidenceFreshness(skillState.freshness)}`
     );
     if (skillState.nextReviewAt) {
-      evidenceLines.push(`Hạn ôn tiếp theo: ${new Date(skillState.nextReviewAt).toISOString().slice(0, 10)}`);
+      // Ngày hiển thị cho ba mẹ ở Việt Nam (UTC+7): dùng lịch địa phương, nếu
+      // không một hạn ôn buổi sáng sẽ bị in thành ngày hôm trước.
+      evidenceLines.push(`Hạn ôn tiếp theo: ${localDateKey(new Date(skillState.nextReviewAt))}`);
     }
   } else {
     evidenceLines.push('Chưa có hồ sơ kỹ năng chi tiết cho hoạt động này — dựa trên lịch sử hoạt động tổng thể.');
@@ -588,10 +591,16 @@ function mapCompetitionReadiness(assessment: ReadinessAssessment | null | undefi
 /* Subject balance                                                      */
 /* ------------------------------------------------------------------ */
 
-function computeSubjectBalanceBoost(
+/**
+ * Điểm mất cân bằng môn theo **đồng hồ của caller**. Xuất ra cho test đồng hồ
+ * (T41B) — cùng bằng liệu nhưng `now` khác nhau phải cho kết quả khác nhau một
+ * cách xác định, không phụ thuộc giờ tường của máy chạy test.
+ */
+export function computeSubjectBalanceBoost(
   knowledgeMap: Record<string, KnowledgeState>,
   recentEvidences: LearningEvidence[],
-  history: DecisionInput['recommendationHistory']
+  history: DecisionInput['recommendationHistory'],
+  now: number
 ): Partial<Record<SubjectType, number>> {
   const attempts: Record<SubjectType, number> = {
     'tieng-viet': 0,
@@ -601,7 +610,10 @@ function computeSubjectBalanceBoost(
   };
 
   // Prefer real evidence timestamps; fall back to knowledge state counts.
-  const windowStart = Date.now() - 14 * DAY_MS;
+  // `now` là đồng hồ do caller truyền (decide({now})) — tự đọc Date.now() ở đây
+  // sẽ làm cùng một dữ liệu cho ra hai kết quả khác nhau giữa hai lần gọi, tức
+  // phá hợp đồng tất định §32 và khiến test không thể tái lập.
+  const windowStart = now - 14 * DAY_MS;
   for (const ev of recentEvidences) {
     if (typeof ev.timestamp === 'number' && ev.timestamp >= windowStart) {
       attempts[ev.subject] = (attempts[ev.subject] ?? 0) + 1;
@@ -942,7 +954,8 @@ export class DecisionEngine {
     const subjectBalanceBoost = computeSubjectBalanceBoost(
       evidence.knowledgeMap,
       evidence.recentEvidences,
-      input.recommendationHistory
+      input.recommendationHistory,
+      now
     );
 
     const readiness = mapCompetitionReadiness(evidence.competitionReadiness);
@@ -1431,12 +1444,15 @@ export class DecisionEngine {
       }));
 
     // Activity minutes today from real evidence timestamps.
-    const todayStart = new Date(now).toISOString().slice(0, 10);
+    // Khoá ngày phải là lịch **địa phương**: `analytics.todayDate` do storage ghi
+    // bằng localDateKey, nên so với khoá UTC thì trước 07:00 ở Việt Nam báo về
+    // "0 phút hôm nay" dù bé vừa học xong.
+    const todayKey = localDateKey(new Date(now));
     let activityMinutesToday = 0;
     for (const ev of evidence.recentEvidences) {
       if (!ev.timestamp) continue;
-      const evDay = new Date(ev.timestamp).toISOString().slice(0, 10);
-      if (evDay !== todayStart) continue;
+      const evDay = localDateKey(new Date(ev.timestamp));
+      if (evDay !== todayKey) continue;
       // Approximate: each evidence ~30s of focused practice when timed.
       activityMinutesToday += ev.responseTimeMs ? ev.responseTimeMs / 60000 : 0.5;
     }
@@ -1444,7 +1460,7 @@ export class DecisionEngine {
     if (activityMinutesToday === 0 && evidence.totalAttempts > 0) {
       try {
         const analytics = StorageService.getAnalytics();
-        if (analytics.todayDate === todayStart) {
+        if (analytics.todayDate === todayKey) {
           activityMinutesToday = analytics.minutesToday || 0;
         }
       } catch {
@@ -1486,7 +1502,7 @@ export class DecisionEngine {
             : 'Hệ thống đang chờ thêm dữ liệu để đưa ra gợi ý chính xác hơn.';
 
     return {
-      today: new Date(now).toISOString().slice(0, 10),
+      today: localDateKey(new Date(now)),
       headline,
       strengths,
       needsWork,

@@ -501,16 +501,38 @@ describe('P39 — subject balance & starvation', () => {
     }));
     const output = DecisionEngine.decide({
       ...coldStartInput(),
-      knowledgeMap: { vn_alphabet: strongVietState() },
+      knowledgeMap: { vn_alphabet: strongVietState(), math_subtraction_10: weakMathState() },
       recentEvidences: dominatedViet,
       now: NOW,
     });
-    const hasBalance = output.recommendations.some((r) =>
-      r.reasonCodes.includes('SUBJECT_BALANCE')
-    );
-    // May or may not appear depending on curriculum candidates — must not crash.
-    expect(Array.isArray(output.recommendations)).toBe(true);
-    expect(hasBalance === true || hasBalance === false).toBe(true);
+    // Assertion cũ chỉ là `hasBalance === true || false` — luôn đúng nên che mất
+    // việc engine đọc giờ tường chứ không đọc `now`. Giờ kiểm tra đích: môn bị bỏ
+    // đói (toán) phải mang lý do cân bằng môn, môn đang saturate thì không.
+    const toan = output.recommendations.filter((r) => r.subject === 'toan');
+    expect(toan.length).toBeGreaterThan(0);
+    expect(toan.some((r) => r.reasonCodes.includes('SUBJECT_BALANCE'))).toBe(true);
+    expect(
+      output.recommendations.some((r) => r.subject === 'tieng-viet' && r.reasonCodes.includes('SUBJECT_BALANCE'))
+    ).toBe(false);
+  });
+
+  it('thôi không cân bằng khi bằng liệu đã ra ngoài cửa sổ 14 ngày', () => {
+    const dominatedViet = Array.from({ length: 8 }, (_, i) => ({
+      id: `ev_vn_${i}`,
+      learnerId: 'child_1',
+      source: 'LESSON' as const,
+      skillId: 'vn_alphabet',
+      subject: 'tieng-viet' as SubjectType,
+      timestamp: NOW - i * 1000,
+      correct: true,
+    }));
+    const output = DecisionEngine.decide({
+      ...coldStartInput(NOW + 30 * DAY),
+      knowledgeMap: { vn_alphabet: strongVietState(), math_subtraction_10: weakMathState() },
+      recentEvidences: dominatedViet,
+      now: NOW + 30 * DAY,
+    });
+    expect(output.recommendations.some((r) => r.reasonCodes.includes('SUBJECT_BALANCE'))).toBe(false);
   });
 });
 

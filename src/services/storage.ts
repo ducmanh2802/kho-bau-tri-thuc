@@ -574,11 +574,15 @@ export class StorageService {
   /** Regenerates and persists today's plan from current evidence. */
   public static refreshDailyPlan(dateString: string = getTodayString()): DailyPlan {
     const store = StorageService.getLearningOSStore();
+    // Một lần đọc đồng hồ cho cả nhãn ngày lẫn điểm kỹ năng đến hạn (T41B).
+    const now = Date.now();
     const plan = LearningOS.generateDailyPlan(
       store.knowledgeStates,
       dateString,
       store.fatigue,
-      LEARNING_OS_POLICY.POLICY_VERSION
+      LEARNING_OS_POLICY.POLICY_VERSION,
+      [],
+      now
     );
     store.dailyPlan = plan;
     StorageService.saveLearningOSStore(store);
