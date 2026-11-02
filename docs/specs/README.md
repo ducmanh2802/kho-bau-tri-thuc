@@ -15,11 +15,13 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1286 test / 90 file,
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1287 test / 90 file,
    204.2 kB entry + 418.6 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
-   ngay sau đợt sửa "đề cổng phụ huynh vẽ muộn hơn khung hình đầu" (5 test mới trong
-   `tests/t41f-parent-gate.test.ts` ⇒ 1286 test; `src/` đổi nên entry là `index-TgwkX59u.js` dù kB
-   vẫn 204.2); hai đợt đo trước cùng ngày: sửa race màn chúc mừng lên cấp trong `qa/lib.mjs` rồi khoá bước
+   ngay sau đợt bỏ cờ `continue-on-error` của job "3. Browser QA" (1 test hợp đồng mới trong
+   `tests/t31-bug-hunt-fixes.test.ts` ⇒ 1287 test; `src/` không đổi nên entry vẫn `index-TgwkX59u.js` và kB
+   vẫn 204.2); các đợt đo trước cùng ngày: sửa "đề cổng phụ huynh vẽ muộn hơn khung hình đầu" (5 test mới
+   `tests/t41f-parent-gate.test.ts` ⇒ 1286 test, `src/` đổi nên entry **đổi hash** dù kB không đổi), và
+   sửa race màn chúc mừng lên cấp trong `qa/lib.mjs` rồi khoá bước
    "QA probe" của workflow `03` bằng `tee probe-run.log` (3 test hợp đồng mới trong
    `tests/t31-bug-hunt-fixes.test.ts`, khi đó `src/` không đổi nên hash entry giữ nguyên); lần đo
    trước đó là **2026-11-02**, ngay sau merge release `7365830` (nhánh KBT-ISSUE-43 vào `main`) kèm bản sửa flake theo giờ trong

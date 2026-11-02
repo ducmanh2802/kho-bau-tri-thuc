@@ -16,6 +16,25 @@ asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện 
 `77d90ce`; tag đầu `6687667` ở `7d92246` đã xoá vì CI đỏ ở Install. Chữ ký Go/No-Go của người giữ repo
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
+### Changed
+- **Đã xoá cờ `continue-on-error` của job `qa-smoke` — `3. Browser QA` từ đây là cổng chặn thật.**
+  Điều kiện bỏ cờ ghi ngay trong comment của `.github/workflows/03-qa-browser.yml` ("xanh liên tiếp
+  vài lần trên main") và trong `docs/lifecycle/07_RELEASE_OPERATIONS.md` §2; cổng đạt **ba lượt xanh
+  liên tiếp**: `2d2ca27` run 41515106575 (66 s) · `c9fd2b4` run 41516820864 (127 s) · `eb4b7b2`
+  run 41518983585 (job 125529796579, `2026-11-02T20:25:03Z` → `20:26:12Z` = **69 s**, bước 7 "QA
+  probe" `success` / bước 8 chẩn đoán `skipped`) ⇒ tổng **4/10 lượt xanh**. Test hợp đồng viết
+  **trước** bản sửa: `tests/t31-bug-hunt-fixes.test.ts` đọc YAML, cắt riêng khối job `qa-smoke` và
+  cấm khoá `continue-on-error:` ở đầu dòng (RED `1 failed \| 21 passed (22)`); vì thế assertion là
+  regex khoá YAML chứ không phải chuỗi trần — comment mới vẫn *kể tên* cờ để giải thích lịch sử.
+  Sửa net **+1 dòng** nên con trỏ annotation `line=59` phải thành `line=60`; đã in lại dòng 59–61
+  để xác nhận nó vẫn chỉ đúng bước `tee probe-run.log` (annotation chỉ sai dòng còn hại hơn không
+  có annotation). **Chưa chứng minh được:** chưa từng thấy một lần probe đỏ *thật* bị cổng chặn,
+  nên ô 13 của `docs/plan/TEST_PLAN.md` §16 vẫn MỞ; lượt CI chạy trên chính commit bỏ cờ là lần đầu
+  probe đi không có lưới. Bằng chứng: `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §9 và
+  `evidence/2026-11-03-QA-RACE/verify-1287.txt` (`npm run verify` EXIT=0 · 90 file / **1287** test ·
+  `Duration 22.09s` · `Main chunk: index-TgwkX59u.js = 204.2 kB → PASS`, `src/` không đổi nên cả hash
+  lẫn kB đứng nguyên).
+
 ### Fixed
 - **Đề của "Cổng Xác Nhận Phụ Huynh" sinh sau khi vẽ — lỗi ứng dụng thật, không phải của probe.**
   Run 41508824890 (`80c7e39`) chết ở dòng bấm "Đấu Trường Thi Thử" trong `qa/lib.mjs`, timeout 12 s.
@@ -39,6 +58,10 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   (run 41516820864, job 125522382222) cũng `success` sau 127 s ⇒ cổng đạt **3/9 lượt xanh và là 2 lượt
   liên tiếp đầu tiên**; `continue-on-error: true` vẫn giữ theo `03-qa-browser.yml:29` ("xanh liên tiếp
   vài lần") — dự kiến bỏ ở đợt push kế tiếp nếu vẫn xanh.
+  *(Bổ sung đợt bốn: vế "**vẫn giữ**" **đã lỗi thời** — lượt thứ ba `eb4b7b2` (run 41518983585, 69 s)
+  khép chuỗi **ba lượt liên tiếp** nên cờ **đã bị xoá** ngay sau commit đó; tỷ lệ hiện trạng là
+  **4/10 lượt xanh**, không phải 3/9. Xem mục `### Changed` đầu file và
+  `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §9.)*
 - **`3. Browser QA` chưa từng xanh trên CI — nguyên nhân thật là race overlay, không phải app.**
   Bốn lần chạy đỏ ở bước "QA probe" (41488045102 `66e0fea` · 41490451074 `77d90ce` ·
   41493791252 `2db8715` · 41496530836 `e777457`) và không ai đọc được dòng lỗi vì

@@ -47,7 +47,7 @@ thì để trống và ghi lý do — không viết "sẽ làm".
 | Quality gate | `npm run verify` EXIT=0; UI đổi phải có ảnh/probe; test phải chứng minh bắt được lỗi | [`evidence/2026-11-02-T41C/`](../../evidence/README.md) · [`evidence/2026-11-02-KBT-ISSUE-43/`](../../evidence/README.md) |
 | AI Level | **Mức 2** — AI sinh test, expected lấy từ AC do người duyệt. *Deviation:* ở các đợt sớm người duyệt không tách AC 3 nhánh ⇒ xem `06_VERIFICATION_VALIDATION.md` §4 | `TEST_CASES.md` §2 |
 | RACI | R: agent · A: người giữ repo quyết oracle · C: — | — |
-| Metrics | 90 test file / 1286 test / suite 22.18 s · 30 probe · 5 phép ablation làm đỏ đúng test | `verify-1286.txt` (đo 2026-11-03, mới nhất) · `verify-1281.txt` · `verify-1280.txt` · `verify-main-1278.txt` · `verify-rc.txt` · `mutation-M*.txt` |
+| Metrics | 90 test file / 1287 test / suite 22.09 s · 30 probe · 5 phép ablation làm đỏ đúng test | `verify-1287.txt` (đo 2026-11-03 đợt bốn, mới nhất) · `verify-1286.txt` · `verify-1281.txt` · `verify-1280.txt` · `verify-main-1278.txt` · `verify-rc.txt` · `mutation-M*.txt` |
 
 ### Pha 5 — Release (Phát hành)
 

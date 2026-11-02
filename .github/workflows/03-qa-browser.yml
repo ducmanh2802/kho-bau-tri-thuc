@@ -24,10 +24,11 @@ jobs:
     name: golden path trên Chromium
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    # Giai đoạn chuyển tiếp: probe QA từng chỉ chạy trên máy dev (đường dẫn Chromium
-    # hardcode), nên chưa chắc xanh ổn định trên runner. Job này BÁO LỖI nhưng chưa
-    # chặn merge. Xoá dòng `continue-on-error` khi nó xanh liên tiếp vài lần trên main.
-    continue-on-error: true
+    # Giai đoạn chuyển tiếp ĐÃ KHÉP: job này từng mang `continue-on-error: true` vì probe chỉ
+    # chạy trên máy dev (đường dẫn Chromium hardcode) — hệ quả là mọi lần probe chết vẫn báo
+    # run success (xem run 41487472845). Ba lượt xanh liên tiếp trên `main` (`2d2ca27` run
+    # 41515106575 · `c9fd2b4` run 41516820864 · `eb4b7b2` run 41518983585) là điều kiện đã chốt
+    # trong `07_RELEASE_OPERATIONS.md` §2 để bỏ cờ ⇒ từ đây probe đỏ làm **đỏ cả run**.
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -102,7 +103,7 @@ jobs:
           emit() {
             m="$1"
             m="${m//$'\r'/}"; m="${m//%/%25}"; m="${m//#/%23}"; m="${m//$'\n'/%0A}"
-            echo "::error file=.github/workflows/03-qa-browser.yml,line=59::$PROBE :: ${m:0:3000}"
+            echo "::error file=.github/workflows/03-qa-browser.yml,line=60::$PROBE :: ${m:0:3000}"
           }
           emit "$summ"
           emit "$(tail -c 900 probe-run.log) || $ctx"

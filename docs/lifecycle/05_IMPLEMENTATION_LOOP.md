@@ -67,7 +67,7 @@ Output       : diff + output `npx vitest run <file>` nguyên văn + số đo tr�
 |---|---|
 | `AGENTS.md` (mệnh lệnh + bất biến) | `scripts/hooks/pre-commit` (typecheck), `commit-msg` (chuẩn message), `pre-push` (`verify:quick`) |
 | skill `kho-bau-mini-game-integration`, `kho-bau-measure-sync` | 4 workflow `.github/workflows/01…04` |
-| 5 MCP server trong `mcp/` (27 tool) | 1286 test, trong đó có **source-contract test** đọc file nguồn bằng regex |
+| 5 MCP server trong `mcp/` (27 tool) | 1287 test, trong đó có **source-contract test** đọc file nguồn bằng regex |
 | bộ docs `docs/specs` + `docs/lifecycle` | `npm run check:budget` chặn hồi quy dung lượng |
 
 Danh mục đầy đủ và cách chạy: [`HARNESS.md`](HARNESS.md).

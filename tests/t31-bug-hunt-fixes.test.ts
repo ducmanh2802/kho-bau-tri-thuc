@@ -118,6 +118,18 @@ describe('T31 — sửa lỗi tìm được khi quét toàn bộ probe', () => {
       expect(probeStep).toContain('PIPESTATUS[0]');
     });
 
+    it('CI: job QA thôi continue-on-error — từ đây probe đỏ làm đỏ cả run', () => {
+      // Cờ `continue-on-error: true` từng biến MỌI lần job failure thành run success
+      // (phát hiện ở run 41487472845): không probe nào thật sự chặn được merge. Nó chỉ đáng
+      // tồn tại trong giai đoạn chuyển tiếp, và giai đoạn đó đã khép sau ba lượt xanh liên
+      // tiếp trên `main` (`2d2ca27` run 41515106575 · `c9fd2b4` run 41516820864 · `eb4b7b2`
+      // run 41518983585). Test này giữ cho cờ không quay lại.
+      const wf = read('.github/workflows/03-qa-browser.yml');
+      const jobHeader = wf.slice(wf.indexOf('qa-smoke:'), wf.indexOf('    steps:'));
+      expect(jobHeader).not.toMatch(/^\s*continue-on-error\s*:/m);
+      expect(jobHeader).toContain('timeout-minutes: 25');
+    });
+
     it('focus: nhận diện nút bài học bằng data-testid', () => {
       const src = read('qa/focus.mjs');
       expect(src).toContain('triggerTestId');
