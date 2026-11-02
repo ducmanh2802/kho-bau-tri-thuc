@@ -5,7 +5,9 @@
 `useEffect` nên khung hình đầu vẽ đề mồi "15 + 18" (MutationObserver: 9/9 lần mở, đề thật đến sau
 5–114 ms). Đã sửa `ParentDashboardModal.tsx` (`useMemo` + reset tại render) và cho probe tự vệ
 (`unlockParentDashboard` trong `qa/lib.mjs` — nộp rồi **chờ cổng đóng**). 4/4 `golden-path` xanh,
-`focus`/`mobile-golden` xanh, `verify` EXIT=0 — **chưa có run CI trên commit chứa bản sửa**.
+`focus`/`mobile-golden` xanh, `verify` EXIT=0. **`3. Browser QA` đã xanh trên đúng commit chứa bản
+sửa** (run 41515106575 / job 125516556497, bước 7 "QA probe" success sau 66 s) — lượt xanh thứ hai
+của cổng, lượt đầu tiên có fix app bên trong; `continue-on-error` vẫn bật vì mới hai lượt.
 Cập nhật trước đó: 2026-11-03 (đợt hai) — xanh lần đầu trên `afb9eeb` rồi đỏ lại trên `8e6f9f5`
 docs-only ⇒ cổng QA intermittent; (đợt một) P42/T01 hotfix certified 2026-10-14.
 
@@ -69,7 +71,7 @@ Go/No-Go vẫn thuộc người giữ repo** (`docs/lifecycle/07_RELEASE_OPERATI
 | 3 | `useGameStage.pausedByUser` + `isGameClockRunning`, nút tạm cho 4 trò `REALTIME_GAME_IDS` | XONG — RED `24 failed \| 6 passed` trước, `30 passed` sau |
 | 4 | `evidence/2026-11-02-KBT-ISSUE-43/` — `verify.txt` + `verify-release-prep.txt`, 3 ảnh, 3 log ablation M3/M4/M5 (M1–M2 ở đợt T41C), `probe-game-pause.json` + `probe-qa-smoke.txt` + `probe-qa-games.txt`, `red-before-fix.txt` | XONG |
 | 5 | Review 4 lớp §6 + thân PR đã điền số đo §7 | XONG — CI đã chạy trên `main` (xem §6 dưới); không có PR object vì máy không có `gh` CLI |
-| 6 | `CHANGELOG [1.1.0] - 2026-11-02`, `package.json`/lock `1.1.0`, tag `v1.1.0` đẩy lên `origin` | **ĐÃ LÀM** — merge `--no-ff` `7365830`, tag hiện hành `4f75f5d` → `77d90ce`; `4. Release` 41490669966 success ⇒ release id `431754261` + asset 1 369 166 byte; **chưa ký Go/No-Go**. `3. Browser QA` từng đỏ ở bước `QA probe` trên Linux qua bốn run; đã bắt đúng nguyên nhân (probe đếm tức thời một modal `React.lazy` chưa mount) và sửa trên `afb9eeb` ⇒ xanh **lần đầu** run 41501753363 (`check-run conclusion=success`, bước 7 "QA probe" `conclusion=success`) — nhưng **đỏ lại** run 41504913606 trên `8e6f9f5` (đợt docs-only, `src/` và `qa/` không đổi) ⇒ probe **intermittent**, chưa đóng. Bản sửa nằm **sau** tag nên điều kiện No-Go của `v1.1.0` vẫn mở |
+| 6 | `CHANGELOG [1.1.0] - 2026-11-02`, `package.json`/lock `1.1.0`, tag `v1.1.0` đẩy lên `origin` | **ĐÃ LÀM** — merge `--no-ff` `7365830`, tag hiện hành `4f75f5d` → `77d90ce`; `4. Release` 41490669966 success ⇒ release id `431754261` + asset 1 369 166 byte; **chưa ký Go/No-Go**. `3. Browser QA` từng đỏ ở bước `QA probe` trên Linux qua bốn run; đã bắt đúng nguyên nhân (probe đếm tức thời một modal `React.lazy` chưa mount) và sửa trên `afb9eeb` ⇒ xanh **lần đầu** run 41501753363 (`check-run conclusion=success`, bước 7 "QA probe" `conclusion=success`) — nhưng **đỏ lại** run 41504913606 trên `8e6f9f5` (đợt docs-only, `src/` và `qa/` không đổi) ⇒ probe **intermittent**, chưa đóng. **Cập nhật đợt ba:** nguyên nhân thật là lỗi app (đề cổng phụ huynh sinh sau paint), đã sửa trong `1afda69` và `3. Browser QA` **xanh trên `2d2ca27`** (run 41515106575) ⇒ ô này đóng. Bản sửa nằm **sau** tag nên điều kiện No-Go của `v1.1.0` vẫn mở |
 
 Số hiện trạng lane này để lại (đo 2026-11-03 đợt ba trên working tree = HEAD `80c7e39` + sửa
 `src/components/parent/ParentDashboardModal.tsx` + `qa/lib.mjs`/`golden-path.mjs`/`focus.mjs`/`mobile-golden.mjs`
@@ -91,7 +93,8 @@ từng ghi "QA PASS"; xem `evidence/2026-11-03-QA-RACE/ci-flake-second-run.txt`)
 (run 41504913606, bước 7 failure / bước 8 success) đã bị chính cái bẫy đó che; bản sửa `tee probe-run.log` +
 `PIPESTATUS[0]` đã merge thành `80c7e39` và **lập tức ăn tiền**: run 41508824890 giao payload thật, nhờ đó tìm ra
 lỗi ứng dụng "đề cổng phụ huynh vẽ muộn" (mục trên đầu file này) — chi tiết ở
-`evidence/2026-11-03-QA-RACE/ci-gate-race.txt`. **Chưa có run CI nào trên commit chứa bản sửa đó.**
+`evidence/2026-11-03-QA-RACE/ci-gate-race.txt`. **CI đã xanh trên commit chứa bản sửa** (`2d2ca27`,
+run 41515106575, bước 7 "QA probe" `success` 66 s) — xem §6 của chính file evidence đó.
 Việc còn mở của repo (không thuộc lát
 cắt này): T41D (merge cloud sync + race đăng nhập), T41E (cổng QA + service worker — `3. Browser QA`
 mới xanh **một** lần và đỏ lại **hai** lần nên `continue-on-error: true` vẫn để nguyên, và service worker chưa kiểm sau đổi probe),

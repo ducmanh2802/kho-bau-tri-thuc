@@ -218,7 +218,11 @@ giữ `isPaused` làm state riêng, không prop nào xuống `useGameStage`, nê
       trả lời sai, bảng không mở nên nút kia không tồn tại. Đã sửa trong `src/components/parent/ParentDashboardModal.tsx`
       (sinh đề bằng `useMemo` ngay lúc vẽ) + helper `unlockParentDashboard` trong `qa/lib.mjs` (probe phải xác nhận
       cổng đã đóng), khoá bằng `tests/t41f-parent-gate.test.ts`; trên máy `golden-path` **4/4 lần liên tiếp** xanh.
-      **Vẫn chưa có run CI nào trên commit chứa bản sửa** ⇒ ô này còn mở. Xem `evidence/2026-11-03-QA-RACE/ci-gate-race.txt`.
+      **Đã có run CI trên đúng commit chứa bản sửa và nó XANH** (`2d2ca27`, run 41515106575, job
+      125516556497, bước 7 "QA probe" `success` sau 66 s; 2 annotation chỉ là cảnh báo runner
+      Node-20/ubuntu-latest) ⇒ vế "xanh trên `main`" đóng ở đây, nhưng **ô vẫn để trống** vì vế đầu
+      của ô là *xanh trên commit được tag*, mà `v1.1.0` đóng ở `77d90ce` — **trước** toàn bộ bản sửa
+      QA. Xem `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §6.
       Người bấm PR cho lát cắt sau cần xem
       xanh **liên tiếp vài lần** rồi mới squash (không lấy log máy này thay cho CI).
 - [x] Commit message theo Conventional Commits — `git log` trên nhánh: `feat(games):`, `test(games):`,

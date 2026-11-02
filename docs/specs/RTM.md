@@ -42,7 +42,7 @@
 | FR-S04 | `src/components/common/Header.tsx` | `tests/mobile-layout.test.ts` | `qa/responsive-a11y.mjs` | V,3 | ĐẠT |
 | FR-S05 | `src/components/world/WorldMapScreen.tsx`, `src/services/levelEngine.ts` | `tests/t07-subject-path.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 | FR-S06 | `src/data/{vietnamese,math,english,life}Curriculum.ts`, `src/components/subject/SubjectScreen.tsx` | `tests/t07-subject-path.test.ts`, `tests/vietnamese-curriculum.test.ts`, `tests/math-curriculum.test.ts`, `tests/english-curriculum.test.ts`, `tests/life-curriculum.test.ts`, `tests/t41a-parent-controls.test.ts` | `qa/mobile-home.mjs`, `qa/parent-controls.mjs` | V,3 | ĐẠT |
-| FR-S07 | `src/components/parent/ParentDashboardModal.tsx:51` | `tests/parent-and-demo.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
+| FR-S07 | `src/components/parent/ParentDashboardModal.tsx:135` (đáp án `gateQuestion.ans`; đề sinh tại render dòng 50–72) | `tests/parent-and-demo.test.ts`, `tests/t41f-parent-gate.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 | FR-S08 | `src/hooks/useFocusTrap.ts` | `tests/t20a-hooks-order.test.ts` | `qa/decision-engine-a11y.mjs` | V,3 | ĐẠT |
 | FR-S09 | `src/data/contentSafety.ts`, `src/index.css` | `tests/p41-font-encoding.test.ts`, `tests/math-typography.test.ts` | `qa/p41-font-visual.mjs` | V,1,3 | ĐẠT |
 | FR-S10 | `src/services/demoSeed.ts` | `tests/parent-and-demo.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
@@ -143,7 +143,7 @@
 | FR-P04 | `src/services/storage.ts` (export JSON) | `tests/parent-and-demo.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 | FR-P05 | `src/services/storage.ts` (import) | `tests/parent-and-demo.test.ts` | — | V,1 | ĐẠT |
 | FR-P06 | `src/components/parent/ParentDashboardModal.tsx` | `tests/parent-and-demo.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
-| FR-P07 | `src/components/parent/ParentDashboardModal.tsx:795`, `src/services/competitionQuality.ts` | `tests/competition-readiness.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
+| FR-P07 | `src/components/parent/ParentDashboardModal.tsx:850` (`{row.accuracy}% / chuẩn {row.gate}%`), `src/services/competitionQuality.ts` | `tests/competition-readiness.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 | FR-P08 | `src/components/parent/KidBoxParentPanel.tsx` | `tests/kidbox-bridge-practice.test.ts` | `qa/kidbox-focus.mjs` | V,3 | **CHƯA ĐẠT** (phụ thuộc FR-N04) |
 
 ### 2.9 FR-Y — Hệ thống

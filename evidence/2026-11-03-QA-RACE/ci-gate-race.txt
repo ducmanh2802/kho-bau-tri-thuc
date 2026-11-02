@@ -103,7 +103,35 @@ Chạy lại cổng ngay trước khi push (toàn bộ `docs/` + `.ai/CURRENT.md
 trên (22.18 s) chỉ vì tải máy khác nhau; **test total, số file và tên entry thì giống hệt** —
 muốn so số stable thì nhìn `check:budget`, không nhìn `Duration`.
 
-## 6. còn mở
+## 6. CI trên commit chứa bản sửa — XANH (lần đầu tiên làm được điều này)
 
-- CI vẫn `continue-on-error: true` cho tới khi thấy nhiều lượt xanh liên tiếp.
-- Tag `v1.1.0` vẫn ở `77d90ce` (predate toàn bộ sửa lỗi QA).
+Push `2d2ca27` (gồm `1afda69` fix + `2d2ca27` docs) lên `main`; workflow `03-qa-browser.yml` chạy
+trên đúng commit có bản sửa. Lệnh đọc (kênh durable, không phải annotation):
+
+```
+curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/<full-sha>/check-runs"
+curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/41515106575/jobs"
+```
+
+```
+typecheck + tests          | completed | success  (id 125516558154)
+build + bundle budget      | completed | success  (id 125516557493)
+golden path trên Chromium  | completed | success  (id 125516556497)
+   started 2026-11-02T20:00:06Z → completed 2026-11-02T20:01:12Z  (66 s)
+   steps: 4 Install · 5 Build · 6 Install Chromium · 7 QA probe → success
+          8 "Đưa lỗi probe lên annotation" → skipped (đúng: chỉ chạy khi có lỗi)
+   annotations = 2, cả hai là cảnh báo runner (Node.js 20 deprecated + ubuntu-latest sẽ
+   migrate sang Ubuntu 26 ngày 2026-10-19), KHÔNG có ::error:: nào từ probe.
+```
+
+So với chữ ký lỗi cũ: run 41508824890 chết ở `locator.click` trên "Đấu Trường Thi Thử" vì cổng
+phụ huynh không mở; từ đó tới nay chưa run nào lặp lại. Đây là lượt **xanh thứ hai trong lịch sử
+của cổng** và là lượt **xanh đầu tiên trên commit chứa bản sửa app**.
+
+## 7. còn mở
+
+- `continue-on-error: true` **vẫn để nguyên**: mới có hai lượt xanh (một trên `afb9eeb` trước khi
+  biết nguyên nhân, một trên `2d2ca27`) — quy ước là phải thấy vài lượt xanh liên tiếp.
+- Tag `v1.1.0` vẫn ở `77d90ce` (predate toàn bộ sửa lỗi QA). **Di chuyển tag đã publish là thao tác
+  shared-state**; người giữ repo quyết, kèm chữ ký Go/No-Go (`docs/lifecycle/07_RELEASE_OPERATIONS.md` §3).
+
