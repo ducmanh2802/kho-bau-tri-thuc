@@ -162,6 +162,7 @@ export const EnglishColorBalloonGame: React.FC<{ onExit: () => void }> = ({ onEx
         {balloons.map((b) => (
           <button
             key={b.id}
+            data-testid="falling-item"
             onClick={() => handleBalloonPop(b)}
             style={{
               left: `${b.x}%`,

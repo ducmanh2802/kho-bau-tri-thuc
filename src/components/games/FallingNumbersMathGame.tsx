@@ -139,6 +139,7 @@ export const FallingNumbersMathGame: React.FC<{ onExit: () => void }> = ({ onExi
         {balls.map((b) => (
           <button
             key={b.id}
+            data-testid="falling-item"
             onClick={() => handleBallClick(b)}
             style={{
               left: `${b.x}%`,

@@ -191,6 +191,7 @@ const CatchFallingStage: React.FC<{
         {bubbles.map((b) => (
           <button
             key={b.id}
+            data-testid="falling-item"
             onClick={() => handleBubbleClick(b)}
             style={{
               left: `${b.x}%`,
