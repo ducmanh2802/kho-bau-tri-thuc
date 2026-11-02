@@ -414,3 +414,38 @@ ngay ở lượt kế. Từ đây các tài liệu hiện trạng phải ghi t�
 Số cũ vẫn đúng cho thời điểm nó đo; chỉ **bỏ mốc** mới là lỗi. Lý do không tăng dần mỗi lần push:
 nó không đổi kết luận nào — **điều cần chứng minh vẫn chưa có** (một probe đỏ *thật* bị chặn), và
 ô 13 `docs/plan/TEST_PLAN.md` §16 giữ nguyên trạng thái MỞ qua cả ba lượt xanh không cờ.
+
+## 14. Lượt CI **thứ tư** không còn lưới — XANH, và là lượt đầu có `src/` đổi
+
+Push `06b8962` = T41D (32 file, +2243/−219 — đọc từ output `git commit`; `git show --shortstat`).
+Khác ba lượt ở §10–§13: commit này **đổi `src/services/`** (`cloudMerge.ts` mới 364 dòng,
+`cloudSync.ts` 338, `firebase.ts` 144, `storage.ts`) **và** nâng suite lên 1327 test. Ba lượt
+trước chỉ đổi `.github/`, `tests/` hoặc tài liệu; lượt này mới là **hình dạng của một lần merge
+thật**: code ứng dụng thay đổi và cổng không còn lưới vẫn phải cho đi (hoặc chặn nếu probe đỏ).
+
+```
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=06b896291c0892d7d5ed71aa7f1bfa4d388a22b1
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/41537247288/jobs
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/06b896291c0892d7d5ed71aa7f1bfa4d388a22b1/check-runs
+```
+
+```
+1. Quality           run 41537247071  success
+2. Build + artifact  run 41537247192  success
+3. Browser QA        run 41537247288  job 125592106681 success 22:26:16Z→22:27:18Z (62 s)
+                     bước 7 "QA probe" = success · bước 8 annotation = skipped
+check-runs trên commit: 125592105633 typecheck + tests success (34 s)
+                        125592105855 build + bundle budget success (17 s)
+                        125592106681 golden path trên Chromium success (62 s)
+```
+
+Cổng máy trước push: `npm run verify` **EXIT=0** · 92 file / **1327** test · `Duration 22.42s` ·
+`index-3QHywPiW.js` **209.9 kB** PASS (`evidence/2026-11-03-T41D/verify-t41d-rerun.txt`).
+
+Tỷ lệ theo **quy tắc dừng** ở §13: **8/14 lượt xanh** (6 đỏ · 8 xanh), **bảy lượt cuối liên tiếp**,
+**bốn lượt cuối chạy khi không còn cờ** — `3b0122c` `6e30794` `e961815` `06b8962` — *tính tới
+commit `06b8962`*. Con số này sẽ lệch ở lượt kế; nguồn sự thật vẫn là hai lệnh `curl` ở khối trên.
+
+Điều **chưa** đổi: chưa lần nào thấy một probe đỏ *thật* bị cổng chặn ⇒ ô 13
+`docs/plan/TEST_PLAN.md` §16 giữ nguyên MỞ. Một lượt xanh trên commit đổi `src/` chứng minh
+cổng **không chặn oan**, chứ không chứng minh cổng **chặn đúng**.

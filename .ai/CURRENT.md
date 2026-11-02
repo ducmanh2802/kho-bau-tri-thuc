@@ -1,5 +1,23 @@
 # CURRENT — KHO BÁU TRI THỨC (Lớp 1)
 
+**Cập nhật 2026-11-03 (đợt năm) — lát cắt này là của T41D, lane khác không bị đụng:** 9 defect hợp
+nhất hồ sơ cloud + race đăng nhập đã sửa và commit thành `06b8962` (32 file, +2243/−219), push
+`1cac775..06b8962`, `HEAD == origin/main`. Module mới `src/services/cloudMerge.ts` (364 dòng, luật
+hợp nhất thuần: luỹ kế → `max`, **tài nguyên tiêu được** → hồ sơ hoạt động sau nhất, bài đã học →
+`Set` union, firewall hồ sơ demo); `cloudSync.ts` 277 → 338 (một hàng đợi + `authEpoch`, tự lặng
+`kho_bau_storage_change` do mình gõ); `firebase.ts` 133 → 144 (`AuthChangeSource` phân biệt SDK
+nạp thất bại với đăng xuất thật). 40 test mới (`tests/t41d-cloud-merge.test.ts` 28 +
+`tests/t41d-cloud-sync-race.test.ts` 12), ablation M6 = 5 failed / 7 passed trên code cũ.
+Cổng máy `npm run verify` **EXIT=0** · **92 file / 1327 test** · `Duration 22.42s` ·
+`index-3QHywPiW.js` **209.9 kB** · boot graph **424.3 kB**; cổng server trên đúng commit:
+`3. Browser QA` run 41537247288 · job 125592106681 **success** 62 s (bước 7 `success`, bước 8
+`skipped`) ⇒ **8/14 lượt xanh, bảy lượt cuối liên tiếp, bốn lượt cuối không còn cờ** *(tính tới
+`06b8962`)* — lượt đầu tiên không lưới trên commit đổi `src/`. Bằng chứng
+`evidence/2026-11-03-T41D/` + §14 `evidence/2026-11-03-QA-RACE/ci-gate-race.txt`. **Không stage:**
+6 ảnh `docs/opencode/reports/img/*.png` (sửa dở của lane khác) vẫn ` M` trong working tree.
+Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ** (chưa thấy probe đỏ thật bị chặn); tag `v1.1.0` vẫn ở
+`77d90ce`; chữ ký Go/No-Go vẫn trống — việc của người giữ repo.
+
 **Updated:** 2026-11-03 (đợt bốn) — sau đợt ba (`3. Browser QA` đỏ trên `80c7e39`, đọc được payload
 thật ⇒ hoá ra **lỗi ứng dụng**: đề "Cổng Xác Nhận Phụ Huynh" sinh trong `useEffect` nên khung hình
 đầu vẽ đề mồi "15 + 18", MutationObserver 9/9 lần mở, đề thật đến sau 5–114 ms; đã sửa
