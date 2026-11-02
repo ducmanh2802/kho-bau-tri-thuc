@@ -53,11 +53,11 @@ thì để trống và ghi lý do — không viết "sẽ làm".
 
 | Lớp | Nội dung | Artifact / lệnh |
 |---|---|---|
-| Deliverable | Quy trình tag + workflow `04-release.yml` (build → zip → GitHub Release) | [`.github/workflows/04-release.yml`](../../.github/workflows/04-release.yml) · [`07_RELEASE_OPERATIONS.md`](07_RELEASE_OPERATIONS.md) |
+| Deliverable | Quy trình tag + workflow `04-release.yml` (build → zip → GitHub Release) + **hồ sơ `v1.1.0` đã điền số đo** | [`.github/workflows/04-release.yml`](../../.github/workflows/04-release.yml) · [`07_RELEASE_OPERATIONS.md`](07_RELEASE_OPERATIONS.md) §3.4 |
 | Quality gate | Exit criteria: tag `vX.Y.Z` + golden-path 0 lỗi (`TEST_PLAN.md` §10) | — |
 | AI Level | **Mức 1** — AI chạy lệnh, người ký go/no-go; AI **không** ký | `07_RELEASE_OPERATIONS.md` §3 |
 | RACI | A: người giữ repo | — |
-| Metrics | **Chưa đo được.** `git tag` trả rỗng tính tới 2026-11-02 ⇒ pha này ở trạng thái `NotRun`, không phải `Pass` | `git tag \| wc -l` = 0 |
+| Metrics | **Chưa đo được.** `git tag` trả rỗng tính tới 2026-11-02 ⇒ pha này ở trạng thái `NotRun`, không phải `Pass`. Ba điều kiện No-Go đã gỡ: `CHANGELOG.md` có `## [1.1.0] - 2026-11-02`, `package.json` = `1.1.0`, cổng xanh trên nhánh. Hai điều kiện còn mở: CI trên GitHub chưa chạy, chưa có người lớn đọc to ≥1 bài/môn | `git tag \| wc -l` = 0 · `node scripts/release-notes.mjs 1.1.0 \| wc -l` = 875 |
 
 ### Pha 6 — Maintenance (Duy trì & tiến hoá)
 

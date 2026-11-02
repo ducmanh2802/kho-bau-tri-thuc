@@ -1,7 +1,7 @@
 {
   "name": "kho-bau-tri-thuc-lop-1",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "description": "Ứng dụng học tập và rèn luyện toàn diện môn Tiếng Việt, Toán và Tiếng Anh dành cho học sinh lớp 1.",
   "scripts": {

@@ -17,7 +17,7 @@ chứng thì để trống và ghi lý do ngay dưới bảng — không tô h�
 | 04 | [Design Blueprint](04_DESIGN_BLUEPRINT.md) | Design | Đạt, 1 lỗ hổng | 18 ADR · 6 driver có số đo · STRIDE 6 mục · lethal trifecta đã cắt 2/3 điều kiện |
 | 05 | [Implementation Loop](05_IMPLEMENTATION_LOOP.md) | Implementation | Đạt | Guarded loop 6 bước có ví dụ thật T41C; merge gate 5 điều kiện, G-5 đang hở |
 | 06 | [Verification & Validation](06_VERIFICATION_VALIDATION.md) | Verification | Đạt cho lát cắt | 42/42 TC Pass · 5 phép ablation · verdict 4 giá trị |
-| 07 | [Release & Operations](07_RELEASE_OPERATIONS.md) | Release | **`NotRun`** | quy trình + workflow 04 đã có; chưa tag, chưa go/no-go, chưa restore drill R-1 |
+| 07 | [Release & Operations](07_RELEASE_OPERATIONS.md) | Release | **`NotRun`** | quy trình + workflow 04 đã có; **hồ sơ `v1.1.0` đóng sẵn ở §3.4** (`CHANGELOG [1.1.0]`, `package.json` 1.1.0, cổng xanh); chưa tag, chưa chữ ký go/no-go, chưa restore drill R-1 |
 | 08 | [Maintenance & Evolution](08_MAINTENANCE_EVOLUTION.md) | Maintenance | Đạt một phần | 4 characterization-style test · impact analysis 6 chiều có ví dụ · 6 nợ có owner + hạn |
 
 Phụ lục: [`CHECKLIST.md`](CHECKLIST.md) · [`HARNESS.md`](HARNESS.md) ·
@@ -44,7 +44,7 @@ Phụ lục: [`CHECKLIST.md`](CHECKLIST.md) · [`HARNESS.md`](HARNESS.md) ·
 | Ô | Trạng thái | Lý do / điều kiện để đầy |
 |---|---|---|
 | Go/No-Go đã ký | `NotRun` | chưa có phiên ký nào; người giữ repo ký, AI không ký (`07` §3) |
-| RC tag `vX.Y.Z` | `NotRun` | cần quyết định phát hành từ người dùng — **không tự tag** |
+| RC tag `vX.Y.Z` | `NotRun` | người dùng **đã đồng ý** tag `v1.1.0` sau luồng nghiệm thu xanh; hồ sơ sẵn ở `07` §3.4. Hai bước còn lại là của người giữ repo: squash `feature/43-game-pause` vào `main` rồi tag HEAD `main` (`07` §3: agent "không ký, không tự tag"; CI trên GitHub vẫn `NotRun` tới lúc mở PR) |
 | Restore drill R-1 trên build thật | `NotRun` | cần chạy tay import/export trên `dist/` + ảnh trước/sau (`07` §5) |
 | UAT với phụ huynh thật | `NotRun` | cần người dùng thật đồng ý; không có telemetry (ADR-01) |
 | BG-01 "bé tự học 15–20 phút/ngày" | không đo được | local-first ⇒ không có aggregate; đây là đánh đổi đã ghi ở ADR-01, không phải lỗi code |

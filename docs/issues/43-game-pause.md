@@ -125,7 +125,7 @@ chấp nhận, ghi rõ trong test. (ii) 27 trò khác không truyền props mớ
 | 3 Hiện thực | `feature/43-game-pause`, commit nhỏ | **XONG** — `verify` EXIT=0 |
 | 4 Kiểm chứng | `verify` + probe + `evidence/` | **XONG** — `evidence/2026-11-02-KBT-ISSUE-43/` (cổng, probe 12 bước, 3 ảnh, 3 log ablation, log đỏ trước khi sửa) |
 | 5 Rà soát | PR checklist + review 4 lớp | **XONG phần máy** — mục 6 (review) + mục 7 (thân PR đã điền số đo thật, `qa:games` 31/31 `mounted`); PR thật: push nhánh + link compare, CI `NotRun` trên máy này |
-| 6 Phát hành | squash vào `main` + `v1.1.0` | chờ luồng nghiệm thu xanh |
+| 6 Phát hành | squash vào `main` + `v1.1.0` | **Hồ sơ đã đóng trên nhánh** — `CHANGELOG.md` có `## [1.1.0] - 2026-11-02`, `package.json` + lock lên `1.1.0`, biên bản go/no-go điền số đo ở `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.4. **Chưa tag** (`git tag \| wc -l` = 0, đo 2026-11-02): tag phải đóng trên HEAD của `main` sau khi PR merge, và quyền ký thuộc người giữ repo (`07` §3) |
 
 ### 5.1 Hai chỗ phải sửa lại mô tả — ghi để không tô hồng
 
@@ -219,3 +219,8 @@ giữ `isPaused` làm state riêng, không prop nào xuống `useGameStage`, nê
 - [x] `CHANGELOG.md`: thêm dòng trong `[Unreleased]` (Added/Fixed/Tests).
 - [x] `docs/SDLC.md` / `docs/GAME_DESIGN.md`: **không đổi** — quy trình và cơ chế trò chơi giữ nguyên;
       cơ chế tạm dừng ghi ở `docs/plan/TEST_CASES.md` và mục 4 của file này.
+
+**Lưu ý cho người duyệt PR:** PR này cũng mang theo hồ sơ phát hành (header `## [1.1.0] - 2026-11-02`
+trong `CHANGELOG.md`, `package.json` + `package-lock.json` lên `1.1.0`) — xem mục 5 giai đoạn 6 ở trên.
+Merge xong mới được tag, vì `07_RELEASE_OPERATIONS.md` §1 trạm 1 định nghĩa RC tag đóng trên **HEAD
+của `main`**, và §3 ghi agent "không ký, không tự tag".

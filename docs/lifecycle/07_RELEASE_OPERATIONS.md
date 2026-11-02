@@ -6,6 +6,14 @@
 Không có release nào đã xảy ra. Tài liệu này mô tả quy trình *đã sẵn sàng* và những gì còn thiếu,
 không kể chuyện đã phát hành.
 
+**Cập nhật cùng ngày (hồ sơ bản `1.1.0` đã đóng trên nhánh):** ba điều kiện No-Go trong §3 mà hồ sơ
+này tự chặn đã gỡ — `CHANGELOG.md` `[Unreleased]` **đã chuyển thành** `## [1.1.0] - 2026-11-02`
+(kiểm bằng `node scripts/release-notes.mjs 1.1.0 | wc -l` = **875** dòng ghi chú release),
+`package.json` và `package-lock.json` cùng `1.1.0` (kiểm bằng `npm install --package-lock-only
+--dry-run` ⇒ `up to date`, EXIT=0 ⇒ `npm ci` của CI không lệch lock), và V&V xanh trên
+`feature/43-game-pause` (mục 2). **Hai việc còn lại thuộc quyền người giữ repo:** mở PR + squash vào
+`main`, rồi tag **đúng commit HEAD của `main`** — xem biên bản §3.4.
+
 ---
 
 ## 1. Release and Operate Loop — 6 trạm
@@ -51,6 +59,19 @@ Người ký          : ................  Ngày: ......
 Kết luận          : GO / NO-GO / GO-CÓ-ĐIỀU-KIỆN
 Căn cứ            : <dán output verify + golden-path + số TC NotRun còn lại>
 ```
+
+### 3.4 Hồ sơ chuẩn bị sẵn cho `v1.1.0` (điền số đo thật — người ký chỉ còn đọc và ghi tên)
+
+| Mục | Nội dung | Lệnh tái lập |
+|---|---|---|
+| Phạm vi bản `1.1.0` | toàn bộ `[Unreleased]` cũ, tức từ baseline `1.0.0` tới nay; lát cắt đóng băng là **KBT-ISSUE-43 — nút Tạm dừng trò chơi** | `node scripts/release-notes.mjs 1.1.0 \| wc -l` ⇒ `875` |
+| Cổng V&V trên nhánh | `npm run verify` **EXIT=0** · `Test Files 88 passed (88)` · `Tests 1272 passed (1272)` · `Duration 21.55s` · `Main chunk: index-qnZ3EVTS.js = 204.2 kB → PASS (meets 450 kB goal)` | `git checkout feature/43-game-pause && npm run hooks:install && npm ci && npm run verify` |
+| Chạy lại sau khi chốt hồ sơ `1.1.0` | `npm run verify` **EXIT=0** · `88 file / 1272 test` · `Duration 33.43s` · **entry vẫn `index-qnZ3EVTS.js` 204.2 kB** — đổi `package.json`/`CHANGELOG` không lọt vào bundle nên artefact phát hành y hệt bản đã qua V&V (`evidence/2026-11-02-KBT-ISSUE-43/verify-release-prep.txt`) | `npm run verify` trên working tree có hồ sơ release |
+| Smoke trên `dist/` | `npm run qa:smoke` ⇒ `QA PASS — 28 step(s), 0 errors` · `errors: []` · `removals: []` | `npm run build && npm run qa:smoke` |
+| Hồi quy 31 trò (wrapper dùng chung) | `npm run qa:games` ⇒ `catalogCount: 31`, `mountSmoke` 31/31 `mounted: true`, `overflowPx` max `0`, `errors: []` | `npm run qa:games` |
+| Probe riêng của lát cắt | `node qa/run-one.mjs qa/game-pause.mjs` ⇒ `QA PASS — 12 step(s), 0 errors`, `ok: true` | như trên, sau `npm run build` |
+| Điều kiện No-Go còn mở | **`NotRun`: CI trên GitHub** — PR chưa mở nên workflow `1. Quality` / `3. Browser QA` / `4. Release` chưa chạy lần nào trên máy chủ; số liệu ở đây đo trên máy phát triển Windows. **`NotRun`: chưa có người lớn đọc to ≥1 bài/môn** trên bản sắp phát hành. Còn 2 ô `NotRun` nữa trong `docs/plan/TEST_CASES.md` §5 (ảnh khoảnh `locked`, kiểm bằng bộ đọc màn hình) | mở PR rồi xem tab Actions |
+| Việc của người ký | (1) mở PR `main` ← `feature/43-game-pause` (link ở `docs/issues/43-game-pause.md` §7), (2) squash-merge khi CI xanh, (3) tag **đúng HEAD của `main`** | `git fetch && git checkout main && git pull && git log -1 --format=%H && git tag -a v1.1.0 -m "Kho Báu Tri Thức — Lớp 1, bản 1.1.0 (KBT-ISSUE-43)" && git push origin v1.1.0` |
 
 ## 4. Expand / Contract — đã có, đo được
 

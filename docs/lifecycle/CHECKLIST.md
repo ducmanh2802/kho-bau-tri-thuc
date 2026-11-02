@@ -33,7 +33,7 @@ FAIL treo.
 | C-07 | Gate tự động chặn chuỗi dữ liệu trẻ lọt ra output agent | **MỘT PHẦN** | hiện là advisory: `AGENTS.md` §1.7 + `progress/` gitignore + ảnh evidence dùng hồ sơ giả | người giữ repo · **trước khi** bật cloudSync mặc định |
 | C-08 | Mutation testing tự động | **CHƯA** | mới có 5 phép ablation thủ công (`TEST_CASES.md` §4, M1…M4) | người giữ repo · cần quyết định thêm dependency |
 | C-09 | Mọi FR có US + TC | **MỘT PHẦN** | 6 US / 42 TC cho **hai** lát cắt; các FR còn lại dừng ở cấp FR (xem `RTM.md` §9 rule 5 về lệch tổng FR) | agent · 60 ngày (`09` §3 mục 2.1) |
-| C-10 | Đã phát hành ít nhất một release | **CHƯA** | `git tag` = 0 | người giữ repo · 30 ngày (`09` §2 mục 1.1) — **cần người dùng cho phép tag** |
+| C-10 | Đã phát hành ít nhất một release | **CHƯA** | `git tag \| wc -l` = 0 (đo lại 2026-11-02) | người giữ repo · 30 ngày (`09` §2 mục 1.1). Người dùng đã đồng ý tag `v1.1.0`; **hồ sơ đóng sẵn** ở `07` §3.4, chỉ còn mở PR → squash vào `main` → tag HEAD của `main`. Agent không tự tag (§3: "không ký, không tự tag"). |
 | C-11 | Restore drill R-1 trên build thật | **CHƯA** | mới có test mock trong `tests/parent-and-demo.test.ts` | agent + người xem ảnh · 30 ngày (`09` §2 mục 1.2) |
 | C-12 | UAT với phụ huynh thật | **CHƯA** | `TEST_CASES.md` §5 ghi `NotRun` kèm lý do | người giữ repo · 90 ngày (`09` §4 mục 3.3) |
 | C-13 | 0 test mồ côi / 0 probe vô chủ | ĐẠT | `RTM.md` §6–§7 | — |

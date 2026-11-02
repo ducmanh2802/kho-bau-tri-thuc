@@ -9,6 +9,11 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
 
 ## [Unreleased]
 
+*(trống — toàn bộ mục dưới đây đã chốt cho bản `1.1.0`; hồ sơ Go/No-Go chưa ký nên chưa tag.
+Xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
+
+## [1.1.0] - 2026-11-02
+
 ### Added
 - Trò chơi mới cho bé lớp 1 (tab Fun), mỗi trò có data pack deterministic 6 bậc +
   component + đăng ký đủ 4 nơi (`gamesCatalog`, `GAME_REGISTRY`, `LAUNCHABLE_GAME_IDS`,
@@ -84,7 +89,13 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   rơi thêm `data-testid="falling-item"` để probe chọn được vật thể thật thay vì đoán toạ độ.
 
 ### Changed
-- **Hợp nhất `origin/main` và giữ cho `npm ci` chạy được (KBT-ISSUE-43, commit merge `c8a3725`):**
+- **Hồ sơ phát hành `1.1.0` (giai đoạn 6):** `[Unreleased]` chuyển thành `## [1.1.0] - 2026-11-02`,
+  `package.json` và `package-lock.json` cùng lên `1.1.0` (kiểm bằng `npm install --package-lock-only
+  --dry-run` ⇒ `up to date`, EXIT=0, nên `npm ci` của CI không lệch lock), ghi chú release trích được
+  bằng `node scripts/release-notes.mjs 1.1.0` ⇒ **875** dòng. `docs/lifecycle/07_RELEASE_OPERATIONS.md`
+  thêm §3.4 "Hồ sơ chuẩn bị sẵn" — điền số đo thật của từng cổng kèm lệnh tái lập. **Chưa tag:**
+  `git tag | wc -l` vẫn `0`; tag chỉ hợp lệ trên HEAD của `main` sau khi PR được merge, và quyền ký
+  Go/No-Go thuộc người giữ repo (`07` §3).
   lane khác (`1338ca2`) xoá `package-lock.json` (3331 dòng) trong khi cả 4 workflow vẫn chạy
   `npm ci --no-audit --no-fund` — kiểm bằng `git ls-tree --name-only origin/main | grep lock`
   (chỉ còn `bun.lock`) ⇒ CI chết ngay bước cài đặt; và `"build": "NODE_ENV=production vite build"`
@@ -895,4 +906,5 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   `scripts/audit-snapshot.mjs`.
 
 [Unreleased]: https://github.com/ducmanh2802/kho-bau-tri-thuc/commits/main
+[1.1.0]: https://github.com/ducmanh2802/kho-bau-tri-thuc/releases/tag/v1.1.0
 [1.0.0]: https://github.com/ducmanh2802/kho-bau-tri-thuc
