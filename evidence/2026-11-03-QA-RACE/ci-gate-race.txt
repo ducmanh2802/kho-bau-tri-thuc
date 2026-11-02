@@ -280,3 +280,68 @@ lỗi đã chốt ở `eaead95` (dòng hiện trạng không được trích s�
 chạy trên commit `ci(qa)` xoá cờ là lần đầu tiên probe chạy mà không còn lưới ⇒ nếu nó đỏ, đó là
 **cổng đang làm việc**, không phải sự cố mới; ô 13 trong `docs/plan/TEST_PLAN.md` §16 vì vậy vẫn
 MỞ. Tag `v1.1.0` vẫn ở `77d90ce` và chữ ký Go/No-Go vẫn trống — hai việc đó thuộc người giữ repo.
+
+## 10. Lượt CI **đầu tiên không còn lưới** — XANH (commit `3b0122c`)
+
+Commit `3b0122c127b10e30130f3c634235559e3315bbcf` (`ci(qa): bỏ continue-on-error …`, 25 file,
++492/−67) đẩy lên `origin/main` kiểu `eb4b7b2..3b0122c`; trước đó `git fetch` +
+`git rev-list --left-right --count origin/main...HEAD` ⇒ `0 1` (không ai khác đẩy chen).
+Hook: pre-commit `✔ typecheck sạch`; pre-push `✔ Pre-push: passed` với `Duration 22.36s` —
+lượt thứ **tám** trong ngày; cổng đầy đủ ngay trước commit: `npm run verify` **EXIT=0** ·
+`Test Files 90 passed (90)` · `Tests 1287 passed (1287)` · `Duration 22.15s` ·
+`Main chunk: index-TgwkX59u.js = 204.2 kB → PASS (meets 450 kB goal)`.
+
+```
+curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=3b0122c127b10e30130f3c634235559e3315bbcf"
+curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/41523226603/jobs"
+```
+
+```
+1. Quality           run 41523226401 · job `typecheck + tests`  success 20:52:52Z→20:53:27Z (35 s)
+2. Build + artifact  run 41523226400 · job `build + bundle budget` success 20:52:52Z→20:53:13Z (21 s)
+3. Browser QA        run 41523226603 · job/check-run 125544242836 **success** 20:52:52Z→20:54:01Z = **69 s**
+   steps: 4 Install · 5 Build · 6 Install Chromium · 7 QA probe → success
+          8 "Đưa lỗi probe lên annotation (đọc public được)" → skipped
+```
+
+Đây là **lần đầu tiên job `qa-smoke` chạy mà không có `continue-on-error`**: kết luận `success` của
+nó không còn là "success dù probe chết" như bốn run đỏ hồi đầu (`66e0fea` … `80c7e39`), và cũng
+không còn bị bước chẩn đoán chạy lại probe che (đã sửa ở `80c7e39`). Chuỗi hiện tại của cổng:
+**5/11 lượt xanh** — 6 đỏ (41488045102 · 41490451074 · 41493791252 · 41496530836 · 41504913606 ·
+41508824890) và 5 xanh (41501753363 `afb9eeb` 63 s · 41515106575 `2d2ca27` 66 s ·
+41516820864 `c9fd2b4` 127 s · 41518983585 `eb4b7b2` 69 s · 41523226603 `3b0122c` 69 s), trong đó
+**bốn lượt cuối liên tiếp nhau** (giữa `afb9eeb` và `2d2ca27` là hai lần đỏ `8e6f9f5` · `80c7e39`).
+
+**Điều vẫn chưa chứng minh được** (viết lại để không tự tô hồng): chưa lần nào thấy một probe ĐỎ
+thật bị cổng chặn — năm lượt xanh không phải bằng chứng rằng cờ đã mất thật, bằng chứng đó là
+`tests/t31-bug-hunt-fixes.test.ts` (test hợp đồng cấm khoá `continue-on-error:` trong khối khai báo
+job) cộng `jobs[].steps[].conclusion`. Ô 13 `docs/plan/TEST_PLAN.md` §16 vì thế **vẫn MỞ**; nó chỉ
+đóng khi hoặc (a) một lần đỏ thật xuất hiện và làm đỏ run, hoặc (b) có gate tự động kiểm semantics
+này thay cho con người.
+
+Manh mối incidental từ chính output hook (chưa làm gì với nó): pre-push in
+`Isolate 90 workers spawned · ~376ms startup each (spawn + environment, per file)` và
+`at least ~10.90s faster with isolate: false` — tức ~một nửa `Duration` 22 s là chi phí khởi tạo
+worker; đổi pool là việc **chạm cấu hình test**, chưa nằm trong lát cắt này, ghi lại để đo sau.
+
+## 11. Lượt đo của chính commit docs này (đợt bốn, lần chót trong ngày)
+
+Working tree = `3b0122c` + toàn bộ sửa tài liệu/evidence của đợt này (`src/`, `qa/`, `tests/`,
+`.github/` **không đổi**): `npm run verify` ⇒ **EXIT=0** · `Test Files 90 passed (90)` ·
+`Tests 1287 passed (1287)` · `Duration 22.26s` · `Main chunk: index-TgwkX59u.js = 204.2 kB →
+PASS (meets 450 kB goal)`. Log (có mã màu, cắt bằng `sed -r "s/\x1b\[[0-9;]*[A-Za-z]//g"` trước khi
+đưa vào `measure.mjs`) nằm ở thư mục tạm **ngoài repo**: `evidence/` chỉ nhận những bằng chứng mà
+docs tái lập được bằng lệnh đã ghi sẵn, còn log của một lần đo đang diễn ra thì không.
+
+`Duration` ngày 2026-11-03, cộng thêm lượt này là **chín lượt** (nối tiếp chuỗi ở §9 và phụ chú
+`.ai/CURRENT.md`): 22.18 · 25.61 · 22.34 · 23.85 · 22.17 · 22.09 · 22.15 · 22.36 · **22.26**. Năm số
+đầu thuộc suite **1286** trở về trước (lượt 22.17 là `verify:quick`), bốn số cuối thuộc suite
+**1287**; không được đem cả chín số ra tính trung bình. Trong nhóm 1287, dao động là 22.09–22.36 s
+trên nguyên văn cùng một nội dung test — `Duration` là số duy nhất đổi, đúng như §9 đã dự đoán.
+
+Đối soát sau đợt docs: `measure.mjs --vitest-out -` **exit 0** (docs khớp số đo hiện trạng);
+VI-TEXT `files scanned=58 · findings=0`; kiểm **số ô bảng** bằng script tạm đặt ngoài repo —
+377 block, mọi dòng phải cùng số ống với dòng header, kết quả `rows-lech=0` (bắt buộc vì
+`docs/lifecycle/` và `evidence/` **không** nằm trong vùng quét của `measure.mjs`).
+`package-lock.json` vẫn còn (110 314 byte). 6 file PNG trong `docs/opencode/reports/img/` là sửa dở
+của **lane khác**, cố tình **không stage**.

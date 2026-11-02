@@ -17,7 +17,7 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1287 test / 90 file,
    204.2 kB entry + 418.6 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
-   ngay sau đợt bỏ cờ `continue-on-error` của job "3. Browser QA" (1 test hợp đồng mới trong
+   ngay sau đợt bỏ cờ `continue-on-error` của job "3. Browser QA" (đã commit thành `3b0122c`; 1 test hợp đồng mới trong
    `tests/t31-bug-hunt-fixes.test.ts` ⇒ 1287 test; `src/` không đổi nên entry vẫn `index-TgwkX59u.js` và kB
    vẫn 204.2); các đợt đo trước cùng ngày: sửa "đề cổng phụ huynh vẽ muộn hơn khung hình đầu" (5 test mới
    `tests/t41f-parent-gate.test.ts` ⇒ 1286 test, `src/` đổi nên entry **đổi hash** dù kB không đổi), và

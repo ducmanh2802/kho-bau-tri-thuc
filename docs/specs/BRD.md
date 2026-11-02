@@ -117,7 +117,7 @@ mặc định, GPU/3D nặng ngoài màn cờ vua.
 | R-01 | Nội dung sai nhưng test vẫn xanh (test chỉ đếm số câu) | Trung bình | Cao — mất niềm tin phụ huynh | `contentValidator` + probe `qa/p41-curriculum-quality.mjs`; **người lớn phải đọc to** (SDLC §8) |
 | R-02 | App chạy offline nhưng người dùng tưởng có tài khoản/đám mây (hoặc ngược lại: tưởng không có gì rời máy trong khi đã bật sync) | Trung bình | Trung bình | Sync **không** bật mặc định (`status: 'offline'` tới khi đăng nhập); `AuthButton`/`CloudSyncBanner` hiển thị trạng thái thật; parent mode vẫn chỉ "xuất file" là đường mặc định |
 | R-03 | Track Kid's Box dùng khi chưa có nguồn chuẩn | **Cao** | Cao | Đánh dấu `CONTENT_SOURCE_REQUIRED`; roadmap để "không dùng với trẻ cho tới khi audit" |
-| R-04 | Probe QA flaky do timing → bỏ qua tín hiệu đỏ thật | Trung bình | Trung bình | CI `continue-on-error` cho tới khi xanh ổn định; quy tắc "chạy lại 1 lần, dán `errors[]` + `failedAt`" |
+| R-04 | Probe QA flaky do timing, bỏ qua tín hiệu đỏ thật | Trung bình | Trung bình | Cờ `continue-on-error` **đã bị bỏ** ở `3b0122c` sau bốn lượt xanh liên tiếp (tổng 5/11) ⇒ probe đỏ làm đỏ cả run, kèm test hợp đồng cấm cờ quay lại; quy tắc "chạy lại 1 lần, dán `errors[]` + `failedAt`" vẫn giữ |
 | R-05 | Main chunk phình khi thêm nội dung | Trung bình | Cao (thiết bị yếu) | `check:budget` chặn 600 kB; bank tách chunk riêng; vendor nặng (`three`, `firebase`) bị ép ra ngoài entry bằng ADR-17 |
 | R-06 | Nhiều phiên/lanh sửa chung một working tree, giẫm nhau | Trung bình | Trung bình | `.ai/CURRENT.md` + quy tắc "không đụng lane khác" (AGENTS.md §1.5) |
 | R-07 | Phụ huynh hiểu sai số liệu mẫu | Thấp | Cao | Cờ `isDemoData` + banner + MCP `kbt-progress` in cảnh báo |
@@ -130,7 +130,7 @@ mặc định, GPU/3D nặng ngoài màn cờ vua.
 **Lợi ích:** bé tự học được; phụ huynh có bằng chứng thay vì cảm tính; giáo viên nhận
 được file chẩn đoán; người bảo trì không sợ "sửa nội dung là sập app".
 
-**Chi phí vận hành thực tế (đo 2026-11-03 đợt bốn, trên working tree = HEAD `main` `eb4b7b2` + bản bỏ cờ `continue-on-error` trong `.github/workflows/03-qa-browser.yml` + 1 test hợp đồng mới trong `tests/t31-bug-hunt-fixes.test.ts`):** `npm run verify` gồm typecheck + 1287 test
+**Chi phí vận hành thực tế (đo 2026-11-03 đợt bốn, nội dung = HEAD `main` `eb4b7b2` + bản bỏ cờ `continue-on-error` trong `.github/workflows/03-qa-browser.yml` + 1 test hợp đồng mới trong `tests/t31-bug-hunt-fixes.test.ts`, **đã commit thành `3b0122c`** và đo lại đúng commit đó: suite 22.15 s):** `npm run verify` gồm typecheck + 1287 test
 trong 90 file (riêng suite test 22.09 s — `evidence/2026-11-03-QA-RACE/verify-1287.txt`; các lần đo trước trong cùng ngày: 1286 test / 22.18 s (`verify-1286.txt`), 1281 test / 22.58 s (`verify-1281.txt`), 1280 test / 21.88 s (`verify-1280.txt`, trên `afb9eeb`) và 1278 test / 23.64 s ngày 2026-11-02 trong `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt`) + build + budget; probe QA cần Chromium của
 Playwright và `dist/`. Không có chi phí server **cho người dùng chưa bật sync**; từ khi có
 `firebase ^13.1.0`, chi phí Firestore thuộc project Firebase của người vận hành và chưa được

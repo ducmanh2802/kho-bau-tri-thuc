@@ -30,7 +30,12 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   để xác nhận nó vẫn chỉ đúng bước `tee probe-run.log` (annotation chỉ sai dòng còn hại hơn không
   có annotation). **Chưa chứng minh được:** chưa từng thấy một lần probe đỏ *thật* bị cổng chặn,
   nên ô 13 của `docs/plan/TEST_PLAN.md` §16 vẫn MỞ; lượt CI chạy trên chính commit bỏ cờ là lần đầu
-  probe đi không có lưới. Bằng chứng: `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §9 và
+  probe đi không có lưới — **và lượt đó xanh**: `3b0122c` · run 41523226603 · job 125544242836
+  `success` sau **69 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41523226401
+  và `2. Build + artifact` run 41523226400 cũng success) ⇒ cổng đạt **5/11 lượt xanh**, bốn lượt cuối
+  liên tiếp, và đây là kết luận success **không còn cờ che**. `npm run verify` đo lại đúng nội dung
+  commit: EXIT=0 · 90 file / **1287** test · `Duration 22.15s` (lượt pre-push: `22.36s`). Bằng chứng:
+  `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §9–§11 và
   `evidence/2026-11-03-QA-RACE/verify-1287.txt` (`npm run verify` EXIT=0 · 90 file / **1287** test ·
   `Duration 22.09s` · `Main chunk: index-TgwkX59u.js = 204.2 kB → PASS`, `src/` không đổi nên cả hash
   lẫn kB đứng nguyên).
@@ -59,9 +64,10 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   liên tiếp đầu tiên**; `continue-on-error: true` vẫn giữ theo `03-qa-browser.yml:29` ("xanh liên tiếp
   vài lần") — dự kiến bỏ ở đợt push kế tiếp nếu vẫn xanh.
   *(Bổ sung đợt bốn: vế "**vẫn giữ**" **đã lỗi thời** — lượt thứ ba `eb4b7b2` (run 41518983585, 69 s)
-  khép chuỗi **ba lượt liên tiếp** nên cờ **đã bị xoá** ngay sau commit đó; tỷ lệ hiện trạng là
-  **4/10 lượt xanh**, không phải 3/9. Xem mục `### Changed` đầu file và
-  `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §9.)*
+  khép chuỗi **ba lượt liên tiếp** nên cờ **đã bị xoá** ngay sau commit đó `3b0122c`, và lượt CI
+  không còn cờ cũng xanh (run 41523226603, 69 s) ⇒ tỷ lệ hiện trạng **5/11 lượt xanh**, bốn lượt cuối
+  liên tiếp, không phải 3/9 hay 4/10. Xem mục `### Changed` đầu file và
+  `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §9–§11.)*
 - **`3. Browser QA` chưa từng xanh trên CI — nguyên nhân thật là race overlay, không phải app.**
   Bốn lần chạy đỏ ở bước "QA probe" (41488045102 `66e0fea` · 41490451074 `77d90ce` ·
   41493791252 `2db8715` · 41496530836 `e777457`) và không ai đọc được dòng lỗi vì
