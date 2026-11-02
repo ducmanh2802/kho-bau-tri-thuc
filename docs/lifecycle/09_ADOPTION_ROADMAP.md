@@ -6,14 +6,14 @@
 
 | Chỉ số | Giá trị 2026-11-02 | Lệnh |
 |---|---|---|
-| Test file / test | 87 / 1240 | `npx vitest run` |
-| Probe QA | 29 | `ls qa/*.mjs qa/*.cjs` (trừ `lib.mjs`, `run-one.mjs`) |
-| FR có chuỗi tới TC + evidence | **1 lát cắt / 88 FR** | `RTM.md` §10 |
-| Verdict `NotRun` còn mở | 5 vùng | `TEST_CASES.md` §5 |
+| Test file / test | 88 / 1270 | `npx vitest run` |
+| Probe QA | 30 | `ls qa/*.mjs qa/*.cjs` (trừ `lib.mjs`, `run-one.mjs`) |
+| FR có chuỗi tới TC + evidence | **2 lát cắt / 88 FR** | `RTM.md` §10 |
+| Verdict `NotRun` còn mở | 6 vùng | `TEST_CASES.md` §5 |
 | Release đã phát hành | 0 | `git tag \| wc -l` |
-| Thời gian `verify` | 27.24 s (phần test) | `evidence/2026-11-02-T41C/verify.txt` |
-| Skill agent trong repo | 0 → **2** (đợt này) | `ls .qoder/skills` |
-| Sub-agent trong repo | 0 → **1** (đợt này) | `ls .qoder/agents` |
+| Thời gian `verify` | 30.69 s (phần test) | `evidence/2026-11-02-KBT-ISSUE-43/verify.txt` |
+| Skill agent trong repo | 0 → **1** (`.qoder/skills/kho-bau-change`) | `find .qoder -name SKILL.md \| wc -l` = 1 — đợt T42 khai "2" là lệch: skill đo số liệu (`kho-bau-measure-sync`) nằm trong thư mục người dùng, **không** nằm trong repo |
+| Sub-agent trong repo | 0 → **1** | `ls .qoder/agents` |
 
 ---
 
@@ -50,7 +50,7 @@
 | # | Việc | Owner | Kết quả đo được | Điều kiện dừng |
 |---|---|---|---|---|
 | 3.1 | Người thứ hai đọc diff theo 4 lớp và ký G-2 | người giữ repo + thành viên mới | ≥ 5 PR có 2 tên khác nhau | Không nới G-2 chỉ để merge nhanh |
-| 3.2 | Nightly: full suite + 29 probe + ablation | người giữ repo | 1 workflow mới, chạy 7/7 đêm | Nếu probe flaky > 1 đêm/tuần ⇒ chẩn đoán, **không** tăng retry |
+| 3.2 | Nightly: full suite + 30 probe + ablation | người giữ repo | 1 workflow mới, chạy 7/7 đêm | Nếu probe flaky > 1 đêm/tuần ⇒ chẩn đoán, **không** tăng retry |
 | 3.3 | UAT 5 phụ huynh thật | người giữ repo | biên bản Given/When/Then, 0 điểm nhãn tiêu cực | Dừng nếu phải thu dữ liệu cá nhân của trẻ ⇒ đụng `SAFETY_PRIVACY.md` |
 | 3.4 | Quyết định có bật cloud-sync mặc định hay không | người giữ repo | ADR mới + threat model cập nhật | Mặc định là **không**; chỉ đảo khi có gate C-07 |
 

@@ -75,7 +75,7 @@
 | FR-G05 | `src/config/policy.ts:297`, `src/data/games/*.ts` | `tests/game-content.test.ts`, `tests/t15-viet-games.test.ts`, `tests/t16-math-games.test.ts`, `tests/t17a-english-games.test.ts`, `tests/t17b-coding.test.ts`, `tests/t17b-scientist.test.ts`, `tests/t21-fun-games.test.ts`, `tests/t25-difficulty-ladder.test.ts` | `qa/games.mjs` | V,1,3 | ĐẠT |
 | FR-G06 | `src/hooks/useGameStage.ts`, DC-08 | `tests/t08-games-hub.test.ts` | `qa/games.mjs` | V,3 | ĐẠT |
 | FR-G07 | DC-09 (`kho_bau_game_first_seen`) | `tests/game-rewards.test.ts` | `qa/games.mjs` | V,1,3 | ĐẠT |
-| FR-G08 | `src/components/games/GameModalWrapper.tsx`, `src/hooks/useFocusTrap.ts` | `tests/t01b-ui-fixes.test.ts` | `qa/focus.mjs`, `qa/kidbox-focus.mjs` | V,3 | ĐẠT |
+| FR-G08 | `src/components/games/GameModalWrapper.tsx`, `src/hooks/useFocusTrap.ts` | `tests/t01b-ui-fixes.test.ts`, `tests/t43-game-pause.test.ts` (chỉ phần **vỏ modal**: nút tạm + lớp phủ render có/không theo `isRealtime`) | `qa/focus.mjs`, `qa/kidbox-focus.mjs`, `qa/game-pause.mjs` | V,3 | ĐẠT — riêng *hành vi* tạm dừng chưa có FR, xem ghi chú sau bảng FR-G ở `SRS.md` §4.3 và dòng §10 |
 | FR-G09 | `qa/games.mjs` @195 px | `tests/mobile-layout.test.ts` | `qa/games.mjs`, `qa/mobile-golden.mjs` | V,3 | ĐẠT |
 
 ### 2.4 FR-R — Luyện đọc
@@ -177,7 +177,7 @@
 
 | ID | Nguồn | Test | Probe | Gate | Trạng thái |
 |---|---|---|---|---|---|
-| NFR-P01 | `scripts/check-bundle-budget.mjs` (`MAIN_CHUNK_BUDGET_BYTES`) + trần boot graph 500 kB (`tests/t39-first-load-graph.test.ts`) | `tests/bundle-budget.test.ts`, `tests/t39-first-load-graph.test.ts` | — (bằng chứng trình duyệt chạy bằng script tạm ngoài `qa/`, giữ catalog 29 probe) | V,2 | ĐẠT — entry 204.2 kB / 600 kB và **dưới mục tiêu 450 kB từ T39**; boot graph 418.5 kB; `three-vendor` 572.6 + `firebase-vendor` 723.0 ở ngoài entry, có gate riêng bằng ADR-17 |
+| NFR-P01 | `scripts/check-bundle-budget.mjs` (`MAIN_CHUNK_BUDGET_BYTES`) + trần boot graph 500 kB (`tests/t39-first-load-graph.test.ts`) | `tests/bundle-budget.test.ts`, `tests/t39-first-load-graph.test.ts` | — (bằng chứng trình duyệt chạy bằng script tạm ngoài `qa/`, catalog vẫn là 30 probe) | V,2 | ĐẠT — entry 204.2 kB / 600 kB và **dưới mục tiêu 450 kB từ T39**; boot graph 418.5 kB; `three-vendor` 572.6 + `firebase-vendor` 723.0 ở ngoài entry, có gate riêng bằng ADR-17 |
 | NFR-P02 | `src/components/games/registry.ts` | `tests/t02c-startup-split.test.ts` | `qa/t02-smoke.mjs` | V,2 | ĐẠT |
 | NFR-P03 | `src/components/learning/cotuong/cotuongEngine.ts` (node budget) | `tests/cotuong-engine.test.ts` | — | V,1 | ĐẠT |
 | NFR-P04 | `src/config/policy.ts:297` | `tests/game-content.test.ts` | — | V,1 | ĐẠT |
@@ -199,7 +199,7 @@
 | NFR-M01 | `package.json` (`verify`, `verify:quick`) | — | — | V,H,1,2 | ĐẠT |
 | NFR-M02 | `src/config/policy.ts` (17 export, có rationale) | test theo từng policy block | — | V,1 | ĐẠT |
 | NFR-M03 | ADR-03; `src/services/answerCheck.ts` | `tests/answerCheck.test.ts`, `tests/competition-engine.test.ts` | `qa/question-types.mjs` | V,1 | ĐẠT |
-| NFR-M04 | `tests/` naming | 87 file / 1240 test | — | V,H,1 | ĐẠT |
+| NFR-M04 | `tests/` naming | 88 file / 1270 test | — | V,H,1 | ĐẠT |
 | NFR-M05 | `package.json` (8 runtime deps; `@types/three` sai chỗ — nợ #8 ARCHITECTURE §13) | `tests/t23-mcp-servers.test.ts` | — | V,H,1 | ĐẠT |
 | NFR-M06 | `mcp/lib/server.mjs` | `tests/t23-mcp-servers.test.ts` | — | V,1 | ĐẠT |
 
@@ -268,6 +268,7 @@
 | `qa/t01b-fixes.mjs` | FR-S02, FR-G08, FR-P02 | UI fixes |
 | `qa/t02-smoke.mjs` | NFR-P02, FR-Y07 | startup split + network sạch |
 | `qa/parent-controls.mjs` | FR-P01, FR-S06, NFR-M04 | quyền ba mẹ trên build thật: công tắc thưởng chặn tiêu sao, màn kết quả không hứa Sao/XP/Vé, CTA mở thẳng bài gợi ý, "Vì sao gợi ý này?" → tab Phân Tích |
+| `qa/game-pause.mjs` | **KBT-ISSUE-43** (chưa có FR — ứng viên `FR-G10`), FR-G08 (vỏ modal), NFR-A03/NFR-A05 (nhãn + icon, vùng chạm) | 5 game trên `dist/` @390×844: 0 nút cho trò không đồng hồ, 4 bóng đứng nguyên khi tạm, chạm bóng lúc tạm không ăn điểm (kèm **đối chứng** cùng cú chạm lúc đang chạy xoá bóng), đường đếm ngược của Đường Đua đóng băng rồi chạy lại |
 | `qa/lib.mjs`, `qa/run-one.mjs` | (hạ tầng, không phải probe) | runner + helper |
 
 **Kết luận truy vết ngược:** không có probe nào không phục vụ yêu cầu; mỗi probe đều có chủ
@@ -277,7 +278,7 @@
 
 ## 7. Ma trận ngược: test không phục vụ yêu cầu nào?
 
-87 file test đều nằm trong ít nhất một dòng §2 hoặc §3 ở trên (mới: `tests/t41c-idempotency.test.ts` → NFR-R04/FR-G04/FR-R05; `tests/t41b-decision-clock.test.ts` → FR-L04/FR-L06; `tests/t41a-parent-controls.test.ts` → FR-P01/FR-S06/NFR-M04; `tests/t40-parent-facing-ids.test.ts` → FR-P01/FR-L06/FR-R04/NFR-R02/NFR-M04; `tests/t39-first-load-graph.test.ts` → NFR-P01/NFR-C01/NFR-M04 + ADR-18; `tests/t38-webgl-fallback.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/t34-chess-real-set.test.ts` → FR-C06; `tests/t33-feedback-timers.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/t32-game-stage-reset.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/chess-3d.test.ts` → FR-C06; `tests/t31-bug-hunt-fixes.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/firebase-cloud-sync.test.ts` đổi tên thành `tests/firebase-auth-sync.test.ts` → FR-Y08/Y09/NFR-C01; `tests/t24-speech-math-operators.test.ts` → FR-Y02; `tests/t25-difficulty-ladder.test.ts` → FR-G04/G05; `tests/t26-cotuong-puzzles.test.ts` → FR-C06; `tests/t27-lesson-engagement.test.ts` → FR-M01/FR-S08; `tests/t28-ui-polish.test.ts` → NFR-U01/NFR-M04; `tests/t29-lesson-smooth.test.ts` → FR-L02/NFR-M04; `tests/t30-cotuong-piece-depth.test.ts` → FR-C02), **ngoại trừ** các file sau —
+88 file test đều nằm trong ít nhất một dòng §2 hoặc §3 ở trên (mới: `tests/t43-game-pause.test.ts` → FR-G08 + KBT-ISSUE-43 (`docs/issues/43-game-pause.md`), đã ghi ở §6 và §10; `tests/t41c-idempotency.test.ts` → NFR-R04/FR-G04/FR-R05; `tests/t41b-decision-clock.test.ts` → FR-L04/FR-L06; `tests/t41a-parent-controls.test.ts` → FR-P01/FR-S06/NFR-M04; `tests/t40-parent-facing-ids.test.ts` → FR-P01/FR-L06/FR-R04/NFR-R02/NFR-M04; `tests/t39-first-load-graph.test.ts` → NFR-P01/NFR-C01/NFR-M04 + ADR-18; `tests/t38-webgl-fallback.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/t34-chess-real-set.test.ts` → FR-C06; `tests/t33-feedback-timers.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/t32-game-stage-reset.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/chess-3d.test.ts` → FR-C06; `tests/t31-bug-hunt-fixes.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/firebase-cloud-sync.test.ts` đổi tên thành `tests/firebase-auth-sync.test.ts` → FR-Y08/Y09/NFR-C01; `tests/t24-speech-math-operators.test.ts` → FR-Y02; `tests/t25-difficulty-ladder.test.ts` → FR-G04/G05; `tests/t26-cotuong-puzzles.test.ts` → FR-C06; `tests/t27-lesson-engagement.test.ts` → FR-M01/FR-S08; `tests/t28-ui-polish.test.ts` → NFR-U01/NFR-M04; `tests/t29-lesson-smooth.test.ts` → FR-L02/NFR-M04; `tests/t30-cotuong-piece-depth.test.ts` → FR-C02), **ngoại trừ** các file sau —
 chúng bảo vệ *chất lượng nền* chứ không bảo vệ một FR riêng lẻ:
 
 | File | Vai trò thật |
@@ -314,16 +315,24 @@ chưa được ghi vào SRS (phải thêm FR hoặc xoá test).
 2. Xoá tính năng trong code ⇒ xoá dòng RTM và dòng SRS (giữ lại lịch sử ở `CHANGELOG.md`).
 3. Một dòng RTM chỉ chuyển sang ĐẠT khi output lệnh thật được dán vào PR/Issue —
    không dựa vào số liệu MCP (`AGENTS.md` §1.7, docs/SDLC.md §10).
-4. Số liệu kiểm kê (31 game / 475 câu / 1240 test / entry 204.2 kB + boot graph 418.5 kB…) chỉ được sửa khi vừa đo lại
+4. Số liệu kiểm kê (31 game / 475 câu / 1270 test / entry 204.2 kB + boot graph 418.5 kB…) chỉ được sửa khi vừa đo lại
    bằng `npx vitest run`, `npm run check:budget` hoặc `ls`.
+5. **Lệch đã biết, chưa sửa:** `SRS.md` có **89** dòng `FR-…` (`grep -cE '^\| FR-[A-Z]+[0-9]+ \|' docs/specs/SRS.md`)
+   trong khi hơn mười chỗ khác vẫn ghi "88 FR" — và bảng §8 ở trên đã cộng độ phủ ra **89**
+   (86 ĐẠT + 1 ĐẠT MỘT PHẦN + 2 CHƯA ĐẠT). Không được "sửa cho khớp" bằng cách đổi bừa số nào:
+   phải rà từng chỗ dẫn và xác nhận FR nào được thêm mà không khai. Ghi ở đây vì lát cắt
+   KBT-ISSUE-43 **cố ý không** cấp FR mới (xem ghi chú sau bảng FR-G trong `SRS.md` §4.3),
+   nên số FR không đổi và không được dùng làm cớ để đổi hàng loạt.
 
 ---
 
 ## 10. Chuỗi đầy đủ BR → FR → US → TC → evidence (lát cắt đã đóng)
 
 §2 chỉ truy vết tới cấp **chức năng**. Một chuỗi được coi là *liền mạch* theo nghĩa của khóa học
-chỉ khi mỗi mắt còn lại đều trỏ được tới một file chạy được. Repo này đang có **một** lát cắt như
+chỉ khi mỗi mắt còn lại đều trỏ được tới một file chạy được. Repo này đang có **hai** lát cắt như
 vậy — chọn theo hành trình dọc, không chọn theo số lượng:
+
+**Lát cắt 1 (T41C — chống ghi trùng & biên lai thưởng).**
 
 **BR** BG-06 (đổi nội dung không phá tiến độ cũ) + BG-05 (phụ huynh tin vào dữ liệu của con)
 → **FR** FR-G04 · FR-G07 · FR-R04 · FR-R05 · FR-M05 · FR-P01 + **NFR** NFR-R04 · NFR-M04
@@ -334,6 +343,19 @@ tất cả ở [`evidence/2026-11-02-T41C/`](../../evidence/README.md), commit `
 
 Bảng chiếu (chi tiết từng dòng ở [`docs/plan/TEST_CASES.md`](../plan/TEST_CASES.md) §3):
 
+**Lát cắt 2 (KBT-ISSUE-43 — nút Tạm dừng trò chơi, chạy trọn 6 pha SDLC ngày 2026-11-02).**
+
+**BR** BG-03 (không gây nhầm lẫn cho bé) + BG-04 (dùng được trên điện thoại gia đình)
+→ **FR/NFR** FR-G08 (vỏ modal điều khiển trò chơi) · NFR-A03 (vùng chạm ≥ 44 px) · NFR-A05 (icon + chữ,
+không chỉ màu) — **không có FR cho chính hành vi "tạm dừng"**; nguồn yêu cầu là Issue, ứng viên
+`FR-G10` (xem `SRS.md` §4.3)
+→ **US** US-06, AC 3 nhánh (chính / biên / lỗi)
+→ **TC** TC-30 … TC-42 (13 TC)
+→ **evidence** [`docs/issues/43-game-pause.md`](../issues/43-game-pause.md) (Issue + DoD + ghi chú thiết kế
++ §5.1 chỗ phải sửa mô tả) · `tests/t43-game-pause.test.ts` (30 test) · `qa/game-pause.mjs` (12 bước, 0 lỗi)
+· 3 ảnh · 2 phép ablation M3/M4, tất cả ở [`evidence/2026-11-02-KBT-ISSUE-43/`](../../evidence/README.md),
+commit `675be7e`+`af2d56a`+`494cce2` trên nhánh `feature/43-game-pause`.
+
 | US | AC nguồn | TC | Mắt cuối (bằng chứng) | Verdict |
 |---|---|---|---|---|
 | US-01 Chơi lại không farm Sao | FR-G04/FR-G07 · NFR-R04 (reward) | TC-11…15, TC-19…21, TC-25, TC-26, TC-29 | `evidence/2026-11-02-T41C/probe-t32-game-replay-evidence.json` + `mutation-M2-reward-claim-guard.txt` | Pass |
@@ -341,8 +363,11 @@ Bảng chiếu (chi tiết từng dòng ở [`docs/plan/TEST_CASES.md`](../plan/
 | US-03 Một buổi đọc chỉ gập một lần | FR-R04 · NFR-R04 (completion) | TC-05…07 | `mutation-M1-session-guard.txt` (guard `readingEngine.ts:320`) | Pass |
 | US-04 Máy hết chỗ không làm streak nhảy | FR-M05 · NFR-R01 · NFR-R04 | TC-08…10, TC-17, TC-18 | `tests/t41c-idempotency.test.ts:198` | Pass |
 | US-05 Ba mẹ tắt thưởng ⇒ không hứa Sao | FR-P01 · NFR-M04 | TC-22…24, TC-27, TC-29 | `evidence/2026-11-02-T41C/game-rewards-off.png` + `probe-parent-controls.json` | Pass |
+| US-06 Bé bấm tạm dừng giữa màn đếm giờ | **Issue KBT-ISSUE-43** (chưa có FR) · FR-G08 · NFR-A03/A05 | TC-30…42 | `evidence/2026-11-02-KBT-ISSUE-43/probe-game-pause.json` + `mutation-M3-clock-decision.txt` + `b3-dang-tam-dung.png` | Pass |
 
-**Phần còn lại chưa liền mạch — ghi rõ, không tô hồng:** 83 FR khác vẫn dừng ở cấp FR (§2).
-Lý do và điều kiện chuyển sang chuỗi đầy đủ ghi ở `TEST_CASES.md` §5; trạng thái tổng của 6 pha
-ghi ở [`docs/lifecycle/README.md`](../lifecycle/README.md).
+**Phần còn lại chưa liền mạch — ghi rõ, không tô hồng:** ngoài các FR đã nêu ở hai lát cắt trên,
+toàn bộ FR còn lại vẫn dừng ở cấp FR (§2). **Không ghi một con số tuyệt đối** ("còn 83 FR…") ở đây:
+tổng FR mà tài liệu này khai ("88 FR") đang lệch với số dòng FR thật trong `SRS.md` (89) — xem §9 rule 5;
+khi nào đối chiếu xong mới được viết lại số. Lý do và điều kiện chuyển sang chuỗi đầy đủ ghi ở
+`TEST_CASES.md` §5; trạng thái tổng của 6 pha ghi ở [`docs/lifecycle/README.md`](../lifecycle/README.md).
 

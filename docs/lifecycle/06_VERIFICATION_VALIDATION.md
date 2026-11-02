@@ -26,10 +26,10 @@ Không sửa ngưỡng sau khi thấy số.
 
 | Verdict | Nghĩa | Đếm trong lát cắt | Đếm toàn repo |
 |---|---|---|---|
-| `Pass` | đã chạy, đạt ngưỡng, có file bằng chứng | 29 | 86/88 FR · 24/25 NFR |
+| `Pass` | đã chạy, đạt ngưỡng, có file bằng chứng | 42 (hai lát cắt) | 86/88 FR · 24/25 NFR |
 | `Fail` | đã chạy, không đạt | 0 | 2 FR (FR-N04, FR-P08 — cùng nguyên nhân: thiếu nguồn giáo trình) |
 | `Blocked` | không chạy được vì điều kiện ngoài code | 1 vùng (Kid's Box) | — |
-| `NotRun` | chưa chạy | 5 vùng (`TEST_CASES.md` §5) | **Pha Release cả pha** — `git tag` rỗng |
+| `NotRun` | chưa chạy | 6 vùng (`TEST_CASES.md` §5) | **Pha Release cả pha** — `git tag` rỗng |
 
 Bảng FR/NFR đầy đủ: `RTM.md` §8.
 
@@ -42,10 +42,14 @@ test phải đỏ vì đúng nguyên nhân, rồi hoàn tác.
 |---|---|---|---|---|
 | M1 | `readingEngine.ts:320` guard `appliedSessionIds` | TC-05 | `1 failed \| 24 skipped`, EXIT=1 | `mutation-M1-session-guard.txt` |
 | M2 | `storage.ts:2140` guard `rewardClaims` | TC-11, TC-12 | `2 failed \| 23 passed`, EXIT=1 | `mutation-M2-reward-claim-guard.txt` |
-| — | hoàn tác | toàn bộ | `25 passed`, EXIT=0 | `mutation-baseline-t41c.txt` |
+| — | hoàn tác M1+M2 | toàn bộ lát cắt 1 | `25 passed`, EXIT=0 | `mutation-baseline-t41c.txt` |
+| M3 | `useGameStage.ts:24` bỏ `!s.pausedByUser` | TC-30, TC-32 | `2 failed \| 28 passed`, EXIT=1 | `mutation-M3-clock-decision.txt` |
+| M4 | `useGameStage.ts:139` bỏ một guard `if (!isRunning) return;` | TC-36 | `1 failed \| 29 passed`, EXIT=1 | `mutation-M4-score-guard.txt` |
+| — | hoàn tác M3+M4 | lát cắt 2 | `30 passed`, EXIT=0 | chạy lại `npx vitest run tests/t43-game-pause.test.ts` |
 
 Công cụ mutation chạy tự động (Stryker…) **chưa** được tích hợp — thêm dependency phải hỏi trước
-(`AGENTS.md` §1.4), nên dùng ablation thủ công cho các rule then chốt. Số phép ablation đã chạy: **2**.
+(`AGENTS.md` §1.4), nên dùng ablation thủ công cho các rule then chốt. Số phép ablation đã chạy: **4**
+(M1…M4, hai lát cắt).
 
 ## 5. Test ở đâu trong pipeline
 
@@ -53,7 +57,7 @@ Công cụ mutation chạy tự động (Stryker…) **chưa** được tích h�
 |---|---|---|---|
 | Pre-commit | mỗi commit | typecheck | giây |
 | Pre-push | mỗi push | `verify:quick` | ~1 phút |
-| PR/push (workflow 01) | mỗi push/PR | typecheck + `test:ci` (1240 test) | ~27 s cho phần test |
+| PR/push (workflow 01) | mỗi push/PR | typecheck + `test:ci` (1270 test) | 30.69 s cho phần test (`evidence/2026-11-02-KBT-ISSUE-43/verify.txt`) |
 | Build (workflow 02) | mỗi push/PR | build + `check:budget` | phút |
 | Browser (workflow 03) | mỗi push/PR | probe Playwright trên `dist/` | phút |
 | Release (workflow 04) | tag `v*.*.*` | build artifact + zip + GitHub Release | **chưa từng chạy** (không có tag) |

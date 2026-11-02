@@ -73,6 +73,15 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   3 probe JSON, 2 ảnh trước/sau dải thưởng, 3 log ablation/baseline.
 - Harness nằm trong repo: `.qoder/skills/kho-bau-change/SKILL.md` (quy trình 7 bước) và
   `.qoder/agents/kbt-reviewer.md` (reviewer chỉ-đọc, 4 lớp).
+- **Nút Tạm dừng trò chơi (KBT-ISSUE-43)** — đồng hồ chạy/đứng giờ có một chủ:
+  `useGameStage` giữ trạng thái `pausedByUser` và hàm thuần `isGameClockRunning(s)`
+  (`src/hooks/useGameStage.ts:24`) làm cổng duy nhất cho cả nhịp tick lẫn hai đường ghi điểm
+  (`submitCorrect` / `submitWrong`); `GameModalWrapper` bỏ state riêng, chỉ hiện nút cho trò bị
+  đồng hồ phạt (`REALTIME_GAME_IDS` = 4 trò *Bắt Chữ Cái Bay*, *Hứng Số Rơi Rộn Ràng*,
+  *Đập Bóng Màu*, *Đường Đua Thần Tốc* — gắn cờ `isRealtime: true` trong `gamesCatalog`,
+  `grep -c` = 4). Probe mới `qa/game-pause.mjs` (probe thứ **30**) chụp 3 ảnh nghiệm thu vào
+  `evidence/2026-11-02-KBT-ISSUE-43/`; Issue mirror `docs/issues/43-game-pause.md`; ba màn bóng/số
+  rơi thêm `data-testid="falling-item"` để probe chọn được vật thể thật thay vì đoán toạ độ.
 
 ### Changed
 - **Đối soát số liệu dẫn trong docs (T42):** `README.md` khai **17 ADR** trong khi
@@ -228,6 +237,14 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   `git show "99edd29:<đường-dẫn>"` (xem `docs/MASTER_ROADMAP.md` §"Cấu trúc docs/ sau khi gỡ prompt").
 
 ### Fixed
+- **Nút "Tạm dừng" bấm không dừng được gì (KBT-ISSUE-43):** `data-testid="game-pause"` tồn tại
+  từ T32 nhưng là ống nước chết — `GameModalWrapper` giữ `isPaused` trong state riêng, không prop
+  nào truyền xuống `useGameStage`, nên bé bấm tạm mà đồng hồ vẫn chạy, vẫn trừ điểm chậm, vẫn
+  nhận câu trả lời, và lớp phủ "Đang tạm dừng" che mất bàn chơi trong khi ván vẫn trôi. Nay
+  `isGameClockRunning` là cổng duy nhất: `pausedByUser` (hoặc `locked`, `overlayOpen`, không còn
+  `playing`) ⇒ không tick, không đổi câu, không Sao/XP, không lời khen; *Đường Đua* đóng băng cả
+  hai thanh tiến trình (`width` không đổi sau 1 500 ms) nên việc cắt ngang không bị phạt; bấm
+  "Chơi tiếp" thì đồng hồ chạy lại và `aria-pressed` về `false`.
 - **Bốn đường ghi tiến trình tự nhận "idempotent" nhưng chỉ tầng bằng liệu chống trùng thật
   (đợt T41C):**
   (1) `writeJSON` nuốt mọi lỗi ghi (chế độ riêng tư của Safari / hết quota) nên bước ngày của
@@ -551,6 +568,22 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
     `memory-card`, `karaoke-read-all` và `answer-option` + `data-correct` cho `spelling_duel`.
 
 ### Tests
+- `tests/t43-game-pause.test.ts` — **30 test** cho nút Tạm dừng (KBT-ISSUE-43): bảng sự thật
+  `isGameClockRunning` 7 ô (đang chơi / tạm / `overlayOpen` / `locked` / màn xong / tạm-đang-lúc-mở-lớp-phủ
+  / tính thuần tuý không đọc đồng hồ), hợp đồng `GameModalWrapper` 5 (không còn state riêng,
+  `aria-pressed`, testid lớp phủ ổn định, nhãn nút, đóng bảng giữa lúc tạm), `renderToString` 3
+  (trò có đồng hồ ⇒ đúng một nút; đang tạm ⇒ nút thành "Tiếp tục" + lớp phủ; trò không đồng hồ ⇒
+  0 nút), hợp đồng nguồn 4 trò × 2 + 1 đường chạm bóng = 9, hợp đồng hook 4 (guard
+  `if (!isRunning) return;` có ở **cả hai** đường ghi điểm), catalog 2. **RED trước GREEN**:
+  trên source chưa đổi, `npx vitest run tests/t43-game-pause.test.ts` ⇒
+  `Tests 24 failed | 6 passed (30)` EXIT=1 (log `evidence/2026-11-02-KBT-ISSUE-43/red-before-fix.txt`).
+  Trên `dist/`: `node qa/run-one.mjs qa/game-pause.mjs` ⇒ `QA PASS — 12 step(s), 0 errors`, `ok: true`,
+  trong đó bước **C2 đối chứng** chứng minh cú chạm bị bỏ qua ở C1 là do trạng thái tạm chứ không
+  phải bóng bấm không ăn. **Hai phép ablation M3/M4** (log cùng thư mục): bỏ `&& !s.pausedByUser`
+  ở `useGameStage.ts:24` ⇒ `2 failed | 28 passed` EXIT=1; bỏ `if (!isRunning) return;` ở `:139`
+  ⇒ `1 failed | 29 passed` EXIT=1; hoàn tác ⇒ `30 passed`. Tổng cổng sau đợt: `npm run verify`
+  EXIT=0 với **88 file / 1270 test**, `Duration 30.69s`, main chunk `index-ChC_Vk9W.js` **204.2 kB**
+  → PASS mục tiêu 450 kB.
 - **`tests/decision-engine-storage.test.ts` dọn 3 khối `console.log` dump** (nợ D-4): test
   golden-path C in `knowledgeStates.math_addition_10`, danh sách hành động của `LearningOS` và
   `reasonCodes` của từng gợi ý ra output CI — dữ liệu suy luận của bé không có việc gì nằm trong

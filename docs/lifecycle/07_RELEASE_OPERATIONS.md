@@ -13,7 +13,7 @@ không kể chuyện đã phát hành.
 | # | Trạm | Việc | Đã có | Còn thiếu |
 |---|---|---|---|---|
 | 1 | **RC commit** | chốt commit sẽ phát hành, tag `vX.Y.Z` trên **đúng** commit đã qua V&V gate | workflow `04-release.yml` trigger `push: tags v*.*.*` + `workflow_dispatch` | chưa có commit nào được tag |
-| 2 | **Verdict** | 14 AC của lát cắt + toàn bộ exit criteria `TEST_PLAN.md` §10 | 29/29 TC Pass trong lát cắt (`TEST_CASES.md` §3) | 83 FR chưa xuống tầng TC |
+| 2 | **Verdict** | mọi AC của **hai** lát cắt ở `TEST_CASES.md` §2 (6 US × 3 nhánh) + toàn bộ exit criteria `TEST_PLAN.md` §10 | 42/42 TC Pass (`TEST_CASES.md` §3) | phần lớn FR chưa xuống tầng TC — **không ghi con số "còn 83 FR"**: tổng FR khai báo (88) lệch số dòng FR thật trong `SRS.md` (89), xem `RTM.md` §9 rule 5 |
 | 3 | **Go/No-Go** | người chịu trách nhiệm ký; AI **không** ký | mục §3 dưới đây | chưa có phiên ký nào |
 | 4 | **Sẵn sàng vận hành** | expand/contract migration, restore drill, SLI/SLO, incident | ADR-02 + `MIGRATIONS` chain (`storage.ts:111`) | §5, §6 |
 | 5 | **Phát hành** | build → zip `dist/` → GitHub Release, note lấy từ `CHANGELOG.md` | workflow 04 làm đủ 3 bước | chạy lần đầu |
@@ -26,6 +26,7 @@ Quy tắc: một artifact chỉ chứng nhận cho commit nó được tạo ra.
 | Commit | Ngày | Bằng chứng | Verdict |
 |---|---|---|---|
 | `d54f341` | 2026-11-02 | `evidence/2026-11-02-T41C/` — verify log, 3 probe JSON, 2 ảnh, 3 log ablation/baseline | **Pass** cho V&V · **NotRun** cho Release |
+| `675be7e`+`af2d56a`+`494cce2` (nhánh `feature/43-game-pause`, chưa merge) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/` — `red-before-fix.txt` (24 lời khai FAIL), `verify.txt` (EXIT=0, 88 file / 1270 test), `probe-game-pause.json` (12 bước, 0 lỗi), 3 ảnh, 2 log ablation M3/M4 | **Pass** cho V&V · **NotRun** cho Release (CI chưa chạy — repo chưa có tag, `workflow_dispatch` chưa bật; xem §4) |
 
 Không được lấy log của `7c60066` để nói `d54f341` an toàn.
 

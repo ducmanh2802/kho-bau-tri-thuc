@@ -6,17 +6,19 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 | # | Tài liệu | Trả lời câu hỏi | Dài bao nhiêu |
 |---|---|---|---|
 | 1 | [`BRD.md`](BRD.md) | *Tại sao làm, làm gì, không làm gì, thành công đo thế nào?* | 6 mục tiêu BG, 8 rủi ro, Business DoD |
-| 2 | [`SRS.md`](SRS.md) | *Phần mềm phải làm gì, đạt ngưỡng nào?* | 88 FR · 25 NFR · 17 DC · 11 IF |
+| 2 | [`SRS.md`](SRS.md) | *Phần mềm phải làm gì, đạt ngưỡng nào?* | 88 FR · 25 NFR · 19 DC · 11 IF |
 | 3 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | *Ghép như thế nào, dữ liệu đi đâu, vì sao chọn vậy?* | 18 ADR, sơ đồ tầng + luồng dữ liệu |
 | 4 | [`RTM.md`](RTM.md) | *Yêu cầu nào được chứng minh ở đâu? Test nào không phục vụ gì?* | ma trận xuôi + ngược, tổng kết độ phủ |
 | 5 | [`../plan/TASK_PLAN.md`](../plan/TASK_PLAN.md) | *Đã làm gì (P25→P43) và sẽ làm gì tiếp (EP-A…EP-F)?* | WBS 12 gói, 4 milestone |
-| 6 | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) | *Kiểm bằng lớp nào, chạy lệnh nào, khi nào xanh?* | 5 lớp, 29 probe, bảng "đổi gì → chạy gì" |
-| 7 | [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md) | *Ca kiểm thử nào, AC nguồn ở đâu, verdict gì?* | 5 US · 29 TC · 2 phép ablation · exit criteria viết trước |
+| 6 | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) | *Kiểm bằng lớp nào, chạy lệnh nào, khi nào xanh?* | 5 lớp, 30 probe, bảng "đổi gì → chạy gì" |
+| 7 | [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md) | *Ca kiểm thử nào, AC nguồn ở đâu, verdict gì?* | 6 US · 42 TC · 4 phép ablation · exit criteria viết trước |
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1240 test / 87 file,
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1270 test / 88 file,
    204.2 kB entry + 418.5 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-02** — lần cuối ngay sau
+   KBT-ISSUE-43 (nút Tạm dừng trò chơi: đồng hồ gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts`
+   30 test và probe `qa/game-pause.mjs`; entry đổi hash, **kB không đổi** vì thay đổi nằm trong chunk game đã lazy),
    T41C (bốn đường ghi `recordQuestionAnswer` / `applySession` / bước ngày chuỗi /
    `recordTierReward` chỉ tính một lần: bằng liệu trùng bị chặn trước khi cộng, buổi đọc
    có dấu đã gập, ghi thất bại thì hoàn tác, và mỗi lượt chơi có biên lai),

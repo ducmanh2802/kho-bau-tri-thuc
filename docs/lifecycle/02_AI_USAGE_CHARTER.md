@@ -34,7 +34,7 @@ Một cấu hình agent chỉ được tin khi **≥2** trong các lớp sau cù
 |---|---|---|
 | Hook cục bộ | `scripts/hooks/pre-commit`, `commit-msg`, `pre-push` | Đủ 3, `core.hooksPath=scripts/hooks` |
 | CI | 4 workflow `.github/workflows/01…04` | Đủ, chạy `npm ci` |
-| Test | 1240 test, gồm **source-contract test** đọc thẳng file nguồn bằng regex | `tests/t41c-idempotency.test.ts:318` (describe "hợp đồng nguồn") |
+| Test | 1270 test, gồm **source-contract test** đọc thẳng file nguồn bằng regex | `tests/t41c-idempotency.test.ts:318` (describe "hợp đồng nguồn") |
 | Review người | diff đọc theo 4 lớp | mới thành quy trình ở `08_MAINTENANCE_EVOLUTION.md` §3 |
 
 **Lời từ chối của model không phải bằng chứng.** Bằng chứng là thông báo chặn của hook, lỗi quyền
