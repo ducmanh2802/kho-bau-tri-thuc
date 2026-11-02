@@ -23,7 +23,6 @@ if (typeof globalThis.localStorage === 'undefined') {
 
 import { StorageService } from '../src/services/storage';
 import { DecisionEngine } from '../src/services/decisionEngine';
-import { LearningOS } from '../src/services/learningOS';
 
 describe('SM2 repro via StorageService', () => {
   beforeEach(() => {
@@ -101,27 +100,7 @@ describe('SM2 repro via StorageService', () => {
       })
     );
 
-    const store = StorageService.getLearningOSStore();
-    console.log(
-      'addition:',
-      JSON.stringify({
-        status: store.knowledgeStates.math_addition_10?.status,
-        nextReviewAt: store.knowledgeStates.math_addition_10?.nextReviewAt,
-        now,
-      })
-    );
-
-    const core = LearningOS.getNextBestActions(store.knowledgeStates, store.fatigue, now, []);
-    console.log(
-      'core actions:',
-      core.map((a) => ({ id: a.id, type: a.type, skillId: a.skillId }))
-    );
-
     const output = DecisionEngine.decide();
-    console.log(
-      'recs:',
-      output.recommendations.map((r) => ({ id: r.id, codes: r.reasonCodes }))
-    );
     const codes = output.recommendations.flatMap((r) => r.reasonCodes);
     expect(codes).toContain('SM2_DUE');
   });
