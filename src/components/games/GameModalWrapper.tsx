@@ -529,10 +529,10 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
           </div>
 
           {/* Game Stage Area */}
-          <div className="flex-1 relative overflow-hidden p-3 md:p-6 flex flex-col items-center justify-center">
-            <div className="flex-1 min-w-0 overflow-hidden">
-            {children}
-          </div>
+          <div className="w-full flex-1 relative overflow-hidden p-3 md:p-6 flex flex-col items-center justify-center min-h-0">
+            <div className="w-full h-full flex-1 min-w-0 min-h-0 flex flex-col items-center justify-center overflow-hidden self-stretch">
+              {children}
+            </div>
 
           {showOverlay && (
               <div className="absolute inset-0 z-30 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 animate-pop">

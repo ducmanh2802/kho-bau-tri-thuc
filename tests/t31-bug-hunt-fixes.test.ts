@@ -122,4 +122,23 @@ describe('T31 — sửa lỗi tìm được khi quét toàn bộ probe', () => {
       expect(src).toContain('[aria-label^="Chúc mừng"]');
     });
   });
+
+  describe('khung sân chơi GameModalWrapper không làm co hẹp trò chơi con', () => {
+    const wrapper = read('src/components/games/GameModalWrapper.tsx');
+    const catchGame = read('src/components/games/CatchFallingLettersGame.tsx');
+
+    it('GameModalWrapper giữ w-full h-full ở vùng sân chơi để con không co thành sợi chỉ', () => {
+      expect(wrapper).toContain('w-full flex-1 relative overflow-hidden');
+      expect(wrapper).toContain('w-full h-full flex-1 min-w-0 min-h-0 flex flex-col items-center justify-center overflow-hidden');
+      expect(wrapper).toContain('self-stretch');
+    });
+
+    it('CatchFallingLettersGame có min-h-[360px] và khởi tạo bóng ngay khi vào game', () => {
+      expect(catchGame).toContain('min-h-[360px]');
+      expect(catchGame).toContain('min-w-full self-stretch');
+      expect(catchGame).toContain('setBubbles((prev) => {');
+      expect(catchGame).toContain('if (prev.length > 0) return prev;');
+    });
+  });
 });
+

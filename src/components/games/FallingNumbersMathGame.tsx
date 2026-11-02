@@ -112,7 +112,7 @@ export const FallingNumbersMathGame: React.FC<{ onExit: () => void }> = ({ onExi
       instructions={`Bé ơi! Hãy chạm vào các bóng có số: [ ${condition.text} ]`}
       audioInstruction={condition.speech}
     >
-      <div className="w-full h-full relative rounded-3xl bg-gradient-to-b from-indigo-200 via-sky-100 to-amber-100 overflow-hidden border-2 border-indigo-300 p-4 select-none">
+      <div className="w-full h-full min-h-[360px] min-w-full self-stretch relative rounded-3xl bg-gradient-to-b from-indigo-200 via-sky-100 to-amber-100 overflow-hidden border-2 border-indigo-300 p-4 select-none">
         {/* Sky Stars */}
         <div className="absolute top-6 left-10 text-3xl opacity-50 animate-float">⭐</div>
         <div className="absolute top-12 right-12 text-4xl opacity-50 animate-float" style={{ animationDelay: '1.2s' }}>🌟</div>

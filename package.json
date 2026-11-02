@@ -6,7 +6,7 @@
   "description": "Ứng dụng học tập và rèn luyện toàn diện môn Tiếng Việt, Toán và Tiếng Anh dành cho học sinh lớp 1.",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
-    "build": "vite build",
+    "build": "NODE_ENV=production vite build",
     "preview": "vite preview",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "lint": "tsc --noEmit",

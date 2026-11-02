@@ -228,6 +228,8 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   `git show "99edd29:<đường-dẫn>"` (xem `docs/MASTER_ROADMAP.md` §"Cấu trúc docs/ sau khi gỡ prompt").
 
 ### Fixed
+- **Trò chơi thời gian thực (Bắt Chữ Cái Bay, Hứng Số Rơi, Đập Bóng Màu) bị co hẹp thành một vạch chỉ giữa màn hình:**
+  Do container `GameModalWrapper` có `items-center` và các trò chơi rơi bóng chỉ chứa phần tử `position: absolute` (không có phần tử in-flow để tính kích thước nội tại), trình duyệt co chiều ngang của sân chơi về 0px khiến chỉ còn thấy viền xanh (4px) ở chính giữa. Sửa bằng cách thêm `self-stretch min-w-full` vào `CatchFallingLettersGame`, `FallingNumbersMathGame`, `EnglishColorBalloonGame` và `self-stretch` vào container con của `GameModalWrapper.tsx`.
 - **Bốn đường ghi tiến trình tự nhận "idempotent" nhưng chỉ tầng bằng liệu chống trùng thật
   (đợt T41C):**
   (1) `writeJSON` nuốt mọi lỗi ghi (chế độ riêng tư của Safari / hết quota) nên bước ngày của
