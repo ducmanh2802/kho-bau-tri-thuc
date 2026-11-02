@@ -30,8 +30,8 @@
 | Git | `scripts/hooks/pre-push` | push khi `verify:quick` đỏ | có |
 | CI | workflow `01-quality` | typecheck + 1278 test | có, mỗi push/PR |
 | CI | workflow `02-build-artifact` | build + `check:budget` (entry ≤ 600 kB) | có |
-| CI | workflow `03-qa-browser` | 30 probe Playwright trên `dist/` | có |
-| CI | workflow `04-release` | tag sai dạng `vX.Y.Z` bị từ chối | **chưa lần nào** — repo chưa có tag |
+| CI | workflow `03-qa-browser` | 30 probe Playwright trên `dist/` | **có mặt nhưng chưa từng chặn gì**: job đặt `continue-on-error: true` (`03-qa-browser.yml:30`), và tới `66e0fea` probe mới thật sự chạy trên runner (trước đó chết ở bước Install / Download artefact chéo run). Lần chạy đầu 41488045102 ⇒ job failure ở "QA probe" |
+| CI | workflow `04-release` | tag sai dạng `vX.Y.Z` bị từ chối | **1 lần, đỏ**: run 41486056746 trên tag `v1.1.0` đóng ở `7d92246` — chết ở bước Install (`npm ci` + lock lệch npm 10) nên "Create GitHub Release" bị skip, chưa từng có release nào được tạo |
 | Test | **source-contract test** | cấu trúc code đổi (vd `writeJSON` mất `return false`) | có — `tests/t41c-idempotency.test.ts:318` |
 | Test | bất biến 4 danh sách game | game đăng ký thiếu nơi thứ 4 | có — `tests/t23-mcp-servers.test.ts` |
 | Test | đồng hồ trò chơi | bé bấm tạm dừng mà bóng vẫn rơi / vẫn tính điểm | có — `tests/t43-game-pause.test.ts` (30 test, ablation M3/M4) + `qa/game-pause.mjs` |

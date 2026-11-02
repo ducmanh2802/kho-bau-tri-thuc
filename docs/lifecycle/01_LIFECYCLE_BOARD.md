@@ -57,7 +57,7 @@ thì để trống và ghi lý do — không viết "sẽ làm".
 | Quality gate | Exit criteria: tag `vX.Y.Z` + golden-path 0 lỗi (`TEST_PLAN.md` §10) | — |
 | AI Level | **Mức 1** — AI chạy lệnh, người ký go/no-go; AI **không** ký | `07_RELEASE_OPERATIONS.md` §3 |
 | RACI | A: người giữ repo | — |
-| Metrics | **Chưa đo được.** `git tag` trả rỗng tính tới 2026-11-02 ⇒ pha này ở trạng thái `NotRun`, không phải `Pass`. Ba điều kiện No-Go đã gỡ: `CHANGELOG.md` có `## [1.1.0] - 2026-11-02`, `package.json` = `1.1.0`, cổng xanh trên nhánh. Hai điều kiện còn mở: CI trên GitHub chưa chạy, chưa có người lớn đọc to ≥1 bài/môn | `git tag \| wc -l` = 0 · `node scripts/release-notes.mjs 1.1.0 \| wc -l` = 875 |
+| Metrics | **Đo ngày 2026-11-03:** `git tag \| wc -l` = **1** (`v1.1.0` đã ở `origin`) ⇒ pha này là **Pass một phần**, không còn `NotRun`. Năm điều kiện No-Go đã gỡ: `## [1.1.0] - 2026-11-02` trong `CHANGELOG.md`, `package.json` = `1.1.0`, cổng máy xanh trên HEAD được tag, `npm ci` hết lệch npm 10, hai workflow chặn merge (`1. Quality`, `2. Build + artifact`) **success trên runner**. Còn mở: `3. Browser QA` đỏ ở bước `QA probe` (job không chặn — `continue-on-error`), chữ ký Go/No-Go trống, chưa có người lớn đọc to ≥1 bài/môn | `git tag \| wc -l` = 1 · `node scripts/release-notes.mjs 1.1.0 \| wc -l` = 875 · `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?per_page=8` |
 
 ### Pha 6 — Maintenance (Duy trì & tiến hoá)
 

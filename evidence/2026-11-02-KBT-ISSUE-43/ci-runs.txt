@@ -1,0 +1,57 @@
+BẰNG CHỨNG · trạng thái CI phía GitHub quanh lần đóng tag v1.1.0 (đo 2026-11-02, về sau 2026-11-03)
+
+Nguồn số: GitHub REST API công khai, chạy từ máy phát triển
+  curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?per_page=8
+  curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/<id>/jobs
+Mỗi RUN bên dưới in: tên workflow · event · ref · sha viết tắt · kết luận run, rồi tới kết luận
+job và **chỉ những bước không success** (bước `success`/`skipped` ẩn hết, trừ job xanh).
+
+--- LẦN 1: 7d92246 (commit mang tag v1.1.0 đầu tiên) — cả 4 workflow chết ở Install ---
+RUN 41486056746 | 4. Release | event=push | head=v1.1.0 | sha=7d92246 | run=completed/failure
+   job "build và phát hành" => failure  (2026-11-02T16:54:46Z -> 2026-11-02T16:54:53Z)
+      buoc 5 "Install" => failure
+RUN 41485714651 | 1. Quality | event=push | head=main | sha=7d92246 | run=completed/failure
+   job "typecheck + tests" => failure  (2026-11-02T16:52:37Z -> 2026-11-02T16:52:48Z)
+      buoc 4 "Install (clean, from package-lock.json)" => failure
+RUN 41485714641 | 2. Build + artifact | event=push | head=main | sha=7d92246 | run=completed/failure
+   job "build + bundle budget" => failure  (2026-11-02T16:52:37Z -> 2026-11-02T16:52:47Z)
+      buoc 4 "Install" => failure
+RUN 41485714640 | 3. Browser QA | event=push | head=main | sha=7d92246 | run=completed/success
+   job "golden path trên Chromium" => failure  (2026-11-02T16:52:36Z -> 2026-11-02T16:52:48Z)
+      buoc 4 "Install" => failure
+
+Ba điều rút ra: (1) `4. Release` chết ở Install nên "Full gate"/"Package dist"/"Create GitHub
+Release" bị skip ⇒ **không tồn tại GitHub Release nào** cho tới lúc này; (2) lỗi Install tái lập
+bằng `npx --yes npm@10 ci` trên bản sao tree — xem `ci-install-red.txt`; (3) run "3. Browser QA"
+kết luận `success` trong khi job `failure` vì `03-qa-browser.yml:30` đặt `continue-on-error: true`.
+
+--- LẦN 2: 1b8dadd (lockfile đã đồng bộ với npm 10) ---
+RUN 41487472065 | 1. Quality | event=push | head=main | sha=1b8dadd | run=completed/success
+   job "typecheck + tests" => success  (2026-11-02T17:03:44Z -> 2026-11-02T17:04:14Z)
+RUN 41487472410 | 2. Build + artifact | event=push | head=main | sha=1b8dadd | run=completed/success
+   job "build + bundle budget" => success  (2026-11-02T17:03:44Z -> 2026-11-02T17:04:00Z)
+RUN 41487472845 | 3. Browser QA | event=push | head=main | sha=1b8dadd | run=completed/success
+   job "golden path trên Chromium" => failure  (2026-11-02T17:03:44Z -> 2026-11-02T17:04:06Z)
+      buoc 5 "Download dist artifact" => failure
+⇒ cổng chặn merge (01 typecheck+test, 02 build+budget) **xanh thật trên máy chủ**, trên đúng
+commit mà lockfile đã sửa. Browser QA chuyển sang chết ở bước kế tiếp: không lấy được artefact.
+
+--- LẦN 3: 66e0fea (workflow 03 tự build dist, không download chéo run) ---
+RUN 41488045169 | 1. Quality | event=push | head=main | sha=66e0fea | run=completed/success
+   job "typecheck + tests" => success  (2026-11-02T17:07:08Z -> 2026-11-02T17:07:39Z)
+RUN 41488045172 | 2. Build + artifact | event=push | head=main | sha=66e0fea | run=completed/success
+   job "build + bundle budget" => success  (2026-11-02T17:07:08Z -> 2026-11-02T17:07:27Z)
+RUN 41488045102 | 3. Browser QA | event=push | head=main | sha=66e0fea | run=completed/success
+   job "golden path trên Chromium" => failure  (2026-11-02T17:07:08Z -> 2026-11-02T17:08:09Z)
+      buoc 7 "QA probe" => failure
+
+Bước nhảy việc đã đạt: Install · Build · Install Chromium đều success, và job chạy 61 s thay vì
+12 s ⇒ **lần đầu tiên probe Playwright thực sự chạy trên CI**. Nó báo lỗi trên Linux.
+
+--- CHƯA KIỂM CHỨNG ĐƯỢC: vì sao QA probe đỏ trên runner ---
+Không đọc được log: `GET /actions/runs/41486056746/logs` trả `HTTP 403 Must have admin rights to
+Repository.` nên phiên này **không có** dòng lỗi của probe. Muốn có chi tiết phải mở tab
+Actions → run 41488045102 → job "golden path trên Chromium" → bước 7 (người giữ repo xem được).
+Giả thuyết chưa được chứng minh, xếp theo thứ tự đáng nghi: (a) `waitForServer` 60 s trong
+`qa/run-one.mjs:41` không đủ trên runner chậm; (b) golden-path đòi nội dung phụ thuộc locale/font
+khác Linux; (c) audio/TTS bị chặn ở headless Linux. Chưa sửa gì dựa trên giả thuyết.

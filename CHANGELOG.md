@@ -9,8 +9,9 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
 
 ## [Unreleased]
 
-*(trống — toàn bộ mục dưới đây đã chốt cho bản `1.1.0`; hồ sơ Go/No-Go chưa ký nên chưa tag.
-Xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
+*(trống — toàn bộ mục dưới đây đã chốt cho bản `1.1.0`, **đã tag và đẩy `v1.1.0` lên `origin`
+ngày 2026-11-02/03**; chữ ký Go/No-Go của người giữ repo và UAT người đọc to vẫn chưa có,
+xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
 ## [1.1.0] - 2026-11-02
 
@@ -258,6 +259,27 @@ Xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
   `git show "99edd29:<đường-dẫn>"` (xem `docs/MASTER_ROADMAP.md` §"Cấu trúc docs/ sau khi gỡ prompt").
 
 ### Fixed
+- **`npm ci` đỏ trên cả 4 workflow — lockfile lệch theo cách npm 10 kiểm:** push `main` + tag
+  `v1.1.0` đầu tiên (commit `7d92246`) làm `1. Quality` / `2. Build + artifact` / `4. Release` chết
+  đúng bước Install với `npm error code EUSAGE · Missing: @emnapi/core@1.11.3, @emnapi/runtime@1.11.3
+  from lock file`. Máy phát triển không thấy lỗi vì npm 11.6.2 tự suy hai gói còn thiếu
+  (`npm ci` ⇒ EXIT=0, 158 packages). Sửa bằng `npx --yes npm@10 install --package-lock-only
+  --no-audit --no-fund` ⇒ thêm hai mục `inBundle` dưới `@tailwindcss/oxide-wasm32-wasi`, bỏ
+  `@emnapi/wasi-threads` đứng độc lập (21 insertions / 18 deletions, `package.json` và `src/` không
+  đổi). Đối soát: `git archive HEAD | tar -x` rồi `npx --yes npm@10 ci --no-audit --no-fund` ⇒ **EXIT=0**
+  (157 packages, 24s); `npm ci --dry-run` với npm 11 ⇒ EXIT=0. Vì `4. Release` dừng ở Install nên
+  "Create GitHub Release" bị `skipped` — lần tag đầu **không** tạo release nào.
+  Bằng chứng: `evidence/2026-11-02-KBT-ISSUE-43/ci-install-red.txt`.
+- **"3. Browser QA" chưa từng chạy probe trên CI:** sau khi Install xanh, job chuyển sang đỏ ở bước
+  `Download dist artifact` — `actions/download-artifact@v4` chỉ thấy artefact của **cùng một**
+  workflow run, còn `dist-<sha>` do `2. Build + artifact` upload ở run khác. Thay bước đó bằng
+  `npm run build --silent` trong chính job (`qa/run-one.mjs` đã sẵn cho Linux: `DEFAULT_CHROME` là
+  đường dẫn Windows nên `executablePath` để ngỏ, playwright tự tìm chromium vừa install, `--no-sandbox`
+  bật khi `CI=true`). Kết quả đo trên `66e0fea`: Install · Build · Install Chromium đều success, job
+  chạy 61 s thay vì 12 s, và **bước 7 `QA probe` là chỗ đỏ mới** — probe thật sự chạy trên runner
+  Linux lần đầu tiên. Chưa đọc được dòng lỗi (API log trả `403 Must have admin rights to Repository`).
+  `continue-on-error: true` vẫn giữ nguyên theo ghi chú trong file: cần nó xanh liên tiếp vài lần
+  trên `main` trước khi cho phép chặn merge. Bằng chứng: `evidence/2026-11-02-KBT-ISSUE-43/ci-runs.txt`.
 - **Lớp phủ "Đang tạm dừng" không nói gì với bộ đọc màn hình (review 4 lớp, finding #6):** màn che
   chỉ là `div` trang trí ⇒ bé dùng trình đọc màn hình bấm tạm rồi không biết mình đang ở trạng thái
   nào. Thêm `role="status"` + `aria-live="polite"` + `aria-label="Đang tạm dừng"`

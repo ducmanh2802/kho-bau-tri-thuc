@@ -2,9 +2,10 @@
 ## Phát hành & vận hành · Kho Báu Tri Thức — Lớp 1
 
 **Owner:** người giữ repo (`ducmanh2802`) · **Ngày chốt:** 2026-11-02 · commit `d54f341`
-**Trạng thái pha:** **`NotRun`** — `git tag` trả rỗng tính tới ngày chốt (`git tag | wc -l` = 0, đo 2026-11-02).
-Không có release nào đã xảy ra. Tài liệu này mô tả quy trình *đã sẵn sàng* và những gì còn thiếu,
-không kể chuyện đã phát hành.
+**Trạng thái pha:** **`Đã phát hành`** — tag `v1.1.0` tồn tại trên `origin` (`git tag | wc -l` = **1**,
+đo 2026-11-02; `git ls-remote --tags origin` trả `refs/tags/v1.1.0` = tag object `6687667` đóng trên
+commit `7d92246`). Tài liệu này mô tả cả quy trình *đã chạy* lẫn những gì **vẫn mở**: chữ ký Go/No-Go
+của người giữ repo và quan sát workflow phía server.
 
 **Cập nhật cùng ngày (hồ sơ bản `1.1.0` đã đóng trên nhánh):** ba điều kiện No-Go trong §3 mà hồ sơ
 này tự chặn đã gỡ — `CHANGELOG.md` `[Unreleased]` **đã chuyển thành** `## [1.1.0] - 2026-11-02`
@@ -13,6 +14,14 @@ này tự chặn đã gỡ — `CHANGELOG.md` `[Unreleased]` **đã chuyển th�
 --dry-run` ⇒ `up to date`, EXIT=0 ⇒ `npm ci` của CI không lệch lock), và V&V xanh trên
 `feature/43-game-pause` (mục 2). **Hai việc còn lại thuộc quyền người giữ repo:** mở PR + squash vào
 `main`, rồi tag **đúng commit HEAD của `main`** — xem biên bản §3.4.
+
+**Cập nhật sau đó trong cùng ngày (release đã đóng):** người dùng ra "tự động chọn khi tôi không ở
+đây", nên hai bước kể trên agent làm thay phần *thao tác*: merge `--no-ff` `feature/43-game-pause` vào
+`main` (commit `7365830`), sửa flake theo giờ làm cổng đỏ trên HEAD merge (`7d92246`), rồi tag
+`v1.1.0` đúng HEAD đã xanh của `main` và đẩy cả `main` lẫn tag lên `origin`. **Không đổi mục trên —
+nó là biên bản lúc chuẩn bị.** Phần agent *không* làm được: chữ ký Go/No-Go (§3, quyền duy nhất của
+người giữ repo) và đọc to ≥1 bài/môn cho bé; vì vậy release này là **phát hành kỹ thuật**, nghiệm thu
+người dùng vẫn `NotRun`.
 
 ---
 
@@ -36,6 +45,7 @@ Quy tắc: một artifact chỉ chứng nhận cho commit nó được tạo ra.
 | `d54f341` | 2026-11-02 | `evidence/2026-11-02-T41C/` — verify log, 3 probe JSON, 2 ảnh, 3 log ablation/baseline | **Pass** cho V&V · **NotRun** cho Release |
 | `675be7e`+`af2d56a`+`494cce2`+`a61920b`+`fae661c`+`c8a3725`+tip review (nhánh `feature/43-game-pause`, chưa merge vào `main`) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/` — `red-before-fix.txt` (24 test FAIL), `verify.txt` (EXIT=0, 88 file / 1272 test / `Duration 21.55s`), `probe-game-pause.json` (12 bước, 0 lỗi), 3 ảnh, 3 log ablation M3/M4/M5 | **Pass** cho V&V · **NotRun** cho Release (CI chưa chạy — repo chưa có tag, `workflow_dispatch` chưa bật; xem §4) |
 | `3d06930` (RC: `origin/main` `09511d3` merge vào tip nhánh) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt` (EXIT=0, 89 file / 1277 test / `Duration 23.85s`, entry `index-B6au8G63.js` 204.2 kB) + `probe-qa-smoke-rc.txt` + `probe-qa-games-rc.txt` + `probe-game-pause-rc.json` | **Pass** cho V&V trên RC · Release xem dòng §3.4 |
+| `7365830` → `7d92246` (HEAD `main` lúc đóng tag `v1.1.0`) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` (EXIT=0, 89 file / 1278 test / `Duration 23.64s`), `verify-release-head.txt` (chạy lại đúng HEAD tag, EXIT=0 / `22.57s`), `repro-fatigue-midnight.txt` (RED trước – GREEN sau khi sửa flake) | **Pass** cho V&V **và** là commit mang tag — Release **đã phát hành**; CI phía server vẫn chưa quan sát được (§3.4) |
 
 Không được lấy log của `7c60066` để nói `d54f341` an toàn.
 
@@ -72,8 +82,11 @@ Căn cứ            : <dán output verify + golden-path + số TC NotRun còn l
 | **Đo lại trên RC `3d06930`** (tip nhánh, sau merge `09511d3` của lane khác — engine cờ vua đổi hoàn toàn nên phải chạy lại cả ba probe) | `npm run verify` **EXIT=0** · `Test Files 89 passed (89)` · `Tests 1277 passed (1277)` · `Duration 23.85s` · `Main chunk: index-B6au8G63.js = 204.2 kB → PASS (meets 450 kB goal)`; `qa:smoke` `QA PASS — 28 step(s), 0 errors`; `qa:games` `catalogCount: 31` + 31/31 `mounted: true` + `overflowPx` max `0`; `qa/game-pause.mjs` `QA PASS — 12 step(s), 0 errors` `ok: true` | log + JSON lưu ở `evidence/2026-11-02-KBT-ISSUE-43/` (`verify-rc.txt`, `probe-qa-smoke-rc.txt`, `probe-qa-games-rc.txt`, `probe-game-pause-rc.json`) |
 | Hồi quy 31 trò (wrapper dùng chung) | `npm run qa:games` ⇒ `catalogCount: 31`, `mountSmoke` 31/31 `mounted: true`, `overflowPx` max `0`, `errors: []` | `npm run qa:games` |
 | Probe riêng của lát cắt | `node qa/run-one.mjs qa/game-pause.mjs` ⇒ `QA PASS — 12 step(s), 0 errors`, `ok: true` | như trên, sau `npm run build` |
-| Điều kiện No-Go còn mở | **`NotRun`: CI trên GitHub** — PR chưa mở nên workflow `1. Quality` / `3. Browser QA` / `4. Release` chưa chạy lần nào trên máy chủ; số liệu ở đây đo trên máy phát triển Windows. **`NotRun`: chưa có người lớn đọc to ≥1 bài/môn** trên bản sắp phát hành. Còn 2 ô `NotRun` nữa trong `docs/plan/TEST_CASES.md` §5 (ảnh khoảnh `locked`, kiểm bằng bộ đọc màn hình) | mở PR rồi xem tab Actions |
-| Việc của người ký | (1) mở PR `main` ← `feature/43-game-pause` (link ở `docs/issues/43-game-pause.md` §7), (2) squash-merge khi CI xanh, (3) tag **đúng HEAD của `main`** | `git fetch && git checkout main && git pull && git log -1 --format=%H && git tag -a v1.1.0 -m "Kho Báu Tri Thức — Lớp 1, bản 1.1.0 (KBT-ISSUE-43)" && git push origin v1.1.0` |
+| CI trên máy chủ, lần 1 (`7d92246` = tag `v1.1.0` đầu tiên) | `1. Quality` run 41485714651 · `2. Build + artifact` 41485714641 · `4. Release` 41486056746 **đỏ đúng bước Install** (`npm error code EUSAGE`, thiếu `@emnapi/core@1.11.3` + `@emnapi/runtime@1.11.3` trong lock); `3. Browser QA` 41485714640 báo `run success` nhưng job `failure` vì `continue-on-error`. `4. Release` dừng ở bước 5 ⇒ "Create GitHub Release" `skipped`, **chưa có release nào** | `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/<id>/jobs` — bảng đầy đủ ở `evidence/2026-11-02-KBT-ISSUE-43/ci-runs.txt`, nguyên nhân + lệnh tái lập ở `ci-install-red.txt` |
+| CI sau hai sửa (`1b8dadd` lockfile + `66e0fea` workflow 03) | `1. Quality` 41488045169 **success** (17:07:08→17:07:39) · `2. Build + artifact` 41488045172 **success** (→17:07:27) · `3. Browser QA` 41488045102: Install · Build · Install Chromium success, **bước 7 `QA probe` failure** — probe lần đầu thực chạy trên runner Linux; chưa đọc được dòng lỗi (log API trả `403 Must have admin rights to Repository`) | mở run 41488045102 → job "golden path trên Chromium" → bước 7 (chỉ người giữ repo xem được) |
+| Điều kiện No-Go còn mở | **`Đã chạy`: CI trên GitHub** — hai cổng chặn merge `1. Quality` và `2. Build + artifact` **success** trên `66e0fea` (mục trên); `3. Browser QA` đỏ ở bước `QA probe` nhưng job không chặn (`continue-on-error: true`, `03-qa-browser.yml:30`). **`NotRun`: chưa có người lớn đọc to ≥1 bài/môn** trên bản phát hành. Còn 2 ô `NotRun` nữa trong `docs/plan/TEST_CASES.md` §5 (ảnh khoảnh `locked`, kiểm bằng bộ đọc màn hình) | `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?per_page=8` + tab Actions |
+| Việc của người ký *(ghi trước khi ủy quyền — giữ nguyên làm biên bản)* | (1) mở PR `main` ← `feature/43-game-pause` (link ở `docs/issues/43-game-pause.md` §7), (2) squash-merge khi CI xanh, (3) tag **đúng HEAD của `main`** | `git fetch && git checkout main && git pull && git log -1 --format=%H && git tag -a v1.1.0 -m "Kho Báu Tri Thức — Lớp 1, bản 1.1.0 (KBT-ISSUE-43)" && git push origin v1.1.0` |
+| Hai bước (2)(3) đã làm thay ai, và bằng chứng nào gánh | Người dùng ra "tự động chọn khi tôi không ở đây" ⇒ agent merge `--no-ff` vào `main` (`7365830`), sửa flake làm cổng đỏ trên HEAD merge (`7d92246`), rồi tag. **Không đổi quyền ký:** §3 vẫn ghi người giữ repo là duy nhất ký Go/No-Go, mục "Biên mẫu (chưa ký lần nào)" vẫn trống. Release này là **phát hành kỹ thuật**: cổng máy + cổng CI chặn merge xanh, phần nghiệm thu người dùng vẫn mở | `git tag \| wc -l` = **1** · `git for-each-ref refs/tags/v1.1.0 --format='%(objectname) %(*objectname)'` · `git ls-remote --tags origin` |
 
 ## 4. Expand / Contract — đã có, đo được
 

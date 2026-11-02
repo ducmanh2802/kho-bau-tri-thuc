@@ -52,22 +52,26 @@ Cập nhật trước đó: 2026-10-14 — P42/T01 hotfix certified.
 
 ## KBT-ISSUE-43 — luồng SDLC 6 pha đầy đủ (2026-11-02, lane này)
 
-Nhánh `feature/43-game-pause` — đã push tới `origin` (xem `git log --oneline origin/main..origin/feature/43-game-pause`).
-Không squash vào `main` từ lane này — quyền mở PR + merge thuộc người giữ repo
-(`docs/lifecycle/07_RELEASE_OPERATIONS.md` §3).
+Nhánh `feature/43-game-pause` — đã push tới `origin`, **đã merge vào `main` bằng `--no-ff`**
+(`7365830`, giữ lịch sử để `evidence/` còn dẫn được từng commit) và **đã tag `v1.1.0`**. Người dùng ra
+"tự động chọn khi tôi không ở đây" nên lane này thao tác luôn phần merge + tag + push; **quyền ký
+Go/No-Go vẫn thuộc người giữ repo** (`docs/lifecycle/07_RELEASE_OPERATIONS.md` §3 — biên mẫu còn trống).
 
 | Pha | Đầu ra | Trạng thái |
 |---|---|---|
 | 1–2 | `docs/issues/43-game-pause.md` §1–2 (Issue mirror + DoD đo được + ghi chú thiết kế) | XONG |
 | 3 | `useGameStage.pausedByUser` + `isGameClockRunning`, nút tạm cho 4 trò `REALTIME_GAME_IDS` | XONG — RED `24 failed \| 6 passed` trước, `30 passed` sau |
 | 4 | `evidence/2026-11-02-KBT-ISSUE-43/` — `verify.txt` + `verify-release-prep.txt`, 3 ảnh, 3 log ablation M3/M4/M5 (M1–M2 ở đợt T41C), `probe-game-pause.json` + `probe-qa-smoke.txt` + `probe-qa-games.txt`, `red-before-fix.txt` | XONG |
-| 5 | Review 4 lớp §6 + thân PR đã điền số đo §7 | XONG phần máy — CI trên GitHub `NotRun` (PR chưa mở) |
-| 6 | `CHANGELOG [1.1.0] - 2026-11-02`, `package.json`/lock `1.1.0`, hồ sơ go/no-go `07` §3.4 | **Chờ người**: squash → tag HEAD `main` |
+| 5 | Review 4 lớp §6 + thân PR đã điền số đo §7 | XONG — CI đã chạy trên `main` (xem §6 dưới); không có PR object vì máy không có `gh` CLI |
+| 6 | `CHANGELOG [1.1.0] - 2026-11-02`, `package.json`/lock `1.1.0`, tag `v1.1.0` đẩy lên `origin` | **ĐÃ LÀM** — merge `--no-ff` `7365830`, tag trên HEAD xanh của `main`; **chưa ký Go/No-Go**, `3. Browser QA` đỏ ở bước `QA probe` trên Linux, `4. Release` chưa lần nào xanh |
 
-Số hiện trạng lane này để lại: `npm run verify` EXIT=0 trên RC `3d06930` · 89 file / 1277 test ·
-`Duration 23.85s` · entry `index-B6au8G63.js` 204.2 kB · 30 probe · 31/31/31/31 đăng ký trò chơi.
-Việc còn mở của repo (không thuộc lát cắt này): T41D (merge cloud sync + race đăng nhập), T41E
-(cổng QA + service worker), 8 item "Hệ quả chưa đóng" ở `docs/plan/TASK_PLAN.md`.
+Số hiện trạng lane này để lại: `npm run verify` EXIT=0 · 89 file / 1278 test · entry
+`index-B6au8G63.js` 204.2 kB · `Duration 22.57s` (log `evidence/2026-11-02-KBT-ISSUE-43/verify-release-head.txt`,
+đo trên `7d92246` — commit nội dung cuối; chạy lại trên `1b8dadd` chỉ đổi lock ⇒ EXIT=0, `27.57s`,
+cùng entry hash) · 30 probe · 31/31/31/31 đăng ký trò chơi · `git tag | wc -l` = 1. CI phía server trên `66e0fea`: `1. Quality` + `2. Build + artifact` success,
+`3. Browser QA` job failure ở bước "QA probe" (non-blocking). Việc còn mở của repo (không thuộc lát
+cắt này): T41D (merge cloud sync + race đăng nhập), T41E (cổng QA + service worker), 8 item "Hệ quả
+chưa đóng" ở `docs/plan/TASK_PLAN.md`.
 
 ## Tree hygiene note (2026-10-06)
 

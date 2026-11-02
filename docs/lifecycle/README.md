@@ -11,13 +11,13 @@ chứng thì để trống và ghi lý do ngay dưới bảng — không tô h�
 
 | # | Artifact | Pha | Trạng thái | Bằng chứng / số đo |
 |---|---|---|---|---|
-| 01 | [Lifecycle Board](01_LIFECYCLE_BOARD.md) | cả 6 | Đủ, 1 pha `NotRun` | 6 pha × 5 lớp; ô Release trống vì `git tag` = 0 |
+| 01 | [Lifecycle Board](01_LIFECYCLE_BOARD.md) | cả 6 | Đủ, 1 pha **Pass một phần** | 6 pha × 5 lớp; ô Release đã có số đo (`git tag` = 1) nhưng còn 3 điều kiện mở, xem `01` §Pha 5 |
 | 02 | [AI Usage Charter](02_AI_USAGE_CHARTER.md) | governance | Đạt | Rule of Two 4 lớp; 3 hook + 4 workflow + 1278 test |
 | 03 | [Requirements Chain](03_REQUIREMENTS_CHAIN.md) | Requirements | Đạt cho lát cắt | 88 FR · 6 US · 42 TC · 0 test mồ côi (`RTM.md` §7) |
 | 04 | [Design Blueprint](04_DESIGN_BLUEPRINT.md) | Design | Đạt, 1 lỗ hổng | 18 ADR · 6 driver có số đo · STRIDE 6 mục · lethal trifecta đã cắt 2/3 điều kiện |
 | 05 | [Implementation Loop](05_IMPLEMENTATION_LOOP.md) | Implementation | Đạt | Guarded loop 6 bước có ví dụ thật T41C; merge gate 5 điều kiện, G-5 đang hở |
 | 06 | [Verification & Validation](06_VERIFICATION_VALIDATION.md) | Verification | Đạt cho lát cắt | 42/42 TC Pass · 5 phép ablation · verdict 4 giá trị |
-| 07 | [Release & Operations](07_RELEASE_OPERATIONS.md) | Release | **`NotRun`** | quy trình + workflow 04 đã có; **hồ sơ `v1.1.0` đóng sẵn ở §3.4** (`CHANGELOG [1.1.0]`, `package.json` 1.1.0, cổng xanh); chưa tag, chưa chữ ký go/no-go, chưa restore drill R-1 |
+| 07 | [Release & Operations](07_RELEASE_OPERATIONS.md) | Release | **`Đã phát hành` một phần** | tag `v1.1.0` ở `origin` (`git tag \| wc -l` = 1), `CHANGELOG [1.1.0]`, `package.json` 1.1.0, cổng máy xanh trên HEAD được tag, `1. Quality` + `2. Build + artifact` success trên runner; **còn mở**: chữ ký go/no-go trống, `3. Browser QA` đỏ ở bước `QA probe`, chưa restore drill R-1 |
 | 08 | [Maintenance & Evolution](08_MAINTENANCE_EVOLUTION.md) | Maintenance | Đạt một phần | 4 characterization-style test · impact analysis 6 chiều có ví dụ · 6 nợ có owner + hạn |
 
 Phụ lục: [`CHECKLIST.md`](CHECKLIST.md) · [`HARNESS.md`](HARNESS.md) ·
@@ -44,7 +44,8 @@ Phụ lục: [`CHECKLIST.md`](CHECKLIST.md) · [`HARNESS.md`](HARNESS.md) ·
 | Ô | Trạng thái | Lý do / điều kiện để đầy |
 |---|---|---|
 | Go/No-Go đã ký | `NotRun` | chưa có phiên ký nào; người giữ repo ký, AI không ký (`07` §3) |
-| RC tag `vX.Y.Z` | `NotRun` | người dùng **đã đồng ý** tag `v1.1.0` sau luồng nghiệm thu xanh; hồ sơ sẵn ở `07` §3.4. Hai bước còn lại là của người giữ repo: squash `feature/43-game-pause` vào `main` rồi tag HEAD `main` (`07` §3: agent "không ký, không tự tag"; CI trên GitHub vẫn `NotRun` tới lúc mở PR) |
+| RC tag `vX.Y.Z` | **Đã tag** | `v1.1.0` đóng trên HEAD `main` mà cổng máy xanh; người dùng ra "tự động chọn khi tôi không ở đây" nên agent thao tác merge + tag + push. **Không** đồng nghĩa đã nghiệm thu: chữ ký Go/No-Go vẫn trống (hàng trên) và `3. Browser QA` đỏ ở bước `QA probe` trên runner Linux (`07` §3.4) |
+| CI trên máy chủ | `1` + `2` **xanh**, `3` **đỏ không chặn**, `4` chưa có kết quả xanh | đo qua API công khai trên `66e0fea`: `1. Quality` 41488045169 · `2. Build + artifact` 41488045172 success; `3. Browser QA` 41488045102 job failure ở bước "QA probe" (`continue-on-error`). Lần tag đầu (`7d92246`) đỏ ở bước Install vì lockfile lệch npm 10 — đã sửa ở `1b8dadd`. Bảng đầy đủ: `evidence/2026-11-02-KBT-ISSUE-43/ci-runs.txt` |
 | Restore drill R-1 trên build thật | `NotRun` | cần chạy tay import/export trên `dist/` + ảnh trước/sau (`07` §5) |
 | UAT với phụ huynh thật | `NotRun` | cần người dùng thật đồng ý; không có telemetry (ADR-01) |
 | BG-01 "bé tự học 15–20 phút/ngày" | không đo được | local-first ⇒ không có aggregate; đây là đánh đổi đã ghi ở ADR-01, không phải lỗi code |

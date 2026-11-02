@@ -125,7 +125,7 @@ chấp nhận, ghi rõ trong test. (ii) 27 trò khác không truyền props mớ
 | 3 Hiện thực | `feature/43-game-pause`, commit nhỏ | **XONG** — `verify` EXIT=0 |
 | 4 Kiểm chứng | `verify` + probe + `evidence/` | **XONG** — `evidence/2026-11-02-KBT-ISSUE-43/` (cổng, probe 12 bước, 3 ảnh, 3 log ablation, log đỏ trước khi sửa) |
 | 5 Rà soát | PR checklist + review 4 lớp | **XONG phần máy** — mục 6 (review) + mục 7 (thân PR đã điền số đo thật, `qa:games` 31/31 `mounted`); PR thật: push nhánh + link compare, CI `NotRun` trên máy này |
-| 6 Phát hành | squash vào `main` + `v1.1.0` | **Hồ sơ đã đóng trên nhánh** — `CHANGELOG.md` có `## [1.1.0] - 2026-11-02`, `package.json` + lock lên `1.1.0`, biên bản go/no-go điền số đo ở `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.4. **Chưa tag** (`git tag \| wc -l` = 0, đo 2026-11-02): tag phải đóng trên HEAD của `main` sau khi PR merge, và quyền ký thuộc người giữ repo (`07` §3) |
+| 6 Phát hành | squash vào `main` + `v1.1.0` | **ĐÃ PHÁT HÀNH (một phần)** — đo 2026-11-03: `git tag \| wc -l` = **1**, `v1.1.0` có trên `origin`. Nhánh merge vào `main` bằng **`--no-ff`** (`7365830`) thay vì squash, chọn lịch sử mà `evidence/` dẫn tên commit còn truy vết được; người dùng ra "tự động chọn khi tôi không ở đây" nên agent thao tác merge + tag + push. Ba ô vẫn mở: **chữ ký Go/No-Go trống** (`07` §3, quyền duy nhất của người giữ repo), **`3. Browser QA` đỏ ở bước `QA probe` trên runner Linux**, và **`4. Release` chưa có lần xanh** (run đầu 41486056746 chết ở Install ⇒ "Create GitHub Release" bị skip, chưa tồn tại release nào trên GitHub). Chi tiết số đo: `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.4 + `evidence/2026-11-02-KBT-ISSUE-43/ci-runs.txt` |
 
 ### 5.1 Hai chỗ phải sửa lại mô tả — ghi để không tô hồng
 
@@ -227,3 +227,11 @@ giữ `isPaused` làm state riêng, không prop nào xuống `useGameStage`, nê
 trong `CHANGELOG.md`, `package.json` + `package-lock.json` lên `1.1.0`) — xem mục 5 giai đoạn 6 ở trên.
 Merge xong mới được tag, vì `07_RELEASE_OPERATIONS.md` §1 trạm 1 định nghĩa RC tag đóng trên **HEAD
 của `main`**, và §3 ghi agent "không ký, không tự tag".
+
+**Phụ lục 2026-11-03 (khi luồng đã đóng, viết thêm — không sửa hai dòng trên):** điều "chờ người bấm
+PR" đã được ủy quyền bằng câu "tự động chọn khi tôi không ở đây", nên agent tự merge `--no-ff` và tag.
+Kèm theo đó là hai lỗi chỉ lộ ra trên máy chủ, không lộ trên máy phát triển: `package-lock.json` lệch
+khiến `npm ci` của npm 10 báo `EUSAGE` (xem `evidence/2026-11-02-KBT-ISSUE-43/ci-install-red.txt`), và
+workflow `03-qa-browser` download artefact chéo run nên probe chưa từng chạy trên CI
+(`ci-runs.txt`). PR thật vẫn `NotRun` theo nghĩa GitHub-side: không có `gh` CLI, không có PR object —
+toàn bộ thao tác qua `git push`.
