@@ -1,0 +1,17 @@
+# T41D — hai file test mới chạy GREEN trên code đã sửa (đo 2026-11-03)
+
+Lệnh: `npx vitest run tests/t41d-cloud-merge.test.ts tests/t41d-cloud-sync-race.test.ts`
+Đối chứng ĐỎ: xem `mutation-M6-cloud-sync-revert.txt` (hai file cloud reverted về HEAD `1cac775` ⇒ `5 failed | 7 passed (12)`, EXIT=1).
+---
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t41d-cloud-merge.test.ts (28 tests) 29ms
+ ✓ tests/t41d-cloud-sync-race.test.ts (12 tests) 192ms
+
+ Test Files  2 passed (2)
+      Tests  40 passed (40)
+   Start at  05:21:14
+   Duration  590ms (tests 51%, import 24%, transform 19%, worker 6%)
+
+EXIT=0

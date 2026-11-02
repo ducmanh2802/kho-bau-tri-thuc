@@ -28,7 +28,7 @@
 | Git | `scripts/hooks/pre-commit` | commit khi typecheck đỏ | có |
 | Git | `scripts/hooks/commit-msg` | message ngoài Conventional Commits | có |
 | Git | `scripts/hooks/pre-push` | push khi `verify:quick` đỏ | có |
-| CI | workflow `01-quality` | typecheck + 1287 test | có, mỗi push/PR |
+| CI | workflow `01-quality` | typecheck + 1327 test | có, mỗi push/PR |
 | CI | workflow `02-build-artifact` | build + `check:budget` (entry ≤ 600 kB) | có |
 | CI | workflow `03-qa-browser` | 30 probe Playwright trên `dist/` | **từng là sensor giả**: job mang `continue-on-error: true` nên probe chết vẫn báo run success, và tới `66e0fea` probe mới thật sự chạy trên runner (trước đó chết ở bước Install / Download artefact chéo run). Đỏ ở bước "QA probe" bốn lần liên tiếp (41488045102 `66e0fea` · 41490451074 `77d90ce` · 41493791252 `2db8715` · 41496530836 `e777457`) mà **không đọc được lỗi** vì API log trả `403`. Nay có kênh đọc (annotation public, xem §"Kênh chẩn đoán") và lỗi thật đã sửa: **lần đầu xanh = run 41501753363 trên `afb9eeb`, 63 s** (bằng chứng = `jobs[].steps[].conclusion`, không phải "0 annotation"). Nhưng **đỏ lại ngay ở run 41504913606 trên `8e6f9f5`** — commit chỉ sửa docs, `src/` và `qa/` không đổi ⇒ probe **intermittent**, harness thật của cổng QA vẫn chưa đóng; lần đỏ đó còn bị chính bước chẩn đoán che (nó chạy lại probe và in "QA PASS" — đã sửa bằng `tee probe-run.log` + test hợp đồng). **Cờ đã bị bỏ** sau ba lượt xanh liên tiếp trên `main` (`2d2ca27` run 41515106575 · `c9fd2b4` run 41516820864 · `eb4b7b2` run 41518983585, job 125529796579 bước 7 `success` 69 s) — commit `3b0122c` **đã xoá** `continue-on-error`, kèm test hợp đồng trong `tests/t31-bug-hunt-fixes.test.ts` cấm cờ quay lại ⇒ từ đây probe đỏ làm **đỏ cả run**; lượt CI chạy trên chính commit đó — run 41523226603, job 125544242836 `success` 69 s, bước 7 `success` / bước 8 `skipped` — là **lần đầu job này xanh mà không có lưới**, nên `success` của nó giờ mang thông tin thật; **lượt thứ hai không lưới** (push chỉ docs `6e30794`, run 41526285381, job 125554732285 `success` 72 s, bước 7 `success` / bước 8 `skipped`) lặp lại kết quả đó, và **lượt thứ ba** (`e961815`, run 41527657645, job 125559437705 `success` 57 s) cũng vậy ⇒ **7/13 lượt xanh** tính tới `e961815`. Điều chưa chứng minh được: chưa từng thấy một lần đỏ thật bị cổng chặn (ô 13 `docs/plan/TEST_PLAN.md` §16 vẫn MỞ) |
 | CI | workflow `04-release` | tag sai dạng `vX.Y.Z` bị từ chối | **lần đầu đỏ, lần hai xanh**: run 41486056746 trên tag cũ (`v1.1.0` đóng ở `7d92246`) chết ở bước Install (`npm ci` + lock lệch semantics npm 10) nên "Create GitHub Release" bị skip ⇒ **tag tồn tại mà release thì không**, một dạng hỏng mà harness không bắt được nếu chỉ nhìn `git tag`. Run 41490669966 trên tag hiện hành (`4f75f5d` → `77d90ce`) **success cả 9 bước**, sinh release id `431754261` + asset 1 369 166 byte. Bài học đã ghi thành cửa kiểm ở `TEST_PLAN.md` §16 dòng 12 |
@@ -40,7 +40,7 @@
 | Runtime | `writeJSON → boolean` | ghi hỏng bị im lặng | có — T41C |
 | Cloud | `firestore.rules` | đọc/ghi hồ sơ của uid khác | có file, **chưa test end-to-end** (mock thôi) |
 
-**Đếm sensor:** 3 hook · 4 workflow · 90 test file / 1287 test · 30 probe · 1 rules file.
+**Đếm sensor:** 3 hook · 4 workflow · 92 test file / 1327 test · 30 probe · 1 rules file.
 
 ### 2b. Kênh chẩn đoán CI — cái gì đọc được khi không có quyền admin
 
@@ -95,9 +95,9 @@ không ghi bài fix đã commit. Ghi ba loại: *thói quen của người*, *c�
 |---|---|---|---|---|
 | H-1 | Không có gate chặn **nội dung trẻ** lọt ra output agent | lộ dữ liệu cá nhân | advisory `AGENTS.md` §1.7 + `progress/` gitignore + evidence dùng hồ sơ giả | `CHECKLIST.md` C-07 · `09` §2 mục 1.5 |
 | H-2 | Không có PR thật ⇒ G-2 "review ở phiên độc lập" dựa vào người, không vào nền tảng | một người vừa viết vừa duyệt | sub-agent `kbt-reviewer` chỉ-đọc | `09` §4 mục 3.1 |
-| H-3 | `firestore.rules` chưa được test end-to-end | quyền chỉ chắn trên giấy một nửa | mock test + đọc rules | T41D |
+| H-3 | `firestore.rules` chưa được test end-to-end | quyền chỉ chắn trên giấy một nửa | mock test + đọc rules. T41D **đã** đóng phần hợp nhất phía client (40 test: `tests/t41d-cloud-merge.test.ts` + `tests/t41d-cloud-sync-race.test.ts`) nhưng **không** đụng rules ⇒ mục này vẫn mở | cần project Firebase thật để emulator test (`SRS.md` FR-Y09 nợ, `CHECKLIST.md` C-07) |
 | H-4 | Probe deep-flow flaky vì timing | bỏ sót lỗi hoặc tốn công vô ích | chạy lại 1 lần + dán `errors[]`/`failedAt` (`TEST_PLAN.md` §5) | `09` §4 mục 3.2 (nightly) |
-| H-5 | Không có mutation tự động | test không bắt được lỗi tinh vi | ablation thủ công cho rule then chốt (5 phép đã chạy: M1…M5) | `CHECKLIST.md` C-08 |
+| H-5 | Không có mutation tự động | test không bắt được lỗi tinh vi | ablation thủ công cho rule then chốt (6 phép đã chạy: M1…M6) | `CHECKLIST.md` C-08 |
 
 ## 5. Mapping khi sang công cụ khác
 

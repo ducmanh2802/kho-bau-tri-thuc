@@ -1,0 +1,135 @@
+# Mutation M6 — reverting toàn bộ hai file cloud về HEAD (đo 2026-11-03, T41D)
+
+Bối cảnh: HEAD `main` = `1cac775` (chưa có T41D), working tree = T41D (sửa 9 defect hợp nhất cloud + race đăng nhập).
+Test mới `tests/t41d-cloud-sync-race.test.ts` (12 test) là test phân biệt: phải ĐỎ trên code cũ.
+
+Lệnh (backup an toàn — KHÔNG dùng `git checkout --` vì HEAD chứa code cũ, sẽ xoá mất bản chưa commit):
+```bash
+cp src/services/cloudSync.ts src/services/firebase.ts /tmp/t41d-keep-1103/
+git show HEAD:src/services/cloudSync.ts > src/services/cloudSync.ts
+git show HEAD:src/services/firebase.ts   > src/services/firebase.ts
+npx vitest run tests/t41d-cloud-sync-race.test.ts   # log bên dưới, đã cắt mã màu
+echo "EXIT=$?"
+cp /tmp/t41d-keep-1103/cloudSync.ts src/services/cloudSync.ts
+cp /tmp/t41d-keep-1103/firebase.ts  src/services/firebase.ts
+md5sum src/services/cloudSync.ts src/services/firebase.ts   # khớp bản T41D
+```
+
+Kết quả: `Test Files 1 failed (1)` · `Tests 5 failed | 7 passed (12)` · EXIT=1 · 5 defect bắt được (đăng xuất giữa lúc kéo, hai thao tác cloud chồng nhau, ghi cloud về gây tự đẩy, SDK nạp thất bại xoá cờ hint, object trạng thái bị tái sử dụng).
+
+---
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t41d-cloud-sync-race.test.ts (12 tests | 5 failed) 197ms
+   ❯ T41D — race đăng nhập trong cloud sync (12)
+     ✓ start() chỉ đăng ký theo dõi auth một lần dù mở màn tài khoản nhiều lần 118ms
+     × đăng xuất giữa lúc kéo cloud không để lại "synced" khi không còn ai đăng nhập 16ms
+     ✓ bất biến: không có trạng thái "synced" nào mà user rỗng, kể cả khi login/logout xen kẽ 6ms
+     ✓ kết quả kéo về của tài khoản cũ không được gán cho tài khoản mới 4ms
+     × không bao giờ có hai thao tác cloud chồng nhau khi bấm đồng bộ liên tiếp 5ms
+     × ghi hồ sơ do cloud đưa về không tự đặt hẹn giờ đẩy ngược lên cloud 9ms
+     ✓ bé học thật sau khi đồng bộ thì vẫn tự đẩy lên cloud (không chặn quá mức) 9ms
+     × không nạp được SDK thì không xoá cờ "máy này từng đăng nhập" và còn được phép thử lại 6ms
+     ✓ Firebase báo đăng xuất thật thì cờ hint bị xoá 3ms
+     × mỗi lần trạng thái đổi là một object mới để React thực sự render lại 6ms
+     ✓ chưa đăng nhập thì syncNow không gọi Firestore và trả về offline 5ms
+     ✓ lỗi khi đẩy lên cloud được báo cho người dùng và không bị nuốt 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t41d-cloud-sync-race.test.ts > T41D — race đăng nhập trong cloud sync > đăng xuất giữa lúc kéo cloud không để lại "synced" khi không còn ai đăng nhập
+AssertionError: expected 'synced' to be 'offline' // Object.is equality
+
+Expected: "offline"
+Received: "synced"
+
+ ❯ tests/t41d-cloud-sync-race.test.ts:198:26
+    196|     const state = service.getState();
+    197|     expect(state.user).toBeNull();
+    198|     expect(state.status).toBe('offline');
+       |                          ^
+    199|     expect(state.lastSyncedAt).toBeNull();
+    200|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  tests/t41d-cloud-sync-race.test.ts > T41D — race đăng nhập trong cloud sync > không bao giờ có hai thao tác cloud chồng nhau khi bấm đồng bộ liên tiếp
+AssertionError: expected 2 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ tests/t41d-cloud-sync-race.test.ts:259:27
+    257|     const second = service.syncNow();
+    258|     await flush();
+    259|     expect(h.maxInFlight).toBe(1);
+       |                           ^
+    260|
+    261|     release();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  tests/t41d-cloud-sync-race.test.ts > T41D — race đăng nhập trong cloud sync > ghi hồ sơ do cloud đưa về không tự đặt hẹn giờ đẩy ngược lên cloud
+AssertionError: expected 3 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 3
+
+ ❯ tests/t41d-cloud-sync-race.test.ts:281:29
+    279|     // sau 2 s lại setDoc một lần nữa với đúng dữ liệu vừa kéo về.
+    280|     await vi.advanceTimersByTimeAsync(5000);
+    281|     expect(h.writes.length).toBe(1);
+       |                             ^
+    282|     expect(service.getState().status).toBe('synced');
+    283|     expect(service.getState().mergeTrace).toContain('xp:cloud_higher');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  tests/t41d-cloud-sync-race.test.ts > T41D — race đăng nhập trong cloud sync > không nạp được SDK thì không xoá cờ "máy này từng đăng nhập" và còn được phép thử lại
+AssertionError: expected null to be '1' // Object.is equality
+
+- Expected:
+"1"
+
++ Received:
+null
+
+ ❯ tests/t41d-cloud-sync-race.test.ts:313:44
+    311|     await flush();
+    312|
+    313|     expect(localStorage.getItem(HINT_KEY)).toBe('1');
+       |                                            ^
+    314|     service.start();
+    315|     expect(h.authListeners.length).toBe(2);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  tests/t41d-cloud-sync-race.test.ts > T41D — race đăng nhập trong cloud sync > mỗi lần trạng thái đổi là một object mới để React thực sự render lại
+AssertionError: expected { status: 'offline', user: null, …(2) } not to be { status: 'offline', user: null, …(2) } // Object.is equality
+
+Compared values have no visual difference.
+
+ ❯ tests/t41d-cloud-sync-race.test.ts:338:32
+    336|     expect(snapshots.length).toBeGreaterThanOrEqual(3);
+    337|     for (let i = 1; i < snapshots.length; i += 1) {
+    338|       expect(snapshots[i]).not.toBe(snapshots[i - 1]);
+       |                                ^
+    339|     }
+    340|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 7 passed (12)
+   Start at  05:20:47
+   Duration  597ms (tests 79%, import 11%, transform 5%, worker 4%)
+
+EXIT=1

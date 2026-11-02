@@ -130,8 +130,8 @@ mặc định, GPU/3D nặng ngoài màn cờ vua.
 **Lợi ích:** bé tự học được; phụ huynh có bằng chứng thay vì cảm tính; giáo viên nhận
 được file chẩn đoán; người bảo trì không sợ "sửa nội dung là sập app".
 
-**Chi phí vận hành thực tế (đo 2026-11-03 đợt bốn, nội dung = HEAD `main` `eb4b7b2` + bản bỏ cờ `continue-on-error` trong `.github/workflows/03-qa-browser.yml` + 1 test hợp đồng mới trong `tests/t31-bug-hunt-fixes.test.ts`, **đã commit thành `3b0122c`** và đo lại đúng commit đó: suite 22.15 s):** `npm run verify` gồm typecheck + 1287 test
-trong 90 file (riêng suite test 22.09 s — `evidence/2026-11-03-QA-RACE/verify-1287.txt`; các lần đo trước trong cùng ngày: 1286 test / 22.18 s (`verify-1286.txt`), 1281 test / 22.58 s (`verify-1281.txt`), 1280 test / 21.88 s (`verify-1280.txt`, trên `afb9eeb`) và 1278 test / 23.64 s ngày 2026-11-02 trong `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt`) + build + budget; probe QA cần Chromium của
+**Chi phí vận hành thực tế (đo 2026-11-03 lần năm, nội dung = HEAD `main` `1cac775` cộng **T41D** — module mới `src/services/cloudMerge.ts` + sửa `cloudSync.ts`/`firebase.ts`/`storage.ts` + 2 file test mới; `npm run verify` chạy trên working tree: suite 22.32 s):** `npm run verify` gồm typecheck + 1327 test
+trong 92 file (bằng chứng `evidence/2026-11-03-T41D/verify-t41d.txt`; các lần đo trước trong cùng ngày: 1287 test / 22.15 s (`3b0122c`, `evidence/2026-11-03-QA-RACE/verify-1287.txt` — lượt đo trên working tree ngay trước commit là 22.09 s trong cùng file), 1286 test / 22.18 s (`verify-1286.txt`), 1281 test / 22.58 s (`verify-1281.txt`), 1280 test / 21.88 s (`verify-1280.txt`, trên `afb9eeb`) và 1278 test / 23.64 s ngày 2026-11-02 trong `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt`) + build + budget; probe QA cần Chromium của
 Playwright và `dist/`. Không có chi phí server **cho người dùng chưa bật sync**; từ khi có
 `firebase ^13.1.0`, chi phí Firestore thuộc project Firebase của người vận hành và chưa được
 đo (chưa có số liệu dùng thật, chưa thống kê hạn mức free tier).
@@ -151,7 +151,7 @@ Một bản được gọi là "phát hành được" khi:
 
 ---
 
-## Phụ lục A — Số liệu đo ngày 2026-11-03 (đợt đo trước 2026-11-02, gồm cả 2026-10-29 cho nội dung học)
+## Phụ lục A — Số liệu đo ngày 2026-11-03 **lần năm** (đợt đo trước 2026-11-02, gồm cả 2026-10-29 cho nội dung học)
 
 | Chỉ số | Giá trị | Đo bằng |
 |---|---|---|
@@ -159,10 +159,10 @@ Một bản được gọi là "phát hành được" khi:
 | Bậc độ khó mỗi trò | 6, số câu `[5, 6, 6, 7, 8, 8]` | `defaultRoundsPerTier()` trong `src/data/gameLevels.ts` |
 | Chủ đề / bài / câu nội dung học (đếm **runtime**, import array trong test tạm) | Tiếng Việt 15/58/612 · Toán 13/26/260 · Tiếng Anh 24/40/434 · Em & Cuộc sống 14/26/264 → **tổng 66 chủ đề, 150 bài, 1570 câu** | `*_TOPICS` trong `src/data/*Curriculum.ts` (đếm tĩnh bằng grep bỏ sót câu sinh qua factory) |
 | Luyện đọc | 36 đoạn · 192 câu hỏi | `READING_PASSAGES`, `READING_QUESTIONS` trong `src/data/readingContent.ts` |
-| Unit test | 90 file / 1287 test, xanh | `npx vitest run` (88 `.ts` + 2 `.tsx`) |
+| Unit test | 92 file / 1327 test, xanh | `npx vitest run` (90 `.ts` + 2 `.tsx`) |
 | Probe trình duyệt | 30 probe (29 `.mjs` + 1 `.cjs`, không tính `lib.mjs`, `run-one.mjs`) | `ls qa/*.mjs` |
-| Main chunk | 204.2 kB (ngân sách 600, mục tiêu 450 — **đã đạt** từ T39) | `npm run check:budget` |
-| Đồ thị chặn lần vẽ đầu | 418.6 kB = `index` 204.2 + `react-vendor` 213.6 + runtime 0.7 — T38 còn 1527.4 kB vì `firebase-vendor` + `math-bank` + `english-bank` bị nạp sẵn | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `428624 total` byte (÷ 1024 = 418.6 KiB) |
+| Main chunk | 209.9 kB (ngân sách 600, mục tiêu 450 — **đã đạt** từ T39) | `npm run check:budget` |
+| Đồ thị chặn lần vẽ đầu | 424.3 kB = `index` 209.9 + `react-vendor` 213.6 + runtime 0.7 — T38 còn 1527.4 kB vì `firebase-vendor` + `math-bank` + `english-bank` bị nạp sẵn | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `434451 total` byte (÷ 1024 = 424.3 KiB) |
 | Chunk vendor lớn | `three-vendor` 572.6 kB · `firebase-vendor` 723 kB · `react-vendor` 213.6 kB — tất cả ngoài entry, chỉ tải khi bé/người lớn mở đúng màn (T39) | `npm run check:budget` |
 | Kho câu thi | **475 câu** (256 trắc nghiệm · 55 nối · 46 điền · 42 xếp thứ tự · 39 đúng/sai · 24 phân loại · 13 kéo-thả), phủ đủ 26/26 kỹ năng taxonomy; đề thi phân môn: Toán 165 · Tiếng Anh 162 · Tiếng Việt 148 | `COMPETITION_QUESTIONS` (gồm `EXAM_FORMAT_QUESTIONS` 29 · `EXPANSION_QUESTIONS` 54 · `P36_QUESTIONS` 271 · `TOURNAMENT_QUESTIONS` 72), bank version 6 |
 | Blueprint đề thi | 16 preset: 6 mini-test · 2 full-mock · 2 speed-trial · 6 tournament; số câu 6→30 | `EXAM_BLUEPRINTS` trong `src/data/competitionBlueprints.ts` |

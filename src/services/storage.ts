@@ -336,7 +336,7 @@ export const INITIAL_ACHIEVEMENTS: Achievement[] = ACHIEVEMENT_CATALOG.map(
   ({ rule, ...rest }) => ({ ...rest })
 );
 
-const DEFAULT_CHILD_PROFILE: ChildProfile = {
+export const DEFAULT_CHILD_PROFILE: ChildProfile = {
   id: 'child_1',
   name: 'Bé Minh',
   grade: 1,

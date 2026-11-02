@@ -12,7 +12,7 @@ Ba rule của tài liệu này (từ `docs/SDLC.md` §1 giai đoạn 4 và `docs
 2. **Verdict chỉ có sau khi chạy.** Bốn giá trị: `Pass` · `Fail` · `Blocked` · `NotRun`.
    `NotRun` **không phải** `Pass` và phải kèm lý do.
 3. **Một TC phải bắt được lỗi.** TC nào cũng phải nói được "sửa sai chỗ nào thì dòng này đỏ".
-   Sáu TC đã kiểm chứng bằng cách tạm bỏ dòng kiểm (`§4`, năm phép ablation M1…M5), không chỉ đoán.
+   Sáu TC đã kiểm chứng bằng cách tạm bỏ dòng kiểm (`§4`, sáu phép ablation M1…M6), không chỉ đoán.
 
 ---
 
@@ -28,7 +28,7 @@ Ba rule của tài liệu này (từ `docs/SDLC.md` §1 giai đoạn 4 và `docs
 | E-4 | Probe Playwright trên `dist/` thật | 0 console error ở 4 probe | `evidence/2026-11-02-T41C/probe-*.json` · `evidence/2026-11-02-KBT-ISSUE-43/probe-game-pause.json` (12 bước, `errors: []`) |
 | E-5 | Không chặn quá mức | có TC chứng minh hai lượt thật **vẫn** được tính 2 lần | TC-04, TC-13 · lát cắt 2: TC-40 (cùng cú chạm lúc **đang chạy** phải xoá bóng) |
 | E-6 | Bằng chứng nhìn thấy được khi đổi UI | 2 ảnh trước/sau của cùng một màn | `game-rewards-on.png`, `game-rewards-off.png` · `b3-dang-tam-dung.png`, `d2-cho-tiep-tuc.png` |
-| E-7 | Test bắt được lỗi | ≥1 phép ablation làm đỏ đúng test cần đỏ | §4, 5 phép (M1…M5) |
+| E-7 | Test bắt được lỗi | ≥1 phép ablation làm đỏ đúng test cần đỏ | §4, 6 phép (M1…M6) |
 
 ---
 
@@ -110,7 +110,7 @@ Verdict: **42 Pass · 0 Fail · 0 Blocked · 0 NotRun** trong phạm vi hai lát
 
 ---
 
-## 4. Test có bắt được lỗi không — năm phép ablation đã chạy
+## 4. Test có bắt được lỗi không — sáu phép ablation đã chạy
 
 Không dùng điểm coverage làm chứng cứ. Cách kiểm: **tạm bỏ đúng dòng kiểm chứng**, chạy lại test,
 test phải đỏ vì **đúng nguyên nhân**, rồi hoàn tác.
@@ -125,6 +125,8 @@ test phải đỏ vì **đúng nguyên nhân**, rồi hoàn tác.
 | — | hoàn tác M3+M4 | `tests/t43-game-pause.test.ts` | `Tests 30 passed (30)` · EXIT=0 | lại bằng `npx vitest run tests/t43-game-pause.test.ts` |
 | M5 | `src/hooks/useGameStage.ts` — **không bỏ** guard, chỉ **lùi** `if (!isRunning) return;` của `submitWrong` xuống **sau** `setMistakesInTier` (phép này do review 4 lớp sinh ra: trước khi siết, test chỉ đếm `guards.length >= 2` nên vẫn xanh với lỗi thật) | TC-36 | `Tests 1 failed \| 29 passed (30)` · EXIT=1 — đỏ vì "guard không nằm ngay đầu hàm" | [`mutation-M5-guard-position.txt`](../../evidence/2026-11-02-KBT-ISSUE-43/mutation-M5-guard-position.txt) |
 | — | hoàn tác M5 + siết lại hợp đồng | `tests/t43-game-pause.test.ts` | `Tests 30 passed (30)` · EXIT=0 | `git checkout -- src/hooks/useGameStage.ts` rồi `npx vitest run tests/t43-game-pause.test.ts` |
+| M6 | **cả file** `src/services/cloudSync.ts` + `src/services/firebase.ts` trở về HEAD (`git show HEAD:<file> > <file>`, không sửa tay) ⇒ mất hàng đợi, `authEpoch`, mute `kho_bau_storage_change`, `AuthChangeSource` | `tests/t41d-cloud-sync-race.test.ts` — đỏ **năm** dòng đúng năm hành vi: đăng xuất giữa lúc kéo · hai `syncNow` chồng nhau · tự nổ auto-sync sau khi áp cloud · SDK hỏng bị coi là đăng xuất · `setState` trả object cũ | `Tests 5 failed \| 7 passed (12)` · EXIT=1 | [`mutation-M6-cloud-sync-revert.txt`](../../evidence/2026-11-03-T41D/mutation-M6-cloud-sync-revert.txt) |
+| — | hoàn tác M6 | hai file test T41D | `Tests 40 passed (40)` · EXIT=0 | [`t41d-tests-green.txt`](../../evidence/2026-11-03-T41D/t41d-tests-green.txt) |
 
 Lệnh tái lập (chạy trên máy sạch, `git checkout -- <file>` ngay sau đó):
 
@@ -143,6 +145,17 @@ npx vitest run tests/t43-game-pause.test.ts                              # phả
 git checkout -- src/hooks/useGameStage.ts
 npx vitest run tests/t43-game-pause.test.ts                              # phải EXIT=0, 30 passed
 node qa/run-one.mjs qa/game-pause.mjs                                    # phải QA PASS — 12 step(s), 0 errors
+
+# M6 — lùi CẢ HAI file cloud về HEAD (phép này mạnh hơn: không sửa tay, chỉ dựng lại bản cũ)
+# Bản T41D khi đó CHƯA nằm trong HEAD ⇒ phải sao lưu, đừng dùng `git checkout --` để "hoàn tác"
+cp src/services/cloudSync.ts /tmp/t41d-keep-cloudSync.ts
+cp src/services/firebase.ts  /tmp/t41d-keep-firebase.ts
+git show HEAD:src/services/cloudSync.ts > src/services/cloudSync.ts
+git show HEAD:src/services/firebase.ts  > src/services/firebase.ts
+npx vitest run tests/t41d-cloud-sync-race.test.ts                        # phải đỏ 5 failed | 7 passed, EXIT=1
+cp /tmp/t41d-keep-cloudSync.ts src/services/cloudSync.ts
+cp /tmp/t41d-keep-firebase.ts  src/services/firebase.ts
+npx vitest run tests/t41d-cloud-sync-race.test.ts                        # phải EXIT=0, 12 passed
 ```
 
 **M4 nói được gì và không nói được gì:** TC-36 đếm số guard (`≥ 2`) nên nó đỏ khi bỏ một guard —

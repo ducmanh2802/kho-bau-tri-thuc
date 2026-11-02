@@ -11,7 +11,7 @@
 
 | Driver | Số đo | Nguồn | Ảnh hưởng thiết kế |
 |---|---|---|---|
-| Dùng được offline trên điện thoại gia đình | boot graph **418.6 kB**, entry **204.2 kB** | BG-04 · NFR-P01 | ADR-16/17/18: vendor lớn phải nằm sau `React.lazy`; `three`/`firebase` không được import thẳng entry |
+| Dùng được offline trên điện thoại gia đình | boot graph **424.3 kB**, entry **209.9 kB** (đo 2026-11-03 lần năm) | BG-04 · NFR-P01 | ADR-16/17/18: vendor lớn phải nằm sau `React.lazy`; `three`/`firebase` không được import thẳng entry |
 | Không làm sai kiến thức lớp 1 | 0 lỗi validator, 18 WARNING đã xoá | BG-03 · NFR-C04 | ADR-05 nội dung là code tĩnh; ADR-06 deterministic theo `(tier, seed)` |
 | Tiến độ không bị hỏng vì thao tác lặp | 5 tầng idempotency | BG-06 · NFR-R04 | sanitizer whitelist + khoá biên lai (`storage.ts:2139`) |
 | Trẻ không bị thu thập dữ liệu | 0 API key, 0 lời gọi mạng bắt buộc | `SAFETY_PRIVACY.md` §1–2 · `.env.example` | ADR-01 local-first; ADR-16 cloud mirror tuỳ chọn |

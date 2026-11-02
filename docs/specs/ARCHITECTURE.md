@@ -189,7 +189,7 @@ Hai đường, và cả hai đều do người lớn khởi động:
 | `math-bank` | `src/data/math/` + `mathCurriculum` | ngân sách sống sót sau khi kho Toán phình |
 | `english-bank` | `src/data/english/` + `englishCurriculum` | tương tự cho kho Anh |
 | `curriculum` | `src/data/curriculum.ts` | 263.5 kB catalogue kỹ năng; T39 cắt được khỏi entry nhờ `StorageService.attachCurriculum` (ADR-18) |
-| entry `index-*.js` | App + services + phần còn lại | **≤ 600 kB (cứng), mục tiêu ≤ 450 kB** — hiện **204.2 kB** (đạt mục tiêu từ T39) |
+| entry `index-*.js` | App + services + phần còn lại | **≤ 600 kB (cứng), mục tiêu ≤ 450 kB** — hiện **209.9 kB** (đạt mục tiêu từ T39) |
 
 - Gate: `npm run check:budget` → `scripts/check-bundle-budget.mjs` đọc `dist/index.html`
   để tìm đúng file entry (bảo đảm không cộng nhầm chunk), exit 1 nếu vượt.
@@ -199,8 +199,8 @@ Hai đường, và cả hai đều do người lớn khởi động:
 - Cờ vua 3D cũng nạp lười: [src/App.tsx:20](file:///D:/trithuc/kho-bau-tri-thuc/src/App.tsx#L20) `lazy(() => import('./components/learning/chess/ChessScreen'))`
   ⇒ `three-vendor` (572.6 kB) và `ChessScreen` (56.2 kB) chỉ tải khi bé mở bàn cờ; chưa từng mở thì không trả giá.
 - **T39 — đường tải tiên phong (boot graph).** `manualChunks` chỉ tách file, **không** hoãn được
-  `import` tĩnh, nên thứ tự đo được là: entry `index-TgwkX59u.js` **204.2 kB**, và
-  `dist/index.html` tham chiếu tĩnh đúng 3 file = **418.6 kB** (index + `react-vendor` 213.6 +
+  `import` tĩnh, nên thứ tự đo được là: entry `index-3QHywPiW.js` **209.9 kB**, và
+  `dist/index.html` tham chiếu tĩnh đúng 3 file = **424.3 kB** (index + `react-vendor` 213.6 +
   `rolldown-runtime` 0.7). Ba màn/đối tượng đã bị kéo ra khỏi tập đó: Cờ Tướng + Luyện Tiếng Anh
   IOE (`React.lazy` + `ScreenFallback`), `data/curriculum` (tự đăng ký vào storage, prefetch sau
   first paint) và Firebase (`loadFirebaseSdk()` + hint phiên, `AccountModal` gọi
@@ -225,16 +225,21 @@ Hai đường, và cả hai đều do người lớn khởi động:
   `STORAGE_KEYS.CLOUD_SESSION_HINT` và đọc qua `readJSONObject`/`writeJSON`, có test đếm đủ 19 key (xem `docs/plan/TASK_PLAN.md` EP-B3).
 - Cache trình duyệt chứa **asset**, không chứa dữ liệu bé ⇒ xoá cache không mất tiến độ
   (`qa/offline-pwa.mjs` chứng minh).
-- **Lớp mirror tuỳ chọn (không thay thế các mục trên):** `src/services/cloudSync.ts` (277 dòng)
-  singleton `CloudSyncService` ([src/services/cloudSync.ts:277](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L277))
+- **Lớp mirror tuỳ chọn (không thay thế các mục trên):** `src/services/cloudSync.ts` (338 dòng)
+  singleton `CloudSyncService` ([src/services/cloudSync.ts:338](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L338))
   — constructor chỉ nghe `kho_bau_storage_change` (phát tại
   [src/services/storage.ts:243](file:///D:/trithuc/kho-bau-tri-thuc/src/services/storage.ts#L243)) và
   gọi `start()` **khi có hint phiên đám mây** `kho_bau_cloud_session_hint === '1'`
-  ([src/services/cloudSync.ts:73](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L73));
+  ([src/services/cloudSync.ts:117](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L117));
   `start()` mới nối `onAuthChange` (T39). `AccountModal` gọi `CloudSyncService.start()` khi
   người lớn mở màn ⇒ `scheduleAutoSync()` debounce 2000 ms, **chỉ khi đã đăng nhập**;
-  `pullAndMergeCloudData(uid)` (cloudSync.ts:162) hợp nhất sao/XP/chuỗi/vé bằng `Math.max`
-  và `completedLessons` bằng `Set` union, rồi ghi trả `localStorage`.
+  `pullAndMergeCloudData(uid)` ([src/services/cloudSync.ts:228](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L228))
+  đọc cloud **trước**, rồi mới đọc local và đẩy tất cả vào `mergeCloudState`
+  ([src/services/cloudMerge.ts:171](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudMerge.ts#L171)):
+  bộ đếm luỹ kế `Math.max`, tài nguyên tiêu được theo hồ sơ hoạt động sau nhất,
+  `completedLessons` bằng `Set` union, hồ sơ demo bị firewall — rồi ghi trả `localStorage`
+  và **đẩy cả profile lẫn analytics** lên cloud (T41D). Toàn bộ thao tác cloud đi qua một hàng đợi
+  và gắn `authEpoch`, nên kết quả của phiên đăng nhập cũ không ghi đè phiên mới.
   Không đăng nhập ⇒ trạng thái `offline` ⇒ app hoạt động y hệt bản không server.
 
 ---
@@ -422,13 +427,25 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
   người dùng đăng nhập Google qua `src/components/auth/AuthButton.tsx`.
 - **Quyết định:** **(c)**. `CloudSyncManager` khởi tạo `status: 'offline'`, `user: null`;
   listener `kho_bau_storage_change` có `if (this.state.user)` trước khi hẹn giờ sync
-  ([src/services/cloudSync.ts:67](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L67)).
+  ([src/services/cloudSync.ts:111](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L111)).
   T39 siết thêm một bước: `start()` (nối `onAuthChange`, và do đó nạp SDK Firebase) chỉ chạy khi
   có hint `kho_bau_cloud_session_hint === '1'` do chính người dùng để lại lần trước
-  ([src/services/cloudSync.ts:73](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L73))
+  ([src/services/cloudSync.ts:117](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L117))
   hoặc khi `AccountModal` mở — thiết bị chưa từng đăng nhập không tải `firebase-vendor`.
-  Hợp nhất kéo-về dùng `Math.max` cho sao/XP/chuỗi/vé và `Set` union cho bài đã học — chọn
-  cực đại vì tiến độ học không bao giờ nên *giảm* do máy khác đồng bộ tới.
+  Hợp nhất kéo-về **ban đầu (T39)** dùng `Math.max` cho sao/XP/chuỗi/vé và `Set` union cho bài đã
+  học — chọn cực đại vì tiến độ học không bao giờ nên *giảm* do máy khác đồng bộ tới.
+- **Bổ sung T41D (2026-11-03) — `Math.max` chỉ đúng với đại lượng luỹ kế.** Vé/sao-ngọc-trang bị là
+  tài nguyên **tiêu được** (`profile.tickets -= 1`, `profile.stars -= item.priceStars`): lấy max nghĩa
+  là in tiền khi hai máy cùng sync. Luật mới (module thuần `src/services/cloudMerge.ts:171`): bộ đếm
+  luỹ kế (XP, số câu đã làm) vẫn `max`; tài nguyên tiêu được theo hồ sơ có `lastActiveDate` **sau nhất**,
+  hoà thì giữ máy này; tiến độ là tập hợp thì `Set` union; tên do người lớn đặt thì cloud thắng, còn
+  tên mặc định thì giữ local; **hồ sơ demo trên cloud không đóng góp gì** vào hồ sơ thật. Cùng đợt:
+  mọi thao tác cloud qua **một hàng đợi** + `authEpoch` (kết quả của phiên đăng nhập cũ bị bỏ), và
+  đọc/ghi local do máy này thực hiện khi áp cloud được mute để không tự nổ vòng auto-sync
+  ([src/services/cloudSync.ts:228](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L228));
+  `AuthChangeSource` phân biệt "SDK không nạp được" với "đăng xuất thật"
+  ([src/services/firebase.ts:124](file:///D:/trithuc/kho-bau-tri-thuc/src/services/firebase.ts#L124))
+  để mất mạng không bị hiểu nhầm thành mất phiên.
 - **Hệ quả:** giữ được lời hứa "không có backend cũng dùng trọn vẹn" (QA offline vẫn xanh);
   có đường thoát cho ai lo ngại về quyền riêng tư. **Nợ:** `firebase-applet-config.json` nằm trong repo — API key
   web là public theo thiết kế của Firebase và `firestore.rules` là chỗ chặn, nhưng repo **không
@@ -498,12 +515,12 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 
 ---
 
-## 12. Kiểm kê kiến trúc (đo 2026-11-03 **lần bốn trong ngày**, nội dung = HEAD `main` `eb4b7b2` cộng bản bỏ cờ `continue-on-error` của job "3. Browser QA" trong `.github/workflows/03-qa-browser.yml` + 1 test hợp đồng mới trong `tests/t31-bug-hunt-fixes.test.ts` — **đã commit thành `3b0122c` và đo lại đúng commit đó: EXIT=0 · 1287 test · suite 22.15 s** ⇒ 1287 test; **`src/` không đổi nên entry đứng nguyên** `index-TgwkX59u.js` 204.2 kB — khác đợt đo thứ ba ngay trước đó, khi entry **đổi hash** mà kB không đổi, đúng cặp lỗi "đổi size quên hash / đổi hash quên size" mà quy ước §"Chỉ số liệu đo được" cảnh báo. Đợt đo thứ ba cùng ngày: sửa "đề cổng phụ huynh vẽ muộn hơn khung hình đầu" trong `src/components/parent/ParentDashboardModal.tsx` + helper `unlockParentDashboard` trong `qa/lib.mjs` (4 probe đi qua helper) + 5 test mới `tests/t41f-parent-gate.test.ts` ⇒ 1286 test. Hai đợt trước nữa: sửa race màn chúc mừng lên cấp trong `qa/lib.mjs` (`afb9eeb`, 2 test hợp đồng) rồi lưu output của **chính lần chạy đỏ** vào `probe-run.log` (`80c7e39`, thêm 1 test hợp đồng) ⇒ 1281 test, khi đó `src/` không đổi nên entry **giữ nguyên tên file**. Đợt đo trước 2026-11-02: sau KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3` — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` và probe `qa/game-pause.mjs`; `09511d3` thêm `tests/chess-engine-performance.test.ts` (5 test) và đổi engine cờ vua, không đụng số liệu khác. Nội dung học, service, component và các mục khác **không đổi** so với các đợt đo trước)
+## 12. Kiểm kê kiến trúc (đo 2026-11-03 **lần năm trong ngày**, nội dung = HEAD `main` `1cac775` cộng T41D — hợp nhất hồ sơ cloud với tiến độ máy khác + race đăng nhập: module mới `src/services/cloudMerge.ts` (⇒ **42** service), `cloudSync.ts`/`firebase.ts`/`storage.ts` đổi, 2 file test `tests/t41d-cloud-merge.test.ts` (28) + `tests/t41d-cloud-sync-race.test.ts` (12) — `npm run verify` **EXIT=0** · **92 file / 1327 test** · suite **22.32 s** · **`src/` đổi nên entry đổi cả hash lẫn kB**: `index-3QHywPiW.js` **209.9 kB**, boot graph **424.3 kB**; các đợt cùng ngày trước đó: bỏ cờ `continue-on-error` của job "3. Browser QA" (commit `3b0122c`, 1 test hợp đồng ⇒ 1287 test, `src/` không đổi nên entry **đứng nguyên cả hash lẫn kB** — khác đợt đo thứ ba ngay trước đó, khi entry **đổi hash** mà kB không đổi, đúng cặp lỗi "đổi size quên hash / đổi hash quên size" mà quy ước §"Chỉ số liệu đo được" cảnh báo. Đợt đo thứ ba cùng ngày: sửa "đề cổng phụ huynh vẽ muộn hơn khung hình đầu" trong `src/components/parent/ParentDashboardModal.tsx` + helper `unlockParentDashboard` trong `qa/lib.mjs` (4 probe đi qua helper) + 5 test mới `tests/t41f-parent-gate.test.ts` ⇒ 1286 test. Hai đợt trước nữa: sửa race màn chúc mừng lên cấp trong `qa/lib.mjs` (`afb9eeb`, 2 test hợp đồng) rồi lưu output của **chính lần chạy đỏ** vào `probe-run.log` (`80c7e39`, thêm 1 test hợp đồng) ⇒ 1281 test, khi đó `src/` không đổi nên entry **giữ nguyên tên file**. Đợt đo trước 2026-11-02: sau KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3` — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` và probe `qa/game-pause.mjs`; `09511d3` thêm `tests/chess-engine-performance.test.ts` (5 test) và đổi engine cờ vua, không đụng số liệu khác. Nội dung học, service, component và các mục khác **không đổi** so với các đợt đo trước)
 
 | Hạng | Số | Nguồn |
 |---|---|---|
 | Component `.tsx` | 95 trong 19 thư mục tính năng | `find src/components -name '*.tsx' \| wc -l` |
-| Service module | 41 | `ls src/services/*.ts \| wc -l` |
+| Service module | 42 | `ls src/services/*.ts \| wc -l` |
 | File dữ liệu | 104 | `find src/data -name '*.ts' \| wc -l` |
 | Module type | 8 | `ls src/types/*.ts \| wc -l` |
 | Hook | 5 | `ls src/hooks/*.ts \| wc -l` |
@@ -512,14 +529,14 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 | Export policy | 17 (693 dòng) | `src/config/policy.ts` |
 | Key `localStorage` | 19 | `STORAGE_KEYS` (17) + 2 key cục bộ (`kho_bau_ioe_store`, `kho_bau_cloud_session_hint` — hint boolean, không chứa dữ liệu bé) |
 | Dependency runtime | 8 | `package.json` → `dependencies` |
-| Test file / test | 90 / 1287 | `npx vitest run` (88 `.ts` + 2 `.tsx`) |
+| Test file / test | 92 / 1327 | `npx vitest run` (90 `.ts` + 2 `.tsx`) |
 | Probe QA | 30 (29 `.mjs` + 1 `.cjs`) | `ls qa/*.mjs qa/*.cjs` (trừ `lib.mjs`, `run-one.mjs`) |
 | Workflow CI | 4 | `.github/workflows/` |
 | MCP server / tool | 5 / 27 | `mcp/` |
-| Main chunk | **204.2 kB** `index-TgwkX59u.js` (trần 600, mục tiêu 450 ⇒ đạt từ T39) | `npm run check:budget` |
-| Boot graph (asset mà `dist/index.html` tham chiếu tĩnh) | **418.6 kB** = index 204.2 + `react-vendor` 213.6 + runtime 0.7 | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `428624 total` — chia 1024 ra 418.6 **KiB** (`check:budget` cũng chia 1024 nhưng in nhãn `kB`) |
+| Main chunk | **209.9 kB** `index-3QHywPiW.js` (trần 600, mục tiêu 450 ⇒ đạt từ T39) | `npm run check:budget` |
+| Boot graph (asset mà `dist/index.html` tham chiếu tĩnh) | **424.3 kB** = index 209.9 + `react-vendor` 213.6 + runtime 0.7 | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `434451 total` — chia 1024 ra 424.3 **KiB** (`check:budget` cũng chia 1024 nhưng in nhãn `kB`) |
 | Vendor chunk lớn nhất | `firebase-vendor` 723.0 kB · `three-vendor` 572.6 kB · `react-vendor` 213.6 kB — cả hai vendor lớn **không** còn trong boot graph | `npm run check:budget` |
-| `App.tsx` / `storage.ts` / `learningOS.ts` / `competitionEngine.ts` / `readingEngine.ts` / `cloudSync.ts` / `firebase.ts` | 499 / 2628 / 845 / 747 / 662 / 277 / 133 dòng | `wc -l` |
+| `App.tsx` / `storage.ts` / `learningOS.ts` / `competitionEngine.ts` / `readingEngine.ts` / `cloudSync.ts` / `cloudMerge.ts` / `firebase.ts` | 499 / 2628 / 845 / 747 / 662 / 338 / 364 / 144 dòng | `wc -l` |
 
 ---
 
@@ -528,7 +545,7 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 | # | Nợ | Ảnh hưởng | Hướng xử lý |
 |---|---|---|---|
 | 1 | `kho_bau_ioe_store` và `kho_bau_cloud_session_hint` ngoài `STORAGE_KEYS`, đọc/ghi trực tiếp `localStorage` | thoát khỏi pipeline sanitize; dễ lệch kiểm kê | đưa về registry + `readJSONObject`, thêm test đếm đủ 19 key |
-| 2 | ~~Entry 533.5 kB so với mục tiêu 450 kB~~ **đã đóng ở T39**: hiện entry 204.2 kB, boot graph 418.6 kB (`tests/t39-first-load-graph.test.ts` giữ trần 500 kB). Nợ còn: catalogue vẫn prefetch **cả bốn môn** sau first paint | thiết bị yếu tải cả ngân hàng đề dù chỉ học một môn | nạp `curriculum`/bank **theo môn** khi mở màn; giữ test trần boot graph |
+| 2 | ~~Entry 533.5 kB so với mục tiêu 450 kB~~ **đã đóng ở T39**: hiện entry 209.9 kB, boot graph 424.3 kB (`tests/t39-first-load-graph.test.ts` giữ trần 500 kB). Nợ còn: catalogue vẫn prefetch **cả bốn môn** sau first paint | thiết bị yếu tải cả ngân hàng đề dù chỉ học một môn | nạp `curriculum`/bank **theo môn** khi mở màn; giữ test trần boot graph |
 | 3 | Kid's Box units = 0 | track Anh chưa dùng được như giáo trình | cần nguồn đã xác minh (FR-N04, ADR-15) |
 | 4 | Chưa audit riêng track Kid's Box với trẻ thật | rủi ro trải nghiệm | audit người dùng thật trước khi quảng bá track |
 | 5 | `bun.lock` còn trong repo trong khi npm là nguồn thật | gây nhầm package manager | giữ nguyên + ghi chú (quyết định đã chốt) |

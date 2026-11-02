@@ -33,21 +33,21 @@ thì để trống và ghi lý do — không viết "sẽ làm".
 
 | Lớp | Nội dung | Artifact / lệnh |
 |---|---|---|
-| Deliverable | 170 module `.ts` + 97 `.tsx`, 41 service, 31 trò chơi đăng ký đủ 4 nơi | `find src -name '*.ts' \| wc -l` · `ARCHITECTURE.md` §12 |
+| Deliverable | 171 module `.ts` + 97 `.tsx`, 42 service, 31 trò chơi đăng ký đủ 4 nơi | `find src -name '*.ts' \| wc -l` · `ARCHITECTURE.md` §12 |
 | Quality gate | `pre-commit` typecheck · `commit-msg` chặn message sai chuẩn · `verify:quick` trước push | `scripts/hooks/` (3 hook) |
 | AI Level | **Mức 3 trong giới hạn** — agent tự sửa code trong phạm vi allowed changes, nhưng không tự merge và không tự thêm dependency | `AGENTS.md` §1 mục 4–5 · [`.qoder/agents/kbt-reviewer.md`](../../.qoder/agents/kbt-reviewer.md) |
 | RACI | R: agent · A: người giữ repo · C: reviewer lane khác | `.ai/CURRENT.md` |
-| Metrics | entry 204.2 kB / boot graph 418.6 kB · 8 dependency runtime | `npm run check:budget` (đo 2026-11-02) |
+| Metrics | entry 209.9 kB / boot graph 424.3 kB · 8 dependency runtime | `npm run check:budget` (đo 2026-11-03 lần năm, sau T41D) |
 
 ### Pha 4 — Verification (Kiểm chứng)
 
 | Lớp | Nội dung | Artifact / lệnh |
 |---|---|---|
-| Deliverable | TEST_PLAN 10 lớp, TEST_CASES 42 TC có verdict (hai lát cắt) · catalog 5 phép ablation | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) · [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md) |
+| Deliverable | TEST_PLAN 10 lớp, TEST_CASES 42 TC có verdict (hai lát cắt) · catalog 6 phép ablation | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) · [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md) |
 | Quality gate | `npm run verify` EXIT=0; UI đổi phải có ảnh/probe; test phải chứng minh bắt được lỗi | [`evidence/2026-11-02-T41C/`](../../evidence/README.md) · [`evidence/2026-11-02-KBT-ISSUE-43/`](../../evidence/README.md) |
 | AI Level | **Mức 2** — AI sinh test, expected lấy từ AC do người duyệt. *Deviation:* ở các đợt sớm người duyệt không tách AC 3 nhánh ⇒ xem `06_VERIFICATION_VALIDATION.md` §4 | `TEST_CASES.md` §2 |
 | RACI | R: agent · A: người giữ repo quyết oracle · C: — | — |
-| Metrics | 90 test file / 1287 test / suite 22.09 s · 30 probe · 5 phép ablation làm đỏ đúng test | `verify-1287.txt` (đo 2026-11-03 đợt bốn, mới nhất) · `verify-1286.txt` · `verify-1281.txt` · `verify-1280.txt` · `verify-main-1278.txt` · `verify-rc.txt` · `mutation-M*.txt` |
+| Metrics | 92 test file / 1327 test / suite 22.32 s · 30 probe · 6 phép ablation làm đỏ đúng test | `evidence/2026-11-03-T41D/` (đo 2026-11-03 lần năm, mới nhất) · `verify-1287.txt` · `verify-1286.txt` · `verify-1281.txt` · `verify-1280.txt` · `verify-main-1278.txt` · `verify-rc.txt` · `mutation-M*.txt` |
 
 ### Pha 5 — Release (Phát hành)
 

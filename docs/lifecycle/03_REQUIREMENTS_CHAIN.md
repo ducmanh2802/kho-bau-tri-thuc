@@ -61,7 +61,7 @@ Hai chiều ngược lại chạy ở `RTM.md` §6 (probe → yêu cầu) và §
 
 | ID | Số đo | Căn cứ | Enforce |
 |---|---|---|---|
-| NFR-P01 | main chunk ≤ 600 kB, mục tiêu 450 kB; hiện **204.2 kB** | thiết bị gia đình 3G/4G yếu | `npm run check:budget` trong `verify` |
+| NFR-P01 | main chunk ≤ 600 kB, mục tiêu 450 kB; hiện **209.9 kB** (đo 2026-11-03 lần năm, sau T41D) | thiết bị gia đình 3G/4G yếu | `npm run check:budget` trong `verify` |
 | NFR-M01 | một ngày học 15–20 phút | khung tập trung của trẻ lớp 1 | `src/config/policy.ts` (693 dòng, 17 export) |
 | NFR-R04 | idempotency 5 tầng, làm lại thao tác không tăng thưởng | tiến độ sai làm phụ huynh mất niềm tin | 25 test trong `tests/t41c-idempotency.test.ts` |
 

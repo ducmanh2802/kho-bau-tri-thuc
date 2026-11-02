@@ -110,21 +110,32 @@ export async function logOut(): Promise<void> {
 }
 
 /**
+ * 'state'          = Firebase đã nạp và trả lời chắc chắn về phiên đăng nhập.
+ * 'sdk_unavailable' = không nạp được SDK (mạng/chunk lỗi) — **không** có nghĩa là
+ *   bé đã đăng xuất. T41D: người nghe cần phân biệt hai loại, vì coi lần thứ hai
+ *   là "đăng xuất" sẽ xoá cờ "máy này từng đăng nhập" và tắt luôn auto-sync.
+ */
+export type AuthChangeSource = 'state' | 'sdk_unavailable';
+
+/**
  * Subscribe to Auth state changes. Trả về hàm huỷ đăng ký dùng được ngay cả khi
  * SDK vẫn đang nạp — người gọi không phải chờ chunk Firebase.
  */
-export function onAuthChange(callback: (user: CloudUser | null) => void): () => void {
+export function onAuthChange(callback: (user: CloudUser | null, source: AuthChangeSource) => void): () => void {
   let disposed = false;
   let unsubscribe: (() => void) | null = null;
   loadFirebaseSdk()
     .then((sdk) => {
-      if (disposed) return;
-      unsubscribe = sdk.onAuthStateChanged(sdk.auth, (user) => {
-        callback(sanitizeUser(user));
+      const listener = sdk.onAuthStateChanged(sdk.auth, (user) => {
+        callback(sanitizeUser(user), 'state');
       });
+      // T41D: huỷ trước khi SDK nạp xong từng làm hỏng luôn việc huỷ — hàm này
+      // bị vứt và auth vẫn gọi lại callback của thành phần đã unmount. Giờ nối ngay.
+      if (disposed) listener();
+      else unsubscribe = listener;
     })
     .catch(() => {
-      if (!disposed) callback(null);
+      if (!disposed) callback(null, 'sdk_unavailable');
     });
   return () => {
     disposed = true;

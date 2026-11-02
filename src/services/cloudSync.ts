@@ -1,6 +1,6 @@
 import { loadFirebaseSdk, onAuthChange, type CloudUser } from './firebase';
 import { StorageService } from './storage';
-import type { ChildProfile } from '../types';
+import { mergeCloudState } from './cloudMerge';
 
 /**
  * T39 — "Thiết bị này từng đăng nhập" là một cờ boolean thuần tuý, không chứa
@@ -8,6 +8,12 @@ import type { ChildProfile } from '../types';
  * dùng cloud sync thật; bé học offline hoàn toàn không tải chunk đó.
  */
 const CLOUD_SESSION_HINT = 'kho_bau_cloud_session_hint';
+
+/**
+ * Độ trễ gom thao tác trước khi đẩy lên cloud: nhỏ đủ để mất mạng đột xuất vẫn
+ * còn bản ghi, lớn đủ để một lượt học không tạo chục lần `setDoc`.
+ */
+const AUTO_SYNC_DEBOUNCE_MS = 2000;
 
 function readSessionHint(): boolean {
   try {
@@ -33,6 +39,12 @@ export interface CloudSyncState {
   user: CloudUser | null;
   lastSyncedAt: Date | null;
   error: string | null;
+  /**
+   * Luật hợp nhất mà lần kéo cloud gần nhất đã áp — chỉ tên trường và chiều thắng
+   * (`stars:from_cloud`), **không** chứa nội dung bài làm của bé. Cần để test chứng
+   * minh luật nào thực sự chạy, và để màn tài khoản giải thích vì sao con số đổi.
+   */
+  mergeTrace: string[];
 }
 
 type SyncListener = (state: CloudSyncState) => void;
@@ -54,16 +66,48 @@ class CloudSyncManager {
     user: null,
     lastSyncedAt: null,
     error: null,
+    mergeTrace: [],
   };
 
   private listeners = new Set<SyncListener>();
   private syncDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private authStarted = false;
 
+  /**
+   * T41D — "thế hệ" của phiên đăng nhập: mỗi lần auth đổi là một epoch mới, kết
+   * quả thuộc epoch cũ bị bỏ. Không có nó thì bé đăng xuất (hoặc đổi tài khoản)
+   * giữa lúc `pullAndMerge` còn chờ mạng sẽ ghi `synced` + `lastSyncedAt` lên
+   * trạng thái của tài khoản **khác** — UI báo "đã lưu an toàn" dù không còn ai
+   * đăng nhập, và hồ sơ máy A lọt vào hồ sơ máy B.
+   */
+  private authEpoch = 0;
+
+  /**
+   * T41D — mọi thao tác cloud đi qua một hàng đợi. Trước đây nút "Đồng bộ ngay",
+   * auto-sync sau 2 s và pull-merge lúc đăng nhập chồng nhau: hai `setDoc` đọc hai
+   * bản local khác rồi tranh ghi, bản ghi sau đè mất bản vừa hợp nhất.
+   */
+  private queue: Promise<void> = Promise.resolve();
+
+  /**
+   * True khi chính máy này đang đọc/ghi `localStorage` để phục vụ đồng bộ.
+   * T41D: `saveChildProfile`, và cả `getAnalytics` (tự làm mới bộ đếm ngày), phát
+   * event `kho_bau_storage_change` y hệt một lần bé học. Người nghe bên dưới coi
+   * đó là "bé vừa làm gì" rồi hẹn giờ đẩy ngược lên cloud ⇒ mỗi lần đăng nhập nổ
+   * một vòng tự đồng bộ, và vòng đó lại ghi local ⇒ nổ tiếp. Chỉ bọc quanh đoạn
+   * **đọc/ghi local**, không bọc lúc chờ mạng, để thao tác học thật của bé trong
+   * lúc sync vẫn được nghe.
+   */
+  private writingOwnState = false;
+
   constructor() {
     // Listen to local storage changes to trigger debounced auto-sync
     if (typeof window !== 'undefined') {
       window.addEventListener('kho_bau_storage_change', () => {
+        // T41D: `saveChildProfile(merged)` và `getAnalytics()` cũng phát event này.
+        // Trước đây nó đặt hẹn giờ auto-sync ngay giữa lúc pull, rồi đẩy ngược dữ
+        // liệu vừa kéo về lên cloud — một vòng tự đồng bộ nổ mỗi lần đăng nhập.
+        if (this.writingOwnState) return;
         if (this.state.user) {
           this.scheduleAutoSync();
         }
@@ -83,8 +127,14 @@ class CloudSyncManager {
   public start(): void {
     if (this.authStarted || typeof window === 'undefined') return;
     this.authStarted = true;
-    onAuthChange((user) => {
-      writeSessionHint(!!user);
+    onAuthChange((user, source) => {
+      // T41D: onAuthChange cũng báo null khi **không nạp được SDK** (mạng đứt,
+      // chunk Firebase lỗi). Xoá cờ "máy này từng đăng nhập" ở nhánh đó là tự cắt
+      // tính năng vĩnh viễn — lần mở sau app không nghe auth nữa dù bé vẫn đang
+      // đăng nhập. Chỉ bỏ cờ khi Firebase chắc chắn trả lời đã đăng xuất.
+      if (source === 'state') writeSessionHint(!!user);
+      else if (user) writeSessionHint(true);
+      else this.authStarted = false;
       void this.handleAuthChanged(user);
     });
   }
@@ -101,6 +151,17 @@ class CloudSyncManager {
     };
   }
 
+  /**
+   * Luôn gán đối tượng trạng thái **mới** rồi mới báo. `AuthButton` và
+   * `CloudSyncBanner` đưa thẳng kết quả vào `setSyncState`, nên sửa tại chỗ
+   * (`this.state.status = …`) giữ nguyên tham chiếu và UI đứng yên — lỗi cũ ở
+   * nhánh "chưa đăng nhập" của `syncNow`.
+   */
+  private setState(patch: Partial<CloudSyncState>) {
+    this.state = { ...this.state, ...patch };
+    this.notify();
+  }
+
   private notify() {
     for (const listener of this.listeners) {
       listener(this.state);
@@ -108,108 +169,75 @@ class CloudSyncManager {
   }
 
   private async handleAuthChanged(user: CloudUser | null) {
+    const epoch = ++this.authEpoch;
+
     if (!user) {
-      this.state = {
-        status: 'offline',
-        user: null,
-        lastSyncedAt: null,
-        error: null,
-      };
-      this.notify();
+      this.cancelScheduledSync();
+      this.setState({ status: 'offline', user: null, lastSyncedAt: null, error: null, mergeTrace: [] });
       return;
     }
 
-    this.state = {
-      ...this.state,
-      user,
-      status: 'syncing',
-      error: null,
-    };
-    this.notify();
+    this.setState({ user, status: 'syncing', error: null });
 
-    try {
-      // Pull and merge with Firestore
-      await this.pullAndMergeCloudData(user.uid);
-      this.state = {
-        ...this.state,
-        status: 'synced',
-        lastSyncedAt: new Date(),
-        error: null,
-      };
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Lỗi đồng bộ đám mây';
-      this.state = {
-        ...this.state,
-        status: 'error',
-        error: msg,
-      };
+    await this.enqueue(async () => {
+      if (epoch !== this.authEpoch) return;
+      try {
+        const mergeTrace = await this.pullAndMergeCloudData(user.uid);
+        if (epoch !== this.authEpoch) return;
+        this.setState({ status: 'synced', lastSyncedAt: new Date(), error: null, mergeTrace });
+      } catch (err: unknown) {
+        if (epoch !== this.authEpoch) return;
+        const msg = err instanceof Error ? err.message : 'Lỗi đồng bộ đám mây';
+        this.setState({ status: 'error', error: msg });
+      }
+    });
+  }
+
+  private cancelScheduledSync() {
+    if (this.syncDebounceTimer) {
+      clearTimeout(this.syncDebounceTimer);
+      this.syncDebounceTimer = null;
     }
-    this.notify();
   }
 
   private scheduleAutoSync() {
-    if (this.syncDebounceTimer) {
-      clearTimeout(this.syncDebounceTimer);
-    }
+    this.cancelScheduledSync();
     this.syncDebounceTimer = setTimeout(() => {
+      this.syncDebounceTimer = null;
       this.syncNow().catch(() => {});
-    }, 2000);
+    }, AUTO_SYNC_DEBOUNCE_MS);
   }
 
   /**
-   * Pulls existing cloud document, merges with local state, and pushes back to cloud
+   * Ghép một thao tác cloud vào cuối hàng đợi. Trả về kết quả của chính thao tác
+   * để caller vẫn thấy lỗi; bản thân hàng đợi nuốt lỗi để không chặn bước sau.
    */
-  private async pullAndMergeCloudData(uid: string): Promise<void> {
+  private enqueue<T>(task: () => Promise<T>): Promise<T> {
+    const run = this.queue.then(task, task);
+    this.queue = run.then(
+      () => undefined,
+      () => undefined
+    );
+    return run;
+  }
+
+  /**
+   * Pulls existing cloud document, merges with local state, and pushes the result
+   * back to cloud. Trả về luật hợp nhất đã áp.
+   */
+  private async pullAndMergeCloudData(uid: string): Promise<string[]> {
     const sdk = await loadFirebaseSdk();
     const userDocRef = sdk.doc(sdk.db, 'users', uid);
     const snap = await sdk.getDoc(userDocRef);
 
-    const localProfile = StorageService.getChildProfile();
-    const localAnalytics = StorageService.getAnalytics();
+    // Đọc sau khi đã chờ mạng: bé vẫn học trong lúc pull, và bản đọc từ đầu phiên
+    // là bản cũ — đẩy nó lên cloud sẽ nuốt các bước bé vừa làm.
+    const { localProfile, localAnalytics } = this.withMutedLocalWrites(() => ({
+      localProfile: StorageService.getChildProfile(),
+      localAnalytics: StorageService.getAnalytics(),
+    }));
 
-    if (snap.exists()) {
-      const cloudData = snap.data();
-      const cloudProfile = (cloudData?.profile as Partial<ChildProfile>) || {};
-
-      // Merge intelligent resolution: highest stars, highest XP, union of lessons
-      const mergedStars = Math.max(localProfile.stars || 0, cloudProfile.stars || 0);
-      const mergedXp = Math.max(localProfile.xp || 0, cloudProfile.xp || 0);
-      const mergedStreak = Math.max(localProfile.streak || 0, cloudProfile.streak || 0);
-      const mergedTickets = Math.max(localProfile.tickets || 0, cloudProfile.tickets || 0);
-
-      const localLessons = localProfile.completedLessons || [];
-      const cloudLessons = cloudProfile.completedLessons || [];
-      const mergedLessons = Array.from(new Set([...localLessons, ...cloudLessons]));
-
-      const mergedLessonStars = {
-        ...(cloudProfile.lessonStars || {}),
-        ...(localProfile.lessonStars || {}),
-      };
-
-      const mergedProfile: ChildProfile = {
-        ...localProfile,
-        stars: mergedStars,
-        xp: mergedXp,
-        streak: mergedStreak,
-        tickets: mergedTickets,
-        completedLessons: mergedLessons,
-        lessonStars: mergedLessonStars,
-        name: cloudProfile.name || localProfile.name,
-      };
-
-      StorageService.saveChildProfile(mergedProfile);
-
-      // Push merged back to cloud
-      await sdk.setDoc(
-        userDocRef,
-        sanitizeForFirestore({
-          profile: mergedProfile,
-          analytics: localAnalytics,
-          updatedAt: new Date().toISOString(),
-        }),
-        { merge: true }
-      );
-    } else {
+    if (!snap.exists()) {
       // First cloud save for this account
       await sdk.setDoc(
         userDocRef,
@@ -220,6 +248,44 @@ class CloudSyncManager {
           updatedAt: new Date().toISOString(),
         })
       );
+      return ['first_cloud_save'];
+    }
+
+    const cloudData = snap.data() || {};
+    const outcome = mergeCloudState({
+      local: localProfile,
+      localAnalytics,
+      cloudProfile: (cloudData.profile as Record<string, unknown>) || null,
+      cloudAnalytics: (cloudData.analytics as Record<string, unknown>) || null,
+    });
+
+    this.withMutedLocalWrites(() => StorageService.saveChildProfile(outcome.profile));
+
+    // Đẩy cả analytics đã hợp nhất. Bản cũ chỉ gửi analytics của máy này nên báo
+    // cáo của máy khác bị đè về số của máy này sau mỗi lần đồng bộ.
+    await sdk.setDoc(
+      userDocRef,
+      sanitizeForFirestore({
+        profile: outcome.profile,
+        analytics: outcome.analytics,
+        updatedAt: new Date().toISOString(),
+      }),
+      { merge: true }
+    );
+
+    return outcome.trace;
+  }
+
+  /**
+   * Chạy một đoạn đọc/ghi `localStorage` của riêng bộ đồng bộ mà không cho nó
+   * tự kích hoạt lần đồng bộ kế tiếp (xem `writingOwnState`).
+   */
+  private withMutedLocalWrites<T>(run: () => T): T {
+    this.writingOwnState = true;
+    try {
+      return run();
+    } finally {
+      this.writingOwnState = false;
     }
   }
 
@@ -229,48 +295,43 @@ class CloudSyncManager {
   public async syncNow(): Promise<void> {
     const user = this.state.user;
     if (!user) {
-      this.state.status = 'offline';
-      this.notify();
+      this.setState({ status: 'offline' });
       return;
     }
+    const epoch = this.authEpoch;
 
-    this.state = { ...this.state, status: 'syncing', error: null };
-    this.notify();
+    return this.enqueue(async () => {
+      if (epoch !== this.authEpoch) return;
+      this.setState({ status: 'syncing', error: null });
 
-    try {
-      const uid = user.uid;
-      const sdk = await loadFirebaseSdk();
-      const userDocRef = sdk.doc(sdk.db, 'users', uid);
-      const profile = StorageService.getChildProfile();
-      const analytics = StorageService.getAnalytics();
+      try {
+        const uid = user.uid;
+        const sdk = await loadFirebaseSdk();
+        const userDocRef = sdk.doc(sdk.db, 'users', uid);
+        const { profile, analytics } = this.withMutedLocalWrites(() => ({
+          profile: StorageService.getChildProfile(),
+          analytics: StorageService.getAnalytics(),
+        }));
 
-      await sdk.setDoc(
-        userDocRef,
-        sanitizeForFirestore({
-          profile,
-          analytics,
-          updatedAt: new Date().toISOString(),
-        }),
-        { merge: true }
-      );
+        await sdk.setDoc(
+          userDocRef,
+          sanitizeForFirestore({
+            profile,
+            analytics,
+            updatedAt: new Date().toISOString(),
+          }),
+          { merge: true }
+        );
 
-      this.state = {
-        ...this.state,
-        status: 'synced',
-        lastSyncedAt: new Date(),
-        error: null,
-      };
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Không thể lưu lên đám mây';
-      this.state = {
-        ...this.state,
-        status: 'error',
-        error: msg,
-      };
-      throw err;
-    } finally {
-      this.notify();
-    }
+        if (epoch !== this.authEpoch) return;
+        this.setState({ status: 'synced', lastSyncedAt: new Date(), error: null });
+      } catch (err: unknown) {
+        if (epoch !== this.authEpoch) return;
+        const msg = err instanceof Error ? err.message : 'Không thể lưu lên đám mây';
+        this.setState({ status: 'error', error: msg });
+        throw err;
+      }
+    });
   }
 }
 

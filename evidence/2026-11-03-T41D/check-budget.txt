@@ -1,0 +1,19 @@
+
+> kho-bau-tri-thuc-lop-1@1.1.0 check:budget
+> node scripts/check-bundle-budget.mjs
+
+Bundle budget (T02C: main chunk must stay ≤ 600 kB, goal ≤ 450 kB):
+     723.0 kB  firebase-vendor-CHgyFgl9.js
+     572.6 kB  three-vendor-DmepbH5g.js
+     263.5 kB  curriculum-BwEgdFyW.js
+     213.6 kB  react-vendor-BNCMh3YF.js
+     209.9 kB  index-3QHywPiW.js  ← main
+     186.0 kB  english-bank-CBDGF6Vb.js
+     143.0 kB  ReadingFluencyScreen-CJRSg-qb.js
+     130.4 kB  competitionQuestions-boIslmox.js
+     124.1 kB  math-bank-BaP_gCx8.js
+      70.7 kB  ParentDashboardModal-D6-TLrcC.js
+      56.2 kB  ChessScreen-BSnA--xN.js
+      54.3 kB  CompetitionHubScreen-6LGDrhNo.js
+  ... +84 more chunks
+Main chunk: index-3QHywPiW.js = 209.9 kB → PASS (meets 450 kB goal)

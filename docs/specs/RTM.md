@@ -158,7 +158,7 @@
 | FR-Y06 | `src/index.css`, `public/fonts` | `tests/p41-font-encoding.test.ts` | `qa/p41-font-visual.mjs` | V,3 | ĐẠT |
 | FR-Y07 | `src/App.tsx` (@vercel/analytics mặc định) | `tests/firebase-auth-sync.test.ts` | `qa/t02-smoke.mjs` (network) | V,1 | ĐẠT |
 | FR-Y08 | `src/services/firebase.ts:82`, `src/components/auth/AccountModal.tsx` | `tests/firebase-auth-sync.test.ts:86` (offline khi chưa đăng nhập) | `qa/golden-path.mjs` | V,1 | ĐẠT |
-| FR-Y09 | `src/services/cloudSync.ts:73`, `:162`, `firestore.rules` | `tests/firebase-auth-sync.test.ts` (mock) | — | V,1 | ĐẠT MỘT PHẦN — chưa test với project Firebase thật, chưa có UI xoá dữ liệu cloud |
+| FR-Y09 | `src/services/cloudMerge.ts:171` (luật hợp nhất thuần), `src/services/cloudSync.ts:228` (kéo + gộp + đẩy), `:117` (chỉ theo dõi auth khi máy từng đăng nhập), `firestore.rules` | `tests/firebase-auth-sync.test.ts`, `tests/t41d-cloud-merge.test.ts` (28), `tests/t41d-cloud-sync-race.test.ts` (12) — đều mock | — | V,1 | ĐẠT MỘT PHẦN — chưa test với project Firebase thật, chưa có UI xoá dữ liệu cloud |
 
 ### 2.10 FR-C — Cờ tướng
 
@@ -190,7 +190,7 @@
 | NFR-R02 | `src/services/storage.ts:114`, `:177` | `tests/exam-fidelity.test.ts`, `tests/t18a-motivation.test.ts`, `tests/reading-fluency.test.ts`, `tests/t40-parent-facing-ids.test.ts` | — | V,1 | ĐẠT |
 | NFR-R03 | `src/services/storage.ts:262` (`readJSONObject`) | `tests/decision-engine-storage.test.ts`, `tests/kidbox-learning-os.test.ts` | — | V,1 | ĐẠT |
 | NFR-R04 | `src/services/storage.ts`, `src/services/learningOS.ts` | `tests/lesson-completion.test.ts`, `tests/game-rewards.test.ts`, `tests/personas-and-learning-os.test.ts` | `qa/games.mjs` | V,1,3 | ĐẠT |
-| NFR-C01 | `src/services/storage.ts` (nguồn thật), `src/services/cloudSync.ts:73` (chỉ sync khi đã đăng nhập), `firestore.rules` | `tests/firebase-auth-sync.test.ts` | `qa/offline-pwa.mjs` | V,1 | ĐẠT (mặc định) — phần cloud mirror mới đạt một phần, xem FR-Y09 |
+| NFR-C01 | `src/services/storage.ts` (nguồn thật), `src/services/cloudSync.ts:117` (chỉ sync khi đã đăng nhập), `firestore.rules` | `tests/firebase-auth-sync.test.ts`, `tests/t41d-cloud-sync-race.test.ts` | `qa/offline-pwa.mjs` | V,1 | ĐẠT (mặc định) — phần cloud mirror mới đạt một phần, xem FR-Y09 |
 | NFR-C02 | `.gitignore` (`progress/`) | `tests/t23-mcp-servers.test.ts` | — | V,1,H | ĐẠT |
 | NFR-C03 | `mcp/sample-export.json` (`isDemoData`), `src/services/demoSeed.ts` | `tests/t23-mcp-servers.test.ts`, `tests/parent-and-demo.test.ts` | `qa/golden-path.mjs` | V,1 | ĐẠT |
 | NFR-C04 | `src/data/contentSafety.ts` | `tests/content-quality.test.ts`, `tests/praise-engine.test.ts` | `qa/p41-curriculum-quality.mjs` | V,1,3 | ĐẠT |
@@ -199,7 +199,7 @@
 | NFR-M01 | `package.json` (`verify`, `verify:quick`) | — | — | V,H,1,2 | ĐẠT |
 | NFR-M02 | `src/config/policy.ts` (17 export, có rationale) | test theo từng policy block | — | V,1 | ĐẠT |
 | NFR-M03 | ADR-03; `src/services/answerCheck.ts` | `tests/answerCheck.test.ts`, `tests/competition-engine.test.ts` | `qa/question-types.mjs` | V,1 | ĐẠT |
-| NFR-M04 | `tests/` naming | 90 file / 1287 test | — | V,H,1 | ĐẠT |
+| NFR-M04 | `tests/` naming | 92 file / 1327 test | — | V,H,1 | ĐẠT |
 | NFR-M05 | `package.json` (8 runtime deps; `@types/three` sai chỗ — nợ #8 ARCHITECTURE §13) | `tests/t23-mcp-servers.test.ts` | — | V,H,1 | ĐẠT |
 | NFR-M06 | `mcp/lib/server.mjs` | `tests/t23-mcp-servers.test.ts` | — | V,1 | ĐẠT |
 
@@ -278,7 +278,7 @@
 
 ## 7. Ma trận ngược: test không phục vụ yêu cầu nào?
 
-90 file test đều nằm trong ít nhất một dòng §2 hoặc §3 ở trên (mới: `tests/t41f-parent-gate.test.ts` → FR-P01/NFR-M04 (cổng phụ huynh phải có đề ngay khung hình đầu) + NFR-U01 (probe không tin một lần đọc); `tests/chess-engine-performance.test.ts` (merge `09511d3`) → FR-C06 + NFR-P01 — tên file không theo quy ước `t<NN>-…`, nợ ghi ở §10; `tests/t43-game-pause.test.ts` → FR-G08 + KBT-ISSUE-43 (`docs/issues/43-game-pause.md`), đã ghi ở §6 và §10; `tests/t41c-idempotency.test.ts` → NFR-R04/FR-G04/FR-R05; `tests/t41b-decision-clock.test.ts` → FR-L04/FR-L06; `tests/t41a-parent-controls.test.ts` → FR-P01/FR-S06/NFR-M04; `tests/t40-parent-facing-ids.test.ts` → FR-P01/FR-L06/FR-R04/NFR-R02/NFR-M04; `tests/t39-first-load-graph.test.ts` → NFR-P01/NFR-C01/NFR-M04 + ADR-18; `tests/t38-webgl-fallback.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/t34-chess-real-set.test.ts` → FR-C06; `tests/t33-feedback-timers.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/t32-game-stage-reset.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/chess-3d.test.ts` → FR-C06; `tests/t31-bug-hunt-fixes.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/firebase-cloud-sync.test.ts` đổi tên thành `tests/firebase-auth-sync.test.ts` → FR-Y08/Y09/NFR-C01; `tests/t24-speech-math-operators.test.ts` → FR-Y02; `tests/t25-difficulty-ladder.test.ts` → FR-G04/G05; `tests/t26-cotuong-puzzles.test.ts` → FR-C06; `tests/t27-lesson-engagement.test.ts` → FR-M01/FR-S08; `tests/t28-ui-polish.test.ts` → NFR-U01/NFR-M04; `tests/t29-lesson-smooth.test.ts` → FR-L02/NFR-M04; `tests/t30-cotuong-piece-depth.test.ts` → FR-C02), **ngoại trừ** các file sau —
+92 file test đều nằm trong ít nhất một dòng §2 hoặc §3 ở trên (mới: `tests/t41d-cloud-merge.test.ts` + `tests/t41d-cloud-sync-race.test.ts` → FR-Y09/NFR-C01/A-03 (phép hợp nhất hồ sơ cloud không in tài nguyên, không bỏ hồ sơ demo vào tài khoản thật, và kết quả của phiên đăng nhập cũ không được ghi lên phiên mới); `tests/t41f-parent-gate.test.ts` → FR-P01/NFR-M04 (cổng phụ huynh phải có đề ngay khung hình đầu) + NFR-U01 (probe không tin một lần đọc); `tests/chess-engine-performance.test.ts` (merge `09511d3`) → FR-C06 + NFR-P01 — tên file không theo quy ước `t<NN>-…`, nợ ghi ở §10; `tests/t43-game-pause.test.ts` → FR-G08 + KBT-ISSUE-43 (`docs/issues/43-game-pause.md`), đã ghi ở §6 và §10; `tests/t41c-idempotency.test.ts` → NFR-R04/FR-G04/FR-R05; `tests/t41b-decision-clock.test.ts` → FR-L04/FR-L06; `tests/t41a-parent-controls.test.ts` → FR-P01/FR-S06/NFR-M04; `tests/t40-parent-facing-ids.test.ts` → FR-P01/FR-L06/FR-R04/NFR-R02/NFR-M04; `tests/t39-first-load-graph.test.ts` → NFR-P01/NFR-C01/NFR-M04 + ADR-18; `tests/t38-webgl-fallback.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/t34-chess-real-set.test.ts` → FR-C06; `tests/t33-feedback-timers.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/t32-game-stage-reset.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/chess-3d.test.ts` → FR-C06; `tests/t31-bug-hunt-fixes.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/firebase-cloud-sync.test.ts` đổi tên thành `tests/firebase-auth-sync.test.ts` → FR-Y08/Y09/NFR-C01; `tests/t24-speech-math-operators.test.ts` → FR-Y02; `tests/t25-difficulty-ladder.test.ts` → FR-G04/G05; `tests/t26-cotuong-puzzles.test.ts` → FR-C06; `tests/t27-lesson-engagement.test.ts` → FR-M01/FR-S08; `tests/t28-ui-polish.test.ts` → NFR-U01/NFR-M04; `tests/t29-lesson-smooth.test.ts` → FR-L02/NFR-M04; `tests/t30-cotuong-piece-depth.test.ts` → FR-C02), **ngoại trừ** các file sau —
 chúng bảo vệ *chất lượng nền* chứ không bảo vệ một FR riêng lẻ:
 
 | File | Vai trò thật |
@@ -297,12 +297,12 @@ chưa được ghi vào SRS (phải thêm FR hoặc xoá test).
 
 | Hạng | Số | Độ phủ |
 |---|---|---|
-| FR | 88 | **86 ĐẠT** · 1 ĐẠT MỘT PHẦN (FR-Y09 — cloud mirror mới có test mock) · 2 CHƯA ĐẠT (FR-N04, FR-P08 — cùng một nguyên nhân: thiếu nguồn giáo trình) |
+| FR | 88 | **86 ĐẠT** · 1 ĐẠT MỘT PHẦN (FR-Y09 — cloud mirror đã có 40 test T41D nhưng **toàn bộ chạy trên Firestore giả lập**; chưa có project Firebase thật / emulator để chứng minh `firestore.rules` chặn đọc-ghi chéo, xem `HARNESS.md` H-3) · 2 CHƯA ĐẠT (FR-N04, FR-P08 — cùng một nguyên nhân: thiếu nguồn giáo trình) |
 | FR có bằng chứng tự động (`tests/`) | 82/88 | 7 FR chỉ có probe (`FR-Y01`, `FR-M08`, `FR-C05`, `FR-S01`, `NFR-A04/A05`…) |
-| NFR | 25 | 24 ĐẠT · 1 đạt một phần (NFR-P01: entry 204.2 kB **đã** dưới mục tiêu 450 kB từ T39, nhưng `check:budget` vẫn chưa đo boot graph ⇒ giữ mức "một phần" cho tới khi trần boot graph vào `verify`) |
+| NFR | 25 | 24 ĐẠT · 1 đạt một phần (NFR-P01: entry **209.9 kB** đã dưới mục tiêu 450 kB từ T39 và trần boot graph 500 kB **đã** vào `verify` nhờ `tests/t39-first-load-graph.test.ts` — đo 424.3 kB; vẫn giữ "một phần" vì `check:budget` — gate riêng — mới chỉ đo entry, chưa đo boot graph, và catalogue vẫn prefetch cả bốn môn sau first paint, nợ #2 `ARCHITECTURE.md` §13) |
 | DC | 19 | 19 có nguồn (`STORAGE_KEYS` 17 + 2 key cục bộ) · **2 lỗ hổng thiết kế**: DC-17 `kho_bau_ioe_store` và DC-19 `kho_bau_cloud_session_hint` nằm ngoài registry |
-| Probe | 29 | 29/29 có chủ đích (28 `.mjs` + 1 `.cjs`, trừ `lib.mjs`/`run-one.mjs`) |
-| Test file | 87 | 87/87 có ánh xạ (`firebase-auth-sync` đổi tên từ `firebase-cloud-sync`; `t40-parent-facing-ids`, `t41a`, `t41b`, `t41c` thêm mới) |
+| Probe | 30 | 30/30 có chủ đích (29 `.mjs` + 1 `.cjs`, trừ `lib.mjs`/`run-one.mjs`) |
+| Test file | 92 | 92/92 có ánh xạ (`firebase-auth-sync` đổi tên từ `firebase-cloud-sync`; `t40-parent-facing-ids`, `t41a`, `t41b`, `t41c`, `t41d-cloud-merge`, `t41d-cloud-sync-race` thêm mới) |
 | US (tầng câu chuyện, §10) | 5 | 5/5 có AC 3 nhánh — **chỉ phủ lát cắt chống ghi trùng**; 83 FR còn lại chưa có US |
 | TC (§10 → `TEST_CASES.md`) | 29 | 29 Pass · 0 Fail · 0 Blocked · 0 NotRun trong lát cắt; 2 TC đã chứng minh bắt được lỗi bằng ablation |
 | Yêu cầu **không đo được** | 1 | BG-01 (cần telemetry thật — bị chặn bởi ADR-01, không phải lỗi code) |
@@ -315,7 +315,7 @@ chưa được ghi vào SRS (phải thêm FR hoặc xoá test).
 2. Xoá tính năng trong code ⇒ xoá dòng RTM và dòng SRS (giữ lại lịch sử ở `CHANGELOG.md`).
 3. Một dòng RTM chỉ chuyển sang ĐẠT khi output lệnh thật được dán vào PR/Issue —
    không dựa vào số liệu MCP (`AGENTS.md` §1.7, docs/SDLC.md §10).
-4. Số liệu kiểm kê (31 game / 475 câu / 1287 test / entry 204.2 kB + boot graph 418.6 kB…) chỉ được sửa khi vừa đo lại
+4. Số liệu kiểm kê (31 game / 475 câu / 1327 test / entry 209.9 kB + boot graph 424.3 kB…) chỉ được sửa khi vừa đo lại
    bằng `npx vitest run`, `npm run check:budget` hoặc `ls`.
 5. **Lệch đã biết, chưa sửa:** `SRS.md` có **89** dòng `FR-…` (`grep -cE '^\| FR-[A-Z]+[0-9]+ \|' docs/specs/SRS.md`)
    trong khi hơn mười chỗ khác vẫn ghi "88 FR" — và bảng §8 ở trên đã cộng độ phủ ra **89**

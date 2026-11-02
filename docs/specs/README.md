@@ -15,12 +15,18 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1287 test / 90 file,
-   204.2 kB entry + 418.6 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
-   ngay sau đợt bỏ cờ `continue-on-error` của job "3. Browser QA" (đã commit thành `3b0122c`; 1 test hợp đồng mới trong
-   `tests/t31-bug-hunt-fixes.test.ts` ⇒ 1287 test; `src/` không đổi nên entry vẫn `index-TgwkX59u.js` và kB
-   vẫn 204.2); các đợt đo trước cùng ngày: sửa "đề cổng phụ huynh vẽ muộn hơn khung hình đầu" (5 test mới
-   `tests/t41f-parent-gate.test.ts` ⇒ 1286 test, `src/` đổi nên entry **đổi hash** dù kB không đổi), và
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1327 test / 92 file,
+   209.9 kB entry + 424.3 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
+   ngay sau **T41D** (phép hợp nhất hồ sơ cloud với tiến độ của máy khác và race đăng xuất/đổi tài khoản
+   giữa lúc kéo cloud: thêm `src/services/cloudMerge.ts` ⇒ **42** service module, `src/` đổi nên entry
+   **đổi cả hash lẫn kB** — `index-3QHywPiW.js` **209.9 kB** (hash của đợt đo trước không còn giá trị
+   tham chiếu) — và
+   2 file test mới `tests/t41d-cloud-merge.test.ts` (28) + `tests/t41d-cloud-sync-race.test.ts` (12)
+   ⇒ 1327 test / 92 file); các đợt đo trước cùng ngày: bỏ cờ `continue-on-error` của job
+   "3. Browser QA" (commit `3b0122c`, 1 test hợp đồng mới trong `tests/t31-bug-hunt-fixes.test.ts`
+   ⇒ 1287 test, `src/` không đổi nên entry giữ nguyên hash), sửa "đề cổng phụ huynh vẽ muộn hơn khung
+   hình đầu" (5 test mới `tests/t41f-parent-gate.test.ts` ⇒ 1286 test, `src/` đổi nên entry **đổi hash**
+   dù kB không đổi), và
    sửa race màn chúc mừng lên cấp trong `qa/lib.mjs` rồi khoá bước
    "QA probe" của workflow `03` bằng `tee probe-run.log` (3 test hợp đồng mới trong
    `tests/t31-bug-hunt-fixes.test.ts`, khi đó `src/` không đổi nên hash entry giữ nguyên); lần đo

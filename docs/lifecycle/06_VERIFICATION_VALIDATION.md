@@ -48,10 +48,16 @@ test phải đỏ vì đúng nguyên nhân, rồi hoàn tác.
 | — | hoàn tác M3+M4 | lát cắt 2 | `30 passed`, EXIT=0 | chạy lại `npx vitest run tests/t43-game-pause.test.ts` |
 | M5 | `useGameStage.ts` — **lùi** guard của `submitWrong` xuống sau `setMistakesInTier` (không bỏ dòng nào; sinh ra từ review 4 lớp vì test cũ chỉ đếm guard `>= 2`) | TC-36 | `1 failed \| 29 passed`, EXIT=1 | `mutation-M5-guard-position.txt` |
 | — | hoàn tác M5 + siết hợp đồng theo vị trí | lát cắt 2 | `30 passed`, EXIT=0 | chạy lại `npx vitest run tests/t43-game-pause.test.ts` |
+| M6 | `cloudSync.ts` + `firebase.ts` **trở về HEAD** (git show, không sửa tay) — tức bỏ hàng đợi + `authEpoch` + mute + `AuthChangeSource` | `tests/t41d-cloud-sync-race.test.ts` — **5** test đỏ đúng năm hành vi: đăng xuất giữa lúc kéo, hai thao tác cloud chồng nhau, tự nổ auto-sync vòng lặp, SDK hỏng bị hiểu là đăng xuất, `setState` trả object cũ | `Tests 5 failed \| 7 passed (12)` · EXIT=1 | [`mutation-M6-cloud-sync-revert.txt`](../../evidence/2026-11-03-T41D/mutation-M6-cloud-sync-revert.txt) |
+| — | hoàn tác M6 (khôi phục bản T41D) | hai file test T41D | `Tests 40 passed (40)` · EXIT=0 | [`t41d-tests-green.txt`](../../evidence/2026-11-03-T41D/t41d-tests-green.txt) |
+
+Hai test cho kết quả **giống nhau ở cả hai bản** ("không có `synced` khi user rỗng", "kết quả uid cũ
+không được gán cho uid mới") là bất biến phòng vệ, không phải bằng chứng ablation — ghi rõ để lần sau
+không tưởng nhầm cả 12 test đều biết đỏ.
 
 Công cụ mutation chạy tự động (Stryker…) **chưa** được tích hợp — thêm dependency phải hỏi trước
-(`AGENTS.md` §1.4), nên dùng ablation thủ công cho các rule then chốt. Số phép ablation đã chạy: **5**
-(M1…M5, hai lát cắt).
+(`AGENTS.md` §1.4), nên dùng ablation thủ công cho các rule then chốt. Số phép ablation đã chạy: **6**
+(M1…M6, ba lát cắt).
 
 ## 5. Test ở đâu trong pipeline
 
@@ -59,7 +65,7 @@ Công cụ mutation chạy tự động (Stryker…) **chưa** được tích h�
 |---|---|---|---|
 | Pre-commit | mỗi commit | typecheck | giây |
 | Pre-push | mỗi push | `verify:quick` | ~1 phút |
-| PR/push (workflow 01) | mỗi push/PR | typecheck + `test:ci` (1287 test) | 22.09 s cho phần test (`evidence/2026-11-03-QA-RACE/verify-1287.txt`) |
+| PR/push (workflow 01) | mỗi push/PR | typecheck + `test:ci` (1327 test) | 22.32 s cho phần test (`evidence/2026-11-03-T41D/verify-t41d.txt`) |
 | Build (workflow 02) | mỗi push/PR | build + `check:budget` | phút |
 | Browser (workflow 03) | mỗi push/PR | probe Playwright trên `dist/` | phút |
 | Release (workflow 04) | tag `v*.*.*` | build artifact + zip + GitHub Release | **chưa từng chạy** (không có tag) |

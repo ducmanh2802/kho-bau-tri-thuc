@@ -41,6 +41,42 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T41D — hợp nhất hồ sơ cloud không còn in tài nguyên, và kết quả của phiên đăng nhập cũ không
+  đè lên phiên mới.** Người dùng yêu cầu "check tất cả các bug, liệt kê ra đã, fix dần"; ô T41D
+  được ghi lịch ở `.ai/CURRENT.md`, `docs/lifecycle/CHECKLIST.md` C-06 và `HARNESS.md` H-3 nhưng
+  **không có danh sách hạng mục ở bất kỳ đâu** ⇒ đọc lại `src/services/cloudSync.ts` và lập 9 defect,
+  sửa cả chín:
+  (1) luật hợp nhất dùng `Math.max` cho **mọi** bộ đếm, kể cả tài nguyên **tiêu được** — vé (`profile.tickets -= 1`),
+  sao đổi quà (`profile.stars -= item.priceStars`), ngọc, trang bị, chuỗi ngày — nên hai máy cùng sync là
+  tiền và sao tự nhân đôi; nay bộ đếm luỹ kế (XP, số bài đã làm) vẫn lấy `max`, còn tài nguyên tiêu được
+  lấy theo hồ sơ có `lastActiveDate` **sau nhất**, hoà thì giữ máy này.
+  (2) hồ sơ trình diễn (`isDemoData: true`) trên cloud bị trộn vào tài khoản thật — nay có firewall:
+  cloud-demo không đóng góp gì vào hồ sơ thật, local-demo + cloud-thì nhận nguyên hồ sơ cloud và
+  tắt cờ demo. (3) bé đăng xuất hoặc đổi tài khoản **giữa lúc** `pullAndMerge` còn chờ mạng ⇒ trạng thái
+  `synced` + `lastSyncedAt` của tài khoản A bị áp cho tài khoản B, UI báo "đã lưu an toàn" khi không còn
+  ai đăng nhập, và hồ sơ máy A lọt sang máy B — nay mỗi lần auth đổi là một `authEpoch` mới, kết quả
+  thuộc epoch cũ bị bỏ. (4) nút "Đồng bộ ngay", auto-sync sau 2 s và pull lúc đăng nhập chạy song song:
+  hai `setDoc` đọc hai bản local khác rồi tranh ghi, bản sau đè bản vừa hợp nhất — nay mọi thao tác cloud
+  đi qua **một hàng đợi**. (5) chính lần áp dữ liệu cloud cũng ghi `localStorage` và phát
+  `kho_bau_storage_change` y hệt một lượt bé học ⇒ hẹn giờ auto-sync đẩy ngược dữ liệu vừa kéo về, nổ một
+  vòng lặp mỗi lần đăng nhập; vì `getAnalytics()` **đọc** cũng phát event, phải bọc cả đoạn đọc lẫn đoạn
+  ghi local (chỉ khi thao tác của máy này, không chặn thao tác thật của bé trong lúc chờ mạng).
+  (6) SDK Firebase nạp thất bại (mất mạng, chunk bị chặn) bị `onAuthChange` báo như "đăng xuất" ⇒
+  app quên phiên và mất nút "Tiếp tục đồng bộ"; nay `AuthChangeSource` phân biệt `'sdk_unavailable'`
+  với `'state'`, chỉ `'state'` không user mới xoá session hint. (7) `syncNow()` nuốt lỗi — người lớn bấm
+  "Đồng bộ ngay" và vẫn thấy "Đã lưu"; nay lỗi nổi lên `status: 'error'` + thông báo
+  "Không lưu được lên cloud". (8) bản đẩy lên cloud sau khi hợp nhất chỉ có **profile**, thiếu analytics
+  vừa gộp ⇒ máy khác kéo về mất lịch sử câu sai; nay đẩy đủ cả hai. (9) `setState` sửa object đang phát
+  cho React ⇒ `useSyncExternalStore` không thấy đổi, UI trạng thái đơ; nay mỗi lần đổi là một object mới.
+  Toàn bộ luật hợp nhất tách sang module thuần `src/services/cloudMerge.ts` (364 dòng, **42** service
+  module) để test được trong môi trường node không DOM; `cloudSync.ts` 277 → 338 dòng, `firebase.ts`
+  133 → 144, `storage.ts` xuất `DEFAULT_CHILD_PROFILE` để luật "đổi tên" so với tên mặc định thật thay
+  vì tự viết lại chuỗi. `mergeTrace` chỉ ghi nhãn quy tắc (`stars:from_cloud`, `cloud_is_demo:ignored`,
+  `recent_errors:merged=20`) — test khoá dạng `/^[a-z_]+:[a-z_0-9]+(=[0-9]+)?$/` để **không bao giờ**
+  lộ nội dung bài làm của bé vào log hay tài liệu. Số liệu: `npm run verify` **EXIT=0** ·
+  **92 file / 1327 test** · `Duration 22.32s` · entry `index-3QHywPiW.js` **209.9 kB** (+5.7 kB vì
+  luật hợp nhất vào entry qua `AuthButton → cloudSync`; mục tiêu 450 kB vẫn đạt) · boot graph
+  **424.3 kB** (trần 500 kB do `tests/t39-first-load-graph.test.ts` giữ).
 - **Đề của "Cổng Xác Nhận Phụ Huynh" sinh sau khi vẽ — lỗi ứng dụng thật, không phải của probe.**
   Run 41508824890 (`80c7e39`) chết ở dòng bấm "Đấu Trường Thi Thử" trong `qa/lib.mjs`, timeout 12 s.
   Lần này đọc được payload thật (nhờ `tee probe-run.log` ở mục dưới). Nguyên nhân:
@@ -101,6 +137,26 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   `continue-on-error: true` **giữ nguyên** vì mới có một lần xanh.
 
 ### Tests
+- **T41D — 40 test mới, kèm bằng chứng phép thử thật (ablation).**
+  `tests/t41d-cloud-merge.test.ts` (28) kiểm luật hợp nhất như hàm thuần: bộ đếm luỹ kế lấy `max`;
+  **sao/vé/ngọc/trang bị/chuỗi không được dùng `max`** (kịch bản in tiền: máy A còn 9 sao, máy B đã tiêu
+  còn 2 ⇒ kết quả phải là 2 của máy hoạt động sau nhất, không phải 9); union tiến độ giữ thứ tự máy này;
+  `lessonStars` so từng khoá; `skillMastery` theo `lastPracticed`; `recentErrors` chống trùng
+  `questionId@timestamp`, sắp theo thời gian giảm dần rồi cắt 20 (bản cũ cắt **trước** khi sắp nên mất
+  câu sai mới); firewall hồ sơ demo ở cả hai chiều; số rác từ cloud rơi về giá trị máy này; hàm **không
+  mutate đầu vào** và **tất định**; `mergeTrace` khớp regex nhãn.
+  `tests/t41d-cloud-sync-race.test.ts` (12) dựng `window` + `localStorage` giả và mock Firestore bằng
+  một `getDoc` **tạm dừng được bằng cổng**: đăng xuất giữa lúc kéo ⇒ trạng thái cuối `offline` / user
+  `null` / `lastSyncedAt` `null`; kết quả uid cũ không áp cho uid mới (vết ghi đếm được
+  `['users/uid-a','users/uid-b']`); hai `syncNow()` chồng nhau ⇒ `maxInFlight === 1`; áp dữ liệu cloud
+  xong không tự nổ auto-sync (một vết ghi, tính cả sau +5 s); bé sửa bài thật vẫn đồng bộ (hai vết ghi);
+  SDK hỏng thì session hint còn `'1'` và `start()` lần sau đăng ký lại listener; đăng xuất thật xoá hint;
+  mỗi lần đổi trạng thái là object mới; chưa đăng nhập mà bấm "Đồng bộ ngay" ⇒ **không ghi gì**;
+  `setDoc` hỏng ⇒ `status: 'error'` đúng thông báo.
+  **Ablation:** hoàn tác `cloudSync.ts` + `firebase.ts` về HEAD rồi chạy file race ⇒ **5 failed / 7
+  passed** (suite không xanh nhờ test rỗng), khôi phục ⇒ xanh lại. Hai test còn lại cho kết quả giống
+  nhau ở cả hai bản là bất biến phòng vệ ("không có `synced` khi user `null`", "uid cũ không được áp").
+  Log đỏ và log xanh lưu ở `evidence/2026-11-03-T41D/`.
 - **`tests/t41f-parent-gate.test.ts` — 5 test, RED đo trước khi sửa, GREEN sau khi sửa.** Ba test
   đầu là "buồng quay camera" deterministic: `renderToString` chỉ vẽ khung hình đầu và **không chạy
   effect**, nên 15 lần mở liên tiếp không được chứa `15 + 18`, đề phải khác nhau giữa các lần

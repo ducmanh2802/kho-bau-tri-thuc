@@ -1,0 +1,11 @@
+# Boot graph — đo 2026-11-03 (T41D), trên dist/ của lần build trong verify-t41d.txt
+
+$ grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html | sed 's#^#dist/#' | sort -u | xargs wc -c | tail -1
+434451 total
+
+$ for f in dist/assets/index-*.js dist/assets/react-vendor-*.js dist/assets/rolldown-runtime-*.js; do wc -c "$f"; done
+214976 dist/assets/index-3QHywPiW.js
+218749 dist/assets/react-vendor-BNCMh3YF.js
+726 dist/assets/rolldown-runtime-XKyaHtl9.js
+
+tổng byte = 434451 ⇒ 424.3 KiB (÷1024 — check:budget cũng chia 1024 nhưng in nhãn kB)
