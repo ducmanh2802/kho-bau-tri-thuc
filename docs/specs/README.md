@@ -7,22 +7,23 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 |---|---|---|---|
 | 1 | [`BRD.md`](BRD.md) | *Tại sao làm, làm gì, không làm gì, thành công đo thế nào?* | 6 mục tiêu BG, 8 rủi ro, Business DoD |
 | 2 | [`SRS.md`](SRS.md) | *Phần mềm phải làm gì, đạt ngưỡng nào?* | 88 FR · 25 NFR · 17 DC · 11 IF |
-| 3 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | *Ghép như thế nào, dữ liệu đi đâu, vì sao chọn vậy?* | 17 ADR, sơ đồ tầng + luồng dữ liệu |
+| 3 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | *Ghép như thế nào, dữ liệu đi đâu, vì sao chọn vậy?* | 18 ADR, sơ đồ tầng + luồng dữ liệu |
 | 4 | [`RTM.md`](RTM.md) | *Yêu cầu nào được chứng minh ở đâu? Test nào không phục vụ gì?* | ma trận xuôi + ngược, tổng kết độ phủ |
 | 5 | [`../plan/TASK_PLAN.md`](../plan/TASK_PLAN.md) | *Đã làm gì (P25→P43) và sẽ làm gì tiếp (EP-A…EP-F)?* | WBS 12 gói, 4 milestone |
 | 6 | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) | *Kiểm bằng lớp nào, chạy lệnh nào, khi nào xanh?* | 5 lớp, 28 probe, bảng "đổi gì → chạy gì" |
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1173 test / 83 file,
-   199.2 kB entry + 413.5 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-01** — lần cuối ngay sau
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1188 test / 84 file,
+   202.3 kB entry + 416.6 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-02** — lần cuối ngay sau
+   T40 (sửa mã máy lộ trên báo cáo Ba Mẹ, chuẩn hoá kỹ năng đọc và migration `P43-v1`),
    T39 (tối ưu đồ thị tải lần đầu: màn Cờ Tướng/IOE + ngân hàng đề ra khỏi chunk khởi động,
    Firebase chỉ nạp khi người lớn mở màn tài khoản), T38 (đường lùi WebGL cho bàn cờ 3D), T37 (kẻ đậm đường ô cờ vua), T36 (Việt hoá nhãn còn sót), T35 (đường kẻ ô + tương phản sáng/tối) và T34 (bộ cờ vua giống cờ gỗ thật), vòng soát bug T31 rồi T32 (bẫy focus popup bài học, header tràn nút "Ba Mẹ", thoại gấu lẫn chữ Hàn,
    cờ vua 3D thiếu fallback WebGL), sau khi đã sửa vòng bug T26/T27 và audit UI T28; trên nền
    hai merge `origin/main`
    (cloud-sync + cờ vua WebGL, rồi `3727f04` auth/chess) và merge `fd3e7da` — bằng
    `npx vitest run`, `npm run check:budget` hoặc `ls`. Các số mô tả nội dung học (31/475/1570
-   câu) giữ nguyên từ đợt đo 2026-10-29 vì T26/T27 không đụng `src/data/`. Dấu ✚ trong `BRD.md`
+   câu) giữ nguyên từ đợt đo 2026-10-29 vì các đợt sửa sau không thêm chủ đề/bài/câu. Dấu ✚ trong `BRD.md`
    nghĩa là "đo trực tiếp từ repo".
 2. **Code là nguồn chân lý.** Khi tài liệu cũ (`PRODUCT_SPEC.md`, `MASTER_ROADMAP.md`)
    lệch với `src/`, thì `src/` đúng và tài liệu này phải sửa theo.

@@ -39,7 +39,7 @@ phí. Vì vậy mọi ràng buộc nghiệp vụ nghiêng về *niềm tin* (an 
 | BG-03 | Không gây nhầm lẫn nội dung (sai đáp án, sai dấu, sai kiến thức) | Lỗi nội dung P0/P1 còn tồn tại | = 0 | ✚ `contentValidator` + `BANNED_WORDS`; P42/T20B đã xoá 18 WARNING |
 | BG-04 | Dùng được trên điện thoại gia đình, offline | Probe QA trên build thật | 0 lỗi console, 0 tràn ở 390px | ✚ 28 probe Playwright, `qa/mobile-golden.mjs` @390/@195px |
 | BG-05 | Phụ huynh tin tưởng về dữ liệu của con | Dữ liệu rời máy? | Không, trừ khi phụ huynh tự xuất **hoặc tự bật sync** | ✚ Mặc định chỉ localStorage; `CloudSyncService` ở `status: 'offline'` cho tới khi người lớn đăng nhập Google ([src/services/cloudSync.ts:37](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L37), `firestore.rules` chắn chéo tài khoản) |
-| BG-06 | Đổi mới nội dung không phá tiến độ cũ | Migration + sanitizer có test | 100% bước migration có test | ✚ chuỗi `MIGRATIONS` P29-v2 → P42-v3 trong `src/services/storage.ts` |
+| BG-06 | Đổi mới nội dung không phá tiến độ cũ | Migration + sanitizer có test | 100% bước migration có test | ✚ chuỗi `MIGRATIONS` P29-v2 → P43-v1 trong `src/services/storage.ts` |
 
 **Không phải mục tiêu:** xếp hạng giữa các bé, kiếm tiền, bắt trẻ tạo tài khoản, cloud-sync
 mặc định, GPU/3D nặng ngoài màn cờ vua.
@@ -130,8 +130,8 @@ mặc định, GPU/3D nặng ngoài màn cờ vua.
 **Lợi ích:** bé tự học được; phụ huynh có bằng chứng thay vì cảm tính; giáo viên nhận
 được file chẩn đoán; người bảo trì không sợ "sửa nội dung là sập app".
 
-**Chi phí vận hành thực tế (đo 2026-11-01):** `npm run verify` gồm typecheck + 1173 test
-trong 83 file (riêng suite test ~20 s) + build + budget; probe QA cần Chromium của
+**Chi phí vận hành thực tế (đo 2026-11-02):** `npm run verify` gồm typecheck + 1188 test
+trong 84 file (riêng suite test ~20 s) + build + budget; probe QA cần Chromium của
 Playwright và `dist/`. Không có chi phí server **cho người dùng chưa bật sync**; từ khi có
 `firebase ^13.1.0`, chi phí Firestore thuộc project Firebase của người vận hành và chưa được
 đo (chưa có số liệu dùng thật, chưa thống kê hạn mức free tier).
@@ -151,7 +151,7 @@ Một bản được gọi là "phát hành được" khi:
 
 ---
 
-## Phụ lục A — Số liệu đo ngày 2026-11-01 (gồm cả đợt đo 2026-10-29 cho nội dung học)
+## Phụ lục A — Số liệu đo ngày 2026-11-02 (gồm cả đợt đo 2026-10-29 cho nội dung học)
 
 | Chỉ số | Giá trị | Đo bằng |
 |---|---|---|
@@ -159,15 +159,15 @@ Một bản được gọi là "phát hành được" khi:
 | Bậc độ khó mỗi trò | 6, số câu `[5, 6, 6, 7, 8, 8]` | `defaultRoundsPerTier()` trong `src/data/gameLevels.ts` |
 | Chủ đề / bài / câu nội dung học (đếm **runtime**, import array trong test tạm) | Tiếng Việt 15/58/612 · Toán 13/26/260 · Tiếng Anh 24/40/434 · Em & Cuộc sống 14/26/264 → **tổng 66 chủ đề, 150 bài, 1570 câu** | `*_TOPICS` trong `src/data/*Curriculum.ts` (đếm tĩnh bằng grep bỏ sót câu sinh qua factory) |
 | Luyện đọc | 36 đoạn · 192 câu hỏi | `READING_PASSAGES`, `READING_QUESTIONS` trong `src/data/readingContent.ts` |
-| Unit test | 83 file / 1173 test, xanh | `npx vitest run` (81 `.ts` + 2 `.tsx`) |
+| Unit test | 84 file / 1188 test, xanh | `npx vitest run` (82 `.ts` + 2 `.tsx`) |
 | Probe trình duyệt | 28 probe (27 `.mjs` + 1 `.cjs`, không tính `lib.mjs`, `run-one.mjs`) | `ls qa/*.mjs` |
-| Main chunk | 199.2 kB (ngân sách 600, mục tiêu 450 — **đã đạt** từ T39) | `npm run check:budget` |
-| Đồ thị chặn lần vẽ đầu | 413.5 kB = `index` 199.2 + `react-vendor` 213.6 + runtime 0.7 — T38 còn 1527.4 kB vì `firebase-vendor` + `math-bank` + `english-bank` bị nạp sẵn | `grep -o 'assets/.*\\.js' dist/index.html` + `stat` từng file |
+| Main chunk | 202.3 kB (ngân sách 600, mục tiêu 450 — **đã đạt** từ T39) | `npm run check:budget` |
+| Đồ thị chặn lần vẽ đầu | 416.6 kB = `index` 202.3 + `react-vendor` 213.6 + runtime 0.7 — T38 còn 1527.4 kB vì `firebase-vendor` + `math-bank` + `english-bank` bị nạp sẵn | `grep -o 'assets/.*\\.js' dist/index.html` + `stat` từng file |
 | Chunk vendor lớn | `three-vendor` 572.6 kB · `firebase-vendor` 723 kB · `react-vendor` 213.6 kB — tất cả ngoài entry, chỉ tải khi bé/người lớn mở đúng màn (T39) | `npm run check:budget` |
 | Kho câu thi | **475 câu** (256 trắc nghiệm · 55 nối · 46 điền · 42 xếp thứ tự · 39 đúng/sai · 24 phân loại · 13 kéo-thả), phủ đủ 26/26 kỹ năng taxonomy; đề thi phân môn: Toán 165 · Tiếng Anh 162 · Tiếng Việt 148 | `COMPETITION_QUESTIONS` (gồm `EXAM_FORMAT_QUESTIONS` 29 · `EXPANSION_QUESTIONS` 54 · `P36_QUESTIONS` 271 · `TOURNAMENT_QUESTIONS` 72), bank version 6 |
 | Blueprint đề thi | 16 preset: 6 mini-test · 2 full-mock · 2 speed-trial · 6 tournament; số câu 6→30 | `EXAM_BLUEPRINTS` trong `src/data/competitionBlueprints.ts` |
 | Kid's Box (track Anh văn) | **0 unit đã map**, 7 nhóm tài liệu `CONTENT_SOURCE_REQUIRED` | `KIDBOX_MAPPED_UNITS`, `KIDBOX_REQUIRED_ARTIFACTS` — app không bịa tên unit |
-| Keys lưu trữ | **19 key** `localStorage` (17 trong `STORAGE_KEYS` + `kho_bau_ioe_store` và `kho_bau_cloud_session_hint` khai báo cục bộ — hint chỉ là cờ `'1'`, không chứa dữ liệu bé), schema `P42-v3`, 7 phiên bản lịch sử, 6 hàm migration | `src/services/storage.ts`, `grep -o "kho_bau_[a-z0-9_]*" src/` |
+| Keys lưu trữ | **19 key** `localStorage` (17 trong `STORAGE_KEYS` + `kho_bau_ioe_store` và `kho_bau_cloud_session_hint` khai báo cục bộ — hint chỉ là cờ `'1'`, không chứa dữ liệu bé), schema `P43-v1`, 8 phiên bản lịch sử, 7 hàm migration | `src/services/storage.ts`, `grep -o "kho_bau_[a-z0-9_]*" src/` |
 | Chính sách tập trung | `src/config/policy.ts` 693 dòng, 17 khối policy xuất khẩu (`export const`) | Read |
 | Dependency runtime | 8: react, react-dom, lucide-react, @vercel/analytics, tslib, **three, @types/three, firebase** (3 mục in đậm vào repo cùng merge 2026-10-30; `@types/three` lẽ ra thuộc `devDependencies` — nợ #8 ARCHITECTURE §13) | `package.json` |
 | Tài liệu Markdown | **107 file** — `docs/` 100 (gốc 48 · `opencode/` 45 = 4 README/rules + 2 queue + 39 reports · `specs/` 5 · `plan/` 2) + 7 ngoài `docs/` (README, CHANGELOG, CONTRIBUTING, AGENTS, mcp/README, .github/pull_request_template, .ai/CURRENT). Đo 2026-10-30 sau khi gỡ **68 prompt** đã dùng xong (67 `.md` + `docs/opencode/UI.txt`); trước đó 174 `.md` | `find . -name '*.md' -not -path './node_modules/*' -not -path './.git/*' \| wc -l` |

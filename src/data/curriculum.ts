@@ -3,6 +3,7 @@ import { MATH_TOPICS } from './mathCurriculum';
 import { ENGLISH_TOPICS } from './englishCurriculum';
 import { LIFE_TOPICS } from './lifeCurriculum';
 import { getKidBoxSkillCatalogue } from './kidBoxTaxonomy';
+import { READING_SKILLS } from './readingTaxonomy';
 import { StorageService } from '../services/storage';
 import { Lesson, Question, SubjectType, Topic } from '../types';
 
@@ -23,6 +24,15 @@ export function findLessonById(lessonId: string): Lesson | null {
       const found = topic.lessons.find((l) => l.id === lessonId);
       if (found) return found;
     }
+  }
+  return null;
+}
+
+/** T40 — tra tên chủ đề để màn Ba Mẹ in được tiếng Việt thay vì `math-topic-2`. */
+export function findTopicById(topicId: string): Topic | null {
+  for (const topics of Object.values(ALL_TOPICS)) {
+    const found = topics.find((t) => t.id === topicId);
+    if (found) return found;
   }
   return null;
 }
@@ -72,6 +82,20 @@ export function getAllSkills(): { skillId: string; skillName: string; subject: S
         skillId: skill.skillId,
         skillName: `Kid's Box Companion: ${skill.skillName}`,
         subject: skill.subject,
+      });
+    }
+  }
+
+  // T40 — kỹ năng đọc chảy qua cùng đường bằng chứng với tiền tố `rf_`
+  // (`normalizeReadingSkillId`). Thiếu mục này thì tên trong Knowledge State bị
+  // đóng băng thành id thô và màn Ba Mẹ in ra `rf_word_recognition`.
+  for (const skill of READING_SKILLS) {
+    const skillId = skill.skillId.toLowerCase().replace(/-/g, '_');
+    if (!map.has(skillId)) {
+      map.set(skillId, {
+        skillId,
+        skillName: `Đọc lưu loát: ${skill.skillName}`,
+        subject: 'tieng-viet',
       });
     }
   }

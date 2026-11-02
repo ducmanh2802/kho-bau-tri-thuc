@@ -3,7 +3,9 @@ import { StorageService } from '../../services/storage';
 import { seedDemoProfile } from '../../services/demoSeed';
 import { AdaptiveService, ParentDiagnosticReport, ReadingProgressReport } from '../../services/adaptive';
 import { DecisionEngine } from '../../services/decisionEngine';
+import { describeDecisionMode, describeReasonCodes } from '../../services/decisionLabels';
 import { adaptiveDifficulty, describeLevel } from '../../services/adaptiveDifficulty';
+import { humanizeReward } from '../../services/rewardLabels';
 import type { DecisionOutput, KnowledgeState, SessionProfileKind } from '../../types';
 import { ParentSettings } from '../../types';
 import { sound } from '../../services/sound';
@@ -563,7 +565,7 @@ const [activeTab, setActiveTab] = useState<
                         </div>
                         <span className="text-[11px] font-black bg-white/80 border border-indigo-200 rounded-lg px-2 py-1">
                           {decisionReport.evidenceSummary.totalAttempts} lượt luyện · chế độ{' '}
-                          {decisionReport.mode}
+                          {describeDecisionMode(decisionReport.mode)}
                         </span>
                       </div>
 
@@ -604,7 +606,7 @@ const [activeTab, setActiveTab] = useState<
                                   <strong>{n.skillName}</strong> — {n.detail}
                                   {n.reasonCodes.length > 0 && (
                                     <span className="block text-[10px] opacity-70 mt-0.5">
-                                      {n.reasonCodes.join(' · ')}
+                                      {describeReasonCodes(n.reasonCodes)}
                                     </span>
                                   )}
                                 </li>
@@ -648,7 +650,7 @@ const [activeTab, setActiveTab] = useState<
                               </span>
                               {n.reasonCodes.length > 0 && (
                                 <span className="block text-[10px] opacity-65 mt-0.5">
-                                  {n.reasonCodes.join(', ')}
+                                  {describeReasonCodes(n.reasonCodes)}
                                 </span>
                               )}
                             </li>
@@ -1245,25 +1247,28 @@ const [activeTab, setActiveTab] = useState<
                         <History className="w-3.5 h-3.5" /> Lịch Sử Phần Thưởng Gần Đây
                       </h5>
                       {settings.rewardHistory && settings.rewardHistory.length > 0 ? (
-                        <div className="space-y-1.5 max-h-40 overflow-y-auto">
-                          {settings.rewardHistory.slice(0, 20).map((entry, idx) => (
-                            <div
-                              key={`${entry.date}-${entry.type}-${idx}`}
-                              className="p-2 bg-white border border-slate-200 rounded-xl text-[10px] font-medium text-slate-700"
-                            >
-                              <div className="flex items-center justify-between gap-2">
-                                <span className="font-bold text-slate-800">{entry.date}</span>
-                                <span className="text-slate-400">{entry.type}</span>
+                        <div className="space-y-1.5 max-h-40 overflow-y-auto" data-testid="parent-reward-history">
+                          {settings.rewardHistory.slice(0, 20).map((entry, idx) => {
+                            // T40 — `description` do storage sinh ra chứa mã máy (`vn-les-1`,
+                            // `catch_letters_t2`) và `type` là khoá nội bộ; ba mẹ chỉ cần
+                            // tiếng Việt, nên đổi ở tầng hiển thị — mục cũ đã lưu cũng sạch.
+                            const shown = humanizeReward(entry);
+                            return (
+                              <div
+                                key={`${entry.date}-${entry.type}-${idx}`}
+                                className="p-2 bg-white border border-slate-200 rounded-xl text-[10px] font-medium text-slate-700"
+                              >
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="font-bold text-slate-800">{entry.date}</span>
+                                  <span className="text-slate-400">{shown.label}</span>
+                                </div>
+                                <div className="flex items-center justify-between gap-2 mt-0.5">
+                                  <span>{shown.text}</span>
+                                  <span className="text-amber-700 font-black">+{entry.amount}</span>
+                                </div>
                               </div>
-                              <div className="flex items-center justify-between gap-2 mt-0.5">
-                                <span>{entry.description}</span>
-                                <span className="text-amber-700 font-black">+{entry.amount}</span>
-                              </div>
-                              {entry.itemId && (
-                                <span className="text-[9px] text-slate-500">ID: {entry.itemId}</span>
-                              )}
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       ) : (
                         <p className="text-xs text-slate-500 italic py-2 text-center">Chưa có lịch sử phần thưởng.</p>

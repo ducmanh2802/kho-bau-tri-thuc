@@ -4,6 +4,7 @@ import type { DecisionOutput, DecisionRecommendation, SessionKind, SessionPhase 
 // T02C — DecisionEngine (competition/Kid's Box/curriculum) is loaded on
 // demand so Home's first paint does not pay for the whole content bank.
 import { StorageService } from '../../services/storage';
+import { describeReasonCode } from '../../services/decisionLabels';
 import { sound } from '../../services/sound';
 import { ChevronRight, Lightbulb, Target, Zap, Clock, ListChecks, Sparkles } from 'lucide-react';
 
@@ -250,13 +251,13 @@ export const NextBestActionCard: React.FC<NextBestActionCardProps> = ({ onNaviga
                     {explanation.reasonCodes.length > 0 && (
                       <p className="font-black flex items-center gap-1 pt-1 flex-wrap">
                         <Zap className="w-3.5 h-3.5" />
-                        <span className="opacity-70">Mã lý do (phụ huynh):</span>
+                        <span className="opacity-70">Lý do (ba mẹ):</span>
                         {explanation.reasonCodes.map((code) => (
                           <span
                             key={code}
                             className="bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5 text-[10px]"
                           >
-                            {code}
+                            {describeReasonCode(code)}
                           </span>
                         ))}
                       </p>

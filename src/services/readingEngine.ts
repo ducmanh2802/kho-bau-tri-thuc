@@ -579,9 +579,14 @@ export class ReadingEngine {
  * Mapping between reading skill ids and the Learning OS knowledge-state space.
  * Reading skills are tracked under the `rf_` prefix so they never collide with
  * curriculum skills, while still flowing through the same evidence pipeline.
+ *
+ * T40 — id trong ngân hàng đề là dạng in hoa có gạch nối (`RF-WORD-RECOGNITION`),
+ * nên phải chuẩn hoá *rồi mới* kiểm tra tiền tố; thứ tự cũ cộng `rf_` hai lần
+ * và lưu kỹ năng đọc thành `rf_rf_word_recognition`.
  */
 export function normalizeReadingSkillId(skillId: string): string {
-  return skillId.startsWith('rf_') ? skillId : `rf_${skillId.toLowerCase().replace(/-/g, '_')}`;
+  const key = skillId.toLowerCase().replace(/-/g, '_');
+  return key.startsWith('rf_') ? key : `rf_${key}`;
 }
 
 function isComprehensionType(type: string): boolean {

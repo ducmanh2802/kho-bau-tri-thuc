@@ -204,6 +204,17 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   `git show "99edd29:<đường-dẫn>"` (xem `docs/MASTER_ROADMAP.md` §"Cấu trúc docs/ sau khi gỡ prompt").
 
 ### Fixed
+- **Mã máy và tiếng Anh lộ trên báo cáo Ba Mẹ (đợt T40):** lịch sử phần thưởng từng in trực tiếp
+  `vn-les-1`, `catch_letters tier 2`, `shop_item`, `xp` và dòng `ID: …`; nay `rewardLabels.ts`
+  quy đổi id bài học/trò chơi/thành tựu/đồ vật thành tên tiếng Việt ngay lúc hiển thị, không viết
+  lại lịch sử cũ. `decisionLabels.ts` dùng chung cho Home + dashboard để Việt hoá lý do, trạng thái
+  kỹ năng, chất lượng/độ mới bằng chứng, khả năng mở và chế độ quyết định; mã enum vẫn giữ trong
+  dữ liệu có cấu trúc và `data-*` cho QA. Sửa thêm `normalizeReadingSkillId` nhân đôi `rf_`, thêm
+  migration `P43-v1` gộp an toàn khoá `rf_rf_* → rf_*`, đưa kỹ năng đọc vào catalogue và chữa tên
+  kỹ năng bị lưu thành id ở lượt đọc; prefetch catalogue trong `App.tsx` nay bắt lỗi và thử lại một
+  lần thay vì tạo unhandled rejection. `npm run verify` **EXIT=0**: **84 file / 1188 test**, entry
+  `index-D9UEuKwe.js` **202.3 kB PASS**, boot graph **416.6 kB**; probe T40 trên `dist/` →
+  `QA PASS — 6 step(s), 0 errors`, `qa/decision-engine.mjs` → `QA PASS — 12 step(s), 0 errors`.
 - **Test chống trùng đề đỏ vì timing, không vì nội dung (đợt T39):** `tests/content-quality.test.ts`
   mục *"never has two semantically duplicated prompts"* chạy một mình hết **4.17 s** (`npx vitest run
   tests/content-quality.test.ts` → 16 test pass) nhưng khi 8 worker tranh CPU thì vượt trần 20 s mặc
@@ -440,6 +451,11 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
     `memory-card`, `karaoke-read-all` và `answer-option` + `data-correct` cho `spelling_duel`.
 
 ### Tests
+- `tests/t40-parent-facing-ids.test.ts` — **15 test** cho nhãn phần thưởng/quyết định tiếng Việt,
+  chuẩn hoá id kỹ năng đọc, migration `P43-v1` có gộp khoá va chạm, chữa tên kỹ năng từ catalogue,
+  các producer phần thưởng thật của `StorageService` và hợp đồng không kéo `decisionEngine`/
+  `data/curriculum` vào đồ thị khởi động. Bằng chứng đo lại sau T40: `npm run verify` **EXIT=0**,
+  **84 file / 1188 test**, entry `index-D9UEuKwe.js` **202.3 kB**, boot graph **416.6 kB**.
 - `tests/t39-first-load-graph.test.ts` — **9 test** cho lần tải đầu (đợt T39): entry đạt mục tiêu
   450 kB; `dist/index.html` **không** còn tham chiếu tĩnh `firebase-vendor`/`three-vendor`/
   `math-bank`/`english-bank`; tổng boot graph ≤ 500 kB; `src/services/firebase.ts` không còn một

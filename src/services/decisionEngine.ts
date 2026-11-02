@@ -46,6 +46,13 @@ import type {
   SkillDecisionState,
 } from '../types/decisionEngine';
 import { LAUNCHABLE_GAME_IDS, P39_DECISION_POLICY, SPEED_POLICY } from '../config/policy';
+import {
+  describeAvailability,
+  describeEvidenceFreshness,
+  describeEvidenceQuality,
+  describeKnowledgeStatus,
+  REASON_LABEL_VI,
+} from './decisionLabels';
 import { LearningOS, LEARNING_OS_POLICY } from './learningOS';
 import { getAllSkills } from '../data/curriculum';
 import { buildKidBoxActions, getCurrentUnit, getKnowledgeSnapshot, getContentSourceSummary, KIDBOX_TRACK_ID } from './kidBoxEngine';
@@ -65,33 +72,6 @@ const SUBJECT_LABEL: Record<SubjectType, string> = {
   toan: 'Toán',
   english: 'Tiếng Anh',
   'cuoc-song': 'Em & Cuộc sống',
-};
-
-const REASON_LABEL_VI: Record<DecisionReasonCode, string> = {
-  SM2_DUE: 'đến hạn ôn tập định kỳ',
-  REPEATED_ERRORS: 'có lỗi sai lặp lại',
-  RECENT_ACCURACY_DROP: 'độ chính xác gần đây giảm',
-  NEEDS_REVIEW: 'cần ôn lại kỹ năng',
-  FOUNDATION_GAP: 'thiếu kiến thức nền',
-  CURRENT_UNIT: 'thuộc Unit tiếng Anh hiện tại',
-  LOW_FLUENCY: 'lưu loát còn thấp',
-  LOW_COMPREHENSION: 'hiểu nội dung còn thấp',
-  LOW_STABILITY: 'độ ổn định chính xác chưa đủ',
-  COMPETITION_READINESS: 'cần chuẩn bị cho Đấu Trường',
-  NOT_PRACTICED_RECENTLY: 'chưa luyện kỹ năng này gần đây',
-  IMPROVEMENT_OPPORTUNITY: 'có dấu hiệu đang tiến bộ',
-  RECOVERY_AFTER_ERROR: 'cần phục hồi sau lỗi',
-  DISCOVERY_NEEDED: 'chưa đủ dữ liệu để xác định điểm yếu',
-  CONTENT_SOURCE_REQUIRED: 'nội dung nguồn chưa sẵn sàng',
-  SUBJECT_BALANCE: 'cân bằng giữa các môn',
-  FATIGUE: 'bé đã mệt sau phiên học dài',
-  OVERPRACTICE: 'đã luyện quá nhiều kỹ năng này',
-  SPEED_SAFE: 'đã đủ chính xác để luyện tốc độ an toàn',
-  FOUNDATION_BEFORE_DEPENDENT: 'nắm kỹ năng nền trước',
-  ACCURACY_BEFORE_SPEED: 'chính xác trước, tốc độ sau',
-  WEAK_BEFORE_MASTERED: 'luyện kỹ năng yếu trước',
-  AVAILABILITY_OK: 'hoạt động sẵn sàng mở được',
-  RECENT_REPETITION: 'vừa được khuyến nghị hoạt động tương tự',
 };
 
 const SESSION_KIND_LABEL: Record<SessionKind, string> = {
@@ -528,17 +508,16 @@ function buildExplanation(
     evidenceLines.push(
       `${skillState.skillName}: ${skillState.attemptCount} lượt, chính xác ${skillState.accuracy}% (gần đây ${skillState.recentAccuracy}%)`
     );
-    evidenceLines.push(`Trạng thái: ${skillState.status} · Chất lượng dữ liệu: ${skillState.quality} · Mới cũ: ${skillState.freshness}`);
+    evidenceLines.push(
+      `Trạng thái: ${describeKnowledgeStatus(skillState.status)} · Dữ liệu: ${describeEvidenceQuality(skillState.quality)} · Độ mới: ${describeEvidenceFreshness(skillState.freshness)}`
+    );
     if (skillState.nextReviewAt) {
       evidenceLines.push(`Hạn ôn tiếp theo: ${new Date(skillState.nextReviewAt).toISOString().slice(0, 10)}`);
     }
   } else {
     evidenceLines.push('Chưa có hồ sơ kỹ năng chi tiết cho hoạt động này — dựa trên lịch sử hoạt động tổng thể.');
   }
-  evidenceLines.push(`Khả năng mở: ${availability === 'AVAILABLE' ? 'AVAILABLE' : 'UNAVAILABLE'}`);
-  if (reasonCodes.length > 0) {
-    evidenceLines.push(`Mã lý do: ${reasonCodes.join(', ')}`);
-  }
+  evidenceLines.push(`Khả năng mở: ${describeAvailability(availability)}`);
 
   const childText =
     language === 'en'

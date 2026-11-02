@@ -97,8 +97,12 @@ const STORAGE_KEYS = {
  *  - expanded `KnowledgeState` adaptive fields (per-skill level, independence
  *    counters, misconception map, retention evidence). Missing fields on older
  *    payloads are backfilled by the sanitizer, so no learning history is reset.
+ *
+ * P43-v1 (T40) rename các khoá `rf_rf_*` trong `knowledgeStates` về `rf_*`:
+ * `normalizeReadingSkillId` cũ cộng tiền tố hai lần nên kỹ năng đọc bị lưu
+ * dưới mã máy trùng lặp. Chỉ đổi khoá + tên, không chấm lại điểm.
  */
-export const STORAGE_SCHEMA_VERSION = 'P42-v3';
+export const STORAGE_SCHEMA_VERSION = 'P43-v1';
 
 /** Schema version for the game-progress store (separate key from the Learning OS). */
 export const GAME_PROGRESS_SCHEMA_VERSION = 1;
@@ -137,10 +141,49 @@ const MIGRATIONS: Record<string, (raw: Record<string, unknown>) => Record<string
   'P42-v2': (raw) => ({ ...raw }),
   // T19 — thêm bgMusicEnabled vào ParentSettings (key riêng, không cần migrate Learning OS)
   'P42-v3': (raw) => ({ ...raw }),
+  // T40 — `normalizeReadingSkillId` cũ cộng tiền tố hai lần nên toàn bộ kỹ năng
+  // đọc bị lưu dưới `rf_rf_*`. Đổi khoá về `rf_*` và viết lại tên cũ khớp khoá;
+  // nếu va khoá (hiếm, chỉ khi bé nâng cấp giữa chừng) thì giữ state mới hơn
+  // và cộng dồn số lượt — không mất dữ liệu học tập.
+  'P43-v1': (raw) => {
+    const states = raw.knowledgeStates;
+    if (!states || typeof states !== 'object' || Array.isArray(states)) return { ...raw };
+    const next: Record<string, unknown> = {};
+    for (const [skillId, value] of Object.entries(states as Record<string, unknown>)) {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) continue;
+      const key = skillId.startsWith('rf_rf_') ? skillId.slice(3) : skillId;
+      const state = { ...(value as Record<string, unknown>) };
+      if (state.skillName === skillId) state.skillName = key;
+      const existing = next[key] as Partial<KnowledgeState> | undefined;
+      if (!existing) {
+        next[key] = { ...state, skillId: key };
+        continue;
+      }
+      const at = (n: unknown) => (typeof n === 'number' && Number.isFinite(n) ? n : 0);
+      const practiced = Math.max(at(existing.lastPracticedAt), at(state.lastPracticedAt));
+      next[key] = {
+        ...state,
+        skillId: key,
+        attemptCount: at(existing.attemptCount) + at(state.attemptCount),
+        correctCount: at(existing.correctCount) + at(state.correctCount),
+        ...(practiced > 0 ? { lastPracticedAt: practiced } : {}),
+      };
+    }
+    return { ...raw, knowledgeStates: next };
+  },
 };
 
 /** Every schema version the app has ever written, oldest first. */
-const SCHEMA_HISTORY = ['P28-v1', 'P29-v2', 'P30-v1', 'P41-v1', 'P42-v1', 'P42-v2', 'P42-v3'] as const;
+const SCHEMA_HISTORY = [
+  'P28-v1',
+  'P29-v2',
+  'P30-v1',
+  'P41-v1',
+  'P42-v1',
+  'P42-v2',
+  'P42-v3',
+  'P43-v1',
+] as const;
 
 const SESSION_PROFILE_KINDS: SessionProfileKind[] = ['QUICK', 'STANDARD', 'DEEP', 'EXTENDED'];
 
@@ -410,6 +453,24 @@ export interface CurriculumCatalogue {
 
 let curriculumCatalogue: CurriculumCatalogue | null = null;
 
+/** Chuỗi chỉ có chữ thường + gạch dưới nối nhau: đó là mã máy, không phải tên bé đọc được. */
+const SKILL_ID_LIKE = /^[a-z0-9]+(?:_[a-z0-9]+)+$/;
+
+/**
+ * T40 — tên kỹ năng hiển thị cho ba mẹ không bao giờ được là mã máy.
+ * `recordLearningEvidence` cũ đóng băng `skillName = skillId` khi catalogue chưa
+ * kịp nạp (T39 biến nó thành tuỳ chọn), còn kỹ năng đọc thì không nằm trong
+ * catalogue nào cả. Lỗi được chữa ở lượt **đọc**: có catalogue là lấy tên thật.
+ */
+function resolveSkillName(skillId: string, storedName?: string): string {
+  const stored = typeof storedName === 'string' && storedName.length > 0 ? storedName : '';
+  if (stored && stored !== skillId && !SKILL_ID_LIKE.test(stored)) return stored;
+  const fromCatalogue = curriculumCatalogue
+    ?.getAllSkills()
+    .find((s) => s.skillId === skillId)?.skillName;
+  return fromCatalogue || stored || skillId;
+}
+
 export class StorageService {
   public static attachCurriculum(catalogue: CurriculumCatalogue): void {
     curriculumCatalogue = catalogue;
@@ -451,12 +512,11 @@ export class StorageService {
     const store = StorageService.getLearningOSStore();
     if (store.processedEvidenceIds.includes(evidence.id)) return false;
 
-    const skillMeta = curriculumCatalogue?.getAllSkills().find((s) => s.skillId === evidence.skillId);
     const previous =
       store.knowledgeStates[evidence.skillId] ??
       LearningOS.createInitialKnowledgeState(
         evidence.skillId,
-        skillMeta?.skillName || evidence.skillId,
+        resolveSkillName(evidence.skillId),
         evidence.subject
       );
 
@@ -722,7 +782,7 @@ export class StorageService {
         store.knowledgeStates[skillId] = {
           ...LearningOS.createInitialKnowledgeState(
             skillId,
-            typeof v.skillName === 'string' && v.skillName ? v.skillName : skillId,
+            resolveSkillName(skillId, typeof v.skillName === 'string' ? v.skillName : undefined),
             subject
           ),
           status: (['NOT_STARTED', 'LEARNING', 'PRACTICING', 'MASTERED', 'NEEDS_REVIEW'] as const).includes(
@@ -2126,7 +2186,7 @@ public static getParentSettings(): ParentSettings {
     }
     // T18A — quest "Thử Thách Tuần" qua engine chung.
     StorageService.recordQuestEvent({ kind: 'weekly' });
-    StorageService.addRewardHistory({ type: 'xp', amount: 0, description: `Hoàn thành Thử Thách Tuần ${challengeId}`, itemId: challengeId });
+    StorageService.addRewardHistory({ type: 'xp', amount: 0, description: 'Hoàn thành Thử Thách Tuần', itemId: challengeId });
   }
 
   /**

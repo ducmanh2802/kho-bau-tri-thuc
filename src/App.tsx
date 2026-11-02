@@ -116,8 +116,24 @@ export default function App() {
 
   // T39 — bốn ngân hàng đề (~350 KiB nguồn) không cần cho lần vẽ đầu tiên. Nạp
   // ngay sau khi mount để dashboard ba mẹ vẫn seed đủ danh sách kỹ năng.
+  // T40 — chunk này có thể trượt (mất mạng lần chạy đầu, cache cũ sau khi deploy):
+  // `void import()` sẽ ném unhandled rejection và cả phiên bị giảm chất lượng im
+  // lặng. Bắt lỗi, thử lại một lần, và để nguyên phần suy giảm có chủ đích của storage.
   useEffect(() => {
-    void import('./data/curriculum');
+    let cancelled = false;
+    let retry: ReturnType<typeof setTimeout> | undefined;
+    import('./data/curriculum').catch(() => {
+      if (cancelled) return;
+      retry = setTimeout(() => {
+        void import('./data/curriculum').catch(() => {
+          // Lần hai vẫn hỏng: các màn import curriculum trực tiếp sẽ tự nạp lại.
+        });
+      }, 3000);
+    });
+    return () => {
+      cancelled = true;
+      if (retry) clearTimeout(retry);
+    };
   }, []);
 
   // Parent modal state
