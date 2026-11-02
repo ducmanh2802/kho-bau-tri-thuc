@@ -56,21 +56,23 @@ jobs:
 
       # Log của một job Actions chỉ người có quyền admin mới tải được (`GET/…/jobs/<id>/logs` trả
       # `403 Must have admin rights to Repository`), nên lane đã ba lần thấy bước "QA probe" đỏ mà
-      # không đọc nổi dòng lỗi. Bước này chạy **sau** khi lỗi, chép 60 dòng cuối vào
-      # `$GITHUB_STEP_SUMMARY` — summary của check-run đọc được qua API **không cần quyền**, nên
-      # nguyên nhân trở nên quan sát được mà không phải đoán. Không đổi code probe ở đây.
-      - name: Chép lỗi probe vào summary (đọc được không cần admin)
+      # không đọc nổi dòng lỗi. Bước này chạy **sau** khi lỗi và in 4 dòng đầu tiên qua
+      # `::error::` — **đo được**: annotation đọc public bằng
+      # `GET /repos/<o>/<r>/check-runs/<id>/annotations` ⇒ HTTP 200, trong khi
+      # `$GITHUB_STEP_SUMMARY` (try ở run 41494831619, step 8 success) **không** hiện trong
+      # `output.summary` của check-run ⇒ summary không phải kênh đọc được cho lane.
+      # Không đổi code probe: chỉ làm nguyên nhân thật trở nên quan sát được.
+      - name: Đưa lỗi probe lên annotation (đọc public được)
         if: failure()
         env:
           PROBE: ${{ github.event.inputs.probe || 'qa/golden-path.mjs' }}
         run: |
-          {
-            echo "## Probe do: \`$PROBE\`"
-            echo "- runner: $(uname -sr) · node $(node -v) · npm $(npm -v)"
-            echo "- playwright: $(npx playwright --version 2>&1 || echo khong chay duoc)"
-            echo "- dist: $(find dist -maxdepth 1 -type f 2>/dev/null | wc -l) file goc"
-            echo '```'
-            node qa/run-one.mjs "$PROBE" 2>&1 | tail -60
-            echo "exit_cua_lot_chay_nay=${PIPESTATUS[0]}"
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+          out="$(node qa/run-one.mjs "$PROBE" 2>&1 | head -c 700 || true)"
+          printf '%s\n' "$out" | while IFS= read -r line; do
+            line="${line//$'\r'/}"
+            line="${line//%/%25}"
+            line="${line//#/%23}"
+            [ -n "$line" ] || continue
+            echo "::error file=.github/workflows/03-qa-browser.yml,line=55::$PROBE :: ${line:0:180}"
+          done
+          echo "::error file=.github/workflows/03-qa-browser.yml,line=55::runner=$(uname -sr) node=$(node -v) npm=$(npm -v) playwright=$(npx playwright --version 2>&1 | head -1) dist_root_files=$(find dist -maxdepth 1 -type f 2>/dev/null | wc -l)"
