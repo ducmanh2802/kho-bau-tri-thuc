@@ -59,7 +59,7 @@ Công cụ mutation chạy tự động (Stryker…) **chưa** được tích h�
 |---|---|---|---|
 | Pre-commit | mỗi commit | typecheck | giây |
 | Pre-push | mỗi push | `verify:quick` | ~1 phút |
-| PR/push (workflow 01) | mỗi push/PR | typecheck + `test:ci` (1272 test) | 21.55 s cho phần test (`evidence/2026-11-02-KBT-ISSUE-43/verify.txt`) |
+| PR/push (workflow 01) | mỗi push/PR | typecheck + `test:ci` (1277 test) | 23.85 s cho phần test (`evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt`) |
 | Build (workflow 02) | mỗi push/PR | build + `check:budget` | phút |
 | Browser (workflow 03) | mỗi push/PR | probe Playwright trên `dist/` | phút |
 | Release (workflow 04) | tag `v*.*.*` | build artifact + zip + GitHub Release | **chưa từng chạy** (không có tag) |

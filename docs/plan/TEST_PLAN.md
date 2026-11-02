@@ -5,8 +5,8 @@
 > coi là xanh**. Danh sách yêu cầu cần kiểm: [`SRS.md`](../specs/SRS.md); ánh xạ
 > yêu cầu ↔ test ↔ probe ↔ gate: [`RTM.md`](../specs/RTM.md); quy trình: [`../SDLC.md`](../SDLC.md).
 >
-> **Số liệu chốt 2026-11-02** (đo lại sau **KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review** — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` 30 test và probe `qa/game-pause.mjs`; đợt đo trước trong cùng ngày là T41C — bốn đường ghi tiến trình chỉ tính một lần: bằng liệu trùng chặn trước khi cộng, buổi đọc có dấu đã gập, bước ngày hoàn tác khi ghi hỏng, mỗi lượt chơi một biên lai; trước đó là T41B cửa sổ cân bằng môn và nhãn ngày trong báo cáo Ba Mẹ theo đồng hồ của caller + lịch địa phương, T41A công tắc phần thưởng chặn đúng tài nguyên, T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, T39 cắt lần tải đầu): 88 file test / 1272 test ·
-> 30 probe (29 `.mjs` + 1 `.cjs`) · 4 workflow CI · 3 git hook · main chunk `index-qnZ3EVTS.js`
+> **Số liệu chốt 2026-11-02** (đo lại sau **KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3`** — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` 30 test và probe `qa/game-pause.mjs`; đợt đo trước trong cùng ngày là T41C — bốn đường ghi tiến trình chỉ tính một lần: bằng liệu trùng chặn trước khi cộng, buổi đọc có dấu đã gập, bước ngày hoàn tác khi ghi hỏng, mỗi lượt chơi một biên lai; trước đó là T41B cửa sổ cân bằng môn và nhãn ngày trong báo cáo Ba Mẹ theo đồng hồ của caller + lịch địa phương, T41A công tắc phần thưởng chặn đúng tài nguyên, T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, T39 cắt lần tải đầu): 89 file test / 1277 test ·
+> 30 probe (29 `.mjs` + 1 `.cjs`) · 4 workflow CI · 3 git hook · main chunk `index-B6au8G63.js`
 > 204.2 kB / trần 600 kB / **mục tiêu 450 kB đã đạt**; đồ thị chặn lần vẽ đầu 418.5 kB (trần 500 kB
 > do `tests/t39-first-load-graph.test.ts` giữ); vendor ngoài entry và ngoài boot graph: `three-vendor` 572.6 kB, `firebase-vendor` 723.0 kB.
 
@@ -36,7 +36,7 @@ Lớp 5  Người lớn đọc to + beta trẻ thật          → §11   (2 phi
 Lớp 4  Thiết bị thật: Android/iOS, offline, audio → §7    (qa/mobile.mjs + tay người)
 Lớp 3  Probe trình duyệt trên dist/ (30 probe)    → §6    (npm run qa:smoke)
 Lớp 2  Build + ngân sách + precache               → §9    (npm run build && npm run check:budget)
-Lớp 1  Unit/integration Vitest (1272 test)        → §5    (npm run test:ci)
+Lớp 1  Unit/integration Vitest (1277 test)        → §5    (npm run test:ci)
 ────────────────────────────────────────────────────────────────────────────────────────────
               npm run verify = typecheck + Lớp 1 + Lớp 2   ← cổng duy nhất
 ```
@@ -81,7 +81,7 @@ Lớp 1  Unit/integration Vitest (1272 test)        → §5    (npm run test:ci)
 `posttest` gọi `scripts/audit-snapshot.mjs` ghi `docs/audit-state.json` và nối
 `docs/AUDIT_REPORT.md` (`AGENTS.md` §1.2).
 
-**Bố trí 88 file theo vai trò** (danh sách này **đủ** — kiểm bằng lệnh: mọi file trong `tests/`
+**Bố trí 89 file theo vai trò** (danh sách này **đủ** — kiểm bằng lệnh: mọi file trong `tests/`
 phải xuất hiện ở một dòng bảng; lần đồng bộ gần nhất 2026-11-02):
 
 | Nhóm | File | Kiểm gì |
@@ -96,7 +96,7 @@ phải xuất hiện ở một dòng bảng; lần đồng bộ gần nhất 202
 | Persistence | `t14c-storage`, `date-utils`, `parent-and-demo`, `firebase-auth-sync` | sanitize, `isRealDateKey`, export/import, **trạng thái offline khi chưa đăng nhập**, hợp nhất `Math.max`/`Set` union (mock Firestore) |
 | Âm thanh & giọng đọc | `question-audio-routing`, `voice-persona`, `t24-speech-math-operators` | nút "Đọc câu hỏi" luôn lấy canonical text (không rò rỉ đáp án/option/giải thích), persona + fallback en-GB, **phép tính `+ − =` đọc thành lời** mà không đổi chữ hiển thị |
 | Hệ thống | `bundle-budget`, `pwa`, `sw-precache`, `mobile-layout`, `t02c-startup-split`, `p41-font-encoding`, `t31-bug-hunt-fixes` | ngân sách chunk, precache, layout, tách chunk, font/dấu, **hợp đồng tĩnh của 5 lỗi T31 + 7 probe đã sửa** |
-| Cờ | `cotuong-engine`, `chess-3d`, `t26-cotuong-puzzles`, `t30-cotuong-piece-depth`, `t34-chess-real-set`, `t38-webgl-fallback` | luật (mã/tượng/pháo/tốt/tướng đối mặt/tự bỏ chiếu), node budget, `applyMove`; mesh 12 quân có shadow, bàn 64 ô + hitbox, marker nước đi/chiếu, nước mở đầu hợp lệ với engine; **độ nổi của quân cờ tướng** (bóng tiếp đất tràn ra ngoài đĩa, thành quân thò dưới mặt quân, thứ tự 3 lớp); 6 thế chiếu bí thật; bộ cờ vua giống ngoài đời; màn cờ vẫn chơi được khi máy không có WebGL |
+| Cờ | `cotuong-engine`, `chess-3d`, `chess-engine-performance`, `t26-cotuong-puzzles`, `t30-cotuong-piece-depth`, `t34-chess-real-set`, `t38-webgl-fallback` | luật (mã/tượng/pháo/tốt/tướng đối mặt/tự bỏ chiếu), node budget, `applyMove`; mesh 12 quân có shadow, bàn 64 ô + hitbox, marker nước đi/chiếu, nước mở đầu hợp lệ với engine; **độ nổi của quân cờ tướng** (bóng tiếp đất tràn ra ngoài đĩa, thành quân thò dưới mặt quân, thứ tự 3 lớp); 6 thế chiếu bí thật; bộ cờ vua giống ngoài đời; màn cờ vẫn chơi được khi máy không có WebGL; **engine cờ vua nhanh** (`chess-engine-performance`, merge `09511d3`): bàn mở đầu hợp lệ, `isAttacked` nhận ra mã/tốt/trượt/tướng, `getBestMove(depth 4, deadline 400 ms)` xong trong **≤ 600 ms** (ngưỡng là **thời gian tường** ⇒ rủi ro flake khi CI máy chậm — đã ghi ở §10), `getBestMove` không mutate bàn vào, tìm được nước bắt quân/chiếu-bí-trong-1 |
 | Ba mẹ & tiến trình (T40–T41C) | `t40-parent-facing-ids`, `t41a-parent-controls`, `t41b-decision-clock`, `t41c-idempotency` | báo cáo Ba Mẹ không lộ mã máy, công tắc thưởng chặn đúng tài nguyên, cửa sổ cân bằng môn + nhãn ngày theo đồng hồ caller, **chống ghi trùng** 5 tầng (evidence id · first-seen · nonce · completion · reward) + hoàn tác khi hết quota |
 | Vỏ UI & quy tắc React | `t01b-ui-fixes`, `t20a-hooks-order`, `t28-ui-polish`, `t36-viet-labels`, `t39-first-load-graph` | header không tràn, focus trap của popup bài học, hooks order, chuỗi Việt hoá còn sót, trần 500 kB cho đồ thị lần vẽ đầu |
 | Tooling | `t23-mcp-servers` | 5 server tồn tại, `node --check`, 0 import ngoài, `progress/` gitignored, 4 danh sách đăng ký khớp |
@@ -218,7 +218,7 @@ không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại 
 | Precache | `tests/sw-precache.test.ts`, `qa/offline-pwa.mjs` | manifest đủ `/assets/*`; placeholder dev ⇒ danh sách rỗng nhưng SW vẫn sống | — |
 | Loại trừ | `node_modules`, `.git`, `dist` không vào manifest | — | — |
 
-**Số đo gần nhất (2026-11-02, sau KBT-ISSUE-43):** `index-qnZ3EVTS.js = 204.2 kB` → PASS trần 600 kB và **đã đạt** mục tiêu 450 kB (T39). Boot graph: 418.5 kB (3 file).
+**Số đo gần nhất (2026-11-02, sau KBT-ISSUE-43 + merge `09511d3`):** `index-B6au8G63.js = 204.2 kB` → PASS trần 600 kB và **đã đạt** mục tiêu 450 kB (T39). Boot graph: 418.5 kB (3 file).
 
 ---
 
@@ -321,6 +321,7 @@ không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại 
 | 9 | Bàn cờ vua WebGL không có ca fallback khi context creation thất bại | máy cấu hình thấp chỉ thấy màn trống | test + fallback CSS (nợ #7 ARCHITECTURE §13) |
 | 6 | Quota `localStorage` đầy chưa có ca | mất tiến độ ở máy dùng lâu | task B6 |
 | 7 | Không có test đổi ngưỡng ⇒ đổi hành vi cho cả 17 policy block | ngưỡng bị "đóng băng" sai | task C5 |
+| 10 | `tests/chess-engine-performance.test.ts:43` đo `getBestMove(depth 4)` bằng **thời gian tường** (`expect(duration).toBeLessThanOrEqual(600)`, engine tự giới hạn 400 ms) | flake trên máy CI chậm hoặc lúc máy bận — đỏ mà code không sai; trong suite đầy đủ (23.85 s) chưa quan sát thấy đỏ | khi đỏ, chạy cô lập `npx vitest run tests/chess-engine-performance.test.ts` để phân biệt flake/thật; ngưỡng nới thành `deadline + buffer` nếu CI chứng minh hụt |
 
 ---
 

@@ -247,7 +247,7 @@ chunk WebGL lớn nhất từ trước tới nay); `src/components/learning/ches
 |---|---|---|
 | K-01 | **T03B — component Mascot Gấu Bút Chì (SVG) + avatar mặc đồ**: task P42 duy nhất còn nợ, prompt giữ lại ở `docs/opencode/queue/05_T03B_linh_vat_minh_hoa.md`; T03A/T04/T06 đang dùng emoji thay thế | `npm run verify` + screenshot 390 px | 
 | K-02 | `AGENTS.md` §0 slot "Công cụ MCP" đã có — thêm slot "Bộ tài liệu specs" | docs |
-| K-03 | Số liệu kiểm kê trong specs (31 game / 475 câu / 88 file test / 1272 test / entry `index-qnZ3EVTS.js` 204.2 kB + boot graph 418.5 kB / 8 deps / 19 key — đo 2026-11-02 sau KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review) cần refresh mỗi lần `verify` | `kbt-docs → project_state` |
+| K-03 | Số liệu kiểm kê trong specs (31 game / 475 câu / 89 file test / 1277 test / entry `index-B6au8G63.js` 204.2 kB + boot graph 418.5 kB / 8 deps / 19 key — đo 2026-11-02 sau KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3`) cần refresh mỗi lần `verify` | `kbt-docs → project_state` |
 | K-04 | `qa/p38-browser-probe.cjs` (`.cjs` duy nhất) — chuyển `.mjs` cho đồng bộ | QA |
 
 ---

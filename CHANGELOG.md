@@ -608,6 +608,12 @@ Xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
   `node qa/run-one.mjs qa/game-pause.mjs` ⇒ `QA PASS — 12 step(s), 0 errors`. Log và 3 ảnh chụp lại
   tại `evidence/2026-11-02-KBT-ISSUE-43/`; số hiện trạng trong `docs/specs` + `docs/lifecycle`
   đổi theo (1270 → 1272, hash entry, `Duration 30.69s` → `21.55s`).
+- **Đo lại cổng + 3 probe trên RC `3d06930` (Pha 6, sau merge `09511d3` của lane khác):** `npm run verify`
+  **EXIT=0** — **89 file / 1277 test** (`tests/chess-engine-performance.test.ts` của lane kia thêm 5 test),
+  `Duration 23.85s`, main chunk `index-B6au8G63.js = 204.2 kB → PASS (meets 450 kB goal)`; vì engine cờ vua
+  bị viết lại toàn bộ nên chạy lại cả ba probe: `qa:smoke` `QA PASS — 28 step(s), 0 errors`, `qa:games`
+  `catalogCount: 31` + 31/31 `mounted: true` + `overflowPx` max `0`, `game-pause` `QA PASS — 12 step(s), 0 errors`
+  (`ok: true`, `failedAt: null`). Bằng chứng: `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt` và ba file hậu tố `-rc`.
 - **Siết hợp đồng nguồn theo VỊ TRÍ (review 4 lớp, finding #1 → phép ablation M5):** hai test
   "chặn guard" của `tests/t43-game-pause.test.ts` trước đây chỉ **đếm** (`toContain` một chuỗi,
   `guards.length >= 2`), nên lùi guard xuống **sau** phép ghi điểm — lỗi thật, điểm vẫn cộng khi

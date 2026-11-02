@@ -199,7 +199,7 @@ Hai đường, và cả hai đều do người lớn khởi động:
 - Cờ vua 3D cũng nạp lười: [src/App.tsx:20](file:///D:/trithuc/kho-bau-tri-thuc/src/App.tsx#L20) `lazy(() => import('./components/learning/chess/ChessScreen'))`
   ⇒ `three-vendor` (572.6 kB) và `ChessScreen` (54.4 kB) chỉ tải khi bé mở bàn cờ; chưa từng mở thì không trả giá.
 - **T39 — đường tải tiên phong (boot graph).** `manualChunks` chỉ tách file, **không** hoãn được
-  `import` tĩnh, nên thứ tự đo được là: entry `index-qnZ3EVTS.js` **204.2 kB**, và
+  `import` tĩnh, nên thứ tự đo được là: entry `index-B6au8G63.js` **204.2 kB**, và
   `dist/index.html` tham chiếu tĩnh đúng 3 file = **418.5 kB** (index + `react-vendor` 213.6 +
   `rolldown-runtime` 0.7). Ba màn/đối tượng đã bị kéo ra khỏi tập đó: Cờ Tướng + Luyện Tiếng Anh
   IOE (`React.lazy` + `ScreenFallback`), `data/curriculum` (tự đăng ký vào storage, prefetch sau
@@ -498,7 +498,7 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 
 ---
 
-## 12. Kiểm kê kiến trúc (đo 2026-11-02, sau KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` và probe `qa/game-pause.mjs`; nội dung học, service, component và các mục khác **không đổi** so với đợt đo T41C cùng ngày)
+## 12. Kiểm kê kiến trúc (đo 2026-11-02, sau KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3` — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` và probe `qa/game-pause.mjs`; `09511d3` thêm `tests/chess-engine-performance.test.ts` (5 test) và đổi engine cờ vua, không đụng số liệu khác. Nội dung học, service, component và các mục khác **không đổi** so với đợt đo T41C cùng ngày)
 
 | Hạng | Số | Nguồn |
 |---|---|---|
@@ -512,11 +512,11 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 | Export policy | 17 (693 dòng) | `src/config/policy.ts` |
 | Key `localStorage` | 19 | `STORAGE_KEYS` (17) + 2 key cục bộ (`kho_bau_ioe_store`, `kho_bau_cloud_session_hint` — hint boolean, không chứa dữ liệu bé) |
 | Dependency runtime | 8 | `package.json` → `dependencies` |
-| Test file / test | 88 / 1272 | `npx vitest run` (86 `.ts` + 2 `.tsx`) |
+| Test file / test | 89 / 1277 | `npx vitest run` (87 `.ts` + 2 `.tsx`) |
 | Probe QA | 30 (29 `.mjs` + 1 `.cjs`) | `ls qa/*.mjs qa/*.cjs` (trừ `lib.mjs`, `run-one.mjs`) |
 | Workflow CI | 4 | `.github/workflows/` |
 | MCP server / tool | 5 / 27 | `mcp/` |
-| Main chunk | **204.2 kB** `index-qnZ3EVTS.js` (trần 600, mục tiêu 450 ⇒ đạt từ T39) | `npm run check:budget` |
+| Main chunk | **204.2 kB** `index-B6au8G63.js` (trần 600, mục tiêu 450 ⇒ đạt từ T39) | `npm run check:budget` |
 | Boot graph (asset mà `dist/index.html` tham chiếu tĩnh) | **418.5 kB** = index 204.2 + `react-vendor` 213.6 + runtime 0.7 | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sort -u` + `stat -c%s` |
 | Vendor chunk lớn nhất | `firebase-vendor` 723.0 kB · `three-vendor` 572.6 kB · `react-vendor` 213.6 kB — cả hai vendor lớn **không** còn trong boot graph | `npm run check:budget` |
 | `App.tsx` / `storage.ts` / `learningOS.ts` / `competitionEngine.ts` / `readingEngine.ts` / `cloudSync.ts` / `firebase.ts` | 499 / 2628 / 845 / 747 / 662 / 277 / 133 dòng | `wc -l` |

@@ -190,6 +190,9 @@ giữ `isPaused` làm state riêng, không prop nào xuống `useGameStage`, nê
 
 - [x] `npm run verify` xanh trên tip nhánh — EXIT=0 · `Test Files 88 passed (88)` ·
       `Tests 1272 passed (1272)` · `Duration 21.55s` · `Main chunk: index-qnZ3EVTS.js = 204.2 kB → PASS (meets 450 kB goal)`
+- [x] `npm run verify` xanh trên **RC** `3d06930` (sau khi merge `09511d3` của lane khác vào nhánh) — EXIT=0 ·
+      `Test Files 89 passed (89)` · `Tests 1277 passed (1277)` · `Duration 23.85s` ·
+      `Main chunk: index-B6au8G63.js = 204.2 kB → PASS (meets 450 kB goal)` — `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt`
 - [x] `npm run qa:smoke` — `QA PASS — 28 step(s), 0 errors`
 - [x] `npm run qa:games` (31 trò, hồi quy cho wrapper dùng chung) — `QA PASS — 0 step(s), 0 errors`,
       `catalogCount: 31`, `mountSmoke` 31/31 `mounted: true`, `overflowPx` lớn nhất = `0`,

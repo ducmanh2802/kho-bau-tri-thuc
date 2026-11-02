@@ -50,11 +50,13 @@ một ô `NotRun` vẫn phải ghi rõ vì sao chưa chạy.
 | File | Mở ra thấy gì | Số đo |
 |---|---|---|
 | `verify.txt` | `npm run verify` trên tip `feature/43-game-pause` — sau merge `c8a3725` và hai sửa review (guard theo vị trí + ARIA lớp phủ) | `88` test file passed · `1272` test passed · `Duration 21.55s` · `Main chunk: index-qnZ3EVTS.js = 204.2 kB → PASS (meets 450 kB goal)` |
+| `verify-rc.txt` | `npm run verify` trên **RC commit** `3d06930` (tip nhánh sau khi merge `09511d3` của lane khác vào) — phép đo chốt để tag `v1.1.0` | `89` test file passed · `1277` test passed · `Duration 23.85s` · `Main chunk: index-B6au8G63.js = 204.2 kB → PASS (meets 450 kB goal)` |
 | `red-before-fix.txt` | Log **trước** khi sửa source — chứng minh test bắt được bug thật, không viết ra sau khi code đã đúng | `30 tests \| 24 failed` · `Tests 24 failed \| 6 passed (30)` · EXIT=1 |
 | `verify-release-prep.txt` | `npm run verify` **sau** khi chốt hồ sơ `1.1.0` (`CHANGELOG` đổi header, `package.json` + lock lên `1.1.0`) — để chắc bước chuẩn bị release không đổi artefact | `88` test file · `1272` test · `Duration 33.43s` · entry **vẫn** `index-qnZ3EVTS.js = 204.2 kB → PASS` (mã bundle không đọc `package.json.version`) |
 | `probe-game-pause.json` | Playwright trên `dist/` thật: 4 trò đồng hồ có đúng 1 nút tạm, 1 trò không đồng hồ có 0 nút; tạm ⇒ bóng đứng nguyên 1 200 ms; chạm lúc tạm không nhích câu; bấm tiếp rơi lại; **C2 đối chứng**: cùng cú chạm lúc đang chạy thì xoá đúng bóng đích | `12` bước · `errors: []` · `ok: true` · `QA PASS — 12 step(s), 0 errors` |
 | `probe-qa-smoke.txt` | `npm run qa:smoke` = `qa/golden-path.mjs` — luồng chính của bé từ trang chủ tới màn chơi, chạy lại sau hai sửa review để chắc không hồi quy | `QA PASS — 28 step(s), 0 errors` · `errors: []` · `removals: []` · `noDuplicateRewards`: `xpBefore 260 → xpAfter 260` |
 | `probe-qa-games.txt` | `npm run qa:games` — mount **cả 31 trò** qua `GameModalWrapper` (file mà lát cắt này sửa), bắt hồi quy toàn bộ chứ không chỉ 4 trò có nút tạm | `QA PASS — 0 step(s), 0 errors` · `catalogCount: 31` · `mountSmoke` 31/31 `mounted: true` · `overflowPx` lớn nhất `0` · `rewards.mountOnlyAwardedNothing: true` |
+| Ba file `-rc` (`probe-qa-smoke-rc.txt`, `probe-qa-games-rc.txt`, `probe-game-pause-rc.json`) | Ba probe trên chạy **lại** trên RC `3d06930` (sau merge `09511d3` — engine cờ vua đổi hoàn toàn, phải chứng minh không hồi quy) | `qa:smoke` `QA PASS — 28 step(s), 0 errors` · `qa:games` `catalogCount: 31`, 31/31 `mounted: true`, `overflowPx` max `0`, `errors: []` · `game-pause` `ok: true`, 12 bước, `errors: []`, `failedAt: null` |
 | `mutation-M3-clock-decision.txt` | Bỏ đúng `&& !s.pausedByUser` ở `src/hooks/useGameStage.ts:24` | `Tests 2 failed \| 28 passed (30)` · EXIT=1 · đã `git checkout --` và kiểm tra lại dòng 24 |
 | `mutation-M4-score-guard.txt` | Bỏ `if (!isRunning) return;` ở `useGameStage.ts:139` (một trong hai bản) | `Tests 1 failed \| 29 passed (30)` · EXIT=1 · `grep -c` lại guard = 2 |
 | `mutation-M5-guard-position.txt` | **Không bỏ** dòng nào — chỉ lùi guard của `submitWrong` xuống **sau** `setMistakesInTier` (lỗi mà review 4 lớp chỉ ra: test cũ chỉ đếm guard nên vẫn xanh) | `Tests 1 failed \| 29 passed (30)` · EXIT=1 · đỏ đúng dòng "guard không nằm ngay đầu hàm" |
@@ -72,9 +74,9 @@ rồi được hoàn tác; tính cả hai phép của đợt T41C thì tổng l�
 ### Tái lập đợt `2026-11-02-KBT-ISSUE-43`
 
 ```bash
-git checkout feature/43-game-pause        # tip nhánh — 1272 test cần merge c8a3725 (thêm 2 test của lane kia)
-npm run hooks:install && npm ci && npm run verify        # 88 file / 1272 test / 204.2 kB
-sed 's/\x1b\[[0-9;]*m//g' <log> > evidence/2026-11-02-KBT-ISSUE-43/verify.txt
+git checkout feature/43-game-pause        # tip nhánh = RC `3d06930` (đã merge `09511d3` + `c8a3725` của lane kia)
+npm run hooks:install && npm ci && npm run verify        # 89 file / 1277 test / 204.2 kB `index-B6au8G63.js`
+sed 's/\x1b\[[0-9;]*m//g' <log> > evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt
 npm run build
 node qa/run-one.mjs qa/game-pause.mjs > evidence/2026-11-02-KBT-ISSUE-43/probe-game-pause.json
 # phải in QA PASS — 12 step(s), 0 errors (dòng đó nằm ngoài JSON, đã cắt khi lưu)

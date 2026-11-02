@@ -1,0 +1,337 @@
+
+> kho-bau-tri-thuc-lop-1@1.1.0 qa:games
+> node qa/run-one.mjs qa/games.mjs
+
+{
+  "mountSmoke": [
+    {
+      "index": 0,
+      "game": "Bắt Chữ Cái Bay",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 1,
+      "game": "Xưởng Ghép Tiếng Lớp 1",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 2,
+      "game": "Săn Vần Trong Vườn Cây",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 3,
+      "game": "Đoàn Tàu Xếp Câu",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 4,
+      "game": "Đôi Tai Thính — Nghe & Chọn",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 5,
+      "game": "Đấu Trường Chính Tả",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 6,
+      "game": "Tô Dấu Thanh",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 7,
+      "game": "Đoàn Tàu Ghép Vần",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 8,
+      "game": "Đọc Câu Làm Theo",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 9,
+      "game": "Hứng Số Rơi Rộn Ràng",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 10,
+      "game": "Đường Đua Thần Tốc",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 11,
+      "game": "Xây Tháp Số Lên Mây",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 12,
+      "game": "Câu Cá Đại Dương Xanh",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 13,
+      "game": "Phân Loại Hình Học",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 14,
+      "game": "Thám Hiểm Giờ & Tiền Việt",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 15,
+      "game": "Chuyện Kể Toán Học",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 16,
+      "game": "Chợ Khung 10",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 17,
+      "game": "Ếch Nhảy Tia Số",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 18,
+      "game": "Thợ Sửa Đồng Hồ",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 19,
+      "game": "Safari Tiếng Anh — Loài Vật",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 20,
+      "game": "Đập Bóng Màu",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 21,
+      "game": "Phonics Pop — Bắn Âm",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 22,
+      "game": "Simon Says — Gấu Ra Lệnh",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 23,
+      "game": "Word Train — Tàu Chữ Tiếng Anh",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 24,
+      "game": "Lập Trình Tìm Kho Báu",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 25,
+      "game": "Nhà Khoa Học Nhí",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 26,
+      "game": "Lật Thẻ Trí Nhớ Vàng",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 27,
+      "game": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 28,
+      "game": "Nối Số Tô Màu",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 29,
+      "game": "Đoán Bóng Hình",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 30,
+      "game": "Bé Xếp Hình Mosaic",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    }
+  ],
+  "rewards": {
+    "countBefore": 0,
+    "countAfterMountOnly": 0,
+    "countAfterRound1": 1,
+    "countAfterRound2": 2,
+    "mountOnlyAwardedNothing": true,
+    "round1AwardedOnce": true,
+    "round2AwardedOnce": true,
+    "gameOverShown": true,
+    "play1": {
+      "matched": true,
+      "total": 6,
+      "settled": 6,
+      "guard": 5
+    }
+  },
+  "errors": [],
+  "catalogCount": 31
+}
+QA PASS — 0 step(s), 0 errors

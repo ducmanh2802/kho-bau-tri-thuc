@@ -24,7 +24,7 @@ FAIL treo.
 
 | ID | Mục | Trạng thái | Bằng chứng | Owner · hạn (nếu chưa đạt hẳn) |
 |---|---|---|---|---|
-| C-01 | `npm run verify` xanh trên commit đang chốt | ĐẠT | `evidence/2026-11-02-KBT-ISSUE-43/verify.txt` (88 file / 1272 test / EXIT=0, đo 2026-11-02) · `evidence/2026-11-02-T41C/verify.txt` | — |
+| C-01 | `npm run verify` xanh trên commit đang chốt | ĐẠT | `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt` (89 file / 1277 test / EXIT=0 trên tip `3d06930`, đo 2026-11-02) · `evidence/2026-11-02-KBT-ISSUE-43/verify.txt` · `evidence/2026-11-02-T41C/verify.txt` | — |
 | C-02 | Bundle dưới trần | ĐẠT | entry 204.2 kB ≤ 450 kB mục tiêu; boot graph 418.5 kB | — |
 | C-03 | SRS có cột ưu tiên (priority) cho FR | **MỘT PHẦN** | `docs/specs/SRS.md` không có cột priority | người giữ repo · 2026-12-31 (cùng đợt rà FR) |
 | C-04 | Characterization test commit **trước** đợt refactor đầu tiên | **MỘT PHẦN** | `tests/t39-first-load-graph.test.ts` viết cùng commit với refactor | agent · đợt refactor kế tiếp (90 ngày, mục 2.1) |

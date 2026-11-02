@@ -64,8 +64,8 @@ Không squash vào `main` từ lane này — quyền mở PR + merge thuộc ng�
 | 5 | Review 4 lớp §6 + thân PR đã điền số đo §7 | XONG phần máy — CI trên GitHub `NotRun` (PR chưa mở) |
 | 6 | `CHANGELOG [1.1.0] - 2026-11-02`, `package.json`/lock `1.1.0`, hồ sơ go/no-go `07` §3.4 | **Chờ người**: squash → tag HEAD `main` |
 
-Số hiện trạng lane này để lại: `npm run verify` EXIT=0 · 88 file / 1272 test · `Duration 21.55s`
-(bản chốt hồ sơ: 33.43s) · entry `index-qnZ3EVTS.js` 204.2 kB · 30 probe · 31/31/31/31 đăng ký trò chơi.
+Số hiện trạng lane này để lại: `npm run verify` EXIT=0 trên RC `3d06930` · 89 file / 1277 test ·
+`Duration 23.85s` · entry `index-B6au8G63.js` 204.2 kB · 30 probe · 31/31/31/31 đăng ký trò chơi.
 Việc còn mở của repo (không thuộc lát cắt này): T41D (merge cloud sync + race đăng nhập), T41E
 (cổng QA + service worker), 8 item "Hệ quả chưa đóng" ở `docs/plan/TASK_PLAN.md`.
 
