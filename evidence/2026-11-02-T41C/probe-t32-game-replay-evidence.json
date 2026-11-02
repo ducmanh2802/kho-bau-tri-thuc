@@ -1,0 +1,42 @@
+{
+  "steps": [
+    "A1: bé đang chọn dở (\"Đã chọn “hai cây bút” — bé chạm vào chỗ để nhé!\") → chọn lại Màn 1 xoá sạch, bảng về 1 bước hợp lệ",
+    "D1: 7 lượt ở Màn 4, luôn chỉ 1 bước hợp lệ",
+    "G1: nút ✕ đóng lớp phủ chọn màn — người dùng bàn phím thoát ra được",
+    "C1: mở lớp phủ 3 giây → đồng hồ giữ nguyên 15s (bé không bị mất giờ oan)",
+    "C2: đóng lớp phủ → đồng hồ chạy tiếp (15s → 12s)"
+  ],
+  "errors": [],
+  "facts": {
+    "hintAfterSelect": "Đã chọn “hai cây bút” — bé chạm vào chỗ để nhé!",
+    "hintAfterReplay": "Bé cần đưa: “hai cái ly” — chạm vào vật này trước nhé!",
+    "markersAfterReplay": 1,
+    "readDoM4": {
+      "rounds": 7,
+      "maxCorrectMarkers": 1,
+      "maxPlacedWhilePending": 0,
+      "seen": [
+        "lượt 1: 1 vật/1 chỗ, 0 đã đặt → Vật một chậu hoa, phím 2",
+        "lượt 2: 1 vật/1 chỗ, 0 đã đặt → Vật hai cái ly, phím 2",
+        "lượt 3: 1 vật/1 chỗ, 0 đã đặt → Vật ba bông hoa, phím 1",
+        "lượt 4: 1 vật/1 chỗ, 0 đã đặt → Vật hai cây bút, phím 3",
+        "lượt 5: 1 vật/1 chỗ, 0 đã đặt → Vật một chú cá, phím 3",
+        "lượt 6: 1 vật/1 chỗ, 0 đã đặt → Vật hai quả táo, phím 1",
+        "lượt 7: 1 vật/1 chỗ, 0 đã đặt → Vật hai quyển sách, phím 1"
+      ]
+    },
+    "behindOverlay": {
+      "before": 15,
+      "after3s": 15
+    },
+    "afterClose": 12
+  },
+  "failedAt": null,
+  "shots": [
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t32\\a-read-do-replay-reset.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t32\\d-read-do-order-m4.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t32\\c-timer-frozen-behind-overlay.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t32\\c-timer-resumed.png"
+  ],
+  "ok": true
+}

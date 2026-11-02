@@ -11,6 +11,7 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 | 4 | [`RTM.md`](RTM.md) | *Yêu cầu nào được chứng minh ở đâu? Test nào không phục vụ gì?* | ma trận xuôi + ngược, tổng kết độ phủ |
 | 5 | [`../plan/TASK_PLAN.md`](../plan/TASK_PLAN.md) | *Đã làm gì (P25→P43) và sẽ làm gì tiếp (EP-A…EP-F)?* | WBS 12 gói, 4 milestone |
 | 6 | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) | *Kiểm bằng lớp nào, chạy lệnh nào, khi nào xanh?* | 5 lớp, 29 probe, bảng "đổi gì → chạy gì" |
+| 7 | [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md) | *Ca kiểm thử nào, AC nguồn ở đâu, verdict gì?* | 5 US · 29 TC · 2 phép ablation · exit criteria viết trước |
 
 ## Quy ước chung của bộ tài liệu
 
@@ -70,7 +71,10 @@ Bốn điểm vào (sửa cùng một commit khi đổi tên file hoặc số li
 
 ## Tài liệu nền khác (không thuộc bộ đặc tả nhưng được tham chiếu nhiều)
 
-[`../SDLC.md`](../SDLC.md) · [`../GAME_DESIGN.md`](../GAME_DESIGN.md) ·
+[`../SDLC.md`](../SDLC.md) · [`../lifecycle/README.md`](../lifecycle/README.md) (8 artifact vòng đời +
+Evidence Board + Checklist) · [`../prompts/README.md`](../prompts/README.md) (5 thẻ prompt tái dùng) ·
+[`../../evidence/README.md`](../../evidence/README.md) (bằng chứng gắn commit) ·
+[`../GAME_DESIGN.md`](../GAME_DESIGN.md) ·
 [`../CURRICULUM_MAP.md`](../CURRICULUM_MAP.md) · [`../PARENT_MODE.md`](../PARENT_MODE.md) ·
 [`../SAFETY_PRIVACY.md`](../SAFETY_PRIVACY.md) · [`../P30_RELIABILITY.md`](../P30_RELIABILITY.md) ·
 [`../P31_PERFORMANCE_ACCESSIBILITY.md`](../P31_PERFORMANCE_ACCESSIBILITY.md) ·

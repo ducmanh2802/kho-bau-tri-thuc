@@ -55,8 +55,32 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   `src/components/learning/chess/ChessPieceSvg.tsx`, và **6 thế cờ tướng** có sẵn cho bé
   (`CotuongPuzzlesView.tsx` + `cotuongPuzzles.ts`: Ngọa Tào Mã, Song Pháo, Thiết Môn Khảm,
   Binh Nhập Cung, Mã Hậu Pháo, Song Xe Tảo Cung).
+- **Bộ artifact vòng đời `docs/lifecycle/`** (T42) — 8 artifact đánh số theo 6 pha, mỗi file có
+  owner + ngày + gate result: `01_LIFECYCLE_BOARD` (6 pha × 5 lớp), `02_AI_USAGE_CHARTER`
+  (phân quyền AI Level + Rule of Two + advisory vs enforced), `03_REQUIREMENTS_CHAIN`
+  (BR → FR → US → TC + hai cổng duyệt), `04_DESIGN_BLUEPRINT` (driver có số đo, C4, ADR index,
+  sequence **kèm state lỗi**, ERD 19 key, STRIDE 6 mục, lethal trifecta), `05_IMPLEMENTATION_LOOP`
+  (Guarded Build Loop 6 bước + merge gate 5 điều kiện), `06_VERIFICATION_VALIDATION` (oracle,
+  verdict 4 giá trị, ablation), `07_RELEASE_OPERATIONS` (RC/go-no-go, expand-contract, SLI/SLO từ
+  NFR, runbook 4 phần), `08_MAINTENANCE_EVOLUTION` (characterization test, impact analysis 6 chiều,
+  review 4 lớp). Kèm `README.md` (Evidence Board một trang), `CHECKLIST.md` (20 mục, 0 FAIL),
+  `HARNESS.md` (Guide × Sensor × Memory), `09_ADOPTION_ROADMAP.md` (30/60/90 + Playbook 3 dòng).
+- **`docs/plan/TEST_CASES.md`** — tầng US + TC đầu tiên của repo: 5 user story AC 3 nhánh,
+  29 ca kiểm thử có verdict, 7 exit criteria viết trước khi chạy.
+- **`docs/prompts/`** — 5 thẻ prompt tái dùng (TASK_BRIEF · BUG_HUNT · MEASURE_SYNC ·
+  REVIEW_4LAYER · CONTEXT_PACK), mỗi thẻ đủ 5 phần + tiêu chí đạt là lệnh.
+- **`evidence/`** — bằng chứng gắn commit: `2026-11-02-T41C/` gồm log `verify` (17.533 byte),
+  3 probe JSON, 2 ảnh trước/sau dải thưởng, 3 log ablation/baseline.
+- Harness nằm trong repo: `.qoder/skills/kho-bau-change/SKILL.md` (quy trình 7 bước) và
+  `.qoder/agents/kbt-reviewer.md` (reviewer chỉ-đọc, 4 lớp).
 
 ### Changed
+- **Đối soát số liệu dẫn trong docs (T42):** `README.md` khai **17 ADR** trong khi
+  `grep -ohE "ADR-[0-9]+" docs/specs/ARCHITECTURE.md | sort -u | wc -l` = **18**, và ghi dấu đo
+  **2026-10-30** trong khi toàn bộ số hiện trạng là của đợt đo sau T41C (commit `d54f341`, ngày
+  2026-11-02) ⇒ sửa hai chỗ, thêm 4 dòng bảng tài liệu trỏ tới `docs/plan/TEST_CASES.md`,
+  `docs/lifecycle/`, `docs/prompts/`, `evidence/`. `docs/specs/README.md` thêm dòng 7 cho tầng
+  US/TC.
 - **Cắt lần tải đầu (đợt T39 — perf):** người dùng yêu cầu "tiếp tục tối ưu bundle xuống 450 kB".
   Đo trước khi sửa: `npm run check:budget` chỉ nhìn chunk entry nên T38 vẫn PASS ở **534.3 kB**,
   trong khi `dist/index.html` tham chiếu **tĩnh** cả `firebase-vendor` 537.9 kB, `english-bank`
@@ -527,6 +551,12 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
     `memory-card`, `karaoke-read-all` và `answer-option` + `data-correct` cho `spelling_duel`.
 
 ### Tests
+- **`tests/decision-engine-storage.test.ts` dọn 3 khối `console.log` dump** (nợ D-4): test
+  golden-path C in `knowledgeStates.math_addition_10`, danh sách hành động của `LearningOS` và
+  `reasonCodes` của từng gợi ý ra output CI — dữ liệu suy luận của bé không có việc gì nằm trong
+  log, và nó làm đỏ mọi lần chạy gate. Bỏ ba khối + bỏ luôn import `LearningOS` thành không dùng;
+  assertion `toContain('SM2_DUE')` giữ nguyên, test vẫn xanh (`npm run verify` **EXIT=0**,
+  **87 file / 1240 test**).
 - `tests/t41c-idempotency.test.ts` — **25 test** cho "một thao tác, một lần tính", với mock
   `localStorage` có công tắc `writable` để mô phỏng hết quota (`setItem` ném): phát lại một câu
   trả lời không nhân đôi `totalQuestionsAnswered`/`skillMastery`/`daily.correctBySubject`/combo,
@@ -541,6 +571,10 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   biên lai trùng và thưởng tắt đều rơi về dòng muted **không** có `+\d+ (Sao|XP)`, kèm ba hợp đồng
   nguồn (`if (!recorded) return;` đứng trước phép cộng, `saveChildProfile(...): boolean` + hoàn
   tác `streakBefore`, `writeJSON(...): boolean`, không còn `receipt?.stars ?? earnedStars`).
+- **Hai phép ablation chứng minh test bắt được lỗi** (2026-11-02, log trong
+  `evidence/2026-11-02-T41C/`): bỏ guard `appliedSessionIds` ở `readingEngine.ts:320` ⇒
+  `1 failed | 24 skipped`, EXIT=1 (đỏ đúng TC-05); bỏ guard `rewardClaims` ở `storage.ts:2140` ⇒
+  `2 failed | 23 passed`, EXIT=1 (đỏ đúng TC-11 + TC-12); hoàn tác cả hai ⇒ `25 passed`, EXIT=0.
 - `tests/t41b-decision-clock.test.ts` — **12 test** cho đồng hồ, ghim `process.env.TZ =
   'Asia/Ho_Chi_Minh'` trong `beforeAll` (khôi tạo ở `afterAll`) để ngày địa phương có nghĩa:
   cửa sổ 14 ngày của `computeSubjectBalanceBoost` tính từ `now` của caller (30 ngày trước ⇒ không

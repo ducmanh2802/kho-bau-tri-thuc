@@ -1,0 +1,87 @@
+# 01 — Lifecycle Board
+## 6 pha × 5 lớp · Kho Báu Tri Thức — Lớp 1
+
+**Owner:** người giữ repo (`ducmanh2802`) · **Ngày chốt:** 2026-11-02 · commit tham chiếu: `d54f341`
+**Cách kiểm:** mỗi ô phải trỏ tới một artifact có thật trong repo hoặc một lệnh đã chạy. Ô nào chưa có
+thì để trống và ghi lý do — không viết "sẽ làm".
+
+---
+
+## 1. Bảng
+
+### Pha 1 — Requirements (Yêu cầu)
+
+| Lớp | Nội dung | Artifact / lệnh |
+|---|---|---|
+| Deliverable | BRD (6 mục tiêu nghiệp vụ + 8 rủi ro), SRS (88 FR · 25 NFR · 19 DC), RTM hai chiều | [`../specs/BRD.md`](../specs/BRD.md) · [`../specs/SRS.md`](../specs/SRS.md) · [`../specs/RTM.md`](../specs/RTM.md) |
+| Quality gate | Không FR nào được ghi mà không trỏ được tới file; RTM §7 đếm **0 test mồ côi** | `grep -c "^| FR-" docs/specs/SRS.md` = 88 · RTM §7 |
+| AI Level | **Mức 2** — AI viết nháp toàn bộ đặc tả, người giữ repo duyệt và cắt yêu cầu | nhật sử: `docs/plan/TASK_PLAN.md` §II |
+| RACI | R: agent viết spec · A: người giữ repo · C: giáo viên lớp 1 (nguồn dữ liệu nội dung) · I: phụ huynh thử | `BRD.md` §1 |
+| Metrics | FR có bằng chứng tự động 82/88 · NFR đạt 24/25 · 1 yêu cầu không đo được (BG-01) | RTM §8 (đo 2026-11-02) |
+
+### Pha 2 — Design (Thiết kế)
+
+| Lớp | Nội dung | Artifact / lệnh |
+|---|---|---|
+| Deliverable | SAD 18 ADR, kiểm kê kiến trúc, ERD key `localStorage`, deployment topology | [`../specs/ARCHITECTURE.md`](../specs/ARCHITECTURE.md) · [`04_DESIGN_BLUEPRINT.md`](04_DESIGN_BLUEPRINT.md) |
+| Quality gate | Bất biến đăng ký trò chơi 4 nơi phải bằng nhau; trần main chunk 600 kB (mục tiêu 450) | `npm run check:budget` · `tests/t23-mcp-servers.test.ts` |
+| AI Level | **Mức 2** — AI đề xuất phương án, người quyết ADR; mỗi ADR có phương án đơn giản nhất làm đối chứng | `ARCHITECTURE.md` §ADR |
+| RACI | R: agent · A: người giữ repo (chấp nhận ADR-01 local-first, ADR-16 lazy chunk) | — |
+| Metrics | 18 ADR · 19 key lưu trữ có registry, **2 lỗ hổng thiết kế** (DC-17, DC-19) | RTM §4 |
+
+### Pha 3 — Implementation (Hiện thực)
+
+| Lớp | Nội dung | Artifact / lệnh |
+|---|---|---|
+| Deliverable | 170 module `.ts` + 97 `.tsx`, 41 service, 31 trò chơi đăng ký đủ 4 nơi | `find src -name '*.ts' \| wc -l` · `ARCHITECTURE.md` §12 |
+| Quality gate | `pre-commit` typecheck · `commit-msg` chặn message sai chuẩn · `verify:quick` trước push | `scripts/hooks/` (3 hook) |
+| AI Level | **Mức 3 trong giới hạn** — agent tự sửa code trong phạm vi allowed changes, nhưng không tự merge và không tự thêm dependency | `AGENTS.md` §1 mục 4–5 · [`.qoder/agents/kbt-reviewer.md`](../../.qoder/agents/kbt-reviewer.md) |
+| RACI | R: agent · A: người giữ repo · C: reviewer lane khác | `.ai/CURRENT.md` |
+| Metrics | entry 204.2 kB / boot graph 418.5 kB · 8 dependency runtime | `npm run check:budget` (đo 2026-11-02) |
+
+### Pha 4 — Verification (Kiểm chứng)
+
+| Lớp | Nội dung | Artifact / lệnh |
+|---|---|---|
+| Deliverable | TEST_PLAN 10 lớp, TEST_CASES 29 TC có verdict, catalog ablation | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) · [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md) |
+| Quality gate | `npm run verify` EXIT=0; UI đổi phải có ảnh/probe; test phải chứng minh bắt được lỗi | [`evidence/2026-11-02-T41C/`](../../evidence/README.md) |
+| AI Level | **Mức 2** — AI sinh test, expected lấy từ AC do người duyệt. *Deviation:* ở các đợt sớm người duyệt không tách AC 3 nhánh ⇒ xem `06_VERIFICATION_VALIDATION.md` §4 | `TEST_CASES.md` §2 |
+| RACI | R: agent · A: người giữ repo quyết oracle · C: — | — |
+| Metrics | 87 test file / 1240 test / suite 27.24 s · 29 probe · 2 phép ablation làm đỏ đúng test | `verify.txt` · `mutation-M*.txt` |
+
+### Pha 5 — Release (Phát hành)
+
+| Lớp | Nội dung | Artifact / lệnh |
+|---|---|---|
+| Deliverable | Quy trình tag + workflow `04-release.yml` (build → zip → GitHub Release) | [`.github/workflows/04-release.yml`](../../.github/workflows/04-release.yml) · [`07_RELEASE_OPERATIONS.md`](07_RELEASE_OPERATIONS.md) |
+| Quality gate | Exit criteria: tag `vX.Y.Z` + golden-path 0 lỗi (`TEST_PLAN.md` §10) | — |
+| AI Level | **Mức 1** — AI chạy lệnh, người ký go/no-go; AI **không** ký | `07_RELEASE_OPERATIONS.md` §3 |
+| RACI | A: người giữ repo | — |
+| Metrics | **Chưa đo được.** `git tag` trả rỗng tính tới 2026-11-02 ⇒ pha này ở trạng thái `NotRun`, không phải `Pass` | `git tag \| wc -l` = 0 |
+
+### Pha 6 — Maintenance (Duy trì & tiến hoá)
+
+| Lớp | Nội dung | Artifact / lệnh |
+|---|---|---|
+| Deliverable | CHANGELOG, AUDIT_REPORT, 39 báo cáo audit, quy trình CR | [`../../CHANGELOG.md`](../../CHANGELOG.md) · [`../opencode/reports/`](../opencode/reports/) · [`08_MAINTENANCE_EVOLUTION.md`](08_MAINTENANCE_EVOLUTION.md) |
+| Quality gate | Mọi thay đổi hành vi phải kèm test; `npx vitest run` trước/sau khi refactor | `AGENTS.md` §2 |
+| AI Level | **Mức 2** — agent sửa từng bước, người đọc diff theo 4 lớp | `08_MAINTENANCE_EVOLUTION.md` §3 |
+| RACI | R: agent · A: người giữ repo | — |
+| Metrics | 41/693 dòng policy là trần số dùng chung; 2628 dòng `storage.ts` là nợ thiết kế lớn nhất | `wc -l` (đo 2026-11-02) |
+
+---
+
+## 2. Quyền No-Go
+
+Người giữ repo giữ quyền **No-Go** ở 3 cổng: (a) FR vào SRS, (b) ADR được chấp nhận, (c) go/no-go
+phát hành. Agent không có quyền ở cả ba — `AGENTS.md` §1 mục 4–5 cấm tự thêm dependency và tự
+commit/push khi chưa được yêu cầu, tức là cấm luôn hai hành vi "tự cho Go" phổ biến nhất.
+
+## 3. Tailoring — những gì khóa học yêu cầu mà repo này **cố ý không làm**
+
+| Chuẩn gốc | Cắt | Lý do |
+|---|---|---|
+| OpenAPI spec cho mọi API | Cắt hẳn | Không có server. Toàn bộ "API" là hàm thuần trong `src/services/`; đặc tả nằm ở `src/types/*.ts` và được typecheck enforce. |
+| Restore drill trên production DB | Thay bằng test quota | Không có DB. Rủi ro tương đương gần nhất là `setItem` ném (Safari riêng tư/hết chỗ) — đã có TC-08/09/10. |
+| UAT với khách hàng | `NotRun` | Chưa có phụ huynh thật đồng ý thử; ghi ở `TEST_CASES.md` §5. |
+| Telemetry aggregate BG-01 | Cắt | ADR-01 local-first + `SAFETY_PRIVACY.md` §1 — không gửi dữ liệu của trẻ đi đâu. |

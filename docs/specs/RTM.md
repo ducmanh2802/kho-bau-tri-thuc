@@ -7,8 +7,8 @@
 > Nguyên tắc ghi: một dòng RTM chỉ được coi là **ĐẠT** khi ô Test **hoặc** Probe có thật
 > và chạy được. Không có ô "sẽ test". Không có yêu cầu nào được ghi mà không trỏ file.
 >
-> **Ngày chốt:** 2026-10-29, đo lại 2026-10-30 sau merge `origin/main` · nguồn yêu cầu: [`SRS.md`](SRS.md) · nghiệp vụ: [`BRD.md`](BRD.md)
-> · kiến trúc: [`ARCHITECTURE.md`](ARCHITECTURE.md).
+> **Ngày chốt:** 2026-10-29, đo lại 2026-10-30 sau merge `origin/main`, bổ sung tầng US/TC (§10) ngày 2026-11-02 · nguồn yêu cầu: [`SRS.md`](SRS.md) · nghiệp vụ: [`BRD.md`](BRD.md)
+> · kiến trúc: [`ARCHITECTURE.md`](ARCHITECTURE.md) · ca kiểm thử: [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md).
 
 **Cột Gate:** `V` = `npm run verify` · `Q` = probe Playwright trên `dist/` (`qa/run-one.mjs`) ·
 `1`/`2`/`3`/`4` = workflow `.github/workflows/01-quality.yml…04-release.yml` ·
@@ -302,13 +302,47 @@ chưa được ghi vào SRS (phải thêm FR hoặc xoá test).
 | DC | 19 | 19 có nguồn (`STORAGE_KEYS` 17 + 2 key cục bộ) · **2 lỗ hổng thiết kế**: DC-17 `kho_bau_ioe_store` và DC-19 `kho_bau_cloud_session_hint` nằm ngoài registry |
 | Probe | 29 | 29/29 có chủ đích (28 `.mjs` + 1 `.cjs`, trừ `lib.mjs`/`run-one.mjs`) |
 | Test file | 87 | 87/87 có ánh xạ (`firebase-auth-sync` đổi tên từ `firebase-cloud-sync`; `t40-parent-facing-ids`, `t41a`, `t41b`, `t41c` thêm mới) |
+| US (tầng câu chuyện, §10) | 5 | 5/5 có AC 3 nhánh — **chỉ phủ lát cắt chống ghi trùng**; 83 FR còn lại chưa có US |
+| TC (§10 → `TEST_CASES.md`) | 29 | 29 Pass · 0 Fail · 0 Blocked · 0 NotRun trong lát cắt; 2 TC đã chứng minh bắt được lỗi bằng ablation |
 | Yêu cầu **không đo được** | 1 | BG-01 (cần telemetry thật — bị chặn bởi ADR-01, không phải lỗi code) |
 
 ## 9. Cách cập nhật tài liệu này
 
 1. Thêm FR/NFR/DC trong `SRS.md` ⇒ **bắt buộc** thêm dòng RTM trong cùng PR.
+   Khi đóng một lát cắt (hành trình dọc có bằng chứng) ⇒ thêm US + TC vào §10 và
+   `docs/plan/TEST_CASES.md` rồi mới được chuyển trạng thái sang ĐẠT.
 2. Xoá tính năng trong code ⇒ xoá dòng RTM và dòng SRS (giữ lại lịch sử ở `CHANGELOG.md`).
 3. Một dòng RTM chỉ chuyển sang ĐẠT khi output lệnh thật được dán vào PR/Issue —
    không dựa vào số liệu MCP (`AGENTS.md` §1.7, docs/SDLC.md §10).
 4. Số liệu kiểm kê (31 game / 475 câu / 1240 test / entry 204.2 kB + boot graph 418.5 kB…) chỉ được sửa khi vừa đo lại
    bằng `npx vitest run`, `npm run check:budget` hoặc `ls`.
+
+---
+
+## 10. Chuỗi đầy đủ BR → FR → US → TC → evidence (lát cắt đã đóng)
+
+§2 chỉ truy vết tới cấp **chức năng**. Một chuỗi được coi là *liền mạch* theo nghĩa của khóa học
+chỉ khi mỗi mắt còn lại đều trỏ được tới một file chạy được. Repo này đang có **một** lát cắt như
+vậy — chọn theo hành trình dọc, không chọn theo số lượng:
+
+**BR** BG-06 (đổi nội dung không phá tiến độ cũ) + BG-05 (phụ huynh tin vào dữ liệu của con)
+→ **FR** FR-G04 · FR-G07 · FR-R04 · FR-R05 · FR-M05 · FR-P01 + **NFR** NFR-R04 · NFR-M04
+→ **US** US-01 … US-05, mỗi US có AC 3 nhánh (chính / biên / lỗi)
+→ **TC** TC-01 … TC-29
+→ **evidence** `tests/t41c-idempotency.test.ts` (25 test) · 3 probe JSON · 2 ảnh · 2 phép ablation,
+tất cả ở [`evidence/2026-11-02-T41C/`](../../evidence/README.md), commit `d54f341`.
+
+Bảng chiếu (chi tiết từng dòng ở [`docs/plan/TEST_CASES.md`](../plan/TEST_CASES.md) §3):
+
+| US | AC nguồn | TC | Mắt cuối (bằng chứng) | Verdict |
+|---|---|---|---|---|
+| US-01 Chơi lại không farm Sao | FR-G04/FR-G07 · NFR-R04 (reward) | TC-11…15, TC-19…21, TC-25, TC-26, TC-29 | `evidence/2026-11-02-T41C/probe-t32-game-replay-evidence.json` + `mutation-M2-reward-claim-guard.txt` | Pass |
+| US-02 Bấm hai lần không tính hai lượt | FR-R05 · NFR-R04 (evidence id) | TC-01…04, TC-16 | `tests/t41c-idempotency.test.ts:118` + `:319` | Pass |
+| US-03 Một buổi đọc chỉ gập một lần | FR-R04 · NFR-R04 (completion) | TC-05…07 | `mutation-M1-session-guard.txt` (guard `readingEngine.ts:320`) | Pass |
+| US-04 Máy hết chỗ không làm streak nhảy | FR-M05 · NFR-R01 · NFR-R04 | TC-08…10, TC-17, TC-18 | `tests/t41c-idempotency.test.ts:198` | Pass |
+| US-05 Ba mẹ tắt thưởng ⇒ không hứa Sao | FR-P01 · NFR-M04 | TC-22…24, TC-27, TC-29 | `evidence/2026-11-02-T41C/game-rewards-off.png` + `probe-parent-controls.json` | Pass |
+
+**Phần còn lại chưa liền mạch — ghi rõ, không tô hồng:** 83 FR khác vẫn dừng ở cấp FR (§2).
+Lý do và điều kiện chuyển sang chuỗi đầy đủ ghi ở `TEST_CASES.md` §5; trạng thái tổng của 6 pha
+ghi ở [`docs/lifecycle/README.md`](../lifecycle/README.md).
+

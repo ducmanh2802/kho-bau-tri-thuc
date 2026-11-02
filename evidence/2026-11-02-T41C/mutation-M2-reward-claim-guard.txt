@@ -1,0 +1,82 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t41c-idempotency.test.ts (25 tests | 2 failed) 101ms
+   ✓ T41C — phát lại câu trả lời không nhân đôi analytics (4)
+     ✓ evidenceId lặp chỉ tính một lần trên analytics và mastery 13ms
+     ✓ quest ngày cũng không nhận cú trả lời thứ hai 4ms
+     ✓ câu sai lặp không đẩy lần hai vào recentErrors 4ms
+     ✓ hai id khác nhau vẫn tính hai lượt (không chặn quá mức) 9ms
+   ✓ T41C — buổi đọc chỉ gập một lần vào hồ sơ (3)
+     ✓ finishSession trùng sessionId không nhân đôi attempts của bậc 7ms
+     ✓ buổi đọc mới vẫn được cộng dồn bình thường 4ms
+     ✓ danh sách id đã gập sống qua một lần đọc lại 5ms
+   ✓ T41C — chuỗi ngày không tăng khi không lưu được (3)
+     ✓ ghi thất bại ⇒ streak và lastActiveDate giữ nguyên sau nhiều lần đọc 1ms
+     ✓ lưu được ⇒ cộng đúng một lần, đọc lại không cộng thêm 1ms
+     ✓ khiên chỉ bị tiêu sau khi bước ngày đã lưu chắc 1ms
+   ❯ T41C — biên lai thưởng cho một lượt chơi (5)
+     × hai cú gửi của cùng một lượt chỉ trả một lần 12ms
+     × quest không nhận lượt chơi thứ hai từ một cú gửi trùng 6ms
+     ✓ nonce mới = lượt chơi thật ⇒ vẫn trả thưởng 5ms
+     ✓ biên lai sống qua một lần đọc lại (whitelist của sanitizer) 2ms
+     ✓ lưu thất bại thì không ghi biên lai, để lần sau còn trả đúng 4ms
+   ✓ T41C — hợp đồng nguồn (3)
+     ✓ phần trailing của recordQuestionAnswer đứng sau phép thử đã ghi được 1ms
+     ✓ bước ngày chỉ hoàn tác khi saveChildProfile báo ghi hỏng 1ms
+     ✓ writeJSON trả về "đã lưu được chưa" thay vì im lặng nuốt lỗi 1ms
+   ✓ T41C — màn kết quả không hứa "+0 Sao" (7)
+     ✓ biên lai thật thì in đúng số vừa vào túi 10ms
+     ✓ lượt chơi lại không phá kỷ lục: in XP luyện tập, giấu dòng Sao 0 2ms
+     ✓ hai cú gửi của một lượt (biên lai trùng) → không còn dải "+0 Sao +0 XP" 1ms
+     ✓ ba mẹ tắt quỹ thưởng thì màn hình không kịp hứa Sao ở khung hình đầu 1ms
+     ✓ khung hình đầu (chưa có biên lai) vẫn in số đề xuất khi thưởng đang bật 1ms
+     ✓ dải muted có data-testid để probe bắt được, không dựa vào màu 1ms
+     ✓ không còn công thức "receipt ?? phần thưởng đề xuất" trong wrapper 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t41c-idempotency.test.ts > T41C — biên lai thưởng cho một lượt chơi > hai cú gửi của cùng một lượt chỉ trả một lần
+AssertionError: expected undefined to be true // Object.is equality
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ tests/t41c-idempotency.test.ts:269:29
+    267|     expect(first.starsAwarded).toBe(3);
+    268|     expect(first.xpAwarded).toBe(20);
+    269|     expect(dup.isDuplicate).toBe(true);
+       |                             ^
+    270|     expect(dup.starsAwarded).toBe(0);
+    271|     expect(dup.xpAwarded).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/t41c-idempotency.test.ts > T41C — biên lai thưởng cho một lượt chơi > quest không nhận lượt chơi thứ hai từ một cú gửi trùng
+AssertionError: expected 2 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ tests/t41c-idempotency.test.ts:288:25
+    286|     StorageService.recordTierReward('t41c_game', 1, 2, 15, 4, 0);
+    287|     expect(afterFirst - before).toBe(1);
+    288|     expect(playCount()).toBe(afterFirst);
+       |                         ^
+    289|   });
+    290|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 23 passed (25)
+   Start at  20:45:42
+   Duration  1.21s (transform 44%, import 42%, tests 12%, worker 1%)
+

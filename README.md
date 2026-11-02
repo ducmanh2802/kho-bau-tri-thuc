@@ -8,7 +8,8 @@ Chế độ Phụ huynh. Chạy trên trình duyệt, cài được như PWA, d�
 - Dữ liệu: mặc định **chỉ nằm trên máy** (`localStorage`); đồng bộ Google Cloud là
   **tuỳ chọn**, phải bấm đăng nhập mới bật (`docs/specs/ARCHITECTURE.md` ADR-16)
 - Quy trình làm việc: **[`docs/SDLC.md`](docs/SDLC.md)** — đọc trước khi sửa code
-- Bộ tài liệu chuẩn (BRD · SRS · Kiến trúc · RTM · Task/Test Plan): [`docs/specs/README.md`](docs/specs/README.md)
+- Bộ tài liệu chuẩn (BRD · SRS · Kiến trúc · RTM · Task/Test Plan/Test Cases): [`docs/specs/README.md`](docs/specs/README.md)
+- Vòng đời & nghiệm thu (8 artifact · checklist · bằng chứng · prompt · harness): [`docs/lifecycle/README.md`](docs/lifecycle/README.md)
 - Lịch sử thay đổi: [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Chạy dự án
@@ -101,13 +102,17 @@ output `npm run verify` trước khi nói “xong” (`docs/SDLC.md` §10).
 |---|---|
 | [`docs/specs/BRD.md`](docs/specs/BRD.md) | Vì sao làm sản phẩm này, đo bằng gì, phạm vi tới đâu |
 | [`docs/specs/SRS.md`](docs/specs/SRS.md) | 88 yêu cầu chức năng + 25 phi chức năng + 11 giao diện ngoài, mỗi yêu cầu có nghiệm thu |
-| [`docs/specs/ARCHITECTURE.md`](docs/specs/ARCHITECTURE.md) | Tầng, luồng dữ liệu, chunk, 17 quyết định (ADR), nợ kỹ thuật |
+| [`docs/specs/ARCHITECTURE.md`](docs/specs/ARCHITECTURE.md) | Tầng, luồng dữ liệu, chunk, 18 quyết định (ADR), nợ kỹ thuật |
 | [`docs/specs/RTM.md`](docs/specs/RTM.md) | Yêu cầu nào được test/probe nào chứng minh — và chỗ nào còn trống |
 | [`docs/plan/TASK_PLAN.md`](docs/plan/TASK_PLAN.md) | WBS, việc đã làm theo phase, backlog còn lại, milestones |
 | [`docs/plan/TEST_PLAN.md`](docs/plan/TEST_PLAN.md) | 5 tầng kiểm thử, đổi gì thì phải chạy gì, tiêu chí vào/ra |
+| [`docs/plan/TEST_CASES.md`](docs/plan/TEST_CASES.md) | 5 user story · 29 ca kiểm thử · verdict Pass/Fail/Blocked/NotRun · 2 phép ablation |
+| [`docs/lifecycle/README.md`](docs/lifecycle/README.md) | 8 artifact vòng đời (Lifecycle Board → Maintenance), bảng bằng chứng một trang, checklist, harness, lộ trình 30/60/90 |
+| [`docs/prompts/README.md`](docs/prompts/README.md) | 5 thẻ prompt tái dùng + context pack 6 mục |
+| [`evidence/README.md`](evidence/README.md) | Bằng chứng gắn commit: log `verify`, probe JSON, ảnh trước/sau, log ablation |
 
-Chỉ số trong bộ tài liệu này đo từ repo ngày **2026-10-30** (sau khi merge Firebase cloud-sync
-và bàn cờ vua WebGL); quy ước cập nhật xem [`docs/specs/README.md`](docs/specs/README.md).
+Chỉ số trong bộ tài liệu này đo từ repo ngày **2026-11-02** (sau T41C, commit `d54f341`);
+quy ước cập nhật xem [`docs/specs/README.md`](docs/specs/README.md).
 
 ## Đóng góp
 

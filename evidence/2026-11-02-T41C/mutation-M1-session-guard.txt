@@ -1,0 +1,63 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t41c-idempotency.test.ts (25 tests | 1 failed | 24 skipped) 28ms
+   ↓ T41C — phát lại câu trả lời không nhân đôi analytics (4)
+     ↓ evidenceId lặp chỉ tính một lần trên analytics và mastery
+     ↓ quest ngày cũng không nhận cú trả lời thứ hai
+     ↓ câu sai lặp không đẩy lần hai vào recentErrors
+     ↓ hai id khác nhau vẫn tính hai lượt (không chặn quá mức)
+   ❯ T41C — buổi đọc chỉ gập một lần vào hồ sơ (3)
+     × finishSession trùng sessionId không nhân đôi attempts của bậc 26ms
+     ↓ buổi đọc mới vẫn được cộng dồn bình thường
+     ↓ danh sách id đã gập sống qua một lần đọc lại
+   ↓ T41C — chuỗi ngày không tăng khi không lưu được (3)
+     ↓ ghi thất bại ⇒ streak và lastActiveDate giữ nguyên sau nhiều lần đọc
+     ↓ lưu được ⇒ cộng đúng một lần, đọc lại không cộng thêm
+     ↓ khiên chỉ bị tiêu sau khi bước ngày đã lưu chắc
+   ↓ T41C — biên lai thưởng cho một lượt chơi (5)
+     ↓ hai cú gửi của cùng một lượt chỉ trả một lần
+     ↓ quest không nhận lượt chơi thứ hai từ một cú gửi trùng
+     ↓ nonce mới = lượt chơi thật ⇒ vẫn trả thưởng
+     ↓ biên lai sống qua một lần đọc lại (whitelist của sanitizer)
+     ↓ lưu thất bại thì không ghi biên lai, để lần sau còn trả đúng
+   ↓ T41C — hợp đồng nguồn (3)
+     ↓ phần trailing của recordQuestionAnswer đứng sau phép thử đã ghi được
+     ↓ bước ngày chỉ hoàn tác khi saveChildProfile báo ghi hỏng
+     ↓ writeJSON trả về "đã lưu được chưa" thay vì im lặng nuốt lỗi
+   ↓ T41C — màn kết quả không hứa "+0 Sao" (7)
+     ↓ biên lai thật thì in đúng số vừa vào túi
+     ↓ lượt chơi lại không phá kỷ lục: in XP luyện tập, giấu dòng Sao 0
+     ↓ hai cú gửi của một lượt (biên lai trùng) → không còn dải "+0 Sao +0 XP"
+     ↓ ba mẹ tắt quỹ thưởng thì màn hình không kịp hứa Sao ở khung hình đầu
+     ↓ khung hình đầu (chưa có biên lai) vẫn in số đề xuất khi thưởng đang bật
+     ↓ dải muted có data-testid để probe bắt được, không dựa vào màu
+     ↓ không còn công thức "receipt ?? phần thưởng đề xuất" trong wrapper
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t41c-idempotency.test.ts > T41C — buổi đọc chỉ gập một lần vào hồ sơ > finishSession trùng sessionId không nhân đôi attempts của bậc
+AssertionError: expected 6 to be 3 // Object.is equality
+
+- Expected
++ Received
+
+- 3
++ 6
+
+ ❯ tests/t41c-idempotency.test.ts:173:49
+    171|
+    172|     expect(attemptsAfterFirst).toBe(first.metrics.itemsProcessed);
+    173|     expect(after.stageStates.ACCURACY.attempts).toBe(attemptsAfterFirs…
+       |                                                 ^
+    174|     // Lần gập thứ hai từng kéo accuracy về giá trị trung bình của riê…
+    175|     // tức điểm của bé thay đổi chỉ vì UI gửi lại.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 24 skipped (25)
+   Start at  20:45:10
+   Duration  1.18s (import 49%, transform 45%, tests 4%, worker 2%)
+

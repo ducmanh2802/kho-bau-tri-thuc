@@ -1,0 +1,176 @@
+{
+  "steps": [
+    {
+      "step": "home",
+      "readingCard": true,
+      "competitionCard": false,
+      "nextBestAction": true,
+      "readingHeadline": false
+    },
+    {
+      "step": "newChildIsClean",
+      "xp": 0
+    },
+    {
+      "step": "vietnameseSubject",
+      "lessonCount": 58
+    },
+    {
+      "step": "lessonOpened",
+      "ok": true
+    },
+    {
+      "step": "lessonCompleted",
+      "questionsAnswered": 11,
+      "completed": true
+    },
+    {
+      "step": "evidenceRecorded",
+      "schemaVersion": "P43-v1",
+      "skillCount": 3,
+      "evidenceCount": 11
+    },
+    {
+      "step": "levelUpCelebrationDismissed",
+      "ok": true,
+      "afterResultScreen": true
+    },
+    {
+      "step": "readingLadder",
+      "hasStages": true,
+      "allFiveStages": true,
+      "lockedStages": 4
+    },
+    {
+      "step": "stageGating",
+      "lockedStageButtons": 4
+    },
+    {
+      "step": "readingPassageShown",
+      "passages": 1
+    },
+    {
+      "step": "readingSession",
+      "itemsAnswered": 6,
+      "resultShown": true
+    },
+    {
+      "step": "readingPersisted",
+      "sessions": 1,
+      "readingIndex": 82,
+      "stageAccuracy": 67
+    },
+    {
+      "step": "SNAP_afterReading",
+      "xp": 110,
+      "lessons": 1,
+      "exams": 0,
+      "reading": 1,
+      "keys": "__sentinel,kho_bau_achievements,kho_bau_analytics,kho_bau_child_profile,kho_bau_daily_quests,kho_bau_learning_os_store,kho_bau_motivation,kho_bau_parent_settings,kho_bau_reading_store",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "competitionHub",
+      "ok": true
+    },
+    {
+      "step": "examDialog",
+      "hasTimer": true,
+      "timerSample": "04:59",
+      "showsQuestionType": true,
+      "typeLabel": "trắc nghiệm"
+    },
+    {
+      "step": "examAnswered",
+      "itemsAnswered": 6
+    },
+    {
+      "step": "examResult",
+      "shown": true
+    },
+    {
+      "step": "resultBreakdown",
+      "hasScoreBreakdown": true,
+      "hasTypeBreakdown": true,
+      "hasRemediation": true,
+      "hasFairnessNote": true
+    },
+    {
+      "step": "errorAnalysisRendered",
+      "hasMistakesHeading": true,
+      "hasCategoryLabel": false,
+      "hasRemediation": true,
+      "hasRemediationButton": true,
+      "showsCorrectAnswer": true
+    },
+    {
+      "step": "SNAP_afterExams",
+      "xp": 260,
+      "lessons": 1,
+      "exams": 2,
+      "reading": 1,
+      "keys": "__sentinel,kho_bau_achievements,kho_bau_analytics,kho_bau_child_profile,kho_bau_competition_history,kho_bau_daily_quests,kho_bau_learning_os_store,kho_bau_motivation,kho_bau_parent_settings,kho_bau_reading_store",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "parentGate",
+      "shown": true
+    },
+    {
+      "step": "parentUnlocked",
+      "ok": true
+    },
+    {
+      "step": "parentReadingTab",
+      "hasIndex": true,
+      "hasLadder": true,
+      "hasAdvice": true,
+      "hasDemoBanner": false
+    },
+    {
+      "step": "parentCompetitionTab",
+      "hasExamCount": true,
+      "hasLog": true
+    },
+    {
+      "step": "SNAP_afterParent",
+      "xp": 260,
+      "lessons": 1,
+      "exams": 2,
+      "reading": 1,
+      "keys": "__sentinel,kho_bau_achievements,kho_bau_analytics,kho_bau_child_profile,kho_bau_competition_history,kho_bau_daily_quests,kho_bau_learning_os_store,kho_bau_motivation,kho_bau_parent_settings,kho_bau_reading_store",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "harnessGuard",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "persistenceAfterReload",
+      "before": {
+        "xp": 260,
+        "lessons": 1,
+        "exams": 2,
+        "readingSessions": 1
+      },
+      "after": {
+        "xp": 260,
+        "lessons": 1,
+        "exams": 2,
+        "readingSessions": 1
+      },
+      "persisted": true
+    },
+    {
+      "step": "noDuplicateRewards",
+      "xpBefore": 260,
+      "xpAfter": 260
+    }
+  ],
+  "errors": [],
+  "removals": []
+}

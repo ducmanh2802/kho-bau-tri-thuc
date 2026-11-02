@@ -1,0 +1,10 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t41c-idempotency.test.ts (25 tests) 106ms
+
+ Test Files  1 passed (1)
+      Tests  25 passed (25)
+   Start at  20:45:56
+   Duration  1.48s (transform 44%, import 42%, tests 11%, worker 3%)
+
