@@ -38,6 +38,21 @@ import { KidBoxParentPanel } from './KidBoxParentPanel';
 
 type ParentDashboardTab = 'progress' | 'reading' | 'insights' | 'competition' | 'kidbox' | 'settings';
 
+/**
+ * Câu hỏi cổng phụ huynh **phải** tồn tại ngay từ lần vẽ đầu tiên.
+ *
+ * Trước đây state khởi tạo bằng một đề mồi cố định, `useEffect` mới sinh đề thật —
+ * mà effect chạy SAU paint nên khung hình đầu luôn là "15 + 18 = ?" trong 5–114 ms
+ * (MutationObserver, 9/9 lần mở). Ai đọc đúng khoảnh khắc đó — ba mẹ gõ nhanh hoặc
+ * probe QA vừa thấy selector là đọc — trả lời 33, cổng báo sai và bảng phụ huynh
+ * không mở. CI đo được ở run 41508824890.
+ */
+const makeGateQuestion = () => {
+  const a = Math.floor(Math.random() * 20) + 12;
+  const b = Math.floor(Math.random() * 20) + 11;
+  return { a, b, ans: a + b };
+};
+
 interface ParentDashboardModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -54,7 +69,7 @@ export const ParentDashboardModal: React.FC<ParentDashboardModalProps> = ({
   initialTab = 'progress',
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [gateQuestion, setGateQuestion] = useState({ a: 15, b: 18, ans: 33 });
+  const gateQuestion = useMemo(makeGateQuestion, [isOpen]);
   const [gateInput, setGateInput] = useState('');
   const [gateError, setGateError] = useState(false);
 
@@ -68,6 +83,20 @@ export const ParentDashboardModal: React.FC<ParentDashboardModalProps> = ({
   const [activeTab, setActiveTab] = useState<ParentDashboardTab>('progress');
   const [showSeedConfirm, setShowSeedConfirm] = useState(false);
   const dialogRef = useFocusTrap<HTMLDivElement>(isOpen);
+
+  /**
+   * Trạng thái cổng phải khớp đề **ngay khung hình đầu**. `useEffect` chạy sau
+   * paint, nên nếu để nó reset thì lần mở kế tiếp vẽ lại đề cũ / ô nhập cũ /
+   * `isAuthenticated` cũ thêm một khung hình. Reset trong lúc vẽ: React thấy
+   * state đổi trong render sẽ vẽ lại tức thì trước khi trình duyệt paint.
+   */
+  const [gateWasOpen, setGateWasOpen] = useState(isOpen);
+  if (gateWasOpen !== isOpen) {
+    setGateWasOpen(isOpen);
+    setGateInput('');
+    setGateError(false);
+    setIsAuthenticated(false);
+  }
 
   // Per-skill adaptive profiles for the insights tab
   const skillProfiles = useMemo(() => {
@@ -95,12 +124,6 @@ export const ParentDashboardModal: React.FC<ParentDashboardModalProps> = ({
   // Regenerate gate challenge on open
   React.useEffect(() => {
     if (isOpen) {
-      const a = Math.floor(Math.random() * 20) + 12;
-      const b = Math.floor(Math.random() * 20) + 11;
-      setGateQuestion({ a, b, ans: a + b });
-      setGateInput('');
-      setGateError(false);
-      setIsAuthenticated(false);
       setSettings(StorageService.getParentSettings());
       setUnlockAllLessons(StorageService.getChildProfile().unlockAllLessons === true);
       setActiveTab(initialTab);

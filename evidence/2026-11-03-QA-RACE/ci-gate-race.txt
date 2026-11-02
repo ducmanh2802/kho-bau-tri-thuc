@@ -1,0 +1,109 @@
+# bằng chứng — race "đề cổng phụ huynh" làm cổng QA đỏ (2026-11-03, đợt ba)
+
+Commit được đo: `80c7e39` (RED) → working tree có `src/components/parent/ParentDashboardModal.tsx`
++ `qa/lib.mjs` (GREEN). Probe liên quan: `qa/golden-path.mjs`.
+
+## 1. CI kể lại đúng lỗi (lần đầu tiên làm được, nhờ `tee probe-run.log` ở `80c7e39`)
+
+Run `41508824890` · check-run `125495014729` · job "QA probe" · 5 annotation.
+Payload nguyên văn của annotation `level=failure` (`.github/workflows/03-qa-browser.yml:59`):
+
+```json
+{"failedAt":"SNAP_afterReading",
+ "errors":["EXCEPTION: locator.click: Timeout 12000ms exceeded. | Call log: | - waiting for getByRole('button', { name: 'Đấu Trường Thi Thử', exact: true })"],
+ "lastSteps":["readingLadder","stageGating","readingPassageShown","readingSession","readingPersisted","SNAP_afterReading"]}
+```
+
+Đọc ra: bước cha mẹ đã bấm `Mở Bảng Phụ Huynh` mà bảng không mở ⇒ không tồn tại nút
+"Đấu Trường Thi Thử" ⇒ timeout 12 s. Đây là lỗi **app**, không phải lỗi probe: probe chỉ
+đọc sai đề.
+
+Lệnh tái đọc (body là **mảng JSON trần**, text nằm ở `message` chứ không phải `body`):
+
+```bash
+curl -s "https://api.github.com/repos/<owner>/<repo>/check-runs/125495014729/annotations" \
+  | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{const a=JSON.parse(d);a.forEach(x=>console.log(x.annotation_level,x.path+":"+x.start_line,(x.message||"").slice(0,900)))})'
+```
+
+## 2. Nguyên nhân
+
+`ParentDashboardModal` khởi tạo state bằng một **đề mồi cố định** `15 + 18` rồi sinh đề thật
+trong `useEffect([isOpen])`. `useEffect` chạy **SAU paint** ⇒ khung hình đầu tiên luôn là
+"15 + 18 = ?". Ai đọc đúng khung hình đó — người lớn gõ nhanh, hoặc probe vừa thấy
+selector `Cổng Xác Nhận Phụ Huynh` là đọc — trả lời `33` ⇒ cổng báo sai ⇒ bảng không mở.
+
+## 3. Đo race bằng MutationObserver (không qua CDP round-trip)
+
+Lệnh (script tạm ở gốc repo, **đã xoá** sau khi đo; không đặt trong `qa/` vì `qa/*.mjs` bị đếm là probe):
+
+```bash
+npm run build && node tmp-gate-race.mjs   # mở cổng 9 lần: CPU throttle 1× / 6× / 20× × 3 lượt
+```
+
+Kết quả **TRƯỚC** khi sửa (chạy ~02:25, cùng lệnh, `dist/` của `80c7e39`):
+
+```
+total=9  paintedDefault15plus18=9
+```
+
+Ví dụ trace thật (mỗi dòng là một lần vẽ lại chuỗi trong ô cổng, `ms` tính từ lúc cài observer):
+
+```
+rate=1  run=0 : {"ms":713,"text":"15 + 18 = ?"} → {"ms":718,"text":"27 + 15 = ?"}   (5 ms)
+rate=20 run=0 : {"ms":818,"text":"15 + 18 = ?"} → {"ms":932,"text":"27 + 14 = ?"}   (114 ms)
+rate=20 run=1 : {"ms":1679,...} → {"ms":1765,...}                                   (86 ms)
+rate=20 run=2 : {"ms":1388,...} → {"ms":1479,...}                                   (91 ms)
+```
+
+⇒ **9/9** lần mở đều vẽ đề mồi trước, đề thật đến sau **5–114 ms** tuỳ tốc độ máy.
+(Trước đó một hướng điều tra khác — đọc qua CDP ngay sau `waitForSelector` — cho 0/8, nên
+không được sửa code theo giả thuyết đó; observer đặt **trong trang** mới bắt được race.)
+
+Kết quả **SAU** khi sửa (chạy 02:4x, cùng lệnh, `dist/` của working tree hiện tại):
+
+```json
+{"total": 9, "paintedDefault15plus18": 0, "repaintedAfterFirstFrame": 9}
+```
+
+`repaintedAfterFirstFrame: 9` **không** phải repaint của đề: `first` của mọi dòng là `null`
+(ô cổng chưa tồn tại) và `frames: 2` = `null → một đề duy nhất`. Đề đọc được ngay sau
+`waitForSelector`: `23 + 14 = ?`, `20 + 11 = ?`, `14 + 12 = ?`, `24 + 20 = ?`, `23 + 24 = ?`,
+`24 + 25 = ?`, `31 + 16 = ?`, `14 + 27 = ?`, `19 + 15 = ?` — 9/9 khác nhau, không lần nào là
+`15 + 18`, và mọi giá trị nằm trong dải `a∈[12,31]`, `b∈[11,30]` mà test T41F chốt.
+
+## 4. Test khoá hành vi (không cần bộ nhớ DOM)
+
+`renderToString` chỉ vẽ **khung hình đầu tiên** và **không chạy effect**, nên nó là camera
+đắt cho đúng lớp lỗi này (SSR chèn `<!-- -->` giữa hai text node ⇒ phải gỡ comment trước khi
+regex).
+
+```
+npx vitest run tests/t41f-parent-gate.test.ts   # RED  (trước sửa): 5 failed (5)
+                                                # GREEN (sau sửa):  5 passed (5)
+npx vitest run tests/t31-bug-hunt-fixes.test.ts # 21 passed (21)
+```
+
+## 5. Probe sau khi sửa
+
+```
+node qa/run-one.mjs qa/golden-path.mjs    → QA PASS — 28 step(s), 0 errors
+node qa/run-one.mjs qa/focus.mjs          → QA PASS, errors: [] (dialog "parent" vẫn vào)
+node qa/run-one.mjs qa/mobile-golden.mjs  → QA PASS, leg parentMode open:true
+npm run verify                             → EXIT=0 · 90 file / 1286 test · 22.18s
+                                             main chunk index-TgwkX59u.js = 204.2 kB PASS
+```
+
+Probe giờ đi qua `unlockParentDashboard()` (đọc đề → nộp → **xác nhận cổng đã đóng** bằng
+`waitForFunction` → đọc lại và nộp lại, tối đa 3 lần), nên kể cả khi app tái xuất hiện race,
+probe sẽ tự sửa lượt đọc thay vì chết ở bước bấm tiếp theo.
+
+Chạy lại cổng ngay trước khi push (toàn bộ `docs/` + `.ai/CURRENT.md` đã sửa xong): `npm run verify`
+**EXIT=0** · `Test Files 90 passed (90)` · `Tests 1286 passed (1286)` · `Duration 25.61s` ·
+`Main chunk: index-TgwkX59u.js = 204.2 kB → PASS (meets 450 kB goal)`. `Duration` đổi so với lần đo
+trên (22.18 s) chỉ vì tải máy khác nhau; **test total, số file và tên entry thì giống hệt** —
+muốn so số stable thì nhìn `check:budget`, không nhìn `Duration`.
+
+## 6. còn mở
+
+- CI vẫn `continue-on-error: true` cho tới khi thấy nhiều lượt xanh liên tiếp.
+- Tag `v1.1.0` vẫn ở `77d90ce` (predate toàn bộ sửa lỗi QA).

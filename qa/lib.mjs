@@ -109,6 +109,39 @@ export async function dismissLevelUpCelebration(page, click = { timeout: 8000 },
 }
 
 /**
+ * T41F — mở "Cổng Xác Nhận Phụ Huynh" mà không tin một lần đọc đề.
+ *
+ * run 41508824890 chết ở dòng bấm "Đấu Trường Thi Thử": đề của cổng sinh trong
+ * `useEffect` nên khung hình đầu tiên vẫn là đề mồi, và probe đọc đúng lúc ấy ⇒
+ * nộp đáp án sai. Đo bằng MutationObserver trong trang: 9/9 lần mở vẽ đề mồi rồi
+ * thay đề thật sau 5–114 ms. App đã sửa, nhưng probe vẫn phải tự vệ: đọc đề,
+ * nộp, rồi **xác nhận cổng đã đóng**; nếu còn mở thì đọc lại và nộp lại.
+ */
+export async function unlockParentDashboard(page, click = { timeout: 12000 }, attempts = 3) {
+  await page.getByRole('button', { name: /Ba Mẹ/ }).first().click(click);
+  await page.waitForSelector('text=Cổng Xác Nhận Phụ Huynh', { timeout: click.timeout ?? 12000 });
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    const gate = await page.evaluate(() => {
+      const el = document.querySelector('.bg-slate-100.rounded-2xl');
+      return el ? el.textContent.trim() : null;
+    });
+    const match = gate && gate.match(/(\d+)\s*\+\s*(\d+)/);
+    if (!match) throw new Error('parent gate arithmetic not found');
+    await page.getByRole('spinbutton').fill(String(Number(match[1]) + Number(match[2])));
+    await page.getByRole('button', { name: 'Mở Bảng Phụ Huynh' }).click(click);
+    const closed = await page
+      .waitForFunction(() => !document.body.innerText.includes('Cổng Xác Nhận Phụ Huynh'), null, {
+        timeout: 3000,
+      })
+      .then(() => true)
+      .catch(() => false);
+    if (closed) return attempt;
+  }
+  throw new Error(`parent gate did not open after ${attempts} attempt(s)`);
+}
+
+/**
  * T20A / bug B-04 — open the competition hub ("Đấu Trường").
  *
  * The hub has no entry in the main nav and none on the world map any more: the
@@ -117,16 +150,7 @@ export async function dismissLevelUpCelebration(page, click = { timeout: 8000 },
  * grown-up does, so the hub itself is still measured.
  */
 export async function openCompetitionHub(page, click = { timeout: 12000 }) {
-  await page.getByRole('button', { name: /Ba Mẹ/ }).first().click(click);
-  await page.waitForSelector('text=Cổng Xác Nhận Phụ Huynh', { timeout: click.timeout ?? 12000 });
-  const gate = await page.evaluate(() => {
-    const el = document.querySelector('.bg-slate-100.rounded-2xl');
-    return el ? el.textContent.trim() : null;
-  });
-  const match = gate && gate.match(/(\d+)\s*\+\s*(\d+)/);
-  if (!match) throw new Error('parent gate arithmetic not found');
-  await page.getByRole('spinbutton').fill(String(Number(match[1]) + Number(match[2])));
-  await page.getByRole('button', { name: 'Mở Bảng Phụ Huynh' }).click(click);
+  await unlockParentDashboard(page, click);
   await page.getByRole('button', { name: 'Đấu Trường Thi Thử', exact: true }).click(click);
   await page.getByRole('button', { name: /Mở Đấu Trường Thi Thật/ }).click(click);
   await page.waitForSelector('text=Kho Báu Đấu Trường Tri Thức', { timeout: click.timeout ?? 12000 });

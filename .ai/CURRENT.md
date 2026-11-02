@@ -1,9 +1,13 @@
 # CURRENT — KHO BÁU TRI THỨC (Lớp 1)
 
-**Updated:** 2026-11-03 — luồng SDLC 6 pha cho KBT-ISSUE-43 đã đóng tới Pha 6: tag `v1.1.0` + GitHub Release thật;
-**`3. Browser QA` từng xanh lần đầu** trên `afb9eeb` (bản sửa race overlay chúc mừng) rồi **đỏ lại** trên `8e6f9f5`
-docs-only ⇒ cổng QA **intermittent**, đang sửa cách đo để lần đỏ sau đọc được nguyên nhân thật.
-Cập nhật trước đó: 2026-10-14 — P42/T01 hotfix certified.
+**Updated:** 2026-11-03 (đợt ba) — `3. Browser QA` đỏ trên `80c7e39` (run 41508824890) và **lần này
+đọc được payload thật** ⇒ hoá ra **lỗi ứng dụng**: đề "Cổng Xác Nhận Phụ Huynh" sinh trong
+`useEffect` nên khung hình đầu vẽ đề mồi "15 + 18" (MutationObserver: 9/9 lần mở, đề thật đến sau
+5–114 ms). Đã sửa `ParentDashboardModal.tsx` (`useMemo` + reset tại render) và cho probe tự vệ
+(`unlockParentDashboard` trong `qa/lib.mjs` — nộp rồi **chờ cổng đóng**). 4/4 `golden-path` xanh,
+`focus`/`mobile-golden` xanh, `verify` EXIT=0 — **chưa có run CI trên commit chứa bản sửa**.
+Cập nhật trước đó: 2026-11-03 (đợt hai) — xanh lần đầu trên `afb9eeb` rồi đỏ lại trên `8e6f9f5`
+docs-only ⇒ cổng QA intermittent; (đợt một) P42/T01 hotfix certified 2026-10-14.
 
 ## P42
 
@@ -67,23 +71,30 @@ Go/No-Go vẫn thuộc người giữ repo** (`docs/lifecycle/07_RELEASE_OPERATI
 | 5 | Review 4 lớp §6 + thân PR đã điền số đo §7 | XONG — CI đã chạy trên `main` (xem §6 dưới); không có PR object vì máy không có `gh` CLI |
 | 6 | `CHANGELOG [1.1.0] - 2026-11-02`, `package.json`/lock `1.1.0`, tag `v1.1.0` đẩy lên `origin` | **ĐÃ LÀM** — merge `--no-ff` `7365830`, tag hiện hành `4f75f5d` → `77d90ce`; `4. Release` 41490669966 success ⇒ release id `431754261` + asset 1 369 166 byte; **chưa ký Go/No-Go**. `3. Browser QA` từng đỏ ở bước `QA probe` trên Linux qua bốn run; đã bắt đúng nguyên nhân (probe đếm tức thời một modal `React.lazy` chưa mount) và sửa trên `afb9eeb` ⇒ xanh **lần đầu** run 41501753363 (`check-run conclusion=success`, bước 7 "QA probe" `conclusion=success`) — nhưng **đỏ lại** run 41504913606 trên `8e6f9f5` (đợt docs-only, `src/` và `qa/` không đổi) ⇒ probe **intermittent**, chưa đóng. Bản sửa nằm **sau** tag nên điều kiện No-Go của `v1.1.0` vẫn mở |
 
-Số hiện trạng lane này để lại (đo 2026-11-03 trên working tree = HEAD `8e6f9f5` + sửa `03-qa-browser.yml`/`t31`): `npm run verify` EXIT=0 · 89 file / **1281** test · entry
-`index-B6au8G63.js` 204.2 kB · `Duration 22.58s` (log `evidence/2026-11-03-QA-RACE/verify-1281.txt`;
-các lần đo trước đó: `Duration 21.88s` trên `afb9eeb` ở
+Số hiện trạng lane này để lại (đo 2026-11-03 đợt ba trên working tree = HEAD `80c7e39` + sửa
+`src/components/parent/ParentDashboardModal.tsx` + `qa/lib.mjs`/`golden-path.mjs`/`focus.mjs`/`mobile-golden.mjs`
++ test mới `tests/t41f-parent-gate.test.ts`): `npm run verify` EXIT=0 · 90 file / **1286** test · entry
+`index-TgwkX59u.js` 204.2 kB · `Duration 22.18s` (log `evidence/2026-11-03-QA-RACE/verify-1286.txt`;
+`src/` đổi nên entry **đổi hash** dù kB vẫn 204.2. Các lần đo trước đó — `1281` test
+(`Duration 22.58s`, `evidence/2026-11-03-QA-RACE/verify-1281.txt`), `1280` test
+(`Duration 21.88s` trên `afb9eeb` ở
 `evidence/2026-11-03-QA-RACE/verify-1280.txt`, `Duration 22.57s` trên `7d92246` ở
 `evidence/2026-11-02-KBT-ISSUE-43/verify-release-head.txt`, `27.57s` trên `1b8dadd` chỉ đổi lock,
-`21.84s` trên chính commit được tag `77d90ce` ở `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt`
-— entry hash không đổi qua cả năm lần vì `src/` không bị đụng) · 30 probe · 31/31/31/31 đăng ký trò chơi · `git tag | wc -l` = 1
+`21.84s` trên chính commit được tag `77d90ce` ở `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt`)
+— cả năm lần dùng chung entry `index-B6au8G63.js` vì `src/` không bị đụng) · 30 probe · 31/31/31/31 đăng ký trò chơi · `git tag | wc -l` = 1
 (`4f75f5d` → `77d90ce`). CI phía server trên `77d90ce`: `1. Quality` + `2. Build + artifact` + `4. Release` success,
 `3. Browser QA` job failure ở bước "QA probe" (non-blocking) — xem `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt`.
 **Trên `afb9eeb` cả ba job chặn merge đều xanh và `3. Browser QA` xanh thật lần đầu** (run 41501753363, 63 s;
 bằng chứng là `jobs[].steps[].conclusion` / `check-run.conclusion = success`, **không phải** "0 annotation `::error::`"
 — annotation chỉ sinh ra khi bước chẩn đoán chạy, mà bước đó từng **chạy lại** probe nên annotation của một lần đỏ
 từng ghi "QA PASS"; xem `evidence/2026-11-03-QA-RACE/ci-flake-second-run.txt`). Lần đỏ tiếp theo trên `8e6f9f5`
-(run 41504913606, bước 7 failure / bước 8 success) đã bị chính cái bẫy đó che — bản sửa trong working tree lưu
-`probe-run.log` của lần thật. Việc còn mở của repo (không thuộc lát
+(run 41504913606, bước 7 failure / bước 8 success) đã bị chính cái bẫy đó che; bản sửa `tee probe-run.log` +
+`PIPESTATUS[0]` đã merge thành `80c7e39` và **lập tức ăn tiền**: run 41508824890 giao payload thật, nhờ đó tìm ra
+lỗi ứng dụng "đề cổng phụ huynh vẽ muộn" (mục trên đầu file này) — chi tiết ở
+`evidence/2026-11-03-QA-RACE/ci-gate-race.txt`. **Chưa có run CI nào trên commit chứa bản sửa đó.**
+Việc còn mở của repo (không thuộc lát
 cắt này): T41D (merge cloud sync + race đăng nhập), T41E (cổng QA + service worker — `3. Browser QA`
-mới xanh **một** lần và đỏ lại **một** lần nên `continue-on-error: true` vẫn để nguyên, và service worker chưa kiểm sau đổi probe),
+mới xanh **một** lần và đỏ lại **hai** lần nên `continue-on-error: true` vẫn để nguyên, và service worker chưa kiểm sau đổi probe),
 8 item "Hệ quả
 chưa đóng" ở `docs/plan/TASK_PLAN.md`.
 

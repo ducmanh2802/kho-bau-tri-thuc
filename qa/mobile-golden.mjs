@@ -7,7 +7,7 @@
  * paints in isolation.
  */
 
-import { openFirstLesson, openCompetitionHub } from './lib.mjs';
+import { openFirstLesson, openCompetitionHub, unlockParentDashboard } from './lib.mjs';
 const CLICK = { timeout: 12000 };
 
 export default async function run(page, ui) {
@@ -120,18 +120,7 @@ export default async function run(page, ui) {
   // PARENT MODE -> gate -> modal
   await page.goto(APP_ORIGIN);
   await page.waitForSelector('[data-testid="nav-home"]:visible', { timeout: 20000 });
-  await page.getByRole('button', { name: 'Khu vực dành cho Ba Mẹ' }).click(CLICK);
-  await page.waitForSelector('text=Cổng Xác Nhận Phụ Huynh', { timeout: 20000 });
-  await page.waitForTimeout(400);
-  const gate = await page.evaluate(() => {
-    const el = document.querySelector('.bg-slate-100.rounded-2xl');
-    return el ? el.textContent.trim() : null;
-  });
-  const m = gate && gate.match(/(\d+)\s*\+\s*(\d+)/);
-  if (m) {
-    await page.getByRole('spinbutton').fill(String(Number(m[1]) + Number(m[2])), CLICK);
-    await page.getByRole('button', { name: 'Mở Bảng Phụ Huynh' }).click(CLICK);
-  }
+  await unlockParentDashboard(page, CLICK);
   await page.waitForTimeout(800);
   const parentOpen = (await page.locator('[role=dialog]').count()) > 0;
   leg('parentMode', { open: parentOpen });

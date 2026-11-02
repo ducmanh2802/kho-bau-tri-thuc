@@ -4,7 +4,7 @@
  * -> COMPETITION -> TIMED TEST -> RESULT -> REVIEW -> PARENT MODE -> RELOAD -> PERSISTENCE
  */
 
-import { openFirstLesson, describeBlocker, dismissLevelUpCelebration, openCompetitionHub } from './lib.mjs';
+import { openFirstLesson, describeBlocker, dismissLevelUpCelebration, openCompetitionHub, unlockParentDashboard } from './lib.mjs';
 const state = { steps: [], errors: [] };
 
 function log(name, detail) {
@@ -390,20 +390,12 @@ async function body(page, ui) {
   await snap(page, 'afterExams', state.steps);
 
   // ---------- 5. PARENT MODE ----------
-  await page.getByRole('button', { name: /Ba Mẹ/ }).first().click(CLICK);
-  await page.waitForSelector('text=Cổng Xác Nhận Phụ Huynh', { timeout: 20000 });
+  // Gate arithmetic is read from the DOM and re-checked until the gate closes
+  // (see unlockParentDashboard): the first painted frame used to be a
+  // placeholder equation, which made this step flake in CI.
+  const gateAttempts = await unlockParentDashboard(page, CLICK);
   log('parentGate', { shown: true });
-
-  const gate = await page.evaluate(() => {
-    const el = document.querySelector('.bg-slate-100.rounded-2xl');
-    return el ? el.textContent.trim() : null;
-  });
-  const m = gate && gate.match(/(\d+)\s*\+\s*(\d+)/);
-  if (!m) fail('could not read the parent gate arithmetic');
-  await page.getByRole('spinbutton').fill(String(Number(m[1]) + Number(m[2])), CLICK);
-  await page.getByRole('button', { name: 'Mở Bảng Phụ Huynh' }).click(CLICK);
-  await page.waitForTimeout(800);
-  log('parentUnlocked', { ok: true });
+  log('parentUnlocked', { ok: true, attempts: gateAttempts });
 
   // Scope to the parent modal so we never hit the app's own navigation.
   const parentModal = page.locator('.fixed.inset-0.z-50').last();
