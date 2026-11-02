@@ -110,14 +110,63 @@ export function findKing(b: Board, color: Color): [number, number] | null {
 }
 
 export function isAttacked(b: Board, r: number, c: number, by: Color): boolean {
-  for (let fr = 0; fr < 8; fr++)
-    for (let fc = 0; fc < 8; fc++) {
-      const p = b[fr][fc];
-      if (p && p.color === by) {
-        const ms = pseudoMoves(b, [fr, fc]);
-        if (ms.some((m) => m.to[0] === r && m.to[1] === c)) return true;
-      }
+  // Knight attacks
+  for (const [dr, dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]) {
+    const nr = r + dr, nc = c + dc;
+    if (inBounds(nr, nc)) {
+      const p = b[nr][nc];
+      if (p && p.color === by && p.type === 'n') return true;
     }
+  }
+
+  // Pawn attacks
+  const pRow = by === 'w' ? r + 1 : r - 1;
+  if (pRow >= 0 && pRow < 8) {
+    if (c > 0) {
+      const p = b[pRow][c - 1];
+      if (p && p.color === by && p.type === 'p') return true;
+    }
+    if (c < 7) {
+      const p = b[pRow][c + 1];
+      if (p && p.color === by && p.type === 'p') return true;
+    }
+  }
+
+  // King attacks
+  for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
+    const nr = r + dr, nc = c + dc;
+    if (inBounds(nr, nc)) {
+      const p = b[nr][nc];
+      if (p && p.color === by && p.type === 'k') return true;
+    }
+  }
+
+  // Orthogonal rays (Rook / Queen)
+  for (const [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+    let nr = r + dr, nc = c + dc;
+    while (inBounds(nr, nc)) {
+      const p = b[nr][nc];
+      if (p) {
+        if (p.color === by && (p.type === 'r' || p.type === 'q')) return true;
+        break;
+      }
+      nr += dr; nc += dc;
+    }
+  }
+
+  // Diagonal rays (Bishop / Queen)
+  for (const [dr, dc] of [[-1,-1],[-1,1],[1,-1],[1,1]]) {
+    let nr = r + dr, nc = c + dc;
+    while (inBounds(nr, nc)) {
+      const p = b[nr][nc];
+      if (p) {
+        if (p.color === by && (p.type === 'b' || p.type === 'q')) return true;
+        break;
+      }
+      nr += dr; nc += dc;
+    }
+  }
+
   return false;
 }
 
@@ -128,15 +177,22 @@ export function inCheck(b: Board, color: Color): boolean {
 }
 
 export function legalMoves(b: Board, from: [number, number]): Move[] {
-  const p = b[from[0]][from[1]];
+  const [r, c] = from;
+  const p = b[r][c];
   if (!p) return [];
-  return pseudoMoves(b, from).filter((m) => {
-    const nb = cloneBoard(b);
-    const pp = nb[m.from[0]][m.from[1]]!;
-    nb[m.to[0]][m.to[1]] = m.promotion ? { type: m.promotion, color: pp.color } : pp;
-    nb[m.from[0]][m.from[1]] = null;
-    return !inCheck(nb, p.color);
-  });
+  const moves = pseudoMoves(b, from);
+  const legals: Move[] = [];
+  for (const m of moves) {
+    const [tr, tc] = m.to;
+    const captured = b[tr][tc];
+    b[tr][tc] = m.promotion ? { type: m.promotion, color: p.color } : p;
+    b[r][c] = null;
+    const safe = !inCheck(b, p.color);
+    b[r][c] = p;
+    b[tr][tc] = captured;
+    if (safe) legals.push(m);
+  }
+  return legals;
 }
 
 export function allLegalMoves(b: Board, color: Color): Move[] {
@@ -190,65 +246,96 @@ const PST_KNIGHT = [
   [-40,-20,0,5,5,0,-20,-40],
   [-50,-40,-30,-30,-30,-30,-40,-50],
 ];
+const PST_BISHOP = [
+  [-20,-10,-10,-10,-10,-10,-10,-20],
+  [-10,0,0,0,0,0,0,-10],
+  [-10,0,5,10,10,5,0,-10],
+  [-10,5,5,10,10,5,5,-10],
+  [-10,0,10,10,10,10,0,-10],
+  [-10,10,10,10,10,10,10,-10],
+  [-10,5,0,0,0,0,5,-10],
+  [-20,-10,-10,-10,-10,-10,-10,-20],
+];
 
 function evaluate(b: Board): number {
   let score = 0;
-  for (let r = 0; r < 8; r++)
+  for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
       const p = b[r][c];
       if (!p) continue;
       const sign = p.color === 'w' ? 1 : -1;
       score += sign * VAL[p.type];
+      const rr = p.color === 'w' ? r : 7 - r;
       if (p.type === 'p') {
-        const rr = p.color === 'w' ? r : 7 - r;
-        score += sign * PST_PAWN[rr][c] / 10;
-      }
-      if (p.type === 'n') {
-        const rr = p.color === 'w' ? r : 7 - r;
-        score += sign * PST_KNIGHT[rr][c] / 10;
+        score += (sign * PST_PAWN[rr][c]) / 10;
+      } else if (p.type === 'n') {
+        score += (sign * PST_KNIGHT[rr][c]) / 10;
+      } else if (p.type === 'b') {
+        score += (sign * PST_BISHOP[rr][c]) / 10;
       }
     }
-  // mobility
-  score += (allLegalMoves(b,'w').length - allLegalMoves(b,'b').length) * 2;
+  }
   return score;
 }
 
-export function getBestMove(b: Board, color: Color, depth: number): Move | null {
-  const moves = allLegalMoves(b, color);
-  if (moves.length === 0) return null;
-  // move ordering: captures first
+function orderMoves(b: Board, moves: Move[]): void {
   moves.sort((a, bmv) => {
     const ta = b[a.to[0]][a.to[1]];
     const tb = b[bmv.to[0]][bmv.to[1]];
-    return (tb ? VAL[tb.type] : 0) - (ta ? VAL[ta.type] : 0);
+    const sa = ta ? VAL[ta.type] * 10 - VAL[b[a.from[0]][a.from[1]]!.type] : 0;
+    const sb = tb ? VAL[tb.type] * 10 - VAL[b[bmv.from[0]][bmv.from[1]]!.type] : 0;
+    return sb - sa;
   });
-  const maximizing = color === 'w';
-  let best: Move | null = null;
-  let bestScore = maximizing ? -Infinity : Infinity;
-  for (const m of moves) {
-    const nb = applyMove(b, m);
-    const sc = minimax(nb, depth - 1, -Infinity, Infinity, !maximizing);
-    if (maximizing ? sc > bestScore : sc < bestScore) {
-      bestScore = sc;
-      best = m;
-    }
-  }
-  return best;
 }
 
-function minimax(b: Board, depth: number, alpha: number, beta: number, maximizing: boolean): number {
-  const over = isGameOver(b);
-  if (over.over) {
-    if (over.result.includes('chiếu hết')) return maximizing ? -100000 : 100000;
-    return 0;
+function minimax(
+  b: Board,
+  depth: number,
+  alpha: number,
+  beta: number,
+  maximizing: boolean,
+  deadline: number,
+  state: { aborted: boolean; nodes: number }
+): number {
+  state.nodes++;
+  if ((state.nodes & 1023) === 0) {
+    if (Date.now() >= deadline) {
+      state.aborted = true;
+      return 0;
+    }
   }
-  if (depth === 0) return evaluate(b);
+
+  if (depth <= 0) return evaluate(b);
+
   const color: Color = maximizing ? 'w' : 'b';
   const moves = allLegalMoves(b, color);
+
+  if (moves.length === 0) {
+    if (inCheck(b, color)) {
+      return maximizing ? -100000 - depth : 100000 + depth;
+    }
+    return 0;
+  }
+
+  orderMoves(b, moves);
+
   if (maximizing) {
     let maxEval = -Infinity;
     for (const m of moves) {
-      const ev = minimax(applyMove(b, m), depth - 1, alpha, beta, false);
+      const [fr, fc] = m.from;
+      const [tr, tc] = m.to;
+      const p = b[fr][fc]!;
+      const cap = b[tr][tc];
+      b[tr][tc] = m.promotion ? { type: m.promotion, color: p.color } : p;
+      b[fr][fc] = null;
+
+      const ev = minimax(b, depth - 1, alpha, beta, false, deadline, state);
+
+      b[fr][fc] = p;
+      b[tr][tc] = cap;
+
+      if (state.aborted) return 0;
+
       maxEval = Math.max(maxEval, ev);
       alpha = Math.max(alpha, ev);
       if (beta <= alpha) break;
@@ -257,11 +344,100 @@ function minimax(b: Board, depth: number, alpha: number, beta: number, maximizin
   } else {
     let minEval = Infinity;
     for (const m of moves) {
-      const ev = minimax(applyMove(b, m), depth - 1, alpha, beta, true);
+      const [fr, fc] = m.from;
+      const [tr, tc] = m.to;
+      const p = b[fr][fc]!;
+      const cap = b[tr][tc];
+      b[tr][tc] = m.promotion ? { type: m.promotion, color: p.color } : p;
+      b[fr][fc] = null;
+
+      const ev = minimax(b, depth - 1, alpha, beta, true, deadline, state);
+
+      b[fr][fc] = p;
+      b[tr][tc] = cap;
+
+      if (state.aborted) return 0;
+
       minEval = Math.min(minEval, ev);
       beta = Math.min(beta, ev);
       if (beta <= alpha) break;
     }
     return minEval;
   }
+}
+
+export function getBestMove(b: Board, color: Color, depth: number, maxMs: number = 400): Move | null {
+  const rootMoves = allLegalMoves(b, color);
+  if (rootMoves.length === 0) return null;
+  if (depth <= 0) return rootMoves[0];
+
+  const deadline = Date.now() + maxMs;
+  const maximizing = color === 'w';
+
+  orderMoves(b, rootMoves);
+
+  let bestMove: Move = rootMoves[0];
+
+  // Iterative deepening from d = 1 up to depth
+  for (let d = 1; d <= depth; d++) {
+    const state = { aborted: false, nodes: 0 };
+    let currentBest: Move = rootMoves[0];
+    let bestScore = maximizing ? -Infinity : Infinity;
+
+    // Prioritize previous best move at the front
+    const bestIdx = rootMoves.findIndex(
+      (m) =>
+        m.from[0] === bestMove.from[0] &&
+        m.from[1] === bestMove.from[1] &&
+        m.to[0] === bestMove.to[0] &&
+        m.to[1] === bestMove.to[1]
+    );
+    if (bestIdx > 0) {
+      const [top] = rootMoves.splice(bestIdx, 1);
+      rootMoves.unshift(top);
+    }
+
+    let alpha = -Infinity;
+    let beta = Infinity;
+
+    for (const m of rootMoves) {
+      const [fr, fc] = m.from;
+      const [tr, tc] = m.to;
+      const p = b[fr][fc]!;
+      const cap = b[tr][tc];
+      b[tr][tc] = m.promotion ? { type: m.promotion, color: p.color } : p;
+      b[fr][fc] = null;
+
+      const sc = minimax(b, d - 1, alpha, beta, !maximizing, deadline, state);
+
+      b[fr][fc] = p;
+      b[tr][tc] = cap;
+
+      if (state.aborted) break;
+
+      if (maximizing) {
+        if (sc > bestScore) {
+          bestScore = sc;
+          currentBest = m;
+        }
+        alpha = Math.max(alpha, sc);
+      } else {
+        if (sc < bestScore) {
+          bestScore = sc;
+          currentBest = m;
+        }
+        beta = Math.min(beta, sc);
+      }
+    }
+
+    if (!state.aborted) {
+      bestMove = currentBest;
+    } else {
+      break;
+    }
+
+    if (Date.now() >= deadline) break;
+  }
+
+  return bestMove;
 }
