@@ -307,7 +307,7 @@ curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/
 Đây là **lần đầu tiên job `qa-smoke` chạy mà không có `continue-on-error`**: kết luận `success` của
 nó không còn là "success dù probe chết" như bốn run đỏ hồi đầu (`66e0fea` … `80c7e39`), và cũng
 không còn bị bước chẩn đoán chạy lại probe che (đã sửa ở `80c7e39`). Chuỗi hiện tại của cổng:
-**5/11 lượt xanh** *(trạng thái lúc viết — xem §12 cho lượt thứ hai không lưới: **6/12**)* — 6 đỏ (41488045102 · 41490451074 · 41493791252 · 41496530836 · 41504913606 ·
+**5/11 lượt xanh** *(trạng thái lúc viết — §12 và §13 ghi hai lượt sau cũng xanh không còn cờ: **7/13** tính tới `e961815`)* — 6 đỏ (41488045102 · 41490451074 · 41493791252 · 41496530836 · 41504913606 ·
 41508824890) và 5 xanh (41501753363 `afb9eeb` 63 s · 41515106575 `2d2ca27` 66 s ·
 41516820864 `c9fd2b4` 127 s · 41518983585 `eb4b7b2` 69 s · 41523226603 `3b0122c` 69 s), trong đó
 **bốn lượt cuối liên tiếp nhau** (giữa `afb9eeb` và `2d2ca27` là hai lần đỏ `8e6f9f5` · `80c7e39`).
@@ -384,3 +384,33 @@ Sau khi lan §12 vào bộ docs, đo lại lần chót: `npm run verify` **EXIT=
 `Duration 22.51s` · entry `index-TgwkX59u.js` 204.2 kB PASS. Ba số 22.26 / 22.24 / 22.51 là **cùng một
 nội dung test** — `Duration` dao động ±0,3 s giữa các lượt, đúng như §11 đã ghi, nên nó **không** dùng
 để so sánh giữa các đợt; số để so là test total (1287), số file (90) và tên entry.
+
+## 13. Lượt CI **thứ ba** không còn lưới — XANH, và quy tắc dừng cho tỷ lệ
+
+Push `e961815` (14 file docs/evidence, +66/−24) — lần thứ ba `3. Browser QA` chạy không có
+`continue-on-error`:
+
+```
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=e9618155046fc20fabb3a52347cc84515530cc8f
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/41527657645/jobs
+```
+
+```
+1. Quality           run 41527657273  success
+2. Build + artifact  run 41527657282  job 125559438380 success 21:21:53Z→21:22:12Z (19 s)
+3. Browser QA        run 41527657645  job 125559437705 success 21:21:54Z→21:22:51Z (57 s), bước 7 success / bước 8 skipped
+```
+
+Cổng máy trước push: `npm run verify` **EXIT=0** · 90 file / **1287** test · `Duration 22.14s`.
+Tỷ lệ **7/13 lượt xanh** (6 đỏ · 7 xanh), **sáu lượt cuối liên tiếp**, **ba lượt cuối chạy khi
+không còn cờ** — `2d2ca27` `c9fd2b4` `eb4b7b2` `3b0122c` `6e30794` `e961815` (và `afb9eeb` ở giữa
+chuỗi xanh đầu).
+
+**Quy tắc dừng (để tỷ lệ không thành cuộc đua đuổi theo CI).** Mọi push vào `main` — kể cả push
+tài liệu — đều sinh một lượt `3. Browser QA` mới, nên một con số viết truồng kiểu "7/13" sẽ lệch
+ngay ở lượt kế. Từ đây các tài liệu hiện trạng phải ghi tỷ lệ **kèm mốc commit đã đo**
+("tính tới `e961815`") và **nguồn sự thật** là
+`curl -s …/actions/runs?head_sha=<sha>` + `jobs[].steps[].conclusion`, không phải con số trong docs.
+Số cũ vẫn đúng cho thời điểm nó đo; chỉ **bỏ mốc** mới là lỗi. Lý do không tăng dần mỗi lần push:
+nó không đổi kết luận nào — **điều cần chứng minh vẫn chưa có** (một probe đỏ *thật* bị chặn), và
+ô 13 `docs/plan/TEST_PLAN.md` §16 giữ nguyên trạng thái MỞ qua cả ba lượt xanh không cờ.
