@@ -148,6 +148,12 @@ export interface MotivationState {
   chestsOpenedTotal: number;
   /** Chuỗi ngày dài nhất bé từng đạt. */
   streakBest: number;
+  /**
+   * Biên lai phần thưởng đã phát (T41C) — mỗi lượt hoàn thành chỉ được trả
+   * **một** lần, kể cả khi UI gửi lại hai lần (hiệu ứng mount hai lần, bé bấm
+   * lại màn, đồng bộ kéo bản cũ). Lưu newest-first, cắt 60 bản gần nhất.
+   */
+  rewardClaims: string[];
   /** Số liệu trong ngày hiện tại (reset khi sang ngày mới). */
   daily: MotivationDaily;
 }

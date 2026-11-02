@@ -277,16 +277,21 @@ export function readJSONObject(key: string): Record<string, unknown> | undefined
 /**
  * Writes a payload without ever throwing (private mode / quota exhaustion).
  * Exported for sibling stores that must survive the same hostile environments.
+ * Trả `false` khi dữ liệu **không** nằm xuống được — bên nào đổi trạng thái
+ * suy ra từ một ngày (chuỗi ngày, khiên) phải hoàn tác bằng không mỗi lần đọc
+ * sẽ cộng thêm một lần nữa (T41C).
  */
-export function writeJSON(key: string, value: unknown): void {
+export function writeJSON(key: string, value: unknown): boolean {
   try {
-    if (typeof localStorage === 'undefined') return;
+    if (typeof localStorage === 'undefined') return false;
     localStorage.setItem(key, JSON.stringify(value));
     if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
       window.dispatchEvent(new CustomEvent('kho_bau_storage_change', { detail: { key } }));
     }
+    return true;
   } catch {
     // Storage full or unavailable: the app must keep running from defaults.
+    return false;
   }
 }
 
@@ -436,6 +441,8 @@ export interface TierRewardReceipt {
   xpAwarded: number;
   isFirstClear: boolean;
   isNewBest: boolean;
+  /** T41C — lượt gửi trùng biên lai: không tài nguyên nào đổi chủ lần hai. */
+  isDuplicate?: boolean;
 }
 
 /**
@@ -772,6 +779,11 @@ export class StorageService {
       parentRatings: Object.keys(parentRatings).length ? parentRatings : undefined,
       parentGrades: Object.keys(parentRatings).length ? { ...parentRatings } : undefined,
       selfReadRatings: selfReadRatings.length ? selfReadRatings : undefined,
+      appliedSessionIds: Array.isArray(p.appliedSessionIds)
+        ? [...new Set(
+            (p.appliedSessionIds as unknown[]).filter((s): s is string => typeof s === 'string' && s.length > 0)
+          )].slice(0, READING_POLICY.MAX_RECENT_SESSIONS)
+        : [],
     };
   }
 
@@ -1033,39 +1045,53 @@ export class StorageService {
           // T18A: nghỉ đúng 1 ngày mà còn khiên → khiên vỡ thay bé, chuỗi
           // giữ nguyên (trẻ con không bị phạt vì bố mẹ bận); lịch chuỗi
           // ngày + kỷ lục chuỗi lưu ở kho động lực (key riêng, không mất).
+          // T41C: bước ngày chỉ được tính khi hồ sơ thực sự lưu xuống được.
+          // `writeJSON` nuốt lỗi (Safari riêng tư / hết quota), nên cộng
+          // `streak` rồi ghi thất bại biến **mỗi lần đọc** thành một lần +1 —
+          // chuỗi phồng ảo và khiên bị ăn ảo theo.
           const today = getTodayString();
           if (sanitized.lastActiveDate !== today) {
-            const diffDays = diffDateKeys(sanitized.lastActiveDate, today);
+            const streakBefore = sanitized.streak;
+            const lastActiveBefore = sanitized.lastActiveDate;
+            const diffDays = diffDateKeys(lastActiveBefore, today);
+            let spendShield = false;
             if (diffDays === 1) {
               sanitized.streak += 1;
             } else if (diffDays === 2) {
-              const motivation = StorageService.getMotivationState(today);
-              if (motivation.shields > 0) {
-                motivation.shields -= 1;
-                motivation.shieldsUsedTotal += 1;
-                sanitized.streak += 1;
-                // Lấp ngày nghỉ (hôm qua) để lịch chuỗi liền mạch.
-                const yesterday = parseDateKey(today);
-                if (yesterday) {
-                  yesterday.setDate(yesterday.getDate() - 1);
-                  const missing = localDateKey(yesterday);
-                  if (!motivation.shieldedDays.includes(missing)) {
-                    motivation.shieldedDays = [...motivation.shieldedDays, missing].sort().slice(-400);
-                  }
-                }
-                if (!motivation.streakDays.includes(today)) {
-                  motivation.streakDays = [...motivation.streakDays, today].sort().slice(-400);
-                }
-                motivation.streakBest = Math.max(motivation.streakBest, sanitized.streak);
-                StorageService.saveMotivationState(motivation);
-              } else {
-                sanitized.streak = 1;
-              }
+              spendShield = StorageService.getMotivationState(today).shields > 0;
+              sanitized.streak = spendShield ? sanitized.streak + 1 : 1;
             } else if (diffDays === null || diffDays > 2 || diffDays < 0) {
               sanitized.streak = 1;
             }
             sanitized.lastActiveDate = today;
-            StorageService.saveChildProfile(sanitized);
+
+            if (StorageService.saveChildProfile(sanitized)) {
+              if (spendShield) {
+                // Khiên chỉ bị tiêu sau khi bước ngày đã nằm chắc trong bộ nhớ.
+                const motivation = StorageService.getMotivationState(today);
+                if (motivation.shields > 0) {
+                  motivation.shields -= 1;
+                  motivation.shieldsUsedTotal += 1;
+                  // Lấp ngày nghỉ (hôm qua) để lịch chuỗi liền mạch.
+                  const yesterday = parseDateKey(today);
+                  if (yesterday) {
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const missing = localDateKey(yesterday);
+                    if (!motivation.shieldedDays.includes(missing)) {
+                      motivation.shieldedDays = [...motivation.shieldedDays, missing].sort().slice(-400);
+                    }
+                  }
+                  if (!motivation.streakDays.includes(today)) {
+                    motivation.streakDays = [...motivation.streakDays, today].sort().slice(-400);
+                  }
+                  motivation.streakBest = Math.max(motivation.streakBest, sanitized.streak);
+                  StorageService.saveMotivationState(motivation);
+                }
+              }
+            } else {
+              sanitized.streak = streakBefore;
+              sanitized.lastActiveDate = lastActiveBefore;
+            }
           }
           // Ghi ngày học vào lịch chuỗi (kể cả mở app nhiều lần trong ngày).
           try {
@@ -1102,8 +1128,8 @@ export class StorageService {
     return fresh;
   }
 
-  public static saveChildProfile(profile: ChildProfile) {
-    writeJSON(STORAGE_KEYS.CHILD_PROFILE, profile);
+  public static saveChildProfile(profile: ChildProfile): boolean {
+    return writeJSON(STORAGE_KEYS.CHILD_PROFILE, profile);
   }
 
 public static getParentSettings(): ParentSettings {
@@ -1354,6 +1380,7 @@ public static getParentSettings(): ParentSettings {
       storiesReadTotal: 0,
       chestsOpenedTotal: 0,
       streakBest: 1,
+      rewardClaims: [],
       daily: StorageService.createDefaultMotivationDaily(date),
     };
   }
@@ -1428,6 +1455,11 @@ public static getParentSettings(): ParentSettings {
       storiesReadTotal: count(raw.storiesReadTotal),
       chestsOpenedTotal: count(raw.chestsOpenedTotal),
       streakBest: Math.max(1, count(raw.streakBest)),
+      // T41C — thiếu dòng này thì biên lai phần thưởng về `[]` sau mỗi lần đọc,
+      // và đúng cái bug mà nó sinh ra để chặn (trả thưởng hai lần) quay lại.
+      rewardClaims: Array.isArray(raw.rewardClaims)
+        ? [...new Set((raw.rewardClaims as unknown[]).filter((k): k is string => typeof k === 'string' && k.length > 0))].slice(0, 60)
+        : [],
       daily,
     };
   }
@@ -1447,8 +1479,8 @@ public static getParentSettings(): ParentSettings {
     return state;
   }
 
-  public static saveMotivationState(state: MotivationState): void {
-    writeJSON(STORAGE_KEYS.MOTIVATION, { ...state, schemaVersion: STORAGE_SCHEMA_VERSION });
+  public static saveMotivationState(state: MotivationState): boolean {
+    return writeJSON(STORAGE_KEYS.MOTIVATION, { ...state, schemaVersion: STORAGE_SCHEMA_VERSION });
   }
 
   /**
@@ -1631,6 +1663,28 @@ public static getParentSettings(): ParentSettings {
       usedHint?: boolean;
     } = {}
   ) {
+    // Emit evidence into Learning OS first (idempotent: replays return false).
+    const recorded = StorageService.recordLearningEvidence({
+      id: options.evidenceId ?? `ev_${subject}_${skillId}_${questionId}_${Date.now()}`,
+      learnerId: StorageService.getChildProfile().id,
+      source: options.source ?? 'LESSON',
+      skillId,
+      subject,
+      questionId,
+      timestamp: Date.now(),
+      correct: isCorrect,
+      responseTimeMs: options.responseTimeMs,
+      difficulty: options.difficulty,
+      errorType: options.errorType,
+      usedHint: options.usedHint,
+    });
+    // T41C: bằng liệu đã từ chối thì **dừng ở đó**. Nếu vẫn cộng tiếp, một lượt
+    // gửi trùng (hiệu ứng chạy hai lần, bé bấm lại khi mất mạng, đồng bộ kéo
+    // lại bản cũ) cộng `totalQuestionsAnswered`, `skillMastery.attempts`, đẩy
+    // câu sai vào `recentErrors` và tính quest lần hai — trong khi engine học
+    // đã chống trùng. Đây chính là tầng "reward/completion" của NFR-R04.
+    if (!recorded) return;
+
     const analytics = StorageService.getAnalytics();
     analytics.totalQuestionsAnswered += 1;
     if (isCorrect) {
@@ -1646,22 +1700,6 @@ public static getParentSettings(): ParentSettings {
         analytics.recentErrors.pop();
       }
     }
-
-    // Emit evidence into Learning OS (idempotent: replays return false).
-    StorageService.recordLearningEvidence({
-      id: options.evidenceId ?? `ev_${subject}_${skillId}_${questionId}_${Date.now()}`,
-      learnerId: StorageService.getChildProfile().id,
-      source: options.source ?? 'LESSON',
-      skillId,
-      subject,
-      questionId,
-      timestamp: Date.now(),
-      correct: isCorrect,
-      responseTimeMs: options.responseTimeMs,
-      difficulty: options.difficulty,
-      errorType: options.errorType,
-      usedHint: options.usedHint,
-    });
 
     let mastery = analytics.skillMastery[skillId];
     if (!mastery) {
@@ -2093,12 +2131,20 @@ public static getParentSettings(): ParentSettings {
     const safePrev = Math.min(Math.max(Math.round(prevStars), 0), 3);
     const isFirstClear = safePrev === 0;
     const isNewBest = safeStars > safePrev;
+    // T41C — biên lai của MỘT lượt chơi. `nonce` là số lần màn này được mở
+    // (useGameStage tăng khi mount/đổi bậc), nên hai cú gửi của cùng một lượt —
+    // hiệu ứng chạy hai lần, bé bấm lại khi mất mạng, đồng bộ kéo bản cũ — va
+    // nhau tại cùng khoá; còn lượt chơi lại thật có nonce mới nên vẫn được trả
+    // XP luyện tập đúng thiết kế T02/B2.
+    const claimKey = `${gameId}:t${Math.round(tier)}:n${StorageService.getPlayNonce(gameId, tier)}:${safePrev}>${safeStars}:s${Math.round(score)}`;
+    if (StorageService.getMotivationState().rewardClaims.includes(claimKey)) {
+      return { starsAwarded: 0, xpAwarded: 0, isFirstClear: false, isNewBest: false, isDuplicate: true };
+    }
     const rewardsEnabled = StorageService.areRewardsEnabled();
     const starsAwarded = rewardsEnabled && isNewBest ? safeStars - safePrev : 0;
     const xpAwarded = rewardsEnabled
       ? (isFirstClear ? Math.round(xpFull) : Math.max(1, Math.round(xpFull * 0.2)))
       : 0;
-    void score;
 
     const profile = StorageService.getChildProfile();
     if (starsAwarded > 0 || xpAwarded > 0) {
@@ -2119,6 +2165,13 @@ public static getParentSettings(): ParentSettings {
     }
     if (starsAwarded > 0) {
       StorageService.addRewardHistory({ type: 'stars', amount: starsAwarded, description: `Sao game ${gameId} tier ${tier}`, itemId: `${gameId}_t${tier}` });
+    }
+    // Ghi biên lai SAU cùng, đọc lại trạng thái mới nhất để không đè lên tiến
+    // trình quest mà `recordQuestEvent` vừa lưu ở trên.
+    const post = StorageService.getMotivationState();
+    if (!post.rewardClaims.includes(claimKey)) {
+      post.rewardClaims = [claimKey, ...post.rewardClaims].slice(0, 60);
+      StorageService.saveMotivationState(post);
     }
     return { starsAwarded, xpAwarded, isFirstClear, isNewBest };
   }

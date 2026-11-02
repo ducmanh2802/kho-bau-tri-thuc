@@ -52,5 +52,6 @@ export function createEmptyReadingProfile(): ReadingProfile {
     comprehensionIndex: 0,
     headline: 'Mình bắt đầu luyện đọc chắc nhé!',
     encouragement: 'Bé cứ đọc từ từ, mình luôn ở đây đồng hành cùng bé!',
+    appliedSessionIds: [],
   };
 }

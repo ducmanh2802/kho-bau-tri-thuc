@@ -92,6 +92,67 @@ function getPraiseSubjectFromGameId(gameId?: string): PraiseSubject {
   return 'VIETNAMESE';
 }
 
+/** Biên lai một lượt chơi — `duplicate` = cùng lượt đó đã được ghi thưởng lần nữa. */
+export interface GameRewardReceipt {
+  stars: number;
+  xp: number;
+  duplicate?: boolean;
+}
+
+/**
+ * T41C — dải thưởng chỉ in đúng số thực sự vào túi bé. Ba trường hợp trả 0 mà
+ * màn hình trước vẫn fallback `+earnedStars Sao`: chơi lại không phá kỷ lục,
+ * ba mẹ tắt quỹ thưởng, và hai cú gửi của cùng một lượt.
+ */
+export const GameRewardStrip: React.FC<{
+  receipt: GameRewardReceipt | null;
+  earnedStars: number;
+  earnedXp: number;
+  rewardsEnabled: boolean;
+  className?: string;
+}> = ({ receipt, earnedStars, earnedXp, rewardsEnabled, className }) => {
+  const stars = receipt ? receipt.stars : rewardsEnabled ? earnedStars : 0;
+  const xp = receipt ? receipt.xp : rewardsEnabled ? earnedXp : 0;
+
+  if (stars > 0 || xp > 0) {
+    return (
+      <div
+        data-testid="game-reward-strip"
+        className={`flex items-center justify-center gap-4 py-3 px-4 bg-amber-50 rounded-2xl border-2 border-amber-200 ${className}`}
+      >
+        {stars > 0 && (
+          <div className="flex items-center gap-2 text-amber-700 font-black text-base">
+            <Star className="w-6 h-6 fill-amber-400 text-amber-500" />
+            <span>+{stars} Sao</span>
+          </div>
+        )}
+        {xp > 0 && (
+          <div className="flex items-center gap-2 text-purple-700 font-black text-base">
+            <Sparkles className="w-6 h-6 text-purple-500" />
+            <span>+{xp} XP</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      data-testid="game-rewards-muted"
+      className={`flex items-center justify-center gap-2 py-3 px-4 bg-sky-50 rounded-2xl border-2 border-sky-200 ${className}`}
+    >
+      <Smile className="w-5 h-5 text-sky-500 shrink-0" aria-hidden="true" />
+      <span className="text-[11px] font-bold text-sky-700">
+        {!rewardsEnabled
+          ? 'Nhà mình đang tắt phần thưởng nên lượt này không cộng Sao hay XP — Gấu vẫn ghi nhớ bài học của bé.'
+          : receipt?.duplicate
+            ? 'Lượt này Gấu ghi rồi nhưng không cộng thêm — phần thưởng của màn này bé đã nhận ở lượt trước.'
+            : 'Lượt luyện tập không thêm Sao hay XP — bé giữ thành tích tốt nhất của màn chơi nhé!'}
+      </span>
+    </div>
+  );
+};
+
 export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
   title,
   subtitle,
@@ -127,7 +188,8 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
   const [isPaused, setIsPaused] = React.useState(false);
   const [showTierModal, setShowTierModal] = useState(false);
   const claimedKeys = React.useRef<Set<string>>(new Set());
-  const [receipt, setReceipt] = React.useState<{ stars: number; xp: number } | null>(null);
+  const [receipt, setReceipt] = React.useState<GameRewardReceipt | null>(null);
+  const rewardsEnabled = StorageService.areRewardsEnabled();
   const dialogRef = useFocusTrap<HTMLDivElement>(true);
   const { requestClose } = useModalHistory(onExit);
 
@@ -277,17 +339,20 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
       const stars = starsEarned ?? earnedStars;
       if (gameId && tier !== undefined) {
         const r = StorageService.recordTierReward(gameId, tier, stars, earnedXp, score, prevBestStars);
-        setReceipt({ stars: r.starsAwarded, xp: r.xpAwarded });
+        setReceipt({ stars: r.starsAwarded, xp: r.xpAwarded, duplicate: r.isDuplicate });
       } else {
         StorageService.recordGamePlayed(earnedXp, stars);
-        setReceipt({ stars, xp: earnedXp });
+        // recordGamePlayed không cộng gì khi ba mẹ tắt quỹ thưởng → đừng hứa.
+        const paid = StorageService.areRewardsEnabled();
+        setReceipt({ stars: paid ? stars : 0, xp: paid ? earnedXp : 0 });
       }
     } else if (!isLevelGame && isGameOver && !claimedKeys.current.has('legacy')) {
       claimedKeys.current.add('legacy');
       sound.playLevelUp();
       fireCelebrationConfetti();
       StorageService.recordGamePlayed(earnedXp, earnedStars);
-      setReceipt({ stars: earnedStars, xp: earnedXp });
+      const paid = StorageService.areRewardsEnabled();
+      setReceipt({ stars: paid ? earnedStars : 0, xp: paid ? earnedXp : 0 });
     }
   }, [isLevelGame, phase, isGameOver, rewardKey, earnedXp, earnedStars, starsEarned, prevBestStars, gameId, tier, score]);
 
@@ -492,16 +557,13 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
                       ))}
                     </div>
 
-                    <div className="flex items-center justify-center gap-4 py-3 px-4 bg-amber-50 rounded-2xl border-2 border-amber-200 mb-5">
-                      <div className="flex items-center gap-2 text-amber-700 font-black text-base">
-                        <Star className="w-6 h-6 fill-amber-400 text-amber-500" />
-                        <span>+{(receipt?.stars ?? earnedStars)} Sao</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-purple-700 font-black text-base">
-                        <Sparkles className="w-6 h-6 text-purple-500" />
-                        <span>+{(receipt?.xp ?? earnedXp)} XP</span>
-                      </div>
-                    </div>
+                    <GameRewardStrip
+                      receipt={receipt}
+                      earnedStars={earnedStars}
+                      earnedXp={earnedXp}
+                      rewardsEnabled={rewardsEnabled}
+                      className="mb-5"
+                    />
 
                     {nextTierMeta && (
                       <div className="flex items-center justify-center gap-2 px-4 py-2 mb-5 bg-blue-50 rounded-2xl border border-blue-200">
@@ -549,16 +611,13 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
                       </div>
                     )}
 
-                    <div className="flex items-center justify-center gap-4 py-3 px-4 bg-amber-50 rounded-2xl border-2 border-amber-200 mb-6">
-                      <div className="flex items-center gap-2 text-amber-700 font-black text-base">
-                        <Star className="w-6 h-6 fill-amber-400 text-amber-500" />
-                        <span>+{(receipt?.stars ?? earnedStars)} Sao</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-purple-700 font-black text-base">
-                        <Sparkles className="w-6 h-6 text-purple-500" />
-                        <span>+{(receipt?.xp ?? earnedXp)} XP</span>
-                      </div>
-                    </div>
+                    <GameRewardStrip
+                      receipt={receipt}
+                      earnedStars={earnedStars}
+                      earnedXp={earnedXp}
+                      rewardsEnabled={rewardsEnabled}
+                      className="mb-6"
+                    />
 
                     <div className="flex items-center gap-3">
                       <button

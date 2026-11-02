@@ -14,8 +14,11 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1215 test / 86 file,
-   203.5 kB entry + 417.8 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-02** — lần cuối ngay sau
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1240 test / 87 file,
+   204.2 kB entry + 418.5 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-02** — lần cuối ngay sau
+   T41C (bốn đường ghi `recordQuestionAnswer` / `applySession` / bước ngày chuỗi /
+   `recordTierReward` chỉ tính một lần: bằng liệu trùng bị chặn trước khi cộng, buổi đọc
+   có dấu đã gập, ghi thất bại thì hoàn tác, và mỗi lượt chơi có biên lai),
    T41B (DecisionEngine + LearningOS chỉ dùng đồng hồ do caller truyền: cửa sổ cân bằng
    môn 14 ngày tính từ `now`, báo cáo Ba Mẹ dùng ngày lịch địa phương thay vì ngày UTC),
    T41A (công tắc phần thưởng của ba mẹ chặn đúng tài nguyên ở tầng service, màn kết quả

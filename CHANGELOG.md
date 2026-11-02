@@ -204,6 +204,32 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   `git show "99edd29:<đường-dẫn>"` (xem `docs/MASTER_ROADMAP.md` §"Cấu trúc docs/ sau khi gỡ prompt").
 
 ### Fixed
+- **Bốn đường ghi tiến trình tự nhận "idempotent" nhưng chỉ tầng bằng liệu chống trùng thật
+  (đợt T41C):**
+  (1) `writeJSON` nuốt mọi lỗi ghi (chế độ riêng tư của Safari / hết quota) nên bước ngày của
+  chuỗi trong `getChildProfile` cộng `streak +1` rồi ghi thất bại ⇒ **mỗi lần đọc** lại thêm một
+  lần, và khiên giữ ngày bị tiêu theo. `writeJSON`/`saveChildProfile`/`saveMotivationState` nay
+  trả `boolean`; bước ngày chỉ giữ kết quả khi ghi được, ngược lại hoàn tác `streak` +
+  `lastActiveDate` và chỉ tiêu khiên **sau khi** bước ngày đã nằm chắc trong bộ nhớ.
+  (2) `recordQuestionAnswer` bỏ qua bằng liệu trùng (`recordLearningEvidence` trả `false`) nhưng
+  lời gọi bị bỏ qua nên vẫn chạy tiếp ⇒ `totalQuestionsAnswered`, `skillMastery.attempts`,
+  `recentErrors` và quest đều bị nhân đôi khi một câu được gửi hai lần. Nay có `if (!recorded)
+  return;` chắn trước toàn bộ phần thưởng.
+  (3) `ReadingEngine.applySession` cộng dồn lượt của buổi đọc vào hồ sơ trong khi
+  `saveReadingMetrics`/bằng liệu đã chống trùng ⇒ buổi gửi hai lần nhân đôi `attempts` và kéo
+  `accuracy` lệch đi. Hồ sơ đọc nay mang `appliedSessionIds` (whitelist trong sanitizer, cắt theo
+  `MAX_RECENT_SESSIONS`) và `applySession` trả nguyên trạng thái khi đã thấy `sessionId`.
+  (4) `recordTierReward` không có biên lai ⇒ hai cú gửi của **cùng một lượt chơi** cộng Sao/XP/
+  `gamesPlayedCount`/quest hai lần — đúng tầng "completion/reward" mà NFR-R04 hứa nhưng chưa từng
+  tồn tại. Mỗi lượt có khoá `game:t<tier>:n<nonce>:<sao cũ>→<sao mới>:s<điểm>` (`nonce` là số
+  lần mở màn, nên lượt chơi lại thật vẫn được trả XP luyện tập) ghi vào `rewardClaims` newest-first
+  60 bản; trùng thì trả `isDuplicate: true` và không ghi biên lai khi lưu thất bại.
+- **Màn kết quả trò chơi hứa phần thưởng không tồn tại (đợt T41C):** hai bảng "VƯỢT QUA MÀN" và
+  "HOÀN THÀNH TẤT CẢ MÀN" in `+{(receipt?.stars ?? earnedStars)} Sao`, nên cả ba trường hợp trả 0
+  (chơi lại không phá kỷ lục, ba mẹ tắt quỹ thưởng, biên lai trùng) vẫn hiện "+0 Sao" — và ở khung
+  hình đầu, khi chưa kịp có biên lai, hiện trọn số đề xuất `+2 Sao` dù thưởng đã tắt. Tách thành
+  `GameRewardStrip`: chỉ in từng dòng khi số lớn hơn 0, số fallback bị chặn bằng
+  `areRewardsEnabled()`, và 0/0 chuyển sang dòng `data-testid="game-rewards-muted"` nói rõ lý do.
 - **Đồng hồ của DecisionEngine/LearningOS đọc giờ tường và UTC thay vì đồng hồ caller + lịch
   địa phương (đợt T41B):** ba chỗ hỏng cùng một họ.
   (1) `computeSubjectBalanceBoost` tự gọi `Date.now()` để cắt cửa sổ 14 ngày trong khi
@@ -501,6 +527,20 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
     `memory-card`, `karaoke-read-all` và `answer-option` + `data-correct` cho `spelling_duel`.
 
 ### Tests
+- `tests/t41c-idempotency.test.ts` — **25 test** cho "một thao tác, một lần tính", với mock
+  `localStorage` có công tắc `writable` để mô phỏng hết quota (`setItem` ném): phát lại một câu
+  trả lời không nhân đôi `totalQuestionsAnswered`/`skillMastery`/`daily.correctBySubject`/combo,
+  không push `recentErrors` lần hai, hai id khác nhau vẫn tính 2; `finishSession` cùng
+  `sessionId` chỉ gập một lần vào `stageStates` (khác id vẫn gập, và sống qua một lần đọc lại);
+  ba lần đọc liên tiếp khi ghi hỏng vẫn giữ `streak` và khiên nguyên vẹn, khi hết hỏng thì tiến
+  đúng một bậc; `recordTierReward` một lượt chơi chỉ trả một lần (`isDuplicate: true` ở cú thứ
+  hai, `gamesPlayedCount` +1 đúng một, quest `play_game` nhích đúng 1), `bumpPlayNonce` rồi gửi
+  lại vẫn được trả XP luyện tập, biên lai sống qua whitelist của sanitizer và không ghi khi lưu
+  thất bại. Dải thưởng mới kiểm bằng `renderToString` trên `GameRewardStrip` (bỏ thẻ HTML để khớp
+  đúng chữ bé nhìn thấy): biên lai thật in `+2 Sao +8 XP`, lượt chơi lại in XP và giấu dòng Sao 0,
+  biên lai trùng và thưởng tắt đều rơi về dòng muted **không** có `+\d+ (Sao|XP)`, kèm ba hợp đồng
+  nguồn (`if (!recorded) return;` đứng trước phép cộng, `saveChildProfile(...): boolean` + hoàn
+  tác `streakBefore`, `writeJSON(...): boolean`, không còn `receipt?.stars ?? earnedStars`).
 - `tests/t41b-decision-clock.test.ts` — **12 test** cho đồng hồ, ghim `process.env.TZ =
   'Asia/Ho_Chi_Minh'` trong `beforeAll` (khôi tạo ở `afterAll`) để ngày địa phương có nghĩa:
   cửa sổ 14 ngày của `computeSubjectBalanceBoost` tính từ `now` của caller (30 ngày trước ⇒ không

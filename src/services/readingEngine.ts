@@ -312,11 +312,21 @@ export class ReadingEngine {
    * Pure function: returns the next profile without touching storage.
    */
   public static applySession(profile: ReadingProfile, metrics: ReadingMetrics): ReadingProfile {
+    // T41C — một buổi đọc chỉ được gập vào hồ sơ MỘT lần. Bằng liệu đã chống
+    // trùng theo id, nhưng phép cộng số lượt/điểm trung bình ở dưới thì không:
+    // UI mount hai lần (StrictMode, mở lại bảng giữa chừng, đồng bộ kéo bản cũ)
+    // là nhân đôi attempts và kéo accuracy của bé lệch đi thật.
+    const applied = profile.appliedSessionIds ?? [];
+    if (metrics.sessionId && applied.includes(metrics.sessionId)) return profile;
+
     const next: ReadingProfile = {
       ...profile,
       stageStates: { ...profile.stageStates },
       skillStates: { ...profile.skillStates },
       lastSessionAt: metrics.timestamp,
+      appliedSessionIds: metrics.sessionId
+        ? [metrics.sessionId, ...applied.filter((id) => id !== metrics.sessionId)].slice(0, READING_POLICY.MAX_RECENT_SESSIONS)
+        : applied,
     };
 
     // --- Skill level updates -------------------------------------------------

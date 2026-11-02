@@ -216,6 +216,12 @@ export interface ReadingProfile {
   /** Alias retained for compatibility with earlier naming. */
   parentGrades?: Record<string, ReadingParentRating>;
   selfReadRatings?: ReadingParentRating[];
+  /**
+   * Id đã áp dụng vào hồ sơ (T41C). `commitSession` tự chống trùng bằng id
+   * bằng liệu, nhưng hồ sơ đọc thì cộng dồn — nếu không ghi dấu này, một buổi
+   * đọc được gửi hai lần sẽ nhân đôi số lượt và làm lệch điểm trung bình.
+   */
+  appliedSessionIds?: string[];
 }
 
 export interface ReadingSessionResult {
