@@ -10,7 +10,7 @@ lượt liên tiếp trên đúng các commit chứa bản sửa**: `2d2ca27` ru
 `continue-on-error` **đã bị xoá** khỏi job `qa-smoke` trong `3b0122c` (`ci(qa)`, kèm test hợp đồng
 trong `tests/t31-bug-hunt-fixes.test.ts` cấm cờ quay lại); lượt thứ tư **chính là run đầu tiên chạy
 không còn lưới**: `3b0122c` run 41523226603 · job 125544242836 **success** 69 s, bước 7 "QA probe"
-`success` / bước 8 `skipped` ⇒ tổng **5/11 lượt xanh**. Từ đây probe đỏ làm đỏ cả run.
+`success` / bước 8 `skipped`; **lượt thứ hai không lưới cũng xanh** — push docs `6e30794` run run 41526285381 `6e30794` 72 s (job 125554732285, bước 7 "QA probe" `success`, bước 8 `skipped`) ⇒ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**, hai lượt cuối đều chạy lúc **không còn cờ che**. Từ đây probe đỏ làm đỏ cả run.
 Cập nhật trước đó: 2026-11-03 (đợt hai) — xanh lần đầu trên `afb9eeb` rồi đỏ lại trên `8e6f9f5`
 docs-only ⇒ cổng QA intermittent; (đợt một) P42/T01 hotfix certified 2026-10-14.
 
@@ -109,10 +109,10 @@ run 41515106575, bước 7 "QA probe" `success` 66 s) — xem §6 của chính f
 liên tiếp**, đủ điều kiện đã chốt trong `docs/lifecycle/07_RELEASE_OPERATIONS.md` §2 nên
 `continue-on-error` **đã bị xoá** trong `3b0122c`; lượt CI sau đó — `3b0122c` run 41523226603,
 job 125544242836, **69 s**, bước 7 `success` / bước 8 `skipped` — là **lần đầu probe chạy không còn
-lưới và xanh**, nâng cổng lên **5/11 lượt xanh (bốn lượt cuối liên tiếp)**. Xem §8–§11 của file evidence đó.
+lưới và xanh**, nâng cổng lên **5/11 lượt xanh (bốn lượt cuối liên tiếp)**. Xem §8–§12 của file evidence đó (§12 ghi lượt thứ hai không lưới, `6e30794` run 41526285381 success 72 s ⇒ **6/12**).
 Việc còn mở của repo (không thuộc lát
 cắt này): T41D (merge cloud sync + race đăng nhập), T41E (cổng QA + service worker — `3. Browser QA`
-nay **5/11 lượt xanh** (6 đỏ · 5 xanh, **bốn lượt cuối liên tiếp**) ⇒ `continue-on-error: true` **đã bị xoá**
+nay **6/12 lượt xanh** (6 đỏ · 6 xanh, **năm lượt cuối liên tiếp**; hai lượt cuối chạy khi **không còn cờ**) ⇒ `continue-on-error: true` **đã bị xoá**
 khỏi job `qa-smoke`, kèm test hợp đồng cấm cờ quay lại; service worker đã kiểm lại sau đổi probe —
 `qa/offline-pwa.mjs` QA PASS 10 step / 0 errors),
 8 item "Hệ quả chưa đóng" ở `docs/plan/TASK_PLAN.md`.

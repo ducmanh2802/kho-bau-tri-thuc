@@ -307,7 +307,7 @@ curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/
 Đây là **lần đầu tiên job `qa-smoke` chạy mà không có `continue-on-error`**: kết luận `success` của
 nó không còn là "success dù probe chết" như bốn run đỏ hồi đầu (`66e0fea` … `80c7e39`), và cũng
 không còn bị bước chẩn đoán chạy lại probe che (đã sửa ở `80c7e39`). Chuỗi hiện tại của cổng:
-**5/11 lượt xanh** — 6 đỏ (41488045102 · 41490451074 · 41493791252 · 41496530836 · 41504913606 ·
+**5/11 lượt xanh** *(trạng thái lúc viết — xem §12 cho lượt thứ hai không lưới: **6/12**)* — 6 đỏ (41488045102 · 41490451074 · 41493791252 · 41496530836 · 41504913606 ·
 41508824890) và 5 xanh (41501753363 `afb9eeb` 63 s · 41515106575 `2d2ca27` 66 s ·
 41516820864 `c9fd2b4` 127 s · 41518983585 `eb4b7b2` 69 s · 41523226603 `3b0122c` 69 s), trong đó
 **bốn lượt cuối liên tiếp nhau** (giữa `afb9eeb` và `2d2ca27` là hai lần đỏ `8e6f9f5` · `80c7e39`).
@@ -345,3 +345,42 @@ VI-TEXT `files scanned=58 · findings=0`; kiểm **số ô bảng** bằng scrip
 `docs/lifecycle/` và `evidence/` **không** nằm trong vùng quét của `measure.mjs`).
 `package-lock.json` vẫn còn (110 314 byte). 6 file PNG trong `docs/opencode/reports/img/` là sửa dở
 của **lane khác**, cố tình **không stage**.
+
+## 12. Lượt CI **thứ hai** không còn lưới — XANH (commit docs `6e30794`)
+
+Push `6e30794` (`docs(evidence)`, 17 file, +123/−37, **chỉ** `docs/` + `evidence/` + `.ai/`) là
+lần thứ hai `3. Browser QA` chạy mà không có `continue-on-error`. Đọc qua API công khai:
+
+```
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=6e30794d33d490e0ce520bf52e1c18b294d4b9ef
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/41526285381/jobs
+```
+
+```
+1. Quality           run 41526285257 · job 125554731783 `typecheck + tests` success 21:12:59Z→21:13:49Z (50 s)
+2. Build + artifact  run 41526285281 · job 125554731665 `build + bundle budget` success 21:12:59Z→21:13:14Z (15 s)
+3. Browser QA        run 41526285381 · job 125554732285 `golden path trên Chromium` **success** 21:13:00Z→21:14:12Z = **72 s**
+   steps: 4 Install · 5 Build · 6 Install Chromium · 7 QA probe → success
+          8 "Đưa lỗi probe lên annotation (đọc public được)" → skipped
+```
+
+Chuỗi cổng bây giờ **6/12 lượt xanh** (6 đỏ · 6 xanh) với **năm lượt cuối liên tiếp** và **hai lượt
+cuối chạy khi không còn cờ** — `1. Quality` / `2. Build + artifact` cũng success nên commit docs
+này đi qua đủ cả ba cổng chặn merge. Ý nghĩa thật của lượt này: nó **lặp lại** kết quả của §10
+trên một push không chứa bất kỳ sửa code nào, tức xanh không đến từ việc đổi test hay đổi probe.
+
+**Ô 13 vẫn MỞ.** Hai lượt xanh liên tiếp không còn cờ cũng **không** chứng minh cổng *chặn* được
+đỏ, vì chưa từng có một probe đỏ thật xuất hiện trong điều kiện đó. Bằng chứng cho việc bỏ cờ
+vẫn là `tests/t31-bug-hunt-fixes.test.ts` (test hợp đồng cấm khoá `continue-on-error:` trong khối
+khai báo job `qa-smoke`) cộng `jobs[].steps[].conclusion`, không phải chuỗi xanh.
+
+Cổng máy trước push: `npm run verify` **EXIT=0** · `Test Files 90 passed (90)` ·
+`Tests 1287 passed (1287)` · `Duration 22.26s` · `Main chunk: index-TgwkX59u.js = 204.2 kB → PASS
+(meets 450 kB goal)`; hook pre-push chạy lại đúng suite đó và in `Duration 22.24s` rồi
+`✔ Pre-push: passed`. Đối soát docs: `measure.mjs --vitest-out -` exit 0 · VI-TEXT 58 file / 0
+findings · kiểm số ô bảng 377 block / 0 dòng lệch.
+
+Sau khi lan §12 vào bộ docs, đo lại lần chót: `npm run verify` **EXIT=0** · 90 file / **1287** test ·
+`Duration 22.51s` · entry `index-TgwkX59u.js` 204.2 kB PASS. Ba số 22.26 / 22.24 / 22.51 là **cùng một
+nội dung test** — `Duration` dao động ±0,3 s giữa các lượt, đúng như §11 đã ghi, nên nó **không** dùng
+để so sánh giữa các đợt; số để so là test total (1287), số file (90) và tên entry.

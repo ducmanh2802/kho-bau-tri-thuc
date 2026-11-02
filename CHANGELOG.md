@@ -35,10 +35,10 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   và `2. Build + artifact` run 41523226400 cũng success) ⇒ cổng đạt **5/11 lượt xanh**, bốn lượt cuối
   liên tiếp, và đây là kết luận success **không còn cờ che**. `npm run verify` đo lại đúng nội dung
   commit: EXIT=0 · 90 file / **1287** test · `Duration 22.15s` (lượt pre-push: `22.36s`). Bằng chứng:
-  `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §9–§11 và
+  `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §9–§12 và
   `evidence/2026-11-03-QA-RACE/verify-1287.txt` (`npm run verify` EXIT=0 · 90 file / **1287** test ·
   `Duration 22.09s` · `Main chunk: index-TgwkX59u.js = 204.2 kB → PASS`, `src/` không đổi nên cả hash
-  lẫn kB đứng nguyên).
+  lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`).
 
 ### Fixed
 - **Đề của "Cổng Xác Nhận Phụ Huynh" sinh sau khi vẽ — lỗi ứng dụng thật, không phải của probe.**
@@ -65,9 +65,9 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   vài lần") — dự kiến bỏ ở đợt push kế tiếp nếu vẫn xanh.
   *(Bổ sung đợt bốn: vế "**vẫn giữ**" **đã lỗi thời** — lượt thứ ba `eb4b7b2` (run 41518983585, 69 s)
   khép chuỗi **ba lượt liên tiếp** nên cờ **đã bị xoá** ngay sau commit đó `3b0122c`, và lượt CI
-  không còn cờ cũng xanh (run 41523226603, 69 s) ⇒ tỷ lệ hiện trạng **5/11 lượt xanh**, bốn lượt cuối
+  không còn cờ cũng xanh (run 41523226603, 69 s) ⇒ **5/11 lượt xanh**, bốn lượt cuối
   liên tiếp, không phải 3/9 hay 4/10. Xem mục `### Changed` đầu file và
-  `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §9–§11.)*
+  `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §9–§12; lượt thứ hai không lưới (`6e30794`, run 41526285381, 72 s) đưa cổng lên **6/12 lượt xanh, năm lượt cuối liên tiếp**.)*
 - **`3. Browser QA` chưa từng xanh trên CI — nguyên nhân thật là race overlay, không phải app.**
   Bốn lần chạy đỏ ở bước "QA probe" (41488045102 `66e0fea` · 41490451074 `77d90ce` ·
   41493791252 `2db8715` · 41496530836 `e777457`) và không ai đọc được dòng lỗi vì
