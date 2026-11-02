@@ -158,6 +158,9 @@ export const GAMES_CATALOG: GameInfo[] = [
     skillTag: 'Tính nhẩm trong 10',
     color: 'from-amber-500 to-red-500',
     skillIds: ["math_arithmetic_fast"],
+    // KBT-ISSUE-43 — giấy giờ đếm ngược trừ thẳng vào lỗi khi về 0 nên đây là
+    // trò bị đồng hồ phạt nặng nhất; thiếu cờ này là bé không có nút tạm.
+    isRealtime: true,
   },
   {
     id: 'number_tower',

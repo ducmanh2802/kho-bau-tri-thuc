@@ -54,7 +54,7 @@ export const CatchFallingLettersGame: React.FC<{ onExit: () => void }> = ({ onEx
   };
 
   useEffect(() => {
-    if (stage.phase !== 'playing') return;
+    if (!stage.isRunning) return;
     const pool = targetPool.length > 0 ? targetPool : config.pool;
     const spawnTimer = setInterval(() => {
       const isTarget = Math.random() < 0.45;
@@ -73,10 +73,10 @@ export const CatchFallingLettersGame: React.FC<{ onExit: () => void }> = ({ onEx
     }, config.spawnMs);
 
     return () => clearInterval(spawnTimer);
-  }, [stage.phase, stage.tier, targetChar, config, targetPool]);
+  }, [stage.isRunning, stage.tier, targetChar, config, targetPool]);
 
   useEffect(() => {
-    if (stage.phase !== 'playing') return;
+    if (!stage.isRunning) return;
 
     const animTimer = setInterval(() => {
       setBubbles((prev) =>
@@ -87,7 +87,7 @@ export const CatchFallingLettersGame: React.FC<{ onExit: () => void }> = ({ onEx
     }, 40);
 
     return () => clearInterval(animTimer);
-  }, [stage.phase, stage.tier]);
+  }, [stage.isRunning, stage.tier]);
 
   return (
     <GameModalWrapper
@@ -114,6 +114,10 @@ export const CatchFallingLettersGame: React.FC<{ onExit: () => void }> = ({ onEx
       instructions={`Bé ơi! Hãy chạm vào các bóng bóng mang chữ: [ ${targetChar} ]`}
       audioInstruction={`Hãy chạm vào các bong bóng mang chữ ${targetChar}`}
       praiseSubject="VIETNAMESE"
+      isRealtime
+      isPaused={stage.isPaused}
+      onTogglePause={stage.togglePause}
+      onOverlayOpenChange={stage.setOverlayOpen}
     >
       <CatchFallingStage
         stage={stage}
@@ -140,7 +144,7 @@ const CatchFallingStage: React.FC<{
   const { reportCorrect, reportWrong, showCorrectAnswer, correctAnswer } = useGameFeedback();
 
   const handleBubbleClick = (bubble: FallingBubble) => {
-    if (stage.locked || stage.phase !== 'playing') return;
+    if (!stage.isRunning) return;
     if (bubble.char === targetChar) {
       sound.playCorrect();
       reportCorrect(bubble.char);

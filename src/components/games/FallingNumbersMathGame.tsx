@@ -41,7 +41,7 @@ export const FallingNumbersMathGame: React.FC<{ onExit: () => void }> = ({ onExi
 
   // Spawn falling balls
   useEffect(() => {
-    if (stage.phase !== 'playing') return;
+    if (!stage.isRunning) return;
     const timer = setInterval(() => {
       const i = spawnIdx.current++;
       const spec = sequence[i % sequence.length];
@@ -57,11 +57,11 @@ export const FallingNumbersMathGame: React.FC<{ onExit: () => void }> = ({ onExi
     }, config.spawnMs);
 
     return () => clearInterval(timer);
-  }, [stage.phase, stage.tier, stage.nonce, config, sequence]);
+  }, [stage.isRunning, stage.tier, stage.nonce, config, sequence]);
 
   // Falling animation
   useEffect(() => {
-    if (stage.phase !== 'playing') return;
+    if (!stage.isRunning) return;
 
     const animTimer = setInterval(() => {
       setBalls((prev) =>
@@ -72,10 +72,10 @@ export const FallingNumbersMathGame: React.FC<{ onExit: () => void }> = ({ onExi
     }, 40);
 
     return () => clearInterval(animTimer);
-  }, [stage.phase, stage.tier]);
+  }, [stage.isRunning, stage.tier]);
 
   const handleBallClick = (ball: FallingBall) => {
-    if (stage.locked || stage.phase !== 'playing') return;
+    if (!stage.isRunning) return;
     if (condition.check(ball.val)) {
       sound.playCorrect();
       setBalls((prev) => prev.filter((b) => b.id !== ball.id));
@@ -111,6 +111,10 @@ export const FallingNumbersMathGame: React.FC<{ onExit: () => void }> = ({ onExi
       onExit={onExit}
       instructions={`Bé ơi! Hãy chạm vào các bóng có số: [ ${condition.text} ]`}
       audioInstruction={condition.speech}
+      isRealtime
+      isPaused={stage.isPaused}
+      onTogglePause={stage.togglePause}
+      onOverlayOpenChange={stage.setOverlayOpen}
     >
       <div className="w-full h-full relative rounded-3xl bg-gradient-to-b from-indigo-200 via-sky-100 to-amber-100 overflow-hidden border-2 border-indigo-300 p-4 select-none">
         {/* Sky Stars */}

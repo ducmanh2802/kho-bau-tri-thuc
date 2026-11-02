@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
-import { Volume2, VolumeX, X, Trophy, Star, Sparkles, RotateCcw, Rocket, Lock, Megaphone, Zap, Heart, Smile, Pause } from 'lucide-react';
+import { Volume2, VolumeX, X, Trophy, Star, Sparkles, RotateCcw, Rocket, Lock, Megaphone, Zap, Heart, Smile, Pause, Play } from 'lucide-react';
 import { sound } from '../../services/sound';
 import { fireCelebrationConfetti } from '../../services/confetti';
 import { StorageService } from '../../services/storage';
@@ -67,6 +67,13 @@ interface GameModalWrapperProps {
   /** Subject for praise engine (VIETNAMESE, MATH, ENGLISH) */
   praiseSubject?: PraiseSubject;
   isRealtime?: boolean;
+  /**
+   * KBT-ISSUE-43 — trạng thái tạm dừng DO GAME sở hữu (`useGameStage`), vì chỉ
+   * game mới với tới được hẹn giờ rơi bóng. Wrapper trước đây tự giữ state này
+   * nên bấm nút không dừng được gì.
+   */
+  isPaused?: boolean;
+  onTogglePause?: () => void;
   /** Bảng chơi đang bị lớp phủ "Chọn màn" che khuất — game có đồng hồ phải ngừng đếm. */
   onOverlayOpenChange?: (open: boolean) => void;
 }
@@ -182,10 +189,11 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
   onSelectTier,
   praiseSubject: propsPraiseSubject,
   isRealtime = false,
+  isPaused = false,
+  onTogglePause,
   onOverlayOpenChange,
 }) => {
   const [isMuted, setIsMuted] = React.useState(sound.getMuted());
-  const [isPaused, setIsPaused] = React.useState(false);
   const [showTierModal, setShowTierModal] = useState(false);
   const claimedKeys = React.useRef<Set<string>>(new Set());
   const [receipt, setReceipt] = React.useState<GameRewardReceipt | null>(null);
@@ -477,13 +485,18 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
 
             {isRealtime && (
               <button
-                onClick={() => setIsPaused((v) => !v)}
+                onClick={onTogglePause}
                 aria-label={isPaused ? 'Tiếp tục trò chơi' : 'Tạm dừng trò chơi'}
                 title={isPaused ? 'Tiếp tục' : 'Tạm dừng'}
+                aria-pressed={isPaused}
                 data-testid="game-pause"
                 className="min-w-[44px] min-h-[44px] shrink-0 flex items-center justify-center bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-full transition-all active:scale-95"
               >
-                <Pause className="w-5 h-5" aria-hidden="true" />
+                {isPaused ? (
+                  <Play className="w-5 h-5 fill-amber-700" aria-hidden="true" />
+                ) : (
+                  <Pause className="w-5 h-5" aria-hidden="true" />
+                )}
               </button>
             )}
 
@@ -533,6 +546,19 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
             <div className="flex-1 min-w-0 overflow-hidden">
             {children}
           </div>
+
+          {isRealtime && isPaused && (
+            <div
+              data-testid="game-paused-veil"
+              className="absolute inset-0 z-20 bg-slate-900/70 backdrop-blur-sm flex flex-col items-center justify-center gap-1 text-center p-4"
+            >
+              <Pause className="w-10 h-10 text-amber-200" aria-hidden="true" />
+              <span className="text-xl md:text-2xl font-black text-white font-display">Đang tạm dừng</span>
+              <span className="text-xs md:text-sm font-bold text-amber-100">
+                Bé bấm nút ở thanh trên để chơi tiếp nhé!
+              </span>
+            </div>
+          )}
 
           {showOverlay && (
               <div className="absolute inset-0 z-30 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 animate-pop">

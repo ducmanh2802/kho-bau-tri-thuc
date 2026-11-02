@@ -90,10 +90,11 @@ describe('T32 — vòng chơi reset đúng khi chơi lại, phần thưởng kh�
       expect(wrapperProp()).toContain('onOverlayOpenChange?.(showTierModal);');
     });
 
-    it('game dừng tick khi bảng chọn mở', () => {
-      expect(racing).toContain('onOverlayOpenChange={setPickerOpen}');
-      expect(racing).toMatch(/stage\.phase !== 'playing' \|\| pickerOpen/);
-      expect(racing).toMatch(/\[budgetMs, stage\.roundIdx, stage\.locked, stage\.phase, pickerOpen\]/);
+    it('game dừng tick khi bảng chọn mở (KBT-ISSUE-43: đồng hồ gom về useGameStage)', () => {
+      expect(racing).toContain('onOverlayOpenChange={stage.setOverlayOpen}');
+      expect(racing).toMatch(/if \(!budgetMs \|\| !stage\.isRunning\) return;/);
+      expect(racing).toMatch(/\[budgetMs, stage\.roundIdx, stage\.isRunning\]/);
+      expect(racing).not.toMatch(/pickerOpen/);
     });
 
     function wrapperProp() {
