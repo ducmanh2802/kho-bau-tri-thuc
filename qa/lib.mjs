@@ -80,15 +80,32 @@ export async function describeBlocker(page, selector) {
  * Khớp theo tiền tố "Chúc mừng" thay vì cả nhãn: nhãn này là chữ tiếng Việt
  * hiển thị cho bé (AGENTS §3) và có thể đổi câu chữ — khớp tuyệt đối thì mỗi lần
  * đổi câu là cả đàn probe đỏ theo.
+ *
+ * Phải **chờ** chứ không được đếm tức thời: modal này nạp bằng `React.lazy`
+ * (`src/App.tsx:80`) và mở trong effect theo `profile.xp` (`src/App.tsx:184-201`), nên
+ * nó có thể xuất hiện **sau** vài trăm ms. `count()` hồi trước trả 0 ⇒ helper báo
+ * "không có chúc mừng" ⇒ probe bấm tiếp và bị che. Đó chính là lỗi CI đo được ở
+ * check-run 125463507371 (`commit 37fd35e`):
+ * `<div role="dialog" aria-label="Chúc mừng bé lên cấp"> … intercepts pointer events`
+ * khi bấm `Hoàn Tất`.
  */
-export async function dismissLevelUpCelebration(page, click = { timeout: 8000 }) {
-  const dialog = page.locator('[role="dialog"][aria-label^="Chúc mừng"]:visible');
-  if (!(await dialog.count())) return false;
-  const done = dialog.getByRole('button', { name: /Tuyệt Vời/ }).first();
-  if (await done.count()) await done.click(click).catch(() => {});
-  else await dialog.click({ position: { x: 5, y: 5 } }).catch(() => {});
-  await page.waitForTimeout(200);
-  return true;
+export async function dismissLevelUpCelebration(page, click = { timeout: 8000 }, waitMs = 1500) {
+  let dismissed = false;
+  // Vòng lặp vì mỗi lượt cộng XP có thể mở tiếp một màn chúc mừng khác (lên nhiều cấp).
+  for (let i = 0; i < 3; i += 1) {
+    const dialog = page.locator('[role="dialog"][aria-label^="Chúc mừng"]').first();
+    const appeared = await dialog
+      .waitFor({ state: 'visible', timeout: dismissed ? 600 : waitMs })
+      .then(() => true)
+      .catch(() => false);
+    if (!appeared) break;
+    const done = dialog.getByRole('button', { name: /Tuyệt Vời/ }).first();
+    if (await done.count()) await done.click(click).catch(() => {});
+    else await dialog.click({ position: { x: 5, y: 5 }, timeout: 2000 }).catch(() => {});
+    dismissed = true;
+    await page.waitForTimeout(200);
+  }
+  return dismissed;
 }
 
 /**

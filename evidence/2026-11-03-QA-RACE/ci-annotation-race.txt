@@ -1,0 +1,89 @@
+BẰNG CHỨNG — đọc lỗi CI bằng annotation, và lỗi thật là race màn chúc mừng
+Ngày đo: 2026-11-03. Repo: D:\trithuc\kho-bau-tri-thuc · origin/main.
+
+=====================================================================
+1. KÊNH ĐỌC ĐƯỢC (đo, không suy đoán)
+=====================================================================
+Lệnh (không cần token):
+  curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/<full-sha>/check-runs?per_page=30
+  curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/check-runs/<check_run_id>/annotations
+Kết quả: HTTP 200, đọc được từng dòng lỗi.
+
+Kênh đã thử và BỎ:
+  - GET /repos/.../actions/runs/<run_id>/jobs/<job_id>/logs  ⇒ 403 "Must have admin rights to Repository"
+  - $GITHUB_STEP_SUMMARY (commit bd3f2a7, bước 8 run 41494831619 chạy thành công)
+    ⇒ check-run 125446922885 có output.summary = 0 byte, output.text = 0 byte,
+      annotations_count = 3  ⇒ summary không nối vào check-run output.
+
+=====================================================================
+2. LẦN ĐỌC 1 — commit 08eacc7, check-run 125458270068 (5 annotation)
+=====================================================================
+{"failedAt":"SNAP_afterReading",
+ "errors":["EXCEPTION: locator.click: Timeout 12000ms exceeded."],
+ "lastSteps":["readingLadder","stageGating","readingPassageShown","readingSession",
+              "readingPersisted","SNAP_afterReading"]}
+runner=Linux 7.0.0-1017-azure node=v22.23.4 npm=10.9.9 playwright=Version 1.64.1 dist_files=9
+
+Đọc được gì: chết trong openCompetitionHub(page) (qa/golden-path.mjs:273), chưa tới
+log('competitionHub'). Không đọc được là nút nào, vì catch của probe chỉ giữ dòng đầu
+của exception (`split('\n')[0]`).
+
+=====================================================================
+3. LẦN ĐỌC 2 — commit 37fd35e, check-run 125463507371 (probe đã giữ Call log)
+=====================================================================
+errors[0] = "\"Hoàn Tất\" click failed: locator.click: Timeout 12000ms exceeded."
+errors[1] = EXCEPTION: locator.click: Timeout 12000ms exceeded. | Call log:
+  | - waiting for getByRole('button', { name: 'Hoàn Tất' })
+  | - locator resolved to <button class="px-5 py-2.5 bg-slate-800 ... ">Hoàn Tất</button>
+  | - attempting click action
+  | - waiting for element to be visible, enabled and stable
+  | …
+  | - element is visible, enabled and stable
+  | - scrolling into view if needed
+  | - done scrolling
+  | - <div role="dialog" aria-modal="true" aria-label="Chúc mừng bé lên cấp"
+  |    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40
+  |          backdrop-blur-sm">…</div> intercepts pointer events
+  | - retrying click action
+  | - waiting 500ms
+failedAt = hoanTatBlocked
+lastSteps = competitionHub, examDialog, examAnswered, examResult, resultBreakdown, hoanTatBlocked
+
+⇒ NGUYÊN NHÂN: overlay "Chúc mừng bé lên cấp" che nút bên dưới. Modal này nạp bằng
+React.lazy (src/App.tsx:80) và mở trong effect theo profile.xp (src/App.tsx:184-201),
+nên nó xuất hiện MUỘN HƠN nhịp kiểm tra của probe.
+
+=====================================================================
+4. LỖI THUẦN NHẤT CỦA HAI LẦN ĐỌC LÀ MỘT
+=====================================================================
+qa/lib.mjs dismissLevelUpCelebration() hồi trước:
+    const dialog = page.locator('[role="dialog"][aria-label^="Chúc mừng"]:visible');
+    if (!(await dialog.count())) return false;      // <-- đếm tức thời
+count() == 0 khi modal chưa mount ⇒ helper báo "không có chúc mừng" ⇒ probe bấm tiếp
+⇒ 12 s sau vẫn bị che. Lần 1 che nút "Ba Mẹ" trên header, lần 2 che nút "Hoàn Tất" — cùng một race,
+khác chỗ chạm, tùy máy chạy nhanh/chậm. Windows không gặp vì nhịp mount nhanh hơn.
+
+=====================================================================
+5. TÁI LẬP CÓ ĐIỀU KHIỂN (không cần CI)
+=====================================================================
+Script tạm ngoài repo (C:/Users/Windows/AppData/Local/Temp/kbt-lib-dismiss-test.mjs),
+dùng chromium máy này, trang dựng đúng hình thù đo được: dialog aria-label
+"Chúc mừng bé lên cấp" mount TRỄ 600 ms, đè lên nút "Hoàn Tất".
+  OLD-helper dialog count at t0 = 0 (0 ⇒ helper cũ bỏ qua, không dọn)
+  right after load, dialog count = 0
+  NEW dismissLevelUpCelebration -> true in 1528 ms
+  Hoan Tat clicked OK, total 1702 ms
+  no-celebration case -> false waited 1511 ms
+⇒ helper mới chờ có mặt modal rồi dọn; trường hợp không có modal chỉ tốn 1.5 s.
+
+=====================================================================
+6. CHẠY THẬT TRÊN MÁY Windows SAU KHI SỬA
+=====================================================================
+node qa/run-one.mjs qa/golden-path.mjs   ⇒ exit 0 · QA PASS — 28 step(s), 0 errors
+node qa/run-one.mjs qa/parent-controls.mjs ⇒ exit 0 · QA PASS — 7 step(s), 0 errors
+node qa/run-one.mjs qa/lesson-smooth.mjs   ⇒ exit 0 · QA PASS — 8 step(s), 0 errors
+node qa/run-one.mjs qa/gacha-machine.mjs   ⇒ exit 0 · QA PASS — 4 step(s), 0 errors
+(bốn probe này đều gọi dismissLevelUpCelebration — sửa helper là đụng cả đàn, phải đo lại.)
+
+Cổng: npm run verify ⇒ EXIT=0 · 89 file / 1280 test · Duration 21.88s ·
+      index-B6au8G63.js = 204.2 kB PASS (hash không đổi vì src/ không bị đụng).

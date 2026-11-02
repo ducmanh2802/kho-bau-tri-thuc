@@ -270,6 +270,10 @@ async function body(page, ui) {
   // has the 4 subjects + games + review, and the main nav has no "Đấu Trường"
   // item. The only entry left is the Parent Dashboard, so the probe reaches the
   // hub the same way a grown-up does (see openCompetitionHub in qa/lib.mjs).
+  // Vừa xong lượt đọc là `profile.xp` đổi ⇒ màn chúc mừng lên cấp có thể mở ngay lúc này và
+  // che nút "Ba Mẹ" trên header. Chính điểm này làm check-run 125458270068 (commit `08eacc7`)
+  // chết với `failedAt: SNAP_afterReading`. Dọn overlay trước khi điều hướng, không đổi assertion.
+  await dismissLevelUpCelebration(page);
   await openCompetitionHub(page);
   log('competitionHub', { ok: true });
 

@@ -92,6 +92,20 @@ describe('T31 — sửa lỗi tìm được khi quét toàn bộ probe', () => {
       expect(src).toContain('data-testid="decision-engine-card"');
     });
 
+    it('lib: dọn màn chúc mừng bằng cách CHỜ nó mount, không đếm tức thời', () => {
+      // Modal lên cấp nạp lazy (src/App.tsx:80) và mở theo hiệu ứng `profile.xp`
+      // (src/App.tsx:184-201): `count()` hồi trước trả 0 rồi bỏ qua, để lại overlay che
+      // nút bên dưới — đúng lỗi CI đo được ở check-run 125463507371.
+      const src = read('qa/lib.mjs');
+      expect(src).toContain(".waitFor({ state: 'visible'");
+      expect(src).not.toMatch(/if \(!\(await dialog\.count\(\)\)\) return false;/);
+    });
+
+    it('golden-path: dọn overlay lên cấp trước khi mở Đấu Trường', () => {
+      const src = read('qa/golden-path.mjs');
+      expect(src).toMatch(/await dismissLevelUpCelebration\(page\);\s*await openCompetitionHub\(page\);/);
+    });
+
     it('focus: nhận diện nút bài học bằng data-testid', () => {
       const src = read('qa/focus.mjs');
       expect(src).toContain('triggerTestId');
