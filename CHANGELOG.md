@@ -228,6 +228,13 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   `git show "99edd29:<đường-dẫn>"` (xem `docs/MASTER_ROADMAP.md` §"Cấu trúc docs/ sau khi gỡ prompt").
 
 ### Fixed
+- **Cờ vua mức Kiện tướng (expert) suy nghĩ quá lâu làm lag / đứng trình duyệt:**
+  Thuật toán tìm nước đi ở mức 4 trước đây gọi hàm tạo nước đi và kiểm tra kết thúc trò chơi lặp đi lặp lại ở từng nút lá, liên tục sao chép toàn bộ bàn cờ (`cloneBoard`) và tính độ linh động bằng cách sinh nước đi hợp lệ cho cả hai bên. Khắc phục bằng cách:
+  (1) Thay thế kiểm tra bị chiếu `isAttacked` bằng cơ chế raycast trực tiếp O(1) không cấp phát mảng.
+  (2) Đi và thu hồi nước cờ trực tiếp trên bàn cờ (`in-place make/unmake move`), triệt tiêu 100% chi phí phân bổ mảng và giảm áp lực GC.
+  (3) Đơn giản hóa hàm đánh giá vị trí `evaluate`, loại bỏ việc sinh nước đi ở nút lá.
+  (4) Sắp xếp nước đi theo MVV-LVA (ăn quân giá trị cao bằng quân giá trị thấp) để tối đa hóa hiệu quả cắt tỉa Alpha-Beta.
+  (5) Áp dụng tìm kiếm sâu dần (Iterative Deepening) với trần ngân sách thời gian (deadline 400ms) đảm bảo AI luôn phản hồi mượt mà dưới 500ms mà không làm đơ giao diện.
 - **Trò chơi thời gian thực (Bắt Chữ Cái Bay, Hứng Số Rơi, Đập Bóng Màu) bị co hẹp thành một vạch chỉ giữa màn hình:**
   Do container `GameModalWrapper` có `items-center` và các trò chơi rơi bóng chỉ chứa phần tử `position: absolute` (không có phần tử in-flow để tính kích thước nội tại), trình duyệt co chiều ngang của sân chơi về 0px khiến chỉ còn thấy viền xanh (4px) ở chính giữa. Sửa bằng cách thêm `self-stretch min-w-full` vào `CatchFallingLettersGame`, `FallingNumbersMathGame`, `EnglishColorBalloonGame` và `self-stretch` vào container con của `GameModalWrapper.tsx`.
 - **Bốn đường ghi tiến trình tự nhận "idempotent" nhưng chỉ tầng bằng liệu chống trùng thật
