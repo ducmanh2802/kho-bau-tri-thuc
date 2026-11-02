@@ -126,7 +126,7 @@ Cài tự động qua `prepare` khi chạy `npm install`. Nếu bạn clone bằ
 |---|---|---|---|
 | `1. Quality` | PR + push `main` | `npm ci` → typecheck → `test:ci` | **có** |
 | `2. Build + artifact` | PR + push `main` | build → check budget → upload `dist-*` (giữ 14 ngày) | **có** |
-| `3. Browser QA` | PR + push `main` | tải `dist/`, cài Chromium, chạy probe | chưa (xem dưới) |
+| `3. Browser QA` | PR + push `main` | build `dist/` trong job, cài Chromium, chạy probe | **chưa** — job xanh lần đầu tiên ngày 2026-11-03 (run 41501753363 trên `afb9eeb`, 63 s) nên vẫn để `continue-on-error: true` |
 | `4. Release` | tag `v*.*.*` | full gate → zip → GitHub Release | n/a |
 
 Hai điểm phải hiểu để không mất thời gian debug:
@@ -138,10 +138,13 @@ Hai điểm phải hiểu để không mất thời gian debug:
 - `3. Browser QA` đang bật `continue-on-error: true`, vì các probe từng chỉ chạy trên
   máy dev với đường dẫn Chromium hardcode. `qa/run-one.mjs` giờ đã tự fallback về
   Chromium do Playwright quản lý và in `QA PASS` / `QA FAIL — n error(s) at <step>`.
-  Trên máy dev, `qa/golden-path.mjs` chạy sạch (25 bước, 0 lỗi) nhưng **thỉnh thoảng đỏ
-  do timing** khi bấm chuỗi màn hình quá dài. Probe đó chỉ mang tính báo động, chưa phải
-  gate cứng. **Xoá dòng `continue-on-error` khi job xanh liên tiếp vài lần trên `main`**,
-  và nó trở thành gate cứng.
+  Trên máy dev, `qa/golden-path.mjs` chạy sạch (đo 2026-11-03: **28 bước**, 0 lỗi) nhưng **từng đỏ
+  do race** — overlay "Chúc mừng bé lên cấp" là modal `React.lazy` mở trễ sau màn hình khác, nên
+  probe kiểm `count()` tức thời rồi bỏ sót và bị nó chặn click (`intercepts pointer events`);
+  đã sửa bằng cách **chờ** modal mount (`qa/lib.mjs → dismissLevelUpCelebration`) + 2 test hợp đồng.
+  Lần chạy xanh đầu tiên **phía server** là run 41501753363 trên `afb9eeb` (63 s, 0 annotation lỗi).
+  Probe vẫn chỉ mang tính báo động, chưa phải gate cứng. **Xoá dòng `continue-on-error` khi job
+  xanh liên tiếp vài lần trên `main`**, và nó trở thành gate cứng.
 - Exit code của probe: `run-one.mjs` coi là **đạt** khi `errors[]` rỗng và probe không
   tự khai `ok: false` (nhiều probe cũ không đặt trường `ok`).
 

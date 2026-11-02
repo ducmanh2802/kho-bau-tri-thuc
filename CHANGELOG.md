@@ -9,12 +9,39 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
 
 ## [Unreleased]
 
-*(trống — toàn bộ mục dưới đây đã chốt cho bản `1.1.0`, **đã tag và đẩy `v1.1.0` lên `origin`
+*(**Có mục mới sau bản `1.1.0`** — xem `### Fixed` bên dưới. Phần ghi chú này nói về các mục cũ: toàn bộ mục cũ đã chốt cho bản `1.1.0`, **đã tag và đẩy `v1.1.0` lên `origin`
 ngày 2026-11-02/03**, và workflow `4. Release` đã tạo đối tượng release thật
 (`curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/releases/tags/v1.1.0` ⇒ id `431754261`,
 asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện hành `4f75f5d` đóng trên
 `77d90ce`; tag đầu `6687667` ở `7d92246` đã xoá vì CI đỏ ở Install. Chữ ký Go/No-Go của người giữ repo
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
+
+### Fixed
+- **`3. Browser QA` chưa từng xanh trên CI — nguyên nhân thật là race overlay, không phải app.**
+  Bốn lần chạy đỏ ở bước "QA probe" (41488045102 `66e0fea` · 41490451074 `77d90ce` ·
+  41493791252 `2db8715` · 41496530836 `e777457`) và không ai đọc được dòng lỗi vì
+  `GET …/jobs/<id>/logs` trả `403 Must have admin rights to Repository`. Kênh chẩn đoán mới
+  (annotation, đọc public — đo ở `evidence/2026-11-03-QA-RACE/ci-annotation-race.txt`) bắt được
+  `locator.click: Timeout 12000ms exceeded` trên `getByRole('button', { name: 'Hoàn Tất' })` với
+  `<div role="dialog" aria-label="Chúc mừng bé lên cấp"> … intercepts pointer events`.
+  `dismissLevelUpCelebration` trong `qa/lib.mjs` kiểm tra tức thời `count()` trong khi modal lên cấp
+  nạp `React.lazy` (`src/App.tsx:80`) và mở theo effect `profile.xp` (`src/App.tsx:184-201`):
+  đếm sớm ⇒ 0 ⇒ "không có chúc mừng" ⇒ probe bấm xuyên overlay. Helper này **chờ** modal xuất hiện
+  (mặc định 1500 ms) rồi dọn, lặp 3 lần cho trường hợp lên nhiều cấp; `qa/golden-path.mjs` cũng dọn
+  overlay trước khi mở Đấu Trường (đúng chỗ run 41496530836 chết). Hành vi ứng dụng giữ nguyên:
+  bé thật thấy màn chúc mừng và bấm "Tuyệt Vời!" — đây là bug của probe.
+  **Lần đầu xanh: run 41501753363 trên `afb9eeb` (63 s, 0 annotation lỗi).** Hệ quả còn mở: tag
+  `v1.1.0` đóng ở `77d90ce` tức là *trước* bản sửa, nên gate QA của chính bản phát hành vẫn đỏ.
+- **Probe tự làm mù chẩn đoán.** `qa/golden-path.mjs` cắt `split('\n')[0]` của exception nên CI chỉ
+  còn "Timeout 12000ms exceeded" mà không biết nút nào; nay giữ cả đầu lẫn đuôi "Call log" của
+  Playwright (≤6 dòng mỗi phía) và workflow `03` nâng trần mỗi annotation lên 3000 ký tự.
+
+### Tests
+- Hai test hợp đồng nguồn trong `tests/t31-bug-hunt-fixes.test.ts` khoá lại hai điều vừa học:
+  `qa/lib.mjs` phải dùng `waitFor({ state: 'visible' })` chứ không `count()` tức thời, và
+  `qa/golden-path.mjs` phải dọn overlay trước `openCompetitionHub(page)`. Tổng cổng:
+  **89 file / 1280 test**, `npm run verify` EXIT=0 · `Duration 21.88s` ·
+  `index-B6au8G63.js = 204.2 kB PASS` (`evidence/2026-11-03-QA-RACE/verify-1280.txt`).
 
 ## [1.1.0] - 2026-11-02
 

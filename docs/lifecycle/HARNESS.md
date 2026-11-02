@@ -28,9 +28,9 @@
 | Git | `scripts/hooks/pre-commit` | commit khi typecheck đỏ | có |
 | Git | `scripts/hooks/commit-msg` | message ngoài Conventional Commits | có |
 | Git | `scripts/hooks/pre-push` | push khi `verify:quick` đỏ | có |
-| CI | workflow `01-quality` | typecheck + 1278 test | có, mỗi push/PR |
+| CI | workflow `01-quality` | typecheck + 1280 test | có, mỗi push/PR |
 | CI | workflow `02-build-artifact` | build + `check:budget` (entry ≤ 600 kB) | có |
-| CI | workflow `03-qa-browser` | 30 probe Playwright trên `dist/` | **có mặt nhưng chưa từng chặn gì**: job đặt `continue-on-error: true` (`03-qa-browser.yml:30`), và tới `66e0fea` probe mới thật sự chạy trên runner (trước đó chết ở bước Install / Download artefact chéo run). Lần chạy đầu 41488045102 ⇒ job failure ở "QA probe"; chạy lại trên `77d90ce` (run 41490451074) **cũng đỏ đúng bước đó** ⇒ lỗi tái lập, không phải trượt nhất thời |
+| CI | workflow `03-qa-browser` | 30 probe Playwright trên `dist/` | **có mặt nhưng chưa từng chặn gì**: job đặt `continue-on-error: true` (`03-qa-browser.yml:30`), và tới `66e0fea` probe mới thật sự chạy trên runner (trước đó chết ở bước Install / Download artefact chéo run). Đỏ ở bước "QA probe" bốn lần liên tiếp (41488045102 `66e0fea` · 41490451074 `77d90ce` · 41493791252 `2db8715` · 41496530836 `e777457`) mà **không đọc được lỗi** vì API log trả `403`. Nay có kênh đọc (annotation public, xem §"Kênh chẩn đoán") và lỗi thật đã sửa: **lần đầu xanh = run 41501753363 trên `afb9eeb`, 63 s, 0 annotation lỗi** — mới một lần nên vẫn để `continue-on-error` |
 | CI | workflow `04-release` | tag sai dạng `vX.Y.Z` bị từ chối | **lần đầu đỏ, lần hai xanh**: run 41486056746 trên tag cũ (`v1.1.0` đóng ở `7d92246`) chết ở bước Install (`npm ci` + lock lệch semantics npm 10) nên "Create GitHub Release" bị skip ⇒ **tag tồn tại mà release thì không**, một dạng hỏng mà harness không bắt được nếu chỉ nhìn `git tag`. Run 41490669966 trên tag hiện hành (`4f75f5d` → `77d90ce`) **success cả 9 bước**, sinh release id `431754261` + asset 1 369 166 byte. Bài học đã ghi thành cửa kiểm ở `TEST_PLAN.md` §16 dòng 12 |
 | Test | **source-contract test** | cấu trúc code đổi (vd `writeJSON` mất `return false`) | có — `tests/t41c-idempotency.test.ts:318` |
 | Test | bất biến 4 danh sách game | game đăng ký thiếu nơi thứ 4 | có — `tests/t23-mcp-servers.test.ts` |
@@ -40,7 +40,25 @@
 | Runtime | `writeJSON → boolean` | ghi hỏng bị im lặng | có — T41C |
 | Cloud | `firestore.rules` | đọc/ghi hồ sơ của uid khác | có file, **chưa test end-to-end** (mock thôi) |
 
-**Đếm sensor:** 3 hook · 4 workflow · 89 test file / 1278 test · 30 probe · 1 rules file.
+**Đếm sensor:** 3 hook · 4 workflow · 89 test file / 1280 test · 30 probe · 1 rules file.
+
+### 2b. Kênh chẩn đoán CI — cái gì đọc được khi không có quyền admin
+
+Lane không có `admin` trên repo, nên "CI đỏ" một mình vô dụng: phải biết kênh nào trả được nội dung.
+Số dưới đây đo ngày 2026-11-03 bằng `curl` **không token**, trên repo `ducmanh2802/kho-bau-tri-thuc`:
+
+| Kênh | Lệnh | Kết quả đo | Dùng được? |
+|---|---|---|---|
+| Log của job | `GET /repos/<o>/<r>/actions/runs/<run>/jobs/<job>/logs` | `403 Must have admin rights to Repository` | ✗ |
+| `$GITHUB_STEP_SUMMARY` | `GET /repos/<o>/<r>/check-runs/125446922885` | `output.summary` = **0 byte**, `output.text` = 0, dù bước ghi summary chạy success | ✗ — summary không nối vào check-run |
+| **Annotation** | `GET /repos/<o>/<r>/check-runs/<id>/annotations` | HTTP 200 + nguyên văn dòng `::error::` (13 annotation ở lần thử đầu) | ✓ **kênh duy nhất** |
+
+Vì sao bắt buộc: bước "QA probe" đỏ bốn lần mà không đọc nổi dòng nào ⇒ ba đợt sửa mò bị chính
+quy trình của lane chặn (`TEST_PLAN.md` §16 dòng 13: "không đoán nguyên nhân rồi đổi code").
+Cách phát annotation: in `::error::<nội dung>` từ một bước `if: failure()`, escape `%` → `%25`,
+`#` → `%23`, xuống dòng → `%0A` (mỗi lỗi **một** annotation; chia mỗi dòng một annotation thì API
+trả về lộn xộn, đọc không ra nghĩa). `check_run_id` lấy từ `GET /commits/<full-sha>/check-runs`,
+**không** phải job id. REST công khai chỉ 60 lượt/giờ/IP — hết hạn thì chờ `X-RateLimit-Reset`.
 
 ## 3. Memory — cái nhớ giữa các phiên (và vì sao nó gọn)
 

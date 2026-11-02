@@ -1,6 +1,7 @@
 # CURRENT — KHO BÁU TRI THỨC (Lớp 1)
 
-**Updated:** 2026-11-03 — luồng SDLC 6 pha cho KBT-ISSUE-43 đã đóng tới Pha 6: tag `v1.1.0` + GitHub Release thật.
+**Updated:** 2026-11-03 — luồng SDLC 6 pha cho KBT-ISSUE-43 đã đóng tới Pha 6: tag `v1.1.0` + GitHub Release thật;
+**`3. Browser QA` xanh lần đầu tiên** trên `afb9eeb` (bản sửa race overlay chúc mừng).
 Cập nhật trước đó: 2026-10-14 — P42/T01 hotfix certified.
 
 ## P42
@@ -63,16 +64,21 @@ Go/No-Go vẫn thuộc người giữ repo** (`docs/lifecycle/07_RELEASE_OPERATI
 | 3 | `useGameStage.pausedByUser` + `isGameClockRunning`, nút tạm cho 4 trò `REALTIME_GAME_IDS` | XONG — RED `24 failed \| 6 passed` trước, `30 passed` sau |
 | 4 | `evidence/2026-11-02-KBT-ISSUE-43/` — `verify.txt` + `verify-release-prep.txt`, 3 ảnh, 3 log ablation M3/M4/M5 (M1–M2 ở đợt T41C), `probe-game-pause.json` + `probe-qa-smoke.txt` + `probe-qa-games.txt`, `red-before-fix.txt` | XONG |
 | 5 | Review 4 lớp §6 + thân PR đã điền số đo §7 | XONG — CI đã chạy trên `main` (xem §6 dưới); không có PR object vì máy không có `gh` CLI |
-| 6 | `CHANGELOG [1.1.0] - 2026-11-02`, `package.json`/lock `1.1.0`, tag `v1.1.0` đẩy lên `origin` | **ĐÃ LÀM** — merge `--no-ff` `7365830`, tag hiện hành `4f75f5d` → `77d90ce`; `4. Release` 41490669966 success ⇒ release id `431754261` + asset 1 369 166 byte; **chưa ký Go/No-Go**, `3. Browser QA` đỏ ở bước `QA probe` trên Linux (lần hai, cùng bước) |
+| 6 | `CHANGELOG [1.1.0] - 2026-11-02`, `package.json`/lock `1.1.0`, tag `v1.1.0` đẩy lên `origin` | **ĐÃ LÀM** — merge `--no-ff` `7365830`, tag hiện hành `4f75f5d` → `77d90ce`; `4. Release` 41490669966 success ⇒ release id `431754261` + asset 1 369 166 byte; **chưa ký Go/No-Go**. `3. Browser QA` từng đỏ ở bước `QA probe` trên Linux qua bốn run; đã bắt đúng nguyên nhân (probe đếm tức thời một modal `React.lazy` chưa mount) và sửa trên `afb9eeb` ⇒ **xanh lần đầu** run 41501753363 (63 s, 0 annotation `::error::`) — bản sửa nằm **sau** tag nên điều kiện No-Go của `v1.1.0` vẫn mở |
 
-Số hiện trạng lane này để lại: `npm run verify` EXIT=0 · 89 file / 1278 test · entry
-`index-B6au8G63.js` 204.2 kB · `Duration 22.57s` (log `evidence/2026-11-02-KBT-ISSUE-43/verify-release-head.txt`,
-đo trên `7d92246` — commit nội dung cuối; chạy lại trên `1b8dadd` chỉ đổi lock ⇒ EXIT=0, `27.57s`,
-cùng entry hash; **lần đo mới nhất chạy lại trên chính commit được tag `77d90ce` ⇒ EXIT=0 / `Duration 21.84s`**,
-log `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt`) · 30 probe · 31/31/31/31 đăng ký trò chơi · `git tag | wc -l` = 1
+Số hiện trạng lane này để lại (đo 2026-11-03 trên `afb9eeb`): `npm run verify` EXIT=0 · 89 file / **1280** test · entry
+`index-B6au8G63.js` 204.2 kB · `Duration 21.88s` (log `evidence/2026-11-03-QA-RACE/verify-1280.txt`;
+các lần đo trước đó: `Duration 22.57s` trên `7d92246` ở
+`evidence/2026-11-02-KBT-ISSUE-43/verify-release-head.txt`, `27.57s` trên `1b8dadd` chỉ đổi lock,
+`21.84s` trên chính commit được tag `77d90ce` ở `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt`
+— entry hash không đổi qua cả bốn lần vì `src/` không bị đụng) · 30 probe · 31/31/31/31 đăng ký trò chơi · `git tag | wc -l` = 1
 (`4f75f5d` → `77d90ce`). CI phía server trên `77d90ce`: `1. Quality` + `2. Build + artifact` + `4. Release` success,
-`3. Browser QA` job failure ở bước "QA probe" (non-blocking) — xem `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt`. Việc còn mở của repo (không thuộc lát
-cắt này): T41D (merge cloud sync + race đăng nhập), T41E (cổng QA + service worker), 8 item "Hệ quả
+`3. Browser QA` job failure ở bước "QA probe" (non-blocking) — xem `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt`.
+**Trên `afb9eeb` cả ba job chặn merge đều xanh và `3. Browser QA` xanh thật** (run 41501753363, 63 s,
+0 annotation `::error::`) — xem `evidence/2026-11-03-QA-RACE/ci-annotation-race.txt`. Việc còn mở của repo (không thuộc lát
+cắt này): T41D (merge cloud sync + race đăng nhập), T41E (cổng QA + service worker — `3. Browser QA`
+mới xanh **một** lần nên `continue-on-error: true` vẫn để nguyên, và service worker chưa kiểm sau đổi probe),
+8 item "Hệ quả
 chưa đóng" ở `docs/plan/TASK_PLAN.md`.
 
 ## Tree hygiene note (2026-10-06)

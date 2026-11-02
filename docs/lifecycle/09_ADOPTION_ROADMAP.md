@@ -6,12 +6,12 @@
 
 | Chỉ số | Giá trị 2026-11-02 | Lệnh |
 |---|---|---|
-| Test file / test | 89 / 1278 | `npx vitest run` |
+| Test file / test | 89 / 1280 | `npx vitest run` |
 | Probe QA | 30 | `ls qa/*.mjs qa/*.cjs` (trừ `lib.mjs`, `run-one.mjs`) |
 | FR có chuỗi tới TC + evidence | **2 lát cắt / 88 FR** | `RTM.md` §10 |
 | Verdict `NotRun` còn mở | 6 vùng | `TEST_CASES.md` §5 |
 | Release đã phát hành | **1** (`v1.1.0`) | `git tag \| wc -l` = 1 · `git ls-remote --tags origin` (đo 2026-11-03) |
-| Thời gian `verify` | 23.64 s (phần test) | `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` |
+| Thời gian `verify` | 21.88 s (phần test, đo 2026-11-03) | `evidence/2026-11-03-QA-RACE/verify-1280.txt` |
 | Skill agent trong repo | 0 → **1** (`.qoder/skills/kho-bau-change`) | `find .qoder -name SKILL.md \| wc -l` = 1 — đợt T42 khai "2" là lệch: skill đo số liệu (`kho-bau-measure-sync`) nằm trong thư mục người dùng, **không** nằm trong repo |
 | Sub-agent trong repo | 0 → **1** | `ls .qoder/agents` |
 
