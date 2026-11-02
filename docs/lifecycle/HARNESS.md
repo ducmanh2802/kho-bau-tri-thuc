@@ -28,7 +28,7 @@
 | Git | `scripts/hooks/pre-commit` | commit khi typecheck đỏ | có |
 | Git | `scripts/hooks/commit-msg` | message ngoài Conventional Commits | có |
 | Git | `scripts/hooks/pre-push` | push khi `verify:quick` đỏ | có |
-| CI | workflow `01-quality` | typecheck + 1281 test | có, mỗi push/PR |
+| CI | workflow `01-quality` | typecheck + 1286 test | có, mỗi push/PR |
 | CI | workflow `02-build-artifact` | build + `check:budget` (entry ≤ 600 kB) | có |
 | CI | workflow `03-qa-browser` | 30 probe Playwright trên `dist/` | **có mặt nhưng chưa từng chặn gì**: job đặt `continue-on-error: true` (`03-qa-browser.yml:30`), và tới `66e0fea` probe mới thật sự chạy trên runner (trước đó chết ở bước Install / Download artefact chéo run). Đỏ ở bước "QA probe" bốn lần liên tiếp (41488045102 `66e0fea` · 41490451074 `77d90ce` · 41493791252 `2db8715` · 41496530836 `e777457`) mà **không đọc được lỗi** vì API log trả `403`. Nay có kênh đọc (annotation public, xem §"Kênh chẩn đoán") và lỗi thật đã sửa: **lần đầu xanh = run 41501753363 trên `afb9eeb`, 63 s** (bằng chứng = `jobs[].steps[].conclusion`, không phải "0 annotation"). Nhưng **đỏ lại ngay ở run 41504913606 trên `8e6f9f5`** — commit chỉ sửa docs, `src/` và `qa/` không đổi ⇒ probe **intermittent**, harness thật của cổng QA vẫn chưa đóng; lần đỏ đó còn bị chính bước chẩn đoán che (nó chạy lại probe và in "QA PASS" — đã sửa bằng `tee probe-run.log` + test hợp đồng). Vẫn để `continue-on-error` |
 | CI | workflow `04-release` | tag sai dạng `vX.Y.Z` bị từ chối | **lần đầu đỏ, lần hai xanh**: run 41486056746 trên tag cũ (`v1.1.0` đóng ở `7d92246`) chết ở bước Install (`npm ci` + lock lệch semantics npm 10) nên "Create GitHub Release" bị skip ⇒ **tag tồn tại mà release thì không**, một dạng hỏng mà harness không bắt được nếu chỉ nhìn `git tag`. Run 41490669966 trên tag hiện hành (`4f75f5d` → `77d90ce`) **success cả 9 bước**, sinh release id `431754261` + asset 1 369 166 byte. Bài học đã ghi thành cửa kiểm ở `TEST_PLAN.md` §16 dòng 12 |
@@ -40,7 +40,7 @@
 | Runtime | `writeJSON → boolean` | ghi hỏng bị im lặng | có — T41C |
 | Cloud | `firestore.rules` | đọc/ghi hồ sơ của uid khác | có file, **chưa test end-to-end** (mock thôi) |
 
-**Đếm sensor:** 3 hook · 4 workflow · 89 test file / 1281 test · 30 probe · 1 rules file.
+**Đếm sensor:** 3 hook · 4 workflow · 90 test file / 1286 test · 30 probe · 1 rules file.
 
 ### 2b. Kênh chẩn đoán CI — cái gì đọc được khi không có quyền admin
 
@@ -60,8 +60,8 @@ Cách phát annotation: in `::error::<nội dung>` từ một bước `if: failu
 trả về lộn xộn, đọc không ra nghĩa). `check_run_id` lấy từ `GET /commits/<full-sha>/check-runs`,
 **không** phải job id. REST công khai chỉ 60 lượt/giờ/IP — hết hạn thì chờ `X-RateLimit-Reset`.
 
-Hai cái bẫy đã tự sụp vào ngày 2026-11-03 (đo trên run 41501753363 và 41504913606, nguyên văn payload
-trong `evidence/2026-11-03-QA-RACE/ci-flake-second-run.txt`):
+Ba cái bẫy đã tự sụp vào ngày 2026-11-03 (đo trên run 41501753363, 41504913606 và 41508824890, nguyên văn payload
+trong `evidence/2026-11-03-QA-RACE/ci-flake-second-run.txt` và `ci-gate-race.txt`):
 
 1. **Body của `/annotations` là một mảng trần**, không phải `{ "annotations": [...] }`. Parse rồi truy
    `.annotations` ⇒ `undefined` ⇒ `length` báo 0 ⇒ dễ kết luận sai "lần này không có lỗi". Đếm đúng:
@@ -70,6 +70,14 @@ trong `evidence/2026-11-03-QA-RACE/ci-flake-second-run.txt`):
    `if: failure()` phát ra, mà bước đó từng **chạy lại** probe: lần đỏ thật mất dấu, annotation lại ghi
    "QA PASS". Bằng chứng bền là `workflow_runs/<id>/jobs → jobs[].steps[].conclusion` và
    `check-runs/<id> → conclusion`. Endpoint `/commits/<sha>/check-runs` cần **full sha** (sha ngắn trả mảng rỗng).
+3. **Selector hiện ≠ nội dung đã ổn định.** Probe chờ `text=Cổng Xác Nhận Phụ Huynh` rồi đọc đề, nhưng
+   đề do `useEffect` sinh ra mà **effect chạy sau paint** ⇒ khung hình đầu là đề mồi. Nạn nhân thật
+   là người lớn gõ nhanh, không riêng gì probe. Cách đo: một round-trip CDP sau `waitForSelector` đọc
+   **8/8 thấy đề thật** (đo 2026-11-03) ⇒ kết luận sai "không có race"; phải đặt **MutationObserver
+   trong trang** mới thấy 9/9 lần mở vẽ mồi rồi đổi sau 5–114 ms. Camera tái lập ở tầng unit:
+   `renderToString` chỉ vẽ khung hình đầu và **không** chạy effect (nhớ gỡ `<!-- -->` SSR chèn giữa
+   hai text node trước khi regex). Probe phải **xác nhận trạng thái cuối** (cổng đã đóng) chứ không
+   tin một lần đọc — `unlockParentDashboard` trong `qa/lib.mjs`.
 
 ## 3. Memory — cái nhớ giữa các phiên (và vì sao nó gọn)
 

@@ -17,6 +17,23 @@ asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện 
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
 ### Fixed
+- **Đề của "Cổng Xác Nhận Phụ Huynh" sinh sau khi vẽ — lỗi ứng dụng thật, không phải của probe.**
+  Run 41508824890 (`80c7e39`) chết ở dòng bấm "Đấu Trường Thi Thử" trong `qa/lib.mjs`, timeout 12 s.
+  Lần này đọc được payload thật (nhờ `tee probe-run.log` ở mục dưới). Nguyên nhân:
+  `src/components/parent/ParentDashboardModal.tsx` khởi tạo state bằng một đề mồi cố định và sinh đề
+  thật trong `useEffect` — effect chạy **sau** paint, nên khung hình đầu luôn hiện "15 + 18 = ?".
+  Đo bằng MutationObserver ghi ngay trong trang: **9/9 lần mở** vẽ đề mồi rồi thay đề thật sau
+  **5–114 ms** (`evidence/2026-11-03-QA-RACE/ci-gate-race.txt`). Probe vừa thấy selector là đọc đề
+  ⇒ nộp 33 ⇒ cổng báo sai ⇒ bảng phụ huynh không mở. Ba mẹ gõ nhanh cũng dính đúng khoảng đó.
+  Sửa ứng dụng: `const gateQuestion = useMemo(makeGateQuestion, [isOpen])` (sinh đề **trong** render,
+  `makeGateQuestion` rút ngẫu nhiên `a ∈ [12,31]`, `b ∈ [11,30]`), cộng khối reset trạng thái cổng
+  **tại render** khi `isOpen` đổi thay cho effect. Sửa probe (tự vệ, không tin một lần đọc):
+  `unlockParentDashboard` trong `qa/lib.mjs` đọc đề → nộp → **chờ cổng đóng hẳn**
+  (`waitForFunction`), chưa đóng thì đọc lại, tối đa 3 lần; `openCompetitionHub` gọi helper này, còn
+  `qa/golden-path.mjs`, `qa/focus.mjs`, `qa/mobile-golden.mjs` bỏ đoạn đọc-gate-tức-thời của riêng
+  chúng và dùng chung helper. Sau sửa, đo lại: `{"total":9,"paintedDefault15plus18":0,
+  "repaintedAfterFirstFrame":9}` — đề mồi biến mất, mỗi lần mở vẫn đổi đề.
+  **Chưa đóng được ô CI:** chưa có run nào trên commit chứa bản sửa.
 - **`3. Browser QA` chưa từng xanh trên CI — nguyên nhân thật là race overlay, không phải app.**
   Bốn lần chạy đỏ ở bước "QA probe" (41488045102 `66e0fea` · 41490451074 `77d90ce` ·
   41493791252 `2db8715` · 41496530836 `e777457`) và không ai đọc được dòng lỗi vì
@@ -50,6 +67,17 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   `continue-on-error: true` **giữ nguyên** vì mới có một lần xanh.
 
 ### Tests
+- **`tests/t41f-parent-gate.test.ts` — 5 test, RED đo trước khi sửa, GREEN sau khi sửa.** Ba test
+  đầu là "buồng quay camera" deterministic: `renderToString` chỉ vẽ khung hình đầu và **không chạy
+  effect**, nên 15 lần mở liên tiếp không được chứa `15 + 18`, đề phải khác nhau giữa các lần
+  (`distinct.size > 1`) và `a`/`b` phải nằm trong khoảng đã chốt. Hai test sau là hợp đồng nguồn:
+  `ParentDashboardModal.tsx` phải có `useMemo(makeGateQuestion, [isOpen])`, **không** được quay lại
+  `setGateQuestion(` hay state khởi tạo bằng đề mồi; bốn probe (`lib.mjs`, `golden-path.mjs`,
+  `focus.mjs`, `mobile-golden.mjs`) phải gọi `unlockParentDashboard` và `golden-path.mjs` không được
+  tự bấm "Mở Bảng Phụ Huynh" nữa. RED đo trước khi sửa: `5 failed (5)`. GREEN: `5 passed (5)`.
+  *Chèn giữa hai lần đo là một bài đắt:* sau khi sửa app, cổng vẫn `1 failed | 4 passed (5)` vì
+  `not.toMatch(/useState\(\{\s*a: 15, b: 18/)` khớp cả **dòng comment** giải thích bug — phải viết
+  lại comment. Và `<!-- -->`: SSR chèn chuỗi đó giữa các text node kề nhau, regex đọc đề phải bỏ.
 - Test hợp đồng thứ ba trong `tests/t31-bug-hunt-fixes.test.ts` ("CI: annotation kể lại lần chạy
   THẤT BẠI, không chạy lại probe lần hai") khoá cả hai đầu: bước "QA probe" phải có `| tee
   probe-run.log` + `PIPESTATUS[0]`, bước chẩn đoán phải có `[ -s probe-run.log ]`. RED đo trước khi

@@ -9,8 +9,11 @@ object `4f75f5d` đóng trên commit `77d90ce`) **và đối tượng GitHub Rel
 `431754261`, `draft false`, asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte — mục 3.4).
 Tài liệu này mô tả cả quy trình *đã chạy* lẫn những gì **vẫn mở**: chữ ký Go/No-Go
 của người giữ repo, nghiệm thu người dùng, và thực tế rằng `3. Browser QA` **xanh lần đầu trên `afb9eeb`
-rồi đỏ lại trên `8e6f9f5` (docs-only) — và cả hai lần commit mang tag `v1.1.0` (`77d90ce`) đều chạy
-trước bản sửa race** nên gate của chính bản phát hành vẫn đỏ (§3.4).
+rồi đỏ lại trên `8e6f9f5` (docs-only), đỏ tiếp trên `80c7e39` (run 41508824890) — và cả hai lần commit mang
+tag `v1.1.0` (`77d90ce`) đều chạy trước mọi bản sửa race** nên gate của chính bản phát hành vẫn đỏ (§3.4).
+Đợt ba **đã đọc được nguyên nhân thật** và nó nằm ở app, không phải probe: đề cổng phụ huynh xuất hiện muộn
+hơn khung hình đầu (`useEffect` chạy sau paint) — bản sửa nằm ở working tree, **chưa có run CI nào trên commit
+chứa nó** khi tài liệu này được viết.
 
 **Cập nhật cùng ngày (hồ sơ bản `1.1.0` đã đóng trên nhánh):** ba điều kiện No-Go trong §3 mà hồ sơ
 này tự chặn đã gỡ — `CHANGELOG.md` `[Unreleased]` **đã chuyển thành** `## [1.1.0] - 2026-11-02`
@@ -61,6 +64,7 @@ Quy tắc: một artifact chỉ chứng nhận cho commit nó được tạo ra.
 | `3d06930` (RC: `origin/main` `09511d3` merge vào tip nhánh) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt` (EXIT=0, 89 file / 1277 test / `Duration 23.85s`, entry `index-B6au8G63.js` 204.2 kB) + `probe-qa-smoke-rc.txt` + `probe-qa-games-rc.txt` + `probe-game-pause-rc.json` | **Pass** cho V&V trên RC · Release xem dòng §3.4 |
 | `7365830` → `7d92246` (HEAD `main` lúc đóng tag `v1.1.0` **đầu tiên**) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` (EXIT=0, 89 file / 1278 test / `Duration 23.64s`), `verify-release-head.txt` (chạy lại đúng HEAD tag, EXIT=0 / `22.57s`), `repro-fatigue-midnight.txt` (RED trước – GREEN sau khi sửa flake) | **Pass** cho V&V trên máy phát triển, **Fail** cho Release phía server: `npm ci` của CI (npm 10) đỏ ở Install ⇒ workflow `4. Release` chết trước bước "Create GitHub Release", tag có thật nhưng release thì không. **Tag này đã bị xoá khỏi `origin`** (`ci-install-red.txt`) |
 | `77d90ce` (HEAD `main` mang tag `v1.1.0` **hiện hành** = tag object `4f75f5d`) | 2026-11-03 | `evidence/2026-11-02-KBT-ISSUE-43/ci-release-green.txt` — cổng máy chạy lại đúng commit được tag (EXIT=0, 89 file / 1278 test / `Duration 21.84s`, entry `index-B6au8G63.js` 204.2 kB) + 4 run CI phía server đọc qua API công khai + đối tượng release thật | **Pass** V&V **và** Pass Release kỹ thuật: `1. Quality` 41490451023 · `2. Build + artifact` 41490451085 · `4. Release` 41490669966 success ⇒ release id `431754261` có asset. **Vẫn mở:** `3. Browser QA` 41490451074 đỏ ở bước "QA probe" (nguyên nhân đã bắt và sửa trên `afb9eeb`, **sau** commit này), chữ ký Go/No-Go trống, nghiệm thu người dùng `NotRun` |
+| `80c7e39` (test hợp đồng "annotation kể lại lần chạy THẤT BẠI") → working tree mang bản sửa đề cổng | 2026-11-03 | `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` (payload annotation của chính lần đỏ + số đo MutationObserver trước/sau) · `evidence/2026-11-03-QA-RACE/verify-1286.txt` (EXIT=0 · 90 file / 1286 test · `Duration 22.18s` · `index-TgwkX59u.js` 204.2 kB PASS) | **Fail** trên `80c7e39` (run 41508824890 · check-run 125495014729 · `failedAt: SNAP_afterReading`) nhưng lần này **đọc được nơi chết thật**, và nó là lỗi **app**: khung hình đầu của cổng phụ huynh vẽ một đề mồi, đề thật tới sau 5–114 ms (9/9). **Chưa có run CI nào trên commit chứa bản sửa** ⇒ chưa bỏ `continue-on-error`, chưa đổi tag `v1.1.0` (vẫn ở `77d90ce`), chữ ký Go/No-Go vẫn trống |
 
 Không được lấy log của `7c60066` để nói `d54f341` an toàn.
 
@@ -143,7 +147,7 @@ Nên SLI chỉ đo được ở hai nơi: lúc build và lúc chạy probe.
 
 | SLI | Định nghĩa | Ngưỡng (nguồn NFR) | Đo ở đâu | Trạng thái 2026-11-02 |
 |---|---|---|---|---|
-| Khối lượng tải tiên phong | tổng byte asset mà `dist/index.html` tham chiếu tĩnh | ≤ 600 kB cứng, ≤ 450 kB mục tiêu (NFR-P01) | `npm run check:budget` | 418.5 kB — **đạt** |
+| Khối lượng tải tiên phong | tổng byte asset mà `dist/index.html` tham chiếu tĩnh | ≤ 600 kB cứng, ≤ 450 kB mục tiêu (NFR-P01) | `npm run check:budget` | 418.6 kB — **đạt** |
 | Đường vào học được | `qa/golden-path.mjs` số console error | = 0 (BRD §8) | workflow 03 | 0 lỗi / 28 bước — **đạt** |
 | Hồi quy hành vi | `npm run verify` | EXIT=0 (AGENTS.md §1.1) | mỗi push | 1240/1240 — **đạt** |
 | Thời gian một phiên học | phút bé hoạt động thật | 15–20 phút (NFR-M01) | **không đo được** — không telemetry | `NotRun` |

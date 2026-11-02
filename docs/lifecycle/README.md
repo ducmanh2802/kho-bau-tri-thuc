@@ -12,7 +12,7 @@ chứng thì để trống và ghi lý do ngay dưới bảng — không tô h�
 | # | Artifact | Pha | Trạng thái | Bằng chứng / số đo |
 |---|---|---|---|---|
 | 01 | [Lifecycle Board](01_LIFECYCLE_BOARD.md) | cả 6 | Đủ, 1 pha **Pass một phần** | 6 pha × 5 lớp; ô Release đã có số đo (`git tag` = 1) nhưng còn 3 điều kiện mở, xem `01` §Pha 5 |
-| 02 | [AI Usage Charter](02_AI_USAGE_CHARTER.md) | governance | Đạt | Rule of Two 4 lớp; 3 hook + 4 workflow + 1281 test |
+| 02 | [AI Usage Charter](02_AI_USAGE_CHARTER.md) | governance | Đạt | Rule of Two 4 lớp; 3 hook + 4 workflow + 1286 test |
 | 03 | [Requirements Chain](03_REQUIREMENTS_CHAIN.md) | Requirements | Đạt cho lát cắt | 88 FR · 6 US · 42 TC · 0 test mồ côi (`RTM.md` §7) |
 | 04 | [Design Blueprint](04_DESIGN_BLUEPRINT.md) | Design | Đạt, 1 lỗ hổng | 18 ADR · 6 driver có số đo · STRIDE 6 mục · lethal trifecta đã cắt 2/3 điều kiện |
 | 05 | [Implementation Loop](05_IMPLEMENTATION_LOOP.md) | Implementation | Đạt | Guarded loop 6 bước có ví dụ thật T41C; merge gate 5 điều kiện, G-5 đang hở |
@@ -28,11 +28,11 @@ Phụ lục: [`CHECKLIST.md`](CHECKLIST.md) · [`HARNESS.md`](HARNESS.md) ·
 
 | Hạng | Số | Lệnh |
 |---|---|---|
-| Cổng chất lượng | `npm run verify` EXIT=0 | `evidence/2026-11-03-QA-RACE/verify-1281.txt` (lần đo gần nhất, 2026-11-03) · `verify-1280.txt` · `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` · `verify-rc.txt` · `verify.txt` · `evidence/2026-11-02-T41C/verify.txt` |
-| Test file / test | 89 / 1281 · suite 22.58 s (đo 2026-11-03; trước đó 1280 / 21.88 s cùng ngày, 1278 / 23.64 s ngày 2026-11-02) | `npx vitest run` |
+| Cổng chất lượng | `npm run verify` EXIT=0 | `evidence/2026-11-03-QA-RACE/verify-1286.txt` (lần đo gần nhất, 2026-11-03) · `verify-1281.txt` · `verify-1280.txt` · `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` · `verify-rc.txt` · `verify.txt` · `evidence/2026-11-02-T41C/verify.txt` |
+| Test file / test | 90 / 1286 · suite 22.18 s (đo 2026-11-03; trước đó cùng ngày 1281 / 22.58 s và 1280 / 21.88 s, ngày 2026-11-02 là 1278 / 23.64 s) | `npx vitest run` |
 | Probe QA | 30 (29 `.mjs` + 1 `.cjs`) | `ls qa/*.mjs qa/*.cjs` trừ `lib.mjs`, `run-one.mjs` |
 | Entry chunk | **204.2 kB** `index-B6au8G63.js` | `npm run check:budget` |
-| Boot graph | **418.5 kB** | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sort -u` + `stat -c%s` |
+| Boot graph | **418.6 kB** | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `428624 total` (÷ 1024 = 418.6 KiB) |
 | Trần | entry 600 kB cứng / 450 kB mục tiêu | `src/config/policy.ts` + `scripts/check-bundle-budget.mjs` |
 | Trò chơi đăng ký đủ 4 nơi | 31 = 31 = 31 = 31 | `tests/t23-mcp-servers.test.ts` |
 | Dependency runtime | 8 | `package.json → dependencies` |

@@ -126,7 +126,7 @@ Cài tự động qua `prepare` khi chạy `npm install`. Nếu bạn clone bằ
 |---|---|---|---|
 | `1. Quality` | PR + push `main` | `npm ci` → typecheck → `test:ci` | **có** |
 | `2. Build + artifact` | PR + push `main` | build → check budget → upload `dist-*` (giữ 14 ngày) | **có** |
-| `3. Browser QA` | PR + push `main` | build `dist/` trong job, cài Chromium, chạy probe | **chưa** — xanh lần đầu ngày 2026-11-03 (run 41501753363 trên `afb9eeb`, 63 s) rồi **đỏ lại ở run 41504913606 trên `8e6f9f5`** (commit chỉ sửa docs) ⇒ intermittent, vẫn để `continue-on-error: true` |
+| `3. Browser QA` | PR + push `main` | build `dist/` trong job, cài Chromium, chạy probe | **chưa** — xanh lần đầu ngày 2026-11-03 (run 41501753363 trên `afb9eeb`, 63 s) rồi **đỏ lại ở run 41504913606 trên `8e6f9f5`** (commit chỉ sửa docs) và **đỏ tiếp ở run 41508824890 trên `80c7e39`** ⇒ intermittent; nguyên nhân thật đã bắt được ở đợt ba (đề cổng phụ huynh vẽ muộn hơn khung hình đầu — lỗi app, xem `evidence/2026-11-03-QA-RACE/ci-gate-race.txt`) nhưng **chưa có run CI nào trên commit chứa bản sửa** ⇒ vẫn để `continue-on-error: true` |
 | `4. Release` | tag `v*.*.*` | full gate → zip → GitHub Release | n/a |
 
 Hai điểm phải hiểu để không mất thời gian debug:

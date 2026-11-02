@@ -197,10 +197,10 @@ Hai đường, và cả hai đều do người lớn khởi động:
   không thể lệch nhau.
 - Trò chơi nạp lười qua `src/components/games/registry.ts` (`GAME_REGISTRY`, đủ **31** lời gọi `lazy(...)`); 31 trò = 31 chunk nhỏ, không trò nào nằm trong entry.
 - Cờ vua 3D cũng nạp lười: [src/App.tsx:20](file:///D:/trithuc/kho-bau-tri-thuc/src/App.tsx#L20) `lazy(() => import('./components/learning/chess/ChessScreen'))`
-  ⇒ `three-vendor` (572.6 kB) và `ChessScreen` (54.4 kB) chỉ tải khi bé mở bàn cờ; chưa từng mở thì không trả giá.
+  ⇒ `three-vendor` (572.6 kB) và `ChessScreen` (56.2 kB) chỉ tải khi bé mở bàn cờ; chưa từng mở thì không trả giá.
 - **T39 — đường tải tiên phong (boot graph).** `manualChunks` chỉ tách file, **không** hoãn được
-  `import` tĩnh, nên thứ tự đo được là: entry `index-B6au8G63.js` **204.2 kB**, và
-  `dist/index.html` tham chiếu tĩnh đúng 3 file = **418.5 kB** (index + `react-vendor` 213.6 +
+  `import` tĩnh, nên thứ tự đo được là: entry `index-TgwkX59u.js` **204.2 kB**, và
+  `dist/index.html` tham chiếu tĩnh đúng 3 file = **418.6 kB** (index + `react-vendor` 213.6 +
   `rolldown-runtime` 0.7). Ba màn/đối tượng đã bị kéo ra khỏi tập đó: Cờ Tướng + Luyện Tiếng Anh
   IOE (`React.lazy` + `ScreenFallback`), `data/curriculum` (tự đăng ký vào storage, prefetch sau
   first paint) và Firebase (`loadFirebaseSdk()` + hint phiên, `AccountModal` gọi
@@ -498,7 +498,7 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 
 ---
 
-## 12. Kiểm kê kiến trúc (đo 2026-11-03, trên HEAD `main` `8e6f9f5` cộng thay đổi chưa commit của đợt điều tra flake lần hai — `qa/lib.mjs` chờ modal lên cấp mount thay vì đếm tức thời (`afb9eeb`, 2 test hợp đồng) và `.github/workflows/03-qa-browser.yml` lưu output của **chính lần chạy đỏ** vào `probe-run.log` (thêm 1 test hợp đồng) ⇒ tổng 3 test hợp đồng so với `37fd35e` ⇒ 1281 test; `src/` không bị đụng nên entry vẫn `index-B6au8G63.js` 204.2 kB. Đợt đo trước 2026-11-02: sau KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3` — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` và probe `qa/game-pause.mjs`; `09511d3` thêm `tests/chess-engine-performance.test.ts` (5 test) và đổi engine cờ vua, không đụng số liệu khác. Nội dung học, service, component và các mục khác **không đổi** so với các đợt đo trước)
+## 12. Kiểm kê kiến trúc (đo 2026-11-03 **lần ba trong ngày**, trên working tree = HEAD `main` `80c7e39` cộng bản sửa "đề cổng phụ huynh vẽ muộn hơn khung hình đầu" trong `src/components/parent/ParentDashboardModal.tsx` + helper `unlockParentDashboard` trong `qa/lib.mjs` (4 probe đi qua helper) + 5 test mới `tests/t41f-parent-gate.test.ts` ⇒ 1286 test; **`src/` đổi nên entry đổi hash** `index-TgwkX59u.js` trong khi kB vẫn 204.2 — đúng cặp lỗi "đổi size quên hash / đổi hash quên size" mà quy ước §"Chỉ số liệu đo được" cảnh báo. Hai đợt đo trước cùng ngày: sửa race màn chúc mừng lên cấp trong `qa/lib.mjs` (`afb9eeb`, 2 test hợp đồng) rồi lưu output của **chính lần chạy đỏ** vào `probe-run.log` (`80c7e39`, thêm 1 test hợp đồng) ⇒ 1281 test, khi đó `src/` không đổi nên entry **giữ nguyên tên file**. Đợt đo trước 2026-11-02: sau KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3` — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` và probe `qa/game-pause.mjs`; `09511d3` thêm `tests/chess-engine-performance.test.ts` (5 test) và đổi engine cờ vua, không đụng số liệu khác. Nội dung học, service, component và các mục khác **không đổi** so với các đợt đo trước)
 
 | Hạng | Số | Nguồn |
 |---|---|---|
@@ -512,12 +512,12 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 | Export policy | 17 (693 dòng) | `src/config/policy.ts` |
 | Key `localStorage` | 19 | `STORAGE_KEYS` (17) + 2 key cục bộ (`kho_bau_ioe_store`, `kho_bau_cloud_session_hint` — hint boolean, không chứa dữ liệu bé) |
 | Dependency runtime | 8 | `package.json` → `dependencies` |
-| Test file / test | 89 / 1281 | `npx vitest run` (87 `.ts` + 2 `.tsx`) |
+| Test file / test | 90 / 1286 | `npx vitest run` (88 `.ts` + 2 `.tsx`) |
 | Probe QA | 30 (29 `.mjs` + 1 `.cjs`) | `ls qa/*.mjs qa/*.cjs` (trừ `lib.mjs`, `run-one.mjs`) |
 | Workflow CI | 4 | `.github/workflows/` |
 | MCP server / tool | 5 / 27 | `mcp/` |
-| Main chunk | **204.2 kB** `index-B6au8G63.js` (trần 600, mục tiêu 450 ⇒ đạt từ T39) | `npm run check:budget` |
-| Boot graph (asset mà `dist/index.html` tham chiếu tĩnh) | **418.5 kB** = index 204.2 + `react-vendor` 213.6 + runtime 0.7 | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sort -u` + `stat -c%s` |
+| Main chunk | **204.2 kB** `index-TgwkX59u.js` (trần 600, mục tiêu 450 ⇒ đạt từ T39) | `npm run check:budget` |
+| Boot graph (asset mà `dist/index.html` tham chiếu tĩnh) | **418.6 kB** = index 204.2 + `react-vendor` 213.6 + runtime 0.7 | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `428624 total` — chia 1024 ra 418.6 **KiB** (`check:budget` cũng chia 1024 nhưng in nhãn `kB`) |
 | Vendor chunk lớn nhất | `firebase-vendor` 723.0 kB · `three-vendor` 572.6 kB · `react-vendor` 213.6 kB — cả hai vendor lớn **không** còn trong boot graph | `npm run check:budget` |
 | `App.tsx` / `storage.ts` / `learningOS.ts` / `competitionEngine.ts` / `readingEngine.ts` / `cloudSync.ts` / `firebase.ts` | 499 / 2628 / 845 / 747 / 662 / 277 / 133 dòng | `wc -l` |
 
@@ -528,7 +528,7 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 | # | Nợ | Ảnh hưởng | Hướng xử lý |
 |---|---|---|---|
 | 1 | `kho_bau_ioe_store` và `kho_bau_cloud_session_hint` ngoài `STORAGE_KEYS`, đọc/ghi trực tiếp `localStorage` | thoát khỏi pipeline sanitize; dễ lệch kiểm kê | đưa về registry + `readJSONObject`, thêm test đếm đủ 19 key |
-| 2 | ~~Entry 533.5 kB so với mục tiêu 450 kB~~ **đã đóng ở T39**: hiện entry 204.2 kB, boot graph 418.5 kB (`tests/t39-first-load-graph.test.ts` giữ trần 500 kB). Nợ còn: catalogue vẫn prefetch **cả bốn môn** sau first paint | thiết bị yếu tải cả ngân hàng đề dù chỉ học một môn | nạp `curriculum`/bank **theo môn** khi mở màn; giữ test trần boot graph |
+| 2 | ~~Entry 533.5 kB so với mục tiêu 450 kB~~ **đã đóng ở T39**: hiện entry 204.2 kB, boot graph 418.6 kB (`tests/t39-first-load-graph.test.ts` giữ trần 500 kB). Nợ còn: catalogue vẫn prefetch **cả bốn môn** sau first paint | thiết bị yếu tải cả ngân hàng đề dù chỉ học một môn | nạp `curriculum`/bank **theo môn** khi mở màn; giữ test trần boot graph |
 | 3 | Kid's Box units = 0 | track Anh chưa dùng được như giáo trình | cần nguồn đã xác minh (FR-N04, ADR-15) |
 | 4 | Chưa audit riêng track Kid's Box với trẻ thật | rủi ro trải nghiệm | audit người dùng thật trước khi quảng bá track |
 | 5 | `bun.lock` còn trong repo trong khi npm là nguồn thật | gây nhầm package manager | giữ nguyên + ghi chú (quyết định đã chốt) |
