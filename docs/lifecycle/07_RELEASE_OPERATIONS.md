@@ -6,6 +6,14 @@
 Không có release nào đã xảy ra. Tài liệu này mô tả quy trình *đã sẵn sàng* và những gì còn thiếu,
 không kể chuyện đã phát hành.
 
+**Cập nhật cùng ngày (hồ sơ bản `1.1.0` đã đóng trên nhánh):** ba điều kiện No-Go trong §3 mà hồ sơ
+này tự chặn đã gỡ — `CHANGELOG.md` `[Unreleased]` **đã chuyển thành** `## [1.1.0] - 2026-11-02`
+(kiểm bằng `node scripts/release-notes.mjs 1.1.0 | wc -l` = **875** dòng ghi chú release),
+`package.json` và `package-lock.json` cùng `1.1.0` (kiểm bằng `npm install --package-lock-only
+--dry-run` ⇒ `up to date`, EXIT=0 ⇒ `npm ci` của CI không lệch lock), và V&V xanh trên
+`feature/43-game-pause` (mục 2). **Hai việc còn lại thuộc quyền người giữ repo:** mở PR + squash vào
+`main`, rồi tag **đúng commit HEAD của `main`** — xem biên bản §3.4.
+
 ---
 
 ## 1. Release and Operate Loop — 6 trạm
@@ -13,7 +21,7 @@ không kể chuyện đã phát hành.
 | # | Trạm | Việc | Đã có | Còn thiếu |
 |---|---|---|---|---|
 | 1 | **RC commit** | chốt commit sẽ phát hành, tag `vX.Y.Z` trên **đúng** commit đã qua V&V gate | workflow `04-release.yml` trigger `push: tags v*.*.*` + `workflow_dispatch` | chưa có commit nào được tag |
-| 2 | **Verdict** | 14 AC của lát cắt + toàn bộ exit criteria `TEST_PLAN.md` §10 | 29/29 TC Pass trong lát cắt (`TEST_CASES.md` §3) | 83 FR chưa xuống tầng TC |
+| 2 | **Verdict** | mọi AC của **hai** lát cắt ở `TEST_CASES.md` §2 (6 US × 3 nhánh) + toàn bộ exit criteria `TEST_PLAN.md` §10 | 42/42 TC Pass (`TEST_CASES.md` §3) | phần lớn FR chưa xuống tầng TC — **không ghi con số "còn 83 FR"**: tổng FR khai báo (88) lệch số dòng FR thật trong `SRS.md` (89), xem `RTM.md` §9 rule 5 |
 | 3 | **Go/No-Go** | người chịu trách nhiệm ký; AI **không** ký | mục §3 dưới đây | chưa có phiên ký nào |
 | 4 | **Sẵn sàng vận hành** | expand/contract migration, restore drill, SLI/SLO, incident | ADR-02 + `MIGRATIONS` chain (`storage.ts:111`) | §5, §6 |
 | 5 | **Phát hành** | build → zip `dist/` → GitHub Release, note lấy từ `CHANGELOG.md` | workflow 04 làm đủ 3 bước | chạy lần đầu |
@@ -26,6 +34,8 @@ Quy tắc: một artifact chỉ chứng nhận cho commit nó được tạo ra.
 | Commit | Ngày | Bằng chứng | Verdict |
 |---|---|---|---|
 | `d54f341` | 2026-11-02 | `evidence/2026-11-02-T41C/` — verify log, 3 probe JSON, 2 ảnh, 3 log ablation/baseline | **Pass** cho V&V · **NotRun** cho Release |
+| `675be7e`+`af2d56a`+`494cce2`+`a61920b`+`fae661c`+`c8a3725`+tip review (nhánh `feature/43-game-pause`, chưa merge vào `main`) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/` — `red-before-fix.txt` (24 test FAIL), `verify.txt` (EXIT=0, 88 file / 1272 test / `Duration 21.55s`), `probe-game-pause.json` (12 bước, 0 lỗi), 3 ảnh, 3 log ablation M3/M4/M5 | **Pass** cho V&V · **NotRun** cho Release (CI chưa chạy — repo chưa có tag, `workflow_dispatch` chưa bật; xem §4) |
+| `3d06930` (RC: `origin/main` `09511d3` merge vào tip nhánh) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt` (EXIT=0, 89 file / 1277 test / `Duration 23.85s`, entry `index-B6au8G63.js` 204.2 kB) + `probe-qa-smoke-rc.txt` + `probe-qa-games-rc.txt` + `probe-game-pause-rc.json` | **Pass** cho V&V trên RC · Release xem dòng §3.4 |
 
 Không được lấy log của `7c60066` để nói `d54f341` an toàn.
 
@@ -50,6 +60,20 @@ Người ký          : ................  Ngày: ......
 Kết luận          : GO / NO-GO / GO-CÓ-ĐIỀU-KIỆN
 Căn cứ            : <dán output verify + golden-path + số TC NotRun còn lại>
 ```
+
+### 3.4 Hồ sơ chuẩn bị sẵn cho `v1.1.0` (điền số đo thật — người ký chỉ còn đọc và ghi tên)
+
+| Mục | Nội dung | Lệnh tái lập |
+|---|---|---|
+| Phạm vi bản `1.1.0` | toàn bộ `[Unreleased]` cũ, tức từ baseline `1.0.0` tới nay; lát cắt đóng băng là **KBT-ISSUE-43 — nút Tạm dừng trò chơi** | `node scripts/release-notes.mjs 1.1.0 \| wc -l` ⇒ `875` |
+| Cổng V&V trên nhánh | `npm run verify` **EXIT=0** · `Test Files 88 passed (88)` · `Tests 1272 passed (1272)` · `Duration 21.55s` · `Main chunk: index-qnZ3EVTS.js = 204.2 kB → PASS (meets 450 kB goal)` | `git checkout feature/43-game-pause && npm run hooks:install && npm ci && npm run verify` |
+| Chạy lại sau khi chốt hồ sơ `1.1.0` (commit `b36f3bf`) | `npm run verify` **EXIT=0** · `88 file / 1272 test` · `Duration 33.43s` · **entry vẫn `index-qnZ3EVTS.js` 204.2 kB** — đổi `package.json`/`CHANGELOG` không lọt vào bundle nên artefact phát hành y hệt bản đã qua V&V (`evidence/2026-11-02-KBT-ISSUE-43/verify-release-prep.txt`) | `npm run verify` trên working tree có hồ sơ release |
+| Smoke trên `dist/` | `npm run qa:smoke` ⇒ `QA PASS — 28 step(s), 0 errors` · `errors: []` · `removals: []` | `npm run build && npm run qa:smoke` |
+| **Đo lại trên RC `3d06930`** (tip nhánh, sau merge `09511d3` của lane khác — engine cờ vua đổi hoàn toàn nên phải chạy lại cả ba probe) | `npm run verify` **EXIT=0** · `Test Files 89 passed (89)` · `Tests 1277 passed (1277)` · `Duration 23.85s` · `Main chunk: index-B6au8G63.js = 204.2 kB → PASS (meets 450 kB goal)`; `qa:smoke` `QA PASS — 28 step(s), 0 errors`; `qa:games` `catalogCount: 31` + 31/31 `mounted: true` + `overflowPx` max `0`; `qa/game-pause.mjs` `QA PASS — 12 step(s), 0 errors` `ok: true` | log + JSON lưu ở `evidence/2026-11-02-KBT-ISSUE-43/` (`verify-rc.txt`, `probe-qa-smoke-rc.txt`, `probe-qa-games-rc.txt`, `probe-game-pause-rc.json`) |
+| Hồi quy 31 trò (wrapper dùng chung) | `npm run qa:games` ⇒ `catalogCount: 31`, `mountSmoke` 31/31 `mounted: true`, `overflowPx` max `0`, `errors: []` | `npm run qa:games` |
+| Probe riêng của lát cắt | `node qa/run-one.mjs qa/game-pause.mjs` ⇒ `QA PASS — 12 step(s), 0 errors`, `ok: true` | như trên, sau `npm run build` |
+| Điều kiện No-Go còn mở | **`NotRun`: CI trên GitHub** — PR chưa mở nên workflow `1. Quality` / `3. Browser QA` / `4. Release` chưa chạy lần nào trên máy chủ; số liệu ở đây đo trên máy phát triển Windows. **`NotRun`: chưa có người lớn đọc to ≥1 bài/môn** trên bản sắp phát hành. Còn 2 ô `NotRun` nữa trong `docs/plan/TEST_CASES.md` §5 (ảnh khoảnh `locked`, kiểm bằng bộ đọc màn hình) | mở PR rồi xem tab Actions |
+| Việc của người ký | (1) mở PR `main` ← `feature/43-game-pause` (link ở `docs/issues/43-game-pause.md` §7), (2) squash-merge khi CI xanh, (3) tag **đúng HEAD của `main`** | `git fetch && git checkout main && git pull && git log -1 --format=%H && git tag -a v1.1.0 -m "Kho Báu Tri Thức — Lớp 1, bản 1.1.0 (KBT-ISSUE-43)" && git push origin v1.1.0` |
 
 ## 4. Expand / Contract — đã có, đo được
 

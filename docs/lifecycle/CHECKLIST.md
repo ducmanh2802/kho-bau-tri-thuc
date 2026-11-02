@@ -13,10 +13,10 @@ FAIL treo.
 
 | # | Tiêu chí | Trọng số | Mức đạt | Kết quả | Cách kiểm (đã chạy) |
 |---|---|---|---|---|---|
-| A | Đủ artifact | 20% | 8/8 đúng thư mục, có owner + ngày | **ĐẠT 8/8** | `ls docs/lifecycle/*.md` — 8 file đánh số + README + 2 phụ lục, mỗi file có dòng Owner/Ngày |
-| B | Truy vết | 20% | BR → FR → US → TC → evidence liền mạch | **MỘT PHẦN** | `RTM.md` §10 (lát cắt 29 TC) + §2 (88 FR tới cấp FR) — chưa phủ 83 FR còn lại |
+| A | Đủ artifact | 20% | 8/8 đúng thư mục, có owner + ngày | **ĐẠT** | `ls docs/lifecycle/*.md \| wc -l` = 12 — 9 file đánh số `01`…`09` + README + 2 phụ lục (`CHECKLIST`, `HARNESS`), mỗi file có dòng Owner/Ngày |
+| B | Truy vết | 20% | BR → FR → US → TC → evidence liền mạch | **MỘT PHẦN** | `RTM.md` §10 (**hai** lát cắt liền mạch: 42 TC) + §2 (FR tới cấp FR) — các FR còn lại chưa xuống tầng TC; không ghi "còn 83 FR" vì tổng FR khai báo (88) lệch số dòng FR thật trong `SRS.md` (89), xem `RTM.md` §9 rule 5 |
 | C | Checklist | 20% | 0 Fail; Partial có owner + hạn | **ĐẠT** | chính file này, §2 |
-| D | Bằng chứng | 20% | log/ảnh mở được, tái lập được | **ĐẠT cho lát cắt** | [`evidence/README.md`](../../evidence/README.md) §3 — 8 file, mỗi file có lệnh |
+| D | Bằng chứng | 20% | log/ảnh mở được, tái lập được | **ĐẠT cho lát cắt** | [`evidence/README.md`](../../evidence/README.md) §3 — catalog hai đợt (`2026-11-02-T41C`, `2026-11-02-KBT-ISSUE-43`), mỗi file có lệnh tái lập |
 | E | Prompt tái dùng | 10% | nằm trong repo, người khác chạy lại được | **ĐẠT** | [`../prompts/`](../prompts/) — 4 thẻ prompt + context pack |
 | F | Harness | 10% | ≥1 skill, ≥1 sub-agent, memory gọn | **ĐẠT** | [`HARNESS.md`](HARNESS.md) — 2 skill + 1 sub-agent trong repo, memory 3 + 5 dòng |
 
@@ -24,16 +24,16 @@ FAIL treo.
 
 | ID | Mục | Trạng thái | Bằng chứng | Owner · hạn (nếu chưa đạt hẳn) |
 |---|---|---|---|---|
-| C-01 | `npm run verify` xanh trên commit đang chốt | ĐẠT | `evidence/2026-11-02-T41C/verify.txt` (87 file / 1240 test / EXIT=0) | — |
+| C-01 | `npm run verify` xanh trên commit đang chốt | ĐẠT | `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt` (89 file / 1277 test / EXIT=0 trên tip `3d06930`, đo 2026-11-02) · `evidence/2026-11-02-KBT-ISSUE-43/verify.txt` · `evidence/2026-11-02-T41C/verify.txt` | — |
 | C-02 | Bundle dưới trần | ĐẠT | entry 204.2 kB ≤ 450 kB mục tiêu; boot graph 418.5 kB | — |
 | C-03 | SRS có cột ưu tiên (priority) cho FR | **MỘT PHẦN** | `docs/specs/SRS.md` không có cột priority | người giữ repo · 2026-12-31 (cùng đợt rà FR) |
 | C-04 | Characterization test commit **trước** đợt refactor đầu tiên | **MỘT PHẦN** | `tests/t39-first-load-graph.test.ts` viết cùng commit với refactor | agent · đợt refactor kế tiếp (90 ngày, mục 2.1) |
 | C-05 | Nightly chạy full suite + probe + ablation | **CHƯA** | 4 workflow hiện chạy theo push/PR/tag | người giữ repo · 2027-01-31 (`09` §4 mục 3.2) |
 | C-06 | Lịch contract cho field đã bỏ trong schema | **CHƯA** | `MIGRATIONS` chỉ có chiều expand | agent T41D · 2026-12-31 |
 | C-07 | Gate tự động chặn chuỗi dữ liệu trẻ lọt ra output agent | **MỘT PHẦN** | hiện là advisory: `AGENTS.md` §1.7 + `progress/` gitignore + ảnh evidence dùng hồ sơ giả | người giữ repo · **trước khi** bật cloudSync mặc định |
-| C-08 | Mutation testing tự động | **CHƯA** | mới có 2 phép ablation thủ công (`TEST_CASES.md` §4) | người giữ repo · cần quyết định thêm dependency |
-| C-09 | Mọi FR có US + TC | **MỘT PHẦN** | 5 US / 29 TC cho 1 lát cắt; 83 FR dừng ở cấp FR | agent · 60 ngày (`09` §3 mục 2.1) |
-| C-10 | Đã phát hành ít nhất một release | **CHƯA** | `git tag` = 0 | người giữ repo · 30 ngày (`09` §2 mục 1.1) — **cần người dùng cho phép tag** |
+| C-08 | Mutation testing tự động | **CHƯA** | mới có 5 phép ablation thủ công (`TEST_CASES.md` §4, M1…M4) | người giữ repo · cần quyết định thêm dependency |
+| C-09 | Mọi FR có US + TC | **MỘT PHẦN** | 6 US / 42 TC cho **hai** lát cắt; các FR còn lại dừng ở cấp FR (xem `RTM.md` §9 rule 5 về lệch tổng FR) | agent · 60 ngày (`09` §3 mục 2.1) |
+| C-10 | Đã phát hành ít nhất một release | **CHƯA** | `git tag \| wc -l` = 0 (đo lại 2026-11-02) | người giữ repo · 30 ngày (`09` §2 mục 1.1). Người dùng đã đồng ý tag `v1.1.0`; **hồ sơ đóng sẵn** ở `07` §3.4, chỉ còn mở PR → squash vào `main` → tag HEAD của `main`. Agent không tự tag (§3: "không ký, không tự tag"). |
 | C-11 | Restore drill R-1 trên build thật | **CHƯA** | mới có test mock trong `tests/parent-and-demo.test.ts` | agent + người xem ảnh · 30 ngày (`09` §2 mục 1.2) |
 | C-12 | UAT với phụ huynh thật | **CHƯA** | `TEST_CASES.md` §5 ghi `NotRun` kèm lý do | người giữ repo · 90 ngày (`09` §4 mục 3.3) |
 | C-13 | 0 test mồ côi / 0 probe vô chủ | ĐẠT | `RTM.md` §6–§7 | — |

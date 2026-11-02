@@ -51,7 +51,7 @@ export const EnglishColorBalloonGame: React.FC<{ onExit: () => void }> = ({ onEx
 
   // Spawn balloons
   useEffect(() => {
-    if (stage.phase !== 'playing') return;
+    if (!stage.isRunning) return;
     const timer = setInterval(() => {
       const isTarget = Math.random() < 0.5;
       const chosenColor = isTarget
@@ -71,11 +71,11 @@ export const EnglishColorBalloonGame: React.FC<{ onExit: () => void }> = ({ onEx
     }, config.spawnMs);
 
     return () => clearInterval(timer);
-  }, [stage.phase, stage.tier, currentTarget, config]);
+  }, [stage.isRunning, stage.tier, currentTarget, config]);
 
   // Float balloons upwards
   useEffect(() => {
-    if (stage.phase !== 'playing') return;
+    if (!stage.isRunning) return;
 
     const animTimer = setInterval(() => {
       setBalloons((prev) =>
@@ -86,10 +86,10 @@ export const EnglishColorBalloonGame: React.FC<{ onExit: () => void }> = ({ onEx
     }, 40);
 
     return () => clearInterval(animTimer);
-  }, [stage.phase, stage.tier]);
+  }, [stage.isRunning, stage.tier]);
 
   const handleBalloonPop = (b: Balloon) => {
-    if (stage.locked || stage.phase !== 'playing') return;
+    if (!stage.isRunning) return;
     sound.playPop();
 
     if (b.colorName === currentTarget.name) {
@@ -131,6 +131,10 @@ export const EnglishColorBalloonGame: React.FC<{ onExit: () => void }> = ({ onEx
       instructions={`Touch & Pop: [ ${currentTarget.name} ] (${currentTarget.vietnamese})`}
       audioInstruction={`Pop the ${currentTarget.name} balloon`}
       audioLang="en-GB"
+      isRealtime
+      isPaused={stage.isPaused}
+      onTogglePause={stage.togglePause}
+      onOverlayOpenChange={stage.setOverlayOpen}
     >
       <div className="w-full h-full min-h-[360px] min-w-full self-stretch relative rounded-3xl bg-gradient-to-b from-sky-200 via-sky-100 to-indigo-100 overflow-hidden border-3 border-sky-300 select-none">
         {/* Sky Clouds */}
@@ -158,6 +162,7 @@ export const EnglishColorBalloonGame: React.FC<{ onExit: () => void }> = ({ onEx
         {balloons.map((b) => (
           <button
             key={b.id}
+            data-testid="falling-item"
             onClick={() => handleBalloonPop(b)}
             style={{
               left: `${b.x}%`,

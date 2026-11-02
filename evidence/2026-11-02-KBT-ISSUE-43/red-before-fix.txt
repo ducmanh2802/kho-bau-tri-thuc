@@ -1,0 +1,103 @@
+KBT-ISSUE-43 — bằng chứng test ĐỎ trước khi sửa source
+Lệnh  : npx vitest run tests/t43-game-pause.test.ts   (máy 2026-11-02, nhánh feature/43-game-pause, code chưa đổi)
+Bước : SDLC §1 giai đoạn 3, DoD-1
+Ghi chú: log gốc 4417 dòng; phần code-frame + dump nguồn của từng AssertionError
+         đã cắt vì chiếm ~99% dung lượng và lặp lại nội dung file nguồn đã có trong repo.
+         Giữ nguyên lời khai của 24 FAIL, danh sách test và dòng tổng kết.
+
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t43-game-pause.test.ts (30 tests | 24 failed) 234ms
+   ❯ KBT-43 — hàm quyết định đồng hồ chạy hay đứng (bảng sự thật) (7)
+     × đang chơi, không khoá, không tạm, không lớp phủ ⇒ đồng hồ chạy 6ms
+     × bé bấm tạm dừng ⇒ đồng hồ đứng 1ms
+     × lớp phủ "Chọn màn" đang mở ⇒ đồng hồ đứng (bé không bị trôi màn khi đang chọn) 0ms
+     × đợi chuyển câu (locked) ⇒ đồng hồ đứng, và nhả khoá thì chạy lại 0ms
+     × màn đã xong (tierComplete / allComplete) ⇒ đồng hồ đứng 0ms
+     × bấm tạm ĐANG LÚC mở lớp phủ thì nhả lớp phủ vẫn còn tạm (không tự nhả hộ bé) 0ms
+     × hàm là thuần tuý: cùng đầu vào cho cùng kết quả, không đọc đồng hồ hay state ngoài 0ms
+   ❯ KBT-43 — GameModalWrapper: một nguồn sự thật cho trạng thái tạm dừng (5)
+     × wrapper không còn tự giữ state isPaused (đó chính là lý do đường cũ chết) 4ms
+     × nút bấm gọi thẳng handler của game và không còn tự đảo state cục bộ 5ms
+     × lớp phủ "Đang tạm dừng" có testid ổn định để probe không phụ thuộc câu chữ 3ms
+     ✓ nhãn nút đổi theo trạng thái để bé và bộ đọc màn hình biết đang ở đâu 0ms
+     ✓ đóng bảng chơi giữa lúc tạm thì báo về game để đồng hồ không bị treo vĩnh viễn 0ms
+   ❯ KBT-43 — render thật: nút chỉ xuất hiện với trò có đồng hồ (3)
+     ✓ trò có đồng hồ ⇒ render đúng một nút game-pause 15ms
+     × trò có đồng hồ ĐANG tạm ⇒ nút thành "Tiếp tục" và vùng chơi có lớp phủ 8ms
+     ✓ trò KHÔNG có đồng hồ ⇒ không có nút tạm (không có gì để dừng) 2ms
+   ❯ KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning (9)
+     × catch_letters: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper 100ms
+     × catch_letters: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần 42ms
+     × falling_numbers: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper 1ms
+     × falling_numbers: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần 16ms
+     × color_balloon: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper 1ms
+     × color_balloon: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần 9ms
+     × speed_racing: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper 1ms
+     × speed_racing: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần 3ms
+     × đường chạm của trò bắt bóng cũng bị chặn khi tạm (không farm đáp án lúc dừng) 1ms
+   ❯ KBT-43 — hook sở hữu đồng hồ và tự nhả tạm khi sang màn (4)
+     × hook trả về isRunning/isPaused/togglePause/setOverlayOpen cho game đọc 6ms
+     × submitCorrect/submitWrong chặn theo isRunning — tạm là không tính điểm 1ms
+     × sang màn / chơi lại / nhảy màn đều nhả trạng thái tạm của bé 0ms
+     ✓ hàm quyết định không đọc Date.now hay state ngoài (test phải tất định được) 0ms
+   ❯ KBT-43 — catalog: cờ isRealtime phải chỉ đúng trò có đồng hồ (2)
+     × đúng 4 trò có đồng hồ, và Đường Đua (bị trừ lỗi khi hết giờ) không bị bỏ quên 2ms
+     ✓ thêm cờ không làm lệch bất biến 4 danh sách đăng ký trò chơi 0ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 24 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hàm quyết định đồng hồ chạy hay đứng (bảng sự thật) > đang chơi, không khoá, không tạm, không lớp phủ ⇒ đồng hồ chạy
+TypeError: isGameClockRunning is not a function
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hàm quyết định đồng hồ chạy hay đứng (bảng sự thật) > bé bấm tạm dừng ⇒ đồng hồ đứng
+TypeError: isGameClockRunning is not a function
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hàm quyết định đồng hồ chạy hay đứng (bảng sự thật) > lớp phủ "Chọn màn" đang mở ⇒ đồng hồ đứng (bé không bị trôi màn khi đang chọn)
+TypeError: isGameClockRunning is not a function
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hàm quyết định đồng hồ chạy hay đứng (bảng sự thật) > đợi chuyển câu (locked) ⇒ đồng hồ đứng, và nhả khoá thì chạy lại
+TypeError: isGameClockRunning is not a function
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hàm quyết định đồng hồ chạy hay đứng (bảng sự thật) > màn đã xong (tierComplete / allComplete) ⇒ đồng hồ đứng
+TypeError: isGameClockRunning is not a function
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hàm quyết định đồng hồ chạy hay đứng (bảng sự thật) > bấm tạm ĐANG LÚC mở lớp phủ thì nhả lớp phủ vẫn còn tạm (không tự nhả hộ bé)
+TypeError: isGameClockRunning is not a function
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hàm quyết định đồng hồ chạy hay đứng (bảng sự thật) > hàm là thuần tuý: cùng đầu vào cho cùng kết quả, không đọc đồng hồ hay state ngoài
+TypeError: isGameClockRunning is not a function
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — GameModalWrapper: một nguồn sự thật cho trạng thái tạm dừng > wrapper không còn tự giữ state isPaused (đó chính là lý do đường cũ chết)
+AssertionError: expected 'import React, { createContext, useCon…' not to match /const \[isPaused, setIsPaused\] = Rea…/
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — GameModalWrapper: một nguồn sự thật cho trạng thái tạm dừng > nút bấm gọi thẳng handler của game và không còn tự đảo state cục bộ
+AssertionError: expected 'import React, { createContext, useCon…' to contain 'onClick={onTogglePause}'
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — GameModalWrapper: một nguồn sự thật cho trạng thái tạm dừng > lớp phủ "Đang tạm dừng" có testid ổn định để probe không phụ thuộc câu chữ
+AssertionError: expected 'import React, { createContext, useCon…' to contain 'data-testid="game-paused-veil"'
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — render thật: nút chỉ xuất hiện với trò có đồng hồ > trò có đồng hồ ĐANG tạm ⇒ nút thành "Tiếp tục" và vùng chơi có lớp phủ
+AssertionError: expected '<div class="fixed inset-0 z-50 flex i…' to contain 'Tiếp tục trò chơi'
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning > catch_letters: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper
+AssertionError: src/components/games/CatchFallingLettersGame.tsx: thiếu isRealtime: expected 'import React, { useEffect, useMemo, u…' to match /^\s*isRealtime$/m
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning > catch_letters: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần
+AssertionError: src/components/games/CatchFallingLettersGame.tsx: hẹn giờ vẫn chạy khi tạm: expected 'import React, { useEffect, useMemo, u…' to contain 'if (!stage.isRunning) return;'
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning > falling_numbers: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper
+AssertionError: src/components/games/FallingNumbersMathGame.tsx: thiếu isRealtime: expected 'import React, { useEffect, useMemo, u…' to match /^\s*isRealtime$/m
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning > falling_numbers: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần
+AssertionError: src/components/games/FallingNumbersMathGame.tsx: hẹn giờ vẫn chạy khi tạm: expected 'import React, { useEffect, useMemo, u…' to contain 'if (!stage.isRunning) return;'
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning > color_balloon: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper
+AssertionError: src/components/games/EnglishColorBalloonGame.tsx: thiếu isRealtime: expected 'import React, { useEffect, useMemo, u…' to match /^\s*isRealtime$/m
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning > color_balloon: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần
+AssertionError: src/components/games/EnglishColorBalloonGame.tsx: hẹn giờ vẫn chạy khi tạm: expected 'import React, { useEffect, useMemo, u…' to contain 'if (!stage.isRunning) return;'
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning > speed_racing: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper
+AssertionError: src/components/games/MathSpeedRacingGame.tsx: thiếu isRealtime: expected 'import React, { useEffect, useMemo, u…' to match /^\s*isRealtime$/m
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning > speed_racing: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần
+AssertionError: src/components/games/MathSpeedRacingGame.tsx: hẹn giờ vẫn chạy khi tạm: expected 'import React, { useEffect, useMemo, u…' to contain 'if (!stage.isRunning) return;'
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning > đường chạm của trò bắt bóng cũng bị chặn khi tạm (không farm đáp án lúc dừng)
+AssertionError: expected 'import React, { useEffect, useMemo, u…' to match /const handleBubbleClick = \(bubble: F…/
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hook sở hữu đồng hồ và tự nhả tạm khi sang màn > hook trả về isRunning/isPaused/togglePause/setOverlayOpen cho game đọc
+AssertionError: expected 'import { useEffect, useRef, useState …' to contain 'isGameClockRunning({ phase, locked, p…'
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hook sở hữu đồng hồ và tự nhả tạm khi sang màn > submitCorrect/submitWrong chặn theo isRunning — tạm là không tính điểm
+AssertionError: expected 0 to be greater than or equal to 2
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hook sở hữu đồng hồ và tự nhả tạm khi sang màn > sang màn / chơi lại / nhảy màn đều nhả trạng thái tạm của bé
+AssertionError: expected 0 to be greater than or equal to 4
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — catalog: cờ isRealtime phải chỉ đúng trò có đồng hồ > đúng 4 trò có đồng hồ, và Đường Đua (bị trừ lỗi khi hết giờ) không bị bỏ quên
+AssertionError: expected [ 'catch_letters', …(2) ] to deeply equal [ 'catch_letters', …(3) ]
+
+ Test Files  1 failed (1)
+      Tests  24 failed | 6 passed (30)
+   Start at  21:29:47
+   Duration  9.36s (transform 80%, import 14%, tests 6%)
+

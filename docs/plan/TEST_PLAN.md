@@ -5,8 +5,8 @@
 > coi là xanh**. Danh sách yêu cầu cần kiểm: [`SRS.md`](../specs/SRS.md); ánh xạ
 > yêu cầu ↔ test ↔ probe ↔ gate: [`RTM.md`](../specs/RTM.md); quy trình: [`../SDLC.md`](../SDLC.md).
 >
-> **Số liệu chốt 2026-11-02** (đo lại sau T41C — bốn đường ghi tiến trình chỉ tính một lần: bằng liệu trùng chặn trước khi cộng, buổi đọc có dấu đã gập, bước ngày hoàn tác khi ghi hỏng, mỗi lượt chơi một biên lai; trước đó là T41B cửa sổ cân bằng môn và nhãn ngày trong báo cáo Ba Mẹ theo đồng hồ của caller + lịch địa phương, T41A công tắc phần thưởng chặn đúng tài nguyên, T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, T39 cắt lần tải đầu): 87 file test / 1240 test ·
-> 29 probe (28 `.mjs` + 1 `.cjs`) · 4 workflow CI · 3 git hook · main chunk `index-C_mEaaUG.js`
+> **Số liệu chốt 2026-11-02** (đo lại sau **KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3`** — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` 30 test và probe `qa/game-pause.mjs`; đợt đo trước trong cùng ngày là T41C — bốn đường ghi tiến trình chỉ tính một lần: bằng liệu trùng chặn trước khi cộng, buổi đọc có dấu đã gập, bước ngày hoàn tác khi ghi hỏng, mỗi lượt chơi một biên lai; trước đó là T41B cửa sổ cân bằng môn và nhãn ngày trong báo cáo Ba Mẹ theo đồng hồ của caller + lịch địa phương, T41A công tắc phần thưởng chặn đúng tài nguyên, T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, T39 cắt lần tải đầu): 89 file test / 1277 test ·
+> 30 probe (29 `.mjs` + 1 `.cjs`) · 4 workflow CI · 3 git hook · main chunk `index-B6au8G63.js`
 > 204.2 kB / trần 600 kB / **mục tiêu 450 kB đã đạt**; đồ thị chặn lần vẽ đầu 418.5 kB (trần 500 kB
 > do `tests/t39-first-load-graph.test.ts` giữ); vendor ngoài entry và ngoài boot graph: `three-vendor` 572.6 kB, `firebase-vendor` 723.0 kB.
 
@@ -34,9 +34,9 @@
 ```
 Lớp 5  Người lớn đọc to + beta trẻ thật          → §11   (2 phiên/milestone, không tự động)
 Lớp 4  Thiết bị thật: Android/iOS, offline, audio → §7    (qa/mobile.mjs + tay người)
-Lớp 3  Probe trình duyệt trên dist/ (29 probe)    → §6    (npm run qa:smoke)
+Lớp 3  Probe trình duyệt trên dist/ (30 probe)    → §6    (npm run qa:smoke)
 Lớp 2  Build + ngân sách + precache               → §9    (npm run build && npm run check:budget)
-Lớp 1  Unit/integration Vitest (1240 test)        → §5    (npm run test:ci)
+Lớp 1  Unit/integration Vitest (1277 test)        → §5    (npm run test:ci)
 ────────────────────────────────────────────────────────────────────────────────────────────
               npm run verify = typecheck + Lớp 1 + Lớp 2   ← cổng duy nhất
 ```
@@ -81,21 +81,24 @@ Lớp 1  Unit/integration Vitest (1240 test)        → §5    (npm run test:ci)
 `posttest` gọi `scripts/audit-snapshot.mjs` ghi `docs/audit-state.json` và nối
 `docs/AUDIT_REPORT.md` (`AGENTS.md` §1.2).
 
-**Bố trí 77 file theo vai trò:**
+**Bố trí 89 file theo vai trò** (danh sách này **đủ** — kiểm bằng lệnh: mọi file trong `tests/`
+phải xuất hiện ở một dòng bảng; lần đồng bộ gần nhất 2026-11-02):
 
 | Nhóm | File | Kiểm gì |
 |---|---|---|
-| Engine học tập | `answerCheck`, `learning-engine`, `session-composer`, `adaptive-difficulty`, `decision-engine`, `decision-engine-storage`, `personas-and-learning-os`, `lesson-completion`, `fatigue-reset` | chấm đúng/sai, bằng chứng idempotent, NBA deterministic, profile phiên, reset fatigue |
+| Engine học tập | `answerCheck`, `learning-engine`, `session-composer`, `adaptive-difficulty`, `decision-engine`, `decision-engine-storage`, `personas-and-learning-os`, `lesson-completion`, `lesson-matching`, `fatigue-reset`, `t07-subject-path`, `t27-lesson-engagement`, `t29-lesson-smooth` | chấm đúng/sai, bằng chứng idempotent, NBA deterministic, profile phiên, reset fatigue, đường môn học, độ mượt luồng bài (offsetHeight/layout shift) |
 | Thi thử | `competition-bank`, `competition-engine`, `competition-p36`, `exam-fidelity`, `competition-readiness` | size bank, assemble + `shortfall`, 7 dạng chấm được, seed ổn định, đáp án không trùng, readiness |
 | Nội dung | `content-quality`, `content-validator-t02c`, `curriculum-quality-p41`, `vietnamese-curriculum`, `vietnamese-rhymes`, `math-curriculum`, `math-t11c`, `math-typography`, `english-curriculum`, `life-curriculum`, `t12b-english-units`, `t02d-content-fixes` | số lượng chủ đề/bài/câu, dấu chuẩn GDPT, U+2212, không mojibake, không near-duplicate |
-| Trò chơi | `games-all`, `games-content`, `game-content`, `game-rewards`, `t08-games-hub`, `t15-viet-games`, `t16-math-games`, `t16-math-contract`, `t17a-english-games`, `t17b-coding`, `t17b-scientist`, `t21-fun-games`, `t25-difficulty-ladder` | builder deterministic 6 bậc, thưởng 1 lần/vòng, hợp đồng câu hỏi, BFS màn lập trình, **bậc thang độ khó toàn catalog** (trần số 0–100, số phương án, trần nhóm Puzzle, cấm `Math.random`/`Date.now`) |
+| Trò chơi | `games-all`, `games-content`, `game-content`, `game-rewards`, `t08-games-hub`, `t15-viet-games`, `t16-math-games`, `t16-math-contract`, `t17a-english-games`, `t17b-coding`, `t17b-scientist`, `t21-fun-games`, `t25-difficulty-ladder`, `t32-game-stage-reset`, `t33-feedback-timers`, `t43-game-pause` | builder deterministic 6 bậc, thưởng 1 lần/vòng, hợp đồng câu hỏi, BFS màn lập trình, **bậc thang độ khó toàn catalog** (trần số 0–100, số phương án, trần nhóm Puzzle, cấm `Math.random`/`Date.now`), đồng hồ/locked/sang màn gom về `useGameStage`, **nút Tạm dừng + lớp phủ "Đang tạm dừng"** |
 | Luyện đọc | `reading-fluency` | 5 bậc, công thức chỉ số, parent rating không đè điểm đo |
 | Tiếng Anh | `kidbox-curriculum`, `kidbox-activities`, `kidbox-learning-os`, `kidbox-bridge-practice`, `english-ioe`, `p32-english-mastery`, `voice-persona`, `english-curriculum` | **0 unit bịa** + 7 nhóm cần nguồn, en-GB fallback, mastery key riêng |
 | Động lực | `t18a-motivation`, `t01-achievements`, `praise-engine`, `t14c-logic`, `t14c-storage`, `t20a-levelup-hooks` | sticker/quest/streak/level, lời khen không từ cấm, hooks order |
 | Persistence | `t14c-storage`, `date-utils`, `parent-and-demo`, `firebase-auth-sync` | sanitize, `isRealDateKey`, export/import, **trạng thái offline khi chưa đăng nhập**, hợp nhất `Math.max`/`Set` union (mock Firestore) |
 | Âm thanh & giọng đọc | `question-audio-routing`, `voice-persona`, `t24-speech-math-operators` | nút "Đọc câu hỏi" luôn lấy canonical text (không rò rỉ đáp án/option/giải thích), persona + fallback en-GB, **phép tính `+ − =` đọc thành lời** mà không đổi chữ hiển thị |
 | Hệ thống | `bundle-budget`, `pwa`, `sw-precache`, `mobile-layout`, `t02c-startup-split`, `p41-font-encoding`, `t31-bug-hunt-fixes` | ngân sách chunk, precache, layout, tách chunk, font/dấu, **hợp đồng tĩnh của 5 lỗi T31 + 7 probe đã sửa** |
-| Cờ | `cotuong-engine`, `chess-3d`, `t30-cotuong-piece-depth` | luật (mã/tượng/pháo/tốt/tướng đối mặt/tự bỏ chiếu), node budget, `applyMove`; mesh 12 quân có shadow, bàn 64 ô + hitbox, marker nước đi/chiếu, nước mở đầu hợp lệ với engine; **độ nổi của quân cờ tướng** (bóng tiếp đất tràn ra ngoài đĩa, thành quân thò dưới mặt quân, thứ tự 3 lớp) |
+| Cờ | `cotuong-engine`, `chess-3d`, `chess-engine-performance`, `t26-cotuong-puzzles`, `t30-cotuong-piece-depth`, `t34-chess-real-set`, `t38-webgl-fallback` | luật (mã/tượng/pháo/tốt/tướng đối mặt/tự bỏ chiếu), node budget, `applyMove`; mesh 12 quân có shadow, bàn 64 ô + hitbox, marker nước đi/chiếu, nước mở đầu hợp lệ với engine; **độ nổi của quân cờ tướng** (bóng tiếp đất tràn ra ngoài đĩa, thành quân thò dưới mặt quân, thứ tự 3 lớp); 6 thế chiếu bí thật; bộ cờ vua giống ngoài đời; màn cờ vẫn chơi được khi máy không có WebGL; **engine cờ vua nhanh** (`chess-engine-performance`, merge `09511d3`): bàn mở đầu hợp lệ, `isAttacked` nhận ra mã/tốt/trượt/tướng, `getBestMove(depth 4, deadline 400 ms)` xong trong **≤ 600 ms** (ngưỡng là **thời gian tường** ⇒ rủi ro flake khi CI máy chậm — đã ghi ở §10), `getBestMove` không mutate bàn vào, tìm được nước bắt quân/chiếu-bí-trong-1 |
+| Ba mẹ & tiến trình (T40–T41C) | `t40-parent-facing-ids`, `t41a-parent-controls`, `t41b-decision-clock`, `t41c-idempotency` | báo cáo Ba Mẹ không lộ mã máy, công tắc thưởng chặn đúng tài nguyên, cửa sổ cân bằng môn + nhãn ngày theo đồng hồ caller, **chống ghi trùng** 5 tầng (evidence id · first-seen · nonce · completion · reward) + hoàn tác khi hết quota |
+| Vỏ UI & quy tắc React | `t01b-ui-fixes`, `t20a-hooks-order`, `t28-ui-polish`, `t36-viet-labels`, `t39-first-load-graph` | header không tràn, focus trap của popup bài học, hooks order, chuỗi Việt hoá còn sót, trần 500 kB cho đồ thị lần vẽ đầu |
 | Tooling | `t23-mcp-servers` | 5 server tồn tại, `node --check`, 0 import ngoài, `progress/` gitignored, 4 danh sách đăng ký khớp |
 
 **Quy tắc viết test (bắt buộc):**
@@ -124,7 +127,7 @@ registry của Playwright, cộng `--no-sandbox` khi `CI` được set.
 **Hợp đồng exit code:** in `QA PASS`/`QA FAIL` và **chỉ** exit khác 0 khi probe ghi `errors[]`
 hoặc tự khai `ok: false` (nhiều probe không set `ok` ⇒ thiếu `ok` **không** phải lỗi).
 
-**Danh mục 29 probe:**
+**Danh mục 30 probe:**
 
 | Probe | Kịch bản | Tiêu chí xanh | Chạy khi |
 |---|---|---|---|
@@ -157,13 +160,14 @@ hoặc tự khai `ok: false` (nhiều probe không set `ok` ⇒ thiếu `ok` **k
 | `t32-game-replay-evidence.mjs` | Khung trò chơi @390×844 với `?qa`: Đọc Câu Làm Theo - chạm đồ vật rồi chọn lại Màn 1, đếm số ô được đánh dấu "bước hợp lệ" trong 8 lượt ở Màn 4; Đường Đua Thần Tốc Màn 4 - mở lớp phủ "Chọn Màn" giữ 3 giây rồi đóng | lựa chọn dở bị xoá sau khi chơi lại, mỗi lúc đúng 1 bước hợp lệ, đồng hồ đứng yên khi bị che (15s → 15s) và chạy tiếp khi đóng (15s → 12s), nút ✕ đóng lớp phủ có tên truy cập | đổi `GameModalWrapper` / `useGameStage` / `sound.ts` |
 | `t33-feedback-timers.mjs` | Hẹn giờ phản hồi @390×844 với `?qa`: Ếch Nhảy Tia Số — bấm đúng rồi bấm sai trong 2,5 s; Lật Thẻ Trí Nhớ — đang hẹn giờ úp thẻ ở Màn 1 thì nhảy sang Màn 4 rồi lật tiếp hai thẻ; Luyện Đọc — bấm "Đọc cả câu" hai lần rồi bấm "Thoát" giữa lúc đọc; Đấu Trường Chính Tả — bấm hai phương án sai cách nhau ~0,5 s; Máy Gắp — bấm gắp rồi về Trang Chủ sau 300 ms | bóng lời khen của lượt mới còn nguyên tới mẫu 2.300 ms, Màn 4 vẫn tính 1 lượt, ô sáng karaoke đi một chiều và `speechSynthesis.speaking` về `false` khi bấm "Thoát", phương án bấm sau vẫn tô đỏ qua mốc 900 ms của lượt trước (đối chứng trên bản lỗi: `red` tụt 1→0 tại 1.104 ms), rời máy gắp giữa vòng quay không mất vé và không bắn confetti trên trang chủ | đổi `GameModalWrapper` / `useRoundFeedbackTimer` / karaoke `ReadingFluencyScreen` / `confetti.ts` / `sound.ts` |
 | `parent-controls.mjs` | Quyền kiểm soát của ba mẹ trên build thật @1280×720, 6 chặng: "Vì sao gợi ý này?" → tab Phân Tích; tắt công tắc **Toàn Bộ Phần Thưởng** (đọc `kho_bau_parent_settings`); Tủ Đồ với 999 sao bấm "Mở khóa"; học hết một bài Tiếng Việt; bật lại rồi mua chính món đó; bấm CTA "Bắt đầu: …" | `parent-decision-report` hiện ra, `rewardsEnabled` đổi `true→false→true`, ví sao **không đổi** khi thưởng tắt, màn kết quả có `lesson-rewards-off` và **không** còn dòng `+N Sao/XP/Vé`, sau khi bật lại thì `unlockedItems` tăng, CTA không còn đứng ở trang Chủ (nếu rơi vào bản đồ môn thì bài được gợi ý phải tự bật) | đổi `ParentDashboardModal` / `storage.ts` gate / `LessonPlayerModal` kết quả / `HomeScreen` CTA |
+| `game-pause.mjs` | Nút Tạm dừng trò chơi (KBT-ISSUE-43) trên `dist/` @390×844 với `?qa`: đếm nút `game-pause` ở 1 trò không đồng hồ + 4 trò có đồng hồ; chưa tạm ⇒ bóng rơi, bấm tạm ⇒ `aria-pressed="true"` + lớp phủ `game-paused-veil` + 4 bóng đứng nguyên 1 200 ms; **đang tạm** chạm đúng bóng đích; bấm tiếp ⇒ bóng rơi lại; Đường Đua — width của `[data-testid="race-timer"]` đứng rồi chạy lại | `errors[]` rỗng, `ok: true`, 12 bước; **đối chứng bắt buộc**: cùng cú `dispatchEvent('click')` lúc **đang chạy** phải làm bóng đích biến mất khỏi DOM (nếu không, C1 vô nghĩa — bóng bấm hỏng chứ chẳng liên quan tạm dừng) | đổi `useGameStage` (đồng hồ), `GameModalWrapper` (nút + lớp phủ) hoặc 4 trò `catch_letters`/`color_balloon`/`falling_numbers`/`speed_racing` |
 
 **Chính sách probe đỏ vì timing (đã ghi `AGENTS.md` §1.3):** chạy lại **một** lần;
 nếu vẫn đỏ ⇒ là lỗi thật; khi báo cáo phải dán `errors[]` + `failedAt`, không chỉ exit code.
 Nợ đã biết: selector `qa/games.mjs` từng khiến probe `SKIPPED` ở một số phiên — khắc phục
 ở `TASK_PLAN.md` C2; khi C2 chưa xong, **không** được dùng "games.mjs skip" làm bằng chứng xanh.
 
-**Nợ ghi ngày 2026-11-01 (vòng T32):** `qa/p38-browser-probe.cjs` nằm trong danh mục 29 probe
+**Nợ ghi ngày 2026-11-01 (vòng T32):** `qa/p38-browser-probe.cjs` nằm trong danh mục probe ở §6
 nhưng `require('puppeteer')` — dependency này **không** có trong `package.json` (và `AGENTS.md`
 §1.4 cấm tự thêm), nên probe chết ngay khi chạy: `Cannot find module 'puppeteer'`, exit 1. Nó
 không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại phải port sang Playwright
@@ -214,7 +218,7 @@ không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại 
 | Precache | `tests/sw-precache.test.ts`, `qa/offline-pwa.mjs` | manifest đủ `/assets/*`; placeholder dev ⇒ danh sách rỗng nhưng SW vẫn sống | — |
 | Loại trừ | `node_modules`, `.git`, `dist` không vào manifest | — | — |
 
-**Số đo gần nhất (2026-11-02, sau T41C):** `index-C_mEaaUG.js = 204.2 kB` → PASS trần 600 kB và **đã đạt** mục tiêu 450 kB (T39). Boot graph: 418.5 kB (3 file).
+**Số đo gần nhất (2026-11-02, sau KBT-ISSUE-43 + merge `09511d3`):** `index-B6au8G63.js = 204.2 kB` → PASS trần 600 kB và **đã đạt** mục tiêu 450 kB (T39). Boot graph: 418.5 kB (3 file).
 
 ---
 
@@ -317,6 +321,7 @@ không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại 
 | 9 | Bàn cờ vua WebGL không có ca fallback khi context creation thất bại | máy cấu hình thấp chỉ thấy màn trống | test + fallback CSS (nợ #7 ARCHITECTURE §13) |
 | 6 | Quota `localStorage` đầy chưa có ca | mất tiến độ ở máy dùng lâu | task B6 |
 | 7 | Không có test đổi ngưỡng ⇒ đổi hành vi cho cả 17 policy block | ngưỡng bị "đóng băng" sai | task C5 |
+| 10 | `tests/chess-engine-performance.test.ts:43` đo `getBestMove(depth 4)` bằng **thời gian tường** (`expect(duration).toBeLessThanOrEqual(600)`, engine tự giới hạn 400 ms) | flake trên máy CI chậm hoặc lúc máy bận — đỏ mà code không sai; trong suite đầy đủ (23.85 s) chưa quan sát thấy đỏ | khi đỏ, chạy cô lập `npx vitest run tests/chess-engine-performance.test.ts` để phân biệt flake/thật; ngưỡng nới thành `deadline + buffer` nếu CI chứng minh hụt |
 
 ---
 

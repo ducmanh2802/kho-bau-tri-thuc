@@ -43,21 +43,21 @@ thì để trống và ghi lý do — không viết "sẽ làm".
 
 | Lớp | Nội dung | Artifact / lệnh |
 |---|---|---|
-| Deliverable | TEST_PLAN 10 lớp, TEST_CASES 29 TC có verdict, catalog ablation | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) · [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md) |
-| Quality gate | `npm run verify` EXIT=0; UI đổi phải có ảnh/probe; test phải chứng minh bắt được lỗi | [`evidence/2026-11-02-T41C/`](../../evidence/README.md) |
+| Deliverable | TEST_PLAN 10 lớp, TEST_CASES 42 TC có verdict (hai lát cắt) · catalog 5 phép ablation | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) · [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md) |
+| Quality gate | `npm run verify` EXIT=0; UI đổi phải có ảnh/probe; test phải chứng minh bắt được lỗi | [`evidence/2026-11-02-T41C/`](../../evidence/README.md) · [`evidence/2026-11-02-KBT-ISSUE-43/`](../../evidence/README.md) |
 | AI Level | **Mức 2** — AI sinh test, expected lấy từ AC do người duyệt. *Deviation:* ở các đợt sớm người duyệt không tách AC 3 nhánh ⇒ xem `06_VERIFICATION_VALIDATION.md` §4 | `TEST_CASES.md` §2 |
 | RACI | R: agent · A: người giữ repo quyết oracle · C: — | — |
-| Metrics | 87 test file / 1240 test / suite 27.24 s · 29 probe · 2 phép ablation làm đỏ đúng test | `verify.txt` · `mutation-M*.txt` |
+| Metrics | 89 test file / 1277 test / suite 23.85 s · 30 probe · 5 phép ablation làm đỏ đúng test | `verify-rc.txt` · `verify.txt` · `mutation-M*.txt` |
 
 ### Pha 5 — Release (Phát hành)
 
 | Lớp | Nội dung | Artifact / lệnh |
 |---|---|---|
-| Deliverable | Quy trình tag + workflow `04-release.yml` (build → zip → GitHub Release) | [`.github/workflows/04-release.yml`](../../.github/workflows/04-release.yml) · [`07_RELEASE_OPERATIONS.md`](07_RELEASE_OPERATIONS.md) |
+| Deliverable | Quy trình tag + workflow `04-release.yml` (build → zip → GitHub Release) + **hồ sơ `v1.1.0` đã điền số đo** | [`.github/workflows/04-release.yml`](../../.github/workflows/04-release.yml) · [`07_RELEASE_OPERATIONS.md`](07_RELEASE_OPERATIONS.md) §3.4 |
 | Quality gate | Exit criteria: tag `vX.Y.Z` + golden-path 0 lỗi (`TEST_PLAN.md` §10) | — |
 | AI Level | **Mức 1** — AI chạy lệnh, người ký go/no-go; AI **không** ký | `07_RELEASE_OPERATIONS.md` §3 |
 | RACI | A: người giữ repo | — |
-| Metrics | **Chưa đo được.** `git tag` trả rỗng tính tới 2026-11-02 ⇒ pha này ở trạng thái `NotRun`, không phải `Pass` | `git tag \| wc -l` = 0 |
+| Metrics | **Chưa đo được.** `git tag` trả rỗng tính tới 2026-11-02 ⇒ pha này ở trạng thái `NotRun`, không phải `Pass`. Ba điều kiện No-Go đã gỡ: `CHANGELOG.md` có `## [1.1.0] - 2026-11-02`, `package.json` = `1.1.0`, cổng xanh trên nhánh. Hai điều kiện còn mở: CI trên GitHub chưa chạy, chưa có người lớn đọc to ≥1 bài/môn | `git tag \| wc -l` = 0 · `node scripts/release-notes.mjs 1.1.0 \| wc -l` = 875 |
 
 ### Pha 6 — Maintenance (Duy trì & tiến hoá)
 

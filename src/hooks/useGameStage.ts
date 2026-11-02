@@ -5,6 +5,25 @@ import { StorageService } from '../services/storage';
 
 export type GameStagePhase = 'playing' | 'tierComplete' | 'allComplete';
 
+/** Những thứ quyết định đồng hồ của trò chơi có được chạy hay không. */
+export interface GameClockState {
+  phase: GameStagePhase;
+  locked: boolean;
+  /** Bé bấm nút Tạm dừng. */
+  pausedByUser: boolean;
+  /** Lớp phủ "Chọn Màn & Độ Khó" của wrapper đang che bảng chơi. */
+  overlayOpen: boolean;
+}
+
+/**
+ * KBT-ISSUE-43 — một chỗ duy nhất trả lời "bóng có được rơi nữa không".
+ * Thuần tuý và không đọc đồng hồ: bảng sự thật test được, còn bug gốc là
+ * `isPaused` nằm riêng trong wrapper nên không hẹn giờ nào của game nghe theo.
+ */
+export function isGameClockRunning(s: GameClockState): boolean {
+  return s.phase === 'playing' && !s.locked && !s.pausedByUser && !s.overlayOpen;
+}
+
 export interface UseGameStageOptions {
   gameId: string;
   /** Objectives/rounds inside each tier (index 0 = tier 1). Length = tier count. */
@@ -34,6 +53,13 @@ export interface GameStage {
   prevBestStars: number;
   /** Play count for the current tier (T02/B5 replay shuffling). */
   nonce: number;
+  /** Bé đang bấm tạm dừng — wrapper vẽ nút/lớp phủ theo cờ này. */
+  isPaused: boolean;
+  /** Đồng hồ của trò chơi có được chạy không (xem `isGameClockRunning`). */
+  isRunning: boolean;
+  togglePause: () => void;
+  /** Wrapper báo lớp phủ "Chọn màn" mở/đóng để game ngừng đếm khi bị che. */
+  setOverlayOpen: (open: boolean) => void;
   submitCorrect: (starsOverride?: number) => void;
   submitWrong: () => void;
   startNextTier: () => void;
@@ -71,6 +97,10 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
   const [starsEarned, setStarsEarned] = useState(0);
   const [prevBestStars, setPrevBestStars] = useState(0);
   const [nonce, setNonce] = useState(0);
+  // KBT-ISSUE-43 — trạng thái tạm dừng sống ở ĐÂY chứ không ở wrapper: chỉ
+  // component gọi hook mới với tới được các hẹn giờ rơi bóng đang chạy.
+  const [pausedByUser, setPausedByUser] = useState(false);
+  const [overlayOpen, setOverlayOpenState] = useState(false);
   const timerRef = useRef<number | null>(null);
 
   // T01/B10 — never leave a pending advance timer running after unmount
@@ -89,6 +119,10 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
   const tierMeta = getTierMeta(tierSafe);
   const isLastTier = tierSafe >= Math.max(tierCount, 1);
   const xpEarned = GAME_LEVEL_POLICY.XP_PER_TIER[Math.min(tierSafe - 1, GAME_LEVEL_POLICY.XP_PER_TIER.length - 1)];
+  const isRunning = isGameClockRunning({ phase, locked, pausedByUser, overlayOpen });
+
+  const togglePause = () => setPausedByUser((v) => !v);
+  const setOverlayOpen = (open: boolean) => setOverlayOpenState(open);
 
   // T02/B5 — every (re)play of a tier bumps its nonce so builders reshuffle.
   // Runs on mount and whenever the tier changes (startNextTier / restart).
@@ -102,7 +136,7 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
   }, [tierSafe]);
 
   const submitCorrect = (starsOverride?: number) => {
-    if (locked || phase !== 'playing') return;
+    if (!isRunning) return;
     setScore((s) => s + 1);
     setTierScore((s) => s + 1);
     setLocked(true);
@@ -128,13 +162,16 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
         // T02B/B16 — persist the PER-TIER score, never the cumulative total.
         StorageService.completeGameTier(gameId, tierSafe, stars, tierScore + 1);
         setStarsEarned(stars);
+        // Màn đã chốt ⇒ không còn gì để tạm; để trạng thái tạm sống sang màn
+        // kế tiếp sẽ che mất bảng "VƯỢT QUA MÀN".
+        setPausedByUser(false);
         setPhase(isLastTier ? 'allComplete' : 'tierComplete');
       }
     }, advanceDelayMs);
   };
 
   const submitWrong = () => {
-    if (locked || phase !== 'playing') return;
+    if (!isRunning) return;
     setMistakesInTier((m) => m + 1);
   };
 
@@ -146,6 +183,7 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
     setMistakesInTier(0);
     setLocked(false);
     setPhase('playing');
+    setPausedByUser(false);
     setStarsEarned(0);
     setPrevBestStars(0);
   };
@@ -161,6 +199,7 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
     setMistakesInTier(0);
     setLocked(false);
     setPhase('playing');
+    setPausedByUser(false);
     setStarsEarned(0);
     setPrevBestStars(0);
     // T02/B5 — replaying the same tier counts as a new play for shuffling.
@@ -182,6 +221,7 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
     setMistakesInTier(0);
     setLocked(false);
     setPhase('playing');
+    setPausedByUser(false);
     setStarsEarned(0);
     setPrevBestStars(0);
     try {
@@ -208,6 +248,10 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
     xpEarned,
     prevBestStars,
     nonce,
+    isPaused: pausedByUser,
+    isRunning,
+    togglePause,
+    setOverlayOpen,
     submitCorrect,
     submitWrong,
     startNextTier,

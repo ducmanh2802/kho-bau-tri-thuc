@@ -1,0 +1,93 @@
+{
+  "steps": [
+    "A1: trò không đồng hồ \"Lật Thẻ Trí Nhớ Vàng\" → 0 nút tạm (không có gì để dừng)",
+    "A2: \"Bắt Chữ Cái Bay\" render đúng 1 nút game-pause",
+    "A2: \"Hứng Số Rơi Rộn Ràng\" render đúng 1 nút game-pause",
+    "A2: \"Đập Bóng Màu\" render đúng 1 nút game-pause",
+    "A2: \"Đường Đua Thần Tốc\" render đúng 1 nút game-pause",
+    "B1 (control): chưa tạm, bóng đã rơi — 45.3% → 61.8% sau 1 200 ms",
+    "B2: bấm tạm → 5 bóng đứng nguyên vị trí trong 1 200 ms, aria-pressed=\"true\", lớp phủ hiện",
+    "C1: đang tạm, chạm đúng bóng đích \"đ\" → bóng còn nguyên trên màn, không nhích câu, 0 lời khen (5 bóng → 5 bóng)",
+    "D1: bấm tiếp → 0 lớp phủ, aria-pressed=\"false\", bóng rơi lại 65.65% → 82.15%",
+    "C2 (đối chứng): cũng cú chạm ấy lúc đang chạy xoá đúng bóng đích \"đ\" (bóng đã mount biến mất khỏi DOM) — C1 là do trạng thái tạm, không phải bóng bấm không ăn",
+    "D2: Đường Đua bấm tạm → width: 83.3333%; giữ nguyên 1 500 ms (bé không bị trừ lỗi vì việc cắt ngang)",
+    "D3: bấm tiếp → đồng hồ chạy lại (width: 83.3333%; → width: 73.3333%;)"
+  ],
+  "errors": [],
+  "facts": {
+    "pauseButtonCount": {
+      "Lật Thẻ Trí Nhớ Vàng": 0,
+      "Bắt Chữ Cái Bay": 1,
+      "Hứng Số Rơi Rộn Ràng": 1,
+      "Đập Bóng Màu": 1,
+      "Đường Đua Thần Tốc": 1
+    },
+    "running": {
+      "before": [
+        "45.3%",
+        "65.3%"
+      ],
+      "after1200ms": [
+        "61.8%",
+        "81.8%"
+      ]
+    },
+    "targetChar": "đ",
+    "paused": {
+      "ariaPressed": "true",
+      "veilCount": 1,
+      "count": 5,
+      "atPause": [
+        "62.9%",
+        "82.9%"
+      ],
+      "after1200ms": [
+        "62.9%",
+        "82.9%"
+      ]
+    },
+    "clickWhilePaused": {
+      "targetChar": "đ",
+      "countBefore": 5,
+      "countAfterClick": 5,
+      "bubbleStillMounted": true,
+      "roundBefore": "🦉\nMàn 4/6 ▾\n· 🚀 Câu 1/7",
+      "roundAfterClick": "🦉\nMàn 4/6 ▾\n· 🚀 Câu 1/7",
+      "praiseToast": 0
+    },
+    "afterResume": {
+      "ariaPressed": "false",
+      "veil": 0,
+      "before": [
+        "65.65%",
+        "85.65%"
+      ],
+      "after1200ms": [
+        "82.15%",
+        "102.15%"
+      ]
+    },
+    "controlClickWhileRunning": {
+      "targetChar": "đ",
+      "targetBubblesBefore": 3,
+      "bubbleRemoved": true,
+      "totalAfter": 5
+    },
+    "raceRunning": {
+      "liveA": "width: 93.3333%;",
+      "liveB": "width: 83.3333%;"
+    },
+    "racePaused": {
+      "pauseA": "width: 83.3333%;",
+      "pauseB": "width: 83.3333%;"
+    },
+    "raceResumed": "width: 73.3333%;"
+  },
+  "failedAt": null,
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-02-KBT-ISSUE-43\\b3-dang-tam-dung.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-02-KBT-ISSUE-43\\d2-cho-tiep-tuc.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-02-KBT-ISSUE-43\\d3-duong-dua-tam-dung.png"
+  ],
+  "ok": true
+}

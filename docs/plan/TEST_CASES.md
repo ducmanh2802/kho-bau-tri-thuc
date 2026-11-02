@@ -12,7 +12,7 @@ Ba rule của tài liệu này (từ `docs/SDLC.md` §1 giai đoạn 4 và `docs
 2. **Verdict chỉ có sau khi chạy.** Bốn giá trị: `Pass` · `Fail` · `Blocked` · `NotRun`.
    `NotRun` **không phải** `Pass` và phải kèm lý do.
 3. **Một TC phải bắt được lỗi.** TC nào cũng phải nói được "sửa sai chỗ nào thì dòng này đỏ".
-   Hai TC đã kiểm chứng bằng cách tạm bỏ dòng kiểm (`§4`), không chỉ đoán.
+   Sáu TC đã kiểm chứng bằng cách tạm bỏ dòng kiểm (`§4`, năm phép ablation M1…M5), không chỉ đoán.
 
 ---
 
@@ -23,20 +23,24 @@ Ba rule của tài liệu này (từ `docs/SDLC.md` §1 giai đoạn 4 và `docs
 | # | Tiêu chí | Ngưỡng | Đo bằng |
 |---|---|---|---|
 | E-1 | Toàn bộ TC của lát cắt có verdict | 0 TC `NotRun` | đếm cột Verdict §3 |
-| E-2 | Cổng chất lượng | `npm run verify` EXIT=0 | `evidence/2026-11-02-T41C/verify.txt` |
-| E-3 | Test đơn vị + hợp đồng nguồn của lát cắt | 25/25 pass | `evidence/2026-11-02-T41C/mutation-baseline-t41c.txt` |
-| E-4 | Probe Playwright trên `dist/` thật | 0 console error ở 3 probe | `evidence/2026-11-02-T41C/probe-*.json` |
-| E-5 | Không chặn quá mức | có TC chứng minh hai lượt thật **vẫn** được tính 2 lần | TC-04, TC-13 |
-| E-6 | Bằng chứng nhìn thấy được khi đổi UI | 2 ảnh trước/sau của cùng một màn | `game-rewards-on.png`, `game-rewards-off.png` |
-| E-7 | Test bắt được lỗi | ≥1 phép ablation làm đỏ đúng test cần đỏ | §4, 2 phép |
+| E-2 | Cổng chất lượng | `npm run verify` EXIT=0 | `evidence/2026-11-02-T41C/verify.txt` · `evidence/2026-11-02-KBT-ISSUE-43/verify.txt` |
+| E-3 | Test đơn vị + hợp đồng nguồn của lát cắt | 25/25 pass (lát cắt 1) · 30/30 pass (lát cắt 2) | `evidence/2026-11-02-T41C/mutation-baseline-t41c.txt` · `evidence/2026-11-02-KBT-ISSUE-43/mutation-M3-clock-decision.txt` |
+| E-4 | Probe Playwright trên `dist/` thật | 0 console error ở 4 probe | `evidence/2026-11-02-T41C/probe-*.json` · `evidence/2026-11-02-KBT-ISSUE-43/probe-game-pause.json` (12 bước, `errors: []`) |
+| E-5 | Không chặn quá mức | có TC chứng minh hai lượt thật **vẫn** được tính 2 lần | TC-04, TC-13 · lát cắt 2: TC-40 (cùng cú chạm lúc **đang chạy** phải xoá bóng) |
+| E-6 | Bằng chứng nhìn thấy được khi đổi UI | 2 ảnh trước/sau của cùng một màn | `game-rewards-on.png`, `game-rewards-off.png` · `b3-dang-tam-dung.png`, `d2-cho-tiep-tuc.png` |
+| E-7 | Test bắt được lỗi | ≥1 phép ablation làm đỏ đúng test cần đỏ | §4, 5 phép (M1…M5) |
 
 ---
 
-## 2. Tầng User Story (US) — lát cắt "Chống ghi trùng & biên lai thưởng"
+## 2. Tầng User Story (US) — hai lát cắt
 
-Lát cắt chọn theo tiêu chí của khóa học: một hành trình dọc, đụng cả 5 tầng idempotency
-(evidence id · first-seen · nonce · completion · reward) và có bằng chứng thật.
+Lát cắt 1 (US-01…05) chọn theo tiêu chí của khóa học: một hành trình dọc, đụng cả 5 tầng
+idempotency (evidence id · first-seen · nonce · completion · reward) và có bằng chứng thật.
 FR/NFR nguồn: `FR-G04`, `FR-G07`, `FR-R04`, `FR-R05`, `FR-M05`, `FR-P01`, `NFR-R04`, `NFR-M04`.
+
+Lát cắt 2 (US-06, chạy đầy đủ 6 pha SDLC ngày 2026-11-02) là một hành trình dọc khác: một nút
+điều khiển **đã có trong code nhưng chưa từng render**, phải đi từ đồng hồ thuần tuý → render
+thật → hợp đồng nguồn → probe trên Chromium → ảnh. FR/NFR nguồn: `FR-G08`, `NFR-A03`, `NFR-A05`.
 
 | US | Ai · Tôi muốn · Để | FR/NFR | AC nhánh chính | AC nhánh biên | AC nhánh lỗi |
 |---|---|---|---|---|---|
@@ -45,6 +49,7 @@ FR/NFR nguồn: `FR-G04`, `FR-G07`, `FR-R04`, `FR-R05`, `FR-M05`, `FR-P01`, `NFR
 | US-03 | Bé · mở lại bảng tổng kết giữa buổi đọc · để hồ sơ kỹ năng chỉ nhận buổi đọc **một** lần. | FR-R04, NFR-R04 (completion) | Buổi đọc có `sessionId` mới ⇒ cộng dồn attempts/accuracy bình thường. | Danh sách id đã gập bị trần ở `READING_POLICY.MAX_RECENT_SESSIONS` = 30 (`src/config/policy.ts:110`). | `sessionId` lặp ⇒ `applySession` trả nguyên hồ sơ cũ; id đã gập sống qua một lần đọc lại hồ sơ. |
 | US-04 | Bé · máy hết chỗ lưu (Safari riêng tư) · để chuỗi ngày không nhảy lung tung và khiên không bị tiêu mất. | FR-M05, NFR-R01, NFR-R04 | Ghi được ⇒ bước ngày cộng đúng 1, đọc lại không cộng thêm. | Sau nhiều lần đọc vẫn chỉ 1 bước. | `setItem` ném ⇒ `writeJSON` trả `false`, bước ngày **hoàn tác**, khiên không bị tiêu, biên lai thưởng không ghi non. |
 | US-05 | Ba mẹ · tắt quỹ thưởng · để con không nhận tín hiệu "được thưởng" khi nhà đã tắt. | FR-P01, NFR-M04 | Bật thưởng ⇒ dải kết quả in đúng số vừa vào túi. | Khung hình đầu (chưa có biên lai) vẫn in số đề xuất khi thưởng đang bật. | Tắt thưởng ⇒ màn hình không còn dòng `+N Sao`/`+N XP`, thay bằng dải giải thích có `data-testid`. |
+| US-06 | Bé · đang chơi trò đếm giờ thì có việc cắt ngang · để đồng hồ đứng lại chứ không ăn điểm của bé vì lý do không liên quan bài học. | FR-G08, NFR-A03, NFR-A05 · [KBT-ISSUE-43](../issues/43-game-pause.md) — **SRS chưa có FR cấp riêng cho hành vi "Tạm dừng"** (ứng viên `FR-G10`, chưa cấp nên tổng FR/NFR trong `SRS.md` không đổi; ba ID dẫn ở đây chỉ khung được *chỗ đặt* của tính năng, Oracle thật của từng AC nằm ở cột bên) | Bấm Tạm dừng ⇒ mọi bóng/đồng hồ đứng nguyên, nút đổi thành "Tiếp tục", vùng chơi có lớp phủ "Đang tạm dừng". | Trò **không** có đồng hồ không có nút (27/31 trò); mở lớp phủ "Chọn màn" cũng đóng băng đồng hồ theo cùng một cơ chế; bấm tạm **đang lúc** mở lớp phủ thì đóng lớp phủ vẫn còn tạm. | Đang tạm mà chạm bóng ⇒ không xoá bóng, không nhích câu, không lời khen (`submitCorrect`/`submitWrong` trả sớm); trò không truyền props ⇒ `isPaused === false`, không render nút. |
 
 ---
 
@@ -83,14 +88,29 @@ Cột "Bằng chứng" trỏ tới file chạy được. Cột "Giết bởi" tr
 | TC-27 | US-05 / lỗi | e2e probe | công tắc thưởng của ba mẹ chặn tiêu Sao trên build thật | [`evidence/2026-11-02-T41C/probe-parent-controls.json`](../../evidence/2026-11-02-T41C/probe-parent-controls.json) — `ok:true`, 7 bước, 0 lỗi | `qa/parent-controls.mjs` | Pass |
 | TC-28 | US-01…05 / hồi quy | e2e probe | luồng chính của bé không vỡ sau đợt sửa | [`evidence/2026-11-02-T41C/probe-golden-path.json`](../../evidence/2026-11-02-T41C/probe-golden-path.json) — 28 bước, 0 lỗi, `removals: []` | `qa/golden-path.mjs` | Pass |
 | TC-29 | US-01 / chính | e2e ảnh | màn "VƯỢT QUA MÀN 1!" bật thưởng in `+3 Sao` `+10 XP`; tắt thưởng in dải xanh không hứa Sao | `game-rewards-on.png` · `game-rewards-off.png` (cùng thư mục evidence) | nhìn bằng mắt + TC-19/22 | Pass |
+| TC-30 | US-06 / chính | unit | `pausedByUser` ⇒ `isGameClockRunning` trả `false` | [`tests/t43-game-pause.test.ts:65`](../../tests/t43-game-pause.test.ts#L65) | bỏ `!s.pausedByUser` (`src/hooks/useGameStage.ts:24`) → **đã chứng minh §4 M3** | Pass |
+| TC-31 | US-06 / biên | unit | lớp phủ "Chọn màn" đang mở ⇒ đồng hồ đứng | [`tests/t43-game-pause.test.ts:69`](../../tests/t43-game-pause.test.ts#L69) | bỏ `!s.overlayOpen` trong `isGameClockRunning` | Pass |
+| TC-32 | US-06 / biên | unit | bấm tạm **đang lúc** mở lớp phủ ⇒ nhả lớp phủ vẫn còn tạm (không tự nhả hộ bé) | `tests/t43-game-pause.test.ts:83` | cho `overlayOpen` đè `pausedByUser` (trả `true` khi cả hai từng mở) | Pass |
+| TC-33 | US-06 / chính | UI (SSR) | `isPaused` ⇒ nút đổi "Tiếp tục trò chơi" + có lớp phủ "Đang tạm dừng"; chưa tạm ⇒ không lớp phủ | [`tests/t43-game-pause.test.ts:145`](../../tests/t43-game-pause.test.ts#L145), `:138` | wrapper vẫn tự giữ state riêng nên `isPaused` không bao giờ tới từ game | Pass |
+| TC-34 | US-06 / biên | UI (SSR) | trò **không** có đồng hồ ⇒ 0 nút tạm, 0 lớp phủ | [`tests/t43-game-pause.test.ts:154`](../../tests/t43-game-pause.test.ts#L154) | bỏ điều kiện `isRealtime` quanh nút | Pass |
+| TC-35 | US-06 / hợp đồng | source-contract | wrapper không còn tự giữ `isPaused`; nút gọi thẳng `onTogglePause`; lớp phủ có `data-testid="game-paused-veil"` | `tests/t43-game-pause.test.ts:100`, `:107`, `:112` | thêm lại `const [isPaused, setIsPaused] = React.useState` ⇒ hai nguồn sự thật | Pass |
+| TC-36 | US-06 / lỗi | unit | `submitCorrect`/`submitWrong` đều chặn theo `isRunning` (≥ 2 guard) | [`tests/t43-game-pause.test.ts:207`](../../tests/t43-game-pause.test.ts#L207) | xoá một guard `if (!isRunning) return;` → **đã chứng minh §4 M4** | Pass |
+| TC-37 | US-06 / hợp đồng | source-contract | 4 trò có đồng hồ truyền đủ `isRealtime`/`isPaused`/`onTogglePause`/`onOverlayOpenChange` và mọi hẹn giờ đọc `stage.isRunning`, không còn so `phase !== 'playing'` trần | `tests/t43-game-pause.test.ts:170`, `:180` | bỏ `isPaused=` khỏi một trò, hoặc để lại phép so `phase` trần | Pass |
+| TC-38 | US-06 / biên | unit | catalog: đúng 4 trò `isRealtime` (Đường Đua không bị bỏ quên), bất biến 31 trò không lệch | [`tests/t43-game-pause.test.ts:225`](../../tests/t43-game-pause.test.ts#L225), `:230` | bỏ `isRealtime: true` của `speed_racing` | Pass |
+| TC-39 | US-06 / chính | e2e probe | trên `dist/` thật: chưa tạm bóng rơi `3.90391% → 20.5886%`; bấm tạm ⇒ 4 bóng đứng nguyên 1 200 ms + `aria-pressed="true"` + 1 lớp phủ; bấm tiếp ⇒ bóng rơi lại; đường đếm ngược của Đường Đua đứng rồi chạy lại | [`evidence/2026-11-02-KBT-ISSUE-43/probe-game-pause.json`](../../evidence/2026-11-02-KBT-ISSUE-43/probe-game-pause.json) — `ok:true`, 12 bước, 0 lỗi (`qa/game-pause.mjs`) | game giữ `requestAnimationFrame`/`setInterval` không đọc `stage.isRunning` | Pass |
+| TC-40 | US-06 / lỗi | e2e probe | đang tạm mà chạm đúng bóng đích ⇒ bóng **còn** mount, nhãn câu không nhích, 0 lời khen — và **đối chứng**: cùng cú `dispatchEvent('click')` lúc đang chạy thì bóng đích biến mất khỏi DOM | probe steps C1 + C2 (cùng file evidence) | bỏ guard `submitCorrect` (chính là M4 nhưng ở build thật); probe hết đối chứng nếu cú chạm nào cũng vô hiệu | Pass |
+| TC-41 | US-06 / biên | e2e probe | 0 nút cho "Lật Thẻ Trí Nhớ Vàng", đúng 1 nút cho mỗi 4 trò có đồng hồ, trên build thật | probe steps A1 + A2×4 | truyền `isRealtime` cho mọi trò / cờ catalog sai | Pass |
+| TC-42 | US-06 / chính | e2e ảnh | lớp phủ "Đang tạm dừng" che bảng chơi; sau khi bấm tiếp nút trở lại ▶; Đường Đua đang tạm | `b3-dang-tam-dung.png` · `d2-cho-tiep-tuc.png` · `d3-duong-dua-tam-dung.png` | nhìn bằng mắt + TC-33 | Pass |
 
-**Đếm** (đo bằng `grep -c "^| TC-" docs/plan/TEST_CASES.md` = 29):
-29 TC — 15 unit · 4 source-contract · 6 UI (SSR) · 3 e2e probe · 1 e2e ảnh.
-Verdict: **29 Pass · 0 Fail · 0 Blocked · 0 NotRun** trong phạm vi lát cắt.
+**Đếm** (đo bằng `grep -c "^| TC-" docs/plan/TEST_CASES.md` = 42):
+42 TC — 29 của lát cắt "Chống ghi trùng & biên lai thưởng" (TC-01…29) + 13 của lát cắt
+"Nút Tạm dừng trò chơi" (TC-30…42). Theo loại, cả hai lát cắt: 20 unit · 6 source-contract ·
+8 UI (SSR) · 6 e2e probe · 2 e2e ảnh (đo bằng `grep -c` trên cột "Loại", không đếm tay).
+Verdict: **42 Pass · 0 Fail · 0 Blocked · 0 NotRun** trong phạm vi hai lát cắt (vùng ngoài lát cắt ở §5).
 
 ---
 
-## 4. Test có bắt được lỗi không — hai phép ablation đã chạy
+## 4. Test có bắt được lỗi không — năm phép ablation đã chạy
 
 Không dùng điểm coverage làm chứng cứ. Cách kiểm: **tạm bỏ đúng dòng kiểm chứng**, chạy lại test,
 test phải đỏ vì **đúng nguyên nhân**, rồi hoàn tác.
@@ -99,7 +119,12 @@ test phải đỏ vì **đúng nguyên nhân**, rồi hoàn tác.
 |---|---|---|---|---|
 | M1 | `src/services/readingEngine.ts:320` — guard `appliedSessionIds` | TC-05 `finishSession trùng sessionId không nhân đôi attempts của bậc` | `Tests 1 failed \| 24 skipped (25)` · EXIT=1 | [`mutation-M1-session-guard.txt`](../../evidence/2026-11-02-T41C/mutation-M1-session-guard.txt) |
 | M2 | `src/services/storage.ts:2140` — guard `rewardClaims` | TC-11 + TC-12 | `Tests 2 failed \| 23 passed (25)` · EXIT=1 | [`mutation-M2-reward-claim-guard.txt`](../../evidence/2026-11-02-T41C/mutation-M2-reward-claim-guard.txt) |
-| — | hoàn tác cả hai | toàn bộ lát cắt | `Tests 25 passed (25)` · EXIT=0 | [`mutation-baseline-t41c.txt`](../../evidence/2026-11-02-T41C/mutation-baseline-t41c.txt) |
+| — | hoàn tác M1+M2 | toàn bộ lát cắt 1 | `Tests 25 passed (25)` · EXIT=0 | [`mutation-baseline-t41c.txt`](../../evidence/2026-11-02-T41C/mutation-baseline-t41c.txt) |
+| M3 | `src/hooks/useGameStage.ts:24` — bỏ `!s.pausedByUser` khỏi `isGameClockRunning` | TC-30 và TC-32 (đỏ **hai** dòng: bảng sự thật *và* nhánh "tạm đang lúc mở lớp phủ") | `Tests 2 failed \| 28 passed (30)` · EXIT=1 | [`mutation-M3-clock-decision.txt`](../../evidence/2026-11-02-KBT-ISSUE-43/mutation-M3-clock-decision.txt) |
+| M4 | `src/hooks/useGameStage.ts:139` — bỏ **một** guard `if (!isRunning) return;` trong `submitCorrect` | TC-36 | `Tests 1 failed \| 29 passed (30)` · EXIT=1 | [`mutation-M4-score-guard.txt`](../../evidence/2026-11-02-KBT-ISSUE-43/mutation-M4-score-guard.txt) |
+| — | hoàn tác M3+M4 | `tests/t43-game-pause.test.ts` | `Tests 30 passed (30)` · EXIT=0 | lại bằng `npx vitest run tests/t43-game-pause.test.ts` |
+| M5 | `src/hooks/useGameStage.ts` — **không bỏ** guard, chỉ **lùi** `if (!isRunning) return;` của `submitWrong` xuống **sau** `setMistakesInTier` (phép này do review 4 lớp sinh ra: trước khi siết, test chỉ đếm `guards.length >= 2` nên vẫn xanh với lỗi thật) | TC-36 | `Tests 1 failed \| 29 passed (30)` · EXIT=1 — đỏ vì "guard không nằm ngay đầu hàm" | [`mutation-M5-guard-position.txt`](../../evidence/2026-11-02-KBT-ISSUE-43/mutation-M5-guard-position.txt) |
+| — | hoàn tác M5 + siết lại hợp đồng | `tests/t43-game-pause.test.ts` | `Tests 30 passed (30)` · EXIT=0 | `git checkout -- src/hooks/useGameStage.ts` rồi `npx vitest run tests/t43-game-pause.test.ts` |
 
 Lệnh tái lập (chạy trên máy sạch, `git checkout -- <file>` ngay sau đó):
 
@@ -110,7 +135,19 @@ npx vitest run tests/t41c-idempotency.test.ts -t "finishSession trùng"   # ph�
 npx vitest run tests/t41c-idempotency.test.ts                            # phải đỏ đúng TC-11 + TC-12
 git checkout -- src/services/readingEngine.ts src/services/storage.ts
 npx vitest run tests/t41c-idempotency.test.ts                            # phải EXIT=0, 25 passed
+
+# M3 — sửa dòng useGameStage.ts:24 thành `return s.phase === 'playing' && !s.locked && !s.overlayOpen;`
+npx vitest run tests/t43-game-pause.test.ts                              # phải đỏ đúng TC-30 + TC-32 (2 failed | 28 passed)
+# M4 — xoá MỘT guard ở useGameStage.ts:139 (trong submitCorrect)
+npx vitest run tests/t43-game-pause.test.ts                              # phải đỏ đúng TC-36 (1 failed | 29 passed)
+git checkout -- src/hooks/useGameStage.ts
+npx vitest run tests/t43-game-pause.test.ts                              # phải EXIT=0, 30 passed
+node qa/run-one.mjs qa/game-pause.mjs                                    # phải QA PASS — 12 step(s), 0 errors
 ```
+
+**M4 nói được gì và không nói được gì:** TC-36 đếm số guard (`≥ 2`) nên nó đỏ khi bỏ một guard —
+đó là **hợp đồng nguồn**, không phải hành vi. Bằng chứng hành vi "đang tạm mà chạm bóng không ăn
+điểm" là TC-40, chạy trên `dist/` thật với cả hai chiều (bóng còn nguyên khi tạm, biến mất khi chạy).
 
 ---
 
@@ -123,6 +160,11 @@ npx vitest run tests/t41c-idempotency.test.ts                            # phả
 | Tiếng Anh Kid's Box (FR-N04, FR-P08) | — | `Blocked` | Chặn ở **nguồn giáo trình**, không chặn ở code — xem `RTM.md` §8. |
 | Quyền truy cập chéo giữa hai tài khoản (kiểu test A/B của khóa học) | chưa có | `NotRun` | App chạy 100% `localStorage`, chưa có server tài nguyên ⇒ không tồn tại "tài khoản B" để mà kiểm. Chỉ áp dụng được nếu bật `cloudSync` thật (T41D). |
 | UAT Given/When/Then với phụ huynh thật | chưa có | `NotRun` | Cần người dùng thật; repo chưa có telemetry aggregate (BG-01, ADR-01). |
+| 26 trò **không** có đồng hồ | chỉ 1 trò được bấm thật để chứng minh **không** có nút tạm (TC-41, "Lật Thẻ Trí Nhớ Vàng") | `NotRun` | TC-34 chứng minh quy tắc bằng SSR cho mọi trò; chưa probe 26/31 trên `dist/` thật. Điều kiện chuyển Pass: vòng lặp qua `GAME_TITLES` trong `qa/game-pause.mjs` (chi phí: ~26 lần mount game, mỗi lần ~1 s). |
+| Nút tạm trên thiết bị chạm thật (iOS Safari / Android WebView) | chưa có | `NotRun` | Probe chạy Chromium desktop với viewport 390×844; chưa có thiết bị thật trong luồng này. |
+| Bấm tạm **đúng cửa sổ 1,1 s** sau đáp án (`advanceDelayMs`, `useGameStage.ts:144`) | chưa có | `NotRun` | Review 4 lớp finding #2 (xem `docs/issues/43-game-pause.md` §6): hẹn giờ chuyển câu không theo trạng thái tạm, chưa có bước probe nào bấm vào cửa sổ đó. Điều kiện chuyển Pass: thêm bước "chạm đáp án đúng → bấm tạm trong 300 ms → chờ 1 500 ms → câu phải chưa đổi". |
+| Bóng **đứng giữa màn** trong khoảnh `locked` (900–1200 ms sau đáp án) | chưa có | `NotRun` | Review finding #3: `isGameClockRunning` là cổng của cả effect animation ⇒ hành vi mới là cố ý (bé không bị phạt lúc chuyển câu) nhưng chưa có ảnh bằng chứng cho khoảnh đó. Điều kiện chuyển Pass: một step chụp ảnh tại `locked` trong `qa/game-pause.mjs`. |
+| Lớp phủ được **bộ đọc màn hình** báo khi tạm (`role="status"` + `aria-live`) | chưa có | `NotRun` | Đã thêm thuộc tính ARIA + hợp đồng nguồn trong `tests/t43-game-pause.test.ts:112`, nhưng chưa từng bật NVDA/VoiceOver để nghe. Điều kiện chuyển Pass: một lượt kiểm tay với trình đọc màn hình thật. |
 
 ---
 

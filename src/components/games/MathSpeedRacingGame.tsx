@@ -13,7 +13,6 @@ export const MathSpeedRacingGame: React.FC<{ onExit: () => void }> = ({ onExit }
   const roundsPerTier = useMemo(() => defaultRoundsPerTier(), []);
   const stage = useGameStage({ gameId: 'speed_racing', roundsPerTier, advanceDelayMs: 1200 });
   const [turboActive, setTurboActive] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   const questions = useMemo(() => buildRaceQuestions(stage.tier, stage.nonce), [stage.tier, stage.nonce]);
   const current = questions[stage.roundIdx];
@@ -27,12 +26,12 @@ export const MathSpeedRacingGame: React.FC<{ onExit: () => void }> = ({ onExit }
     setRemainingMs(budgetMs);
   }, [budgetMs, stage.roundIdx, stage.nonce]);
   useEffect(() => {
-    if (!budgetMs || stage.locked || stage.phase !== 'playing' || pickerOpen) return;
+    if (!budgetMs || !stage.isRunning) return;
     const tick = window.setInterval(() => {
       setRemainingMs((r) => (r === null ? null : Math.max(0, r - 100)));
     }, 100);
     return () => window.clearInterval(tick);
-  }, [budgetMs, stage.roundIdx, stage.locked, stage.phase, pickerOpen]);
+  }, [budgetMs, stage.roundIdx, stage.isRunning]);
   useEffect(() => {
     if (remainingMs !== 0) return;
     sound.playWrong();
@@ -44,7 +43,7 @@ export const MathSpeedRacingGame: React.FC<{ onExit: () => void }> = ({ onExit }
 
 
   const handleSelectOption = (num: number) => {
-    if (stage.locked) return;
+    if (!stage.isRunning) return;
     if (num === current.ans) {
       sound.playCorrect();
       sound.speak(`Chính xác! ${current.expr} bằng ${current.ans}!`);
@@ -82,7 +81,10 @@ export const MathSpeedRacingGame: React.FC<{ onExit: () => void }> = ({ onExit }
       onExit={onExit}
       instructions="Bé hãy chọn kết quả đúng của phép tính để nạp năng lượng Nitro cho xe đua!"
       audioInstruction="Hãy chọn kết quả đúng của phép tính để xe đua phóng nhanh về đích"
-      onOverlayOpenChange={setPickerOpen}
+      isRealtime
+      isPaused={stage.isPaused}
+      onTogglePause={stage.togglePause}
+      onOverlayOpenChange={stage.setOverlayOpen}
     >
       <div className="w-full h-full flex flex-col justify-between items-center bg-gradient-to-b from-slate-800 to-slate-900 rounded-3xl p-4 md:p-6 border-4 border-amber-400 text-white relative overflow-hidden select-none">
         {/* Racetrack View */}
@@ -154,10 +156,10 @@ export const MathSpeedRacingGame: React.FC<{ onExit: () => void }> = ({ onExit }
             <button
               key={opt}
               onClick={() => handleSelectOption(opt)}
-              disabled={stage.locked}
+              disabled={!stage.isRunning}
               className={`bg-gradient-to-b from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black rounded-2xl shadow-xl border-2 border-white/50 active:scale-95 transition-all cursor-pointer font-display ${
                 current.options.length > 4 ? 'py-3 px-4 text-2xl md:text-3xl' : 'py-4 px-6 text-3xl'
-              } ${stage.locked ? 'opacity-60' : ''}`}
+              } ${stage.isRunning ? '' : 'opacity-60'}`}
             >
               {opt}
             </button>

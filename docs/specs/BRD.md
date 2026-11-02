@@ -37,7 +37,7 @@ phí. Vì vậy mọi ràng buộc nghiệp vụ nghiêng về *niềm tin* (an 
 | BG-01 | Bé tự học 15–20 phút/ngày không cần người lớn | % phiên bé hoàn thành độc lập | ≥ 70% | Chưa có số liệu thật (dữ liệu nằm `localStorage`; cloud-sync là tuỳ chọn nên vẫn không có aggregate server-side — mới có fixture + demo seed) |
 | BG-02 | Chỉ rõ điểm yếu theo kỹ năng, không chỉ điểm tổng | Số kỹ năng có `mastery` đo được | ≥ 26 kỹ năng thi | ✚ 26 kỹ năng taxonomy, kho thi phủ đủ 26/26; trạng thái kỹ năng lưu ở key `kho_bau_learning_os_store` |
 | BG-03 | Không gây nhầm lẫn nội dung (sai đáp án, sai dấu, sai kiến thức) | Lỗi nội dung P0/P1 còn tồn tại | = 0 | ✚ `contentValidator` + `BANNED_WORDS`; P42/T20B đã xoá 18 WARNING |
-| BG-04 | Dùng được trên điện thoại gia đình, offline | Probe QA trên build thật | 0 lỗi console, 0 tràn ở 390px | ✚ 29 probe Playwright, `qa/mobile-golden.mjs` @390/@195px |
+| BG-04 | Dùng được trên điện thoại gia đình, offline | Probe QA trên build thật | 0 lỗi console, 0 tràn ở 390px | ✚ 30 probe Playwright (`ls qa/*.mjs qa/*.cjs`); `qa/mobile-golden.mjs` @390/@195px; probe mới `qa/game-pause.mjs` chạy trong phiên nghiệm thu 2026-11-02 → `QA PASS — 12 step(s), 0 errors` (`evidence/2026-11-02-KBT-ISSUE-43/probe-game-pause.json`) |
 | BG-05 | Phụ huynh tin tưởng về dữ liệu của con | Dữ liệu rời máy? | Không, trừ khi phụ huynh tự xuất **hoặc tự bật sync** | ✚ Mặc định chỉ localStorage; `CloudSyncService` ở `status: 'offline'` cho tới khi người lớn đăng nhập Google ([src/services/cloudSync.ts:37](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L37), `firestore.rules` chắn chéo tài khoản) |
 | BG-06 | Đổi mới nội dung không phá tiến độ cũ | Migration + sanitizer có test | 100% bước migration có test | ✚ chuỗi `MIGRATIONS` P29-v2 → P43-v1 trong `src/services/storage.ts` |
 
@@ -130,8 +130,8 @@ mặc định, GPU/3D nặng ngoài màn cờ vua.
 **Lợi ích:** bé tự học được; phụ huynh có bằng chứng thay vì cảm tính; giáo viên nhận
 được file chẩn đoán; người bảo trì không sợ "sửa nội dung là sập app".
 
-**Chi phí vận hành thực tế (đo 2026-11-02, sau T41C):** `npm run verify` gồm typecheck + 1240 test
-trong 87 file (riêng suite test ~27 s) + build + budget; probe QA cần Chromium của
+**Chi phí vận hành thực tế (đo 2026-11-02, sau merge `09511d3` lên trên KBT-ISSUE-43):** `npm run verify` gồm typecheck + 1277 test
+trong 89 file (riêng suite test 23.85 s — `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt`) + build + budget; probe QA cần Chromium của
 Playwright và `dist/`. Không có chi phí server **cho người dùng chưa bật sync**; từ khi có
 `firebase ^13.1.0`, chi phí Firestore thuộc project Firebase của người vận hành và chưa được
 đo (chưa có số liệu dùng thật, chưa thống kê hạn mức free tier).
@@ -159,8 +159,8 @@ Một bản được gọi là "phát hành được" khi:
 | Bậc độ khó mỗi trò | 6, số câu `[5, 6, 6, 7, 8, 8]` | `defaultRoundsPerTier()` trong `src/data/gameLevels.ts` |
 | Chủ đề / bài / câu nội dung học (đếm **runtime**, import array trong test tạm) | Tiếng Việt 15/58/612 · Toán 13/26/260 · Tiếng Anh 24/40/434 · Em & Cuộc sống 14/26/264 → **tổng 66 chủ đề, 150 bài, 1570 câu** | `*_TOPICS` trong `src/data/*Curriculum.ts` (đếm tĩnh bằng grep bỏ sót câu sinh qua factory) |
 | Luyện đọc | 36 đoạn · 192 câu hỏi | `READING_PASSAGES`, `READING_QUESTIONS` trong `src/data/readingContent.ts` |
-| Unit test | 87 file / 1240 test, xanh | `npx vitest run` (85 `.ts` + 2 `.tsx`) |
-| Probe trình duyệt | 29 probe (28 `.mjs` + 1 `.cjs`, không tính `lib.mjs`, `run-one.mjs`) | `ls qa/*.mjs` |
+| Unit test | 89 file / 1277 test, xanh | `npx vitest run` (87 `.ts` + 2 `.tsx`) |
+| Probe trình duyệt | 30 probe (29 `.mjs` + 1 `.cjs`, không tính `lib.mjs`, `run-one.mjs`) | `ls qa/*.mjs` |
 | Main chunk | 204.2 kB (ngân sách 600, mục tiêu 450 — **đã đạt** từ T39) | `npm run check:budget` |
 | Đồ thị chặn lần vẽ đầu | 418.5 kB = `index` 204.2 + `react-vendor` 213.6 + runtime 0.7 — T38 còn 1527.4 kB vì `firebase-vendor` + `math-bank` + `english-bank` bị nạp sẵn | `grep -o 'assets/.*\\.js' dist/index.html` + `stat` từng file |
 | Chunk vendor lớn | `three-vendor` 572.6 kB · `firebase-vendor` 723 kB · `react-vendor` 213.6 kB — tất cả ngoài entry, chỉ tải khi bé/người lớn mở đúng màn (T39) | `npm run check:budget` |

@@ -29,7 +29,7 @@ L3  Component  App.tsx (router màn hình) → 95 component .tsx → 41 service 
 ```
 
 Không có môi trường staging; `dist/` + `npm run preview` là môi trường "gần production" duy nhất,
-và đó là nơi 29 probe Playwright chạy.
+và đó là nơi 30 probe Playwright chạy.
 
 ## Tầng 3 — ADR index (18 quyết định, 6 nhóm)
 
