@@ -53,3 +53,24 @@ jobs:
 
       - name: QA probe
         run: node qa/run-one.mjs "${{ github.event.inputs.probe || 'qa/golden-path.mjs' }}"
+
+      # Log của một job Actions chỉ người có quyền admin mới tải được (`GET/…/jobs/<id>/logs` trả
+      # `403 Must have admin rights to Repository`), nên lane đã ba lần thấy bước "QA probe" đỏ mà
+      # không đọc nổi dòng lỗi. Bước này chạy **sau** khi lỗi, chép 60 dòng cuối vào
+      # `$GITHUB_STEP_SUMMARY` — summary của check-run đọc được qua API **không cần quyền**, nên
+      # nguyên nhân trở nên quan sát được mà không phải đoán. Không đổi code probe ở đây.
+      - name: Chép lỗi probe vào summary (đọc được không cần admin)
+        if: failure()
+        env:
+          PROBE: ${{ github.event.inputs.probe || 'qa/golden-path.mjs' }}
+        run: |
+          {
+            echo "## Probe do: \`$PROBE\`"
+            echo "- runner: $(uname -sr) · node $(node -v) · npm $(npm -v)"
+            echo "- playwright: $(npx playwright --version 2>&1 || echo khong chay duoc)"
+            echo "- dist: $(find dist -maxdepth 1 -type f 2>/dev/null | wc -l) file goc"
+            echo '```'
+            node qa/run-one.mjs "$PROBE" 2>&1 | tail -60
+            echo "exit_cua_lot_chay_nay=${PIPESTATUS[0]}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
