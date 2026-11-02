@@ -89,6 +89,9 @@ npx vitest run tests/t31-bug-hunt-fixes.test.ts # 21 passed (21)
 node qa/run-one.mjs qa/golden-path.mjs    → QA PASS — 28 step(s), 0 errors
 node qa/run-one.mjs qa/focus.mjs          → QA PASS, errors: [] (dialog "parent" vẫn vào)
 node qa/run-one.mjs qa/mobile-golden.mjs  → QA PASS, leg parentMode open:true
+node qa/run-one.mjs qa/offline-pwa.mjs    → QA PASS — 10 step(s), 0 errors
+                                            (nhánh service worker: offlineContent/offlineAnswering/
+                                            backOnline/cacheWipeSurvival, xpBefore 0 → xpAfter 0)
 npm run verify                             → EXIT=0 · 90 file / 1286 test · 22.18s
                                              main chunk index-TgwkX59u.js = 204.2 kB PASS
 ```
@@ -128,10 +131,57 @@ So với chữ ký lỗi cũ: run 41508824890 chết ở `locator.click` trên "
 phụ huynh không mở; từ đó tới nay chưa run nào lặp lại. Đây là lượt **xanh thứ hai trong lịch sử
 của cổng** và là lượt **xanh đầu tiên trên commit chứa bản sửa app**.
 
+Lượt thứ ba, trên chính commit ghi bằng chứng này — `c9fd2b4` (docs/evidence, `src/` và `qa/`
+không đổi): run **41516820864** (job 125522382222) **success** 20:10:54Z→20:13:01Z = **127 s** ·
+run 41516820781 `typecheck + tests` (job 125522381402) **success** · run 41516821097
+`build + bundle budget` (job 125522382990) **success** ⇒ **3/9 lượt xanh, và là 2 lượt xanh liên
+tiếp đầu tiên**. Lệnh đọc (phải dùng **SHA đầy đủ** — API 404 với SHA viết tắt):
+`curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/c9fd2b41ef52a37b81e7a3945b062193b0d06d4a/check-runs`.
+
 ## 7. còn mở
 
-- `continue-on-error: true` **vẫn để nguyên**: mới có hai lượt xanh (một trên `afb9eeb` trước khi
-  biết nguyên nhân, một trên `2d2ca27`) — quy ước là phải thấy vài lượt xanh liên tiếp.
+- `continue-on-error: true` **vẫn để nguyên** qua hai commit đầu (`2d2ca27`, `c9fd2b4`): quy ước
+  trong `03-qa-browser.yml:29` là "xanh liên tiếp vài lần trên main" rồi mới bỏ. Kế hoạch đã chốt
+  cho lane này: nếu **đợt push kế tiếp** xanh nữa (tức 3 lượt liên tiếp) thì bỏ cờ đó trong một
+  commit `ci(qa)` riêng, để từ đó probe đỏ làm **cả run đỏ** thay vì bị che.
+- Hook **pre-push trượt một lần, rồi đạt ngay lần bấm lại**: `git push` đầu tiên in
+  `✖ Pre-push: verify:quick thất bại`, chạy `npm run verify:quick` độc lập ⇒ **EXIT=0**
+  (90 file / 1286 test / `Duration 22.34s`), push lại ⇒ `✔ Pre-push: passed`. Vì lệnh lúc đó dùng
+  `| tail -3` nên **không giữ được dòng lỗi thật** — đúng cái bẫy §2 của tài liệu này (cắt output
+  thì mất chứng cứ). Không kết luận là "flake" cho tới khi lần kế tiếp giữ được log; xem thêm
+  `full-suite-timeout-flakes` trong hồ sơ nợ.
 - Tag `v1.1.0` vẫn ở `77d90ce` (predate toàn bộ sửa lỗi QA). **Di chuyển tag đã publish là thao tác
   shared-state**; người giữ repo quyết, kèm chữ ký Go/No-Go (`docs/lifecycle/07_RELEASE_OPERATIONS.md` §3).
 
+
+## 8. Tự soát hồ sơ đợt ba (sửa 4 chỗ sau khi viết xong)
+
+Cổng đo lại trên working tree chỉ đổi tài liệu: `npm run verify` **EXIT=0** · `Test Files 90
+passed (90)` · `Tests 1286 passed (1286)` · `Duration 23.85s` · `Main chunk: index-TgwkX59u.js =
+204.2 kB → PASS (meets 450 kB goal)` ⇒ trùng số liệu §5/§6, chỉ `Duration` khác (tải máy); bốn
+lượt đo trong ngày: 22.18s / 25.61s / 22.34s / 23.85s trên cùng 90 file / 1286 test / cùng entry.
+`node …/measure.mjs --vitest-out -` ⇒ **exit 0** "docs khớp số đo hiện trạng"; VI-TEXT ⇒ 24 file
+0 findings (kèm `evidence/2026-11-03-QA-RACE` 6 file 0 findings).
+
+Bốn chỗ tự bắt được và sửa (không phải số liệu, là **hình thức và tính thật** của hồ sơ):
+
+1. `docs/plan/TASK_PLAN.md` §II dòng "CI xanh trên đúng commit chứa bản sửa" dẫn "run id liệt kê
+   trong `docs/SDLC.md` §3" — **sai mục**: `awk 'NR<=160 && /^## /' docs/SDLC.md` ⇒ §3 là "Bất
+   biến kiến trúc" (dòng 72), bảng gate ở **§4 "Bộ gate tự động"** (dòng 102). Đã đổi thành §4
+   (và sửa lỗi chính tả "liệt kế" → "liệt kê").
+2. Hai dòng bảng của `TASK_PLAN.md` §II có **cột bị xé** vì một ký tự `|` trần nằm trong code
+   span: `` `git tag | wc -l` `` (dòng 141) và `` `| tee` `` (dòng 151). GFM cắt ô tại mọi `|` kể
+   cả trong code span. Escape `\|` sẽ in ra `\|` trong command nên **không dùng escape**, mà viết
+   lại để câu vẫn tái tạo được số: "số dòng của `git tag` lúc đó = 0" và "ống `tee` nuốt exit
+   code". Kiểm bằng script đếm `|` không đứng sau backslash cho từng dòng bảng: mọi bảng trong 10
+   file sửa đợt này khớp số cột của header (một chỗ duy nhất lệch là `docs/issues/43-game-pause.md`
+   dòng 128 — ô cuối thiếu `|` đóng, GFM vẫn chấp nhận; cái thật sự thừa là `|` ở **cuối dòng
+   129**, thuộc một paragraph nối nên in ra ký tự đứng — đã bỏ).
+3. `docs/issues/43-game-pause.md` §5 ô "6 Phát hành" vẫn ghi "**CI phía server chưa chạy lại trên
+   commit chứa bản sửa đợt ba**" — **hạn chế rồi, không còn đúng** sau hai run ở §6. Đã viết lại:
+   vế đó **đã đóng** (run 41515106575 · 41516820864), ô còn mở thu lại còn **hai** (chữ ký
+   Go/No-Go + tag `v1.1.0` ở `77d90ce`). Checkbox "CI xanh trên commit được tag" vẫn để trống vì
+   điều kiện ghi trong ô là *trên commit được tag*, không phải *trên `main`*.
+4. Cùng lý do, `docs/SDLC.md` / `TEST_PLAN.md` §16 dòng 13 / `.ai/CURRENT.md` / `07_RELEASE_OPERATIONS.md`
+   phải thống nhất một tỷ lệ: **3/9 lượt xanh** (6 đỏ · 3 xanh, hai lượt sau liên tiếp). Không
+   dùng lại con số "2/8" của dòng lịch sử `2d2ca27` cho tuyên bố hiện trạng.

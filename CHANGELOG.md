@@ -35,9 +35,10 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   "repaintedAfterFirstFrame":9}` — đề mồi biến mất, mỗi lần mở vẫn đổi đề.
   **Ô CI đã đóng:** `3. Browser QA` chạy trên đúng commit chứa bản sửa (`2d2ca27`, run 41515106575,
   job 125516556497) — `check-run.conclusion = success`, bước 7 "QA probe" `success` sau 66 s, bước
-  chẩn đoán `skipped` vì không có lỗi; 2 annotation chỉ là cảnh báo runner. Đây là lượt xanh
-  **thứ hai** của cổng và là lượt đầu tiên có bản sửa app bên trong; `continue-on-error: true` vẫn
-  giữ vì mới hai lượt.
+  chẩn đoán `skipped` vì không có lỗi; 2 annotation chỉ là cảnh báo runner. Lượt thứ ba trên `c9fd2b4`
+  (run 41516820864, job 125522382222) cũng `success` sau 127 s ⇒ cổng đạt **3/9 lượt xanh và là 2 lượt
+  liên tiếp đầu tiên**; `continue-on-error: true` vẫn giữ theo `03-qa-browser.yml:29` ("xanh liên tiếp
+  vài lần") — dự kiến bỏ ở đợt push kế tiếp nếu vẫn xanh.
 - **`3. Browser QA` chưa từng xanh trên CI — nguyên nhân thật là race overlay, không phải app.**
   Bốn lần chạy đỏ ở bước "QA probe" (41488045102 `66e0fea` · 41490451074 `77d90ce` ·
   41493791252 `2db8715` · 41496530836 `e777457`) và không ai đọc được dòng lỗi vì

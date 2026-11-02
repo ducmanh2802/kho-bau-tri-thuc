@@ -6,8 +6,9 @@
 5–114 ms). Đã sửa `ParentDashboardModal.tsx` (`useMemo` + reset tại render) và cho probe tự vệ
 (`unlockParentDashboard` trong `qa/lib.mjs` — nộp rồi **chờ cổng đóng**). 4/4 `golden-path` xanh,
 `focus`/`mobile-golden` xanh, `verify` EXIT=0. **`3. Browser QA` đã xanh trên đúng commit chứa bản
-sửa** (run 41515106575 / job 125516556497, bước 7 "QA probe" success sau 66 s) — lượt xanh thứ hai
-của cổng, lượt đầu tiên có fix app bên trong; `continue-on-error` vẫn bật vì mới hai lượt.
+sửa** (run 41515106575 / job 125516556497, bước 7 "QA probe" success sau 66 s; lượt ba `c9fd2b4` run
+41516820864 success 127 s) ⇒ **3/9 lượt, 2 lượt liên tiếp**; `continue-on-error` vẫn bật vì chưa đủ
+chuỗi.
 Cập nhật trước đó: 2026-11-03 (đợt hai) — xanh lần đầu trên `afb9eeb` rồi đỏ lại trên `8e6f9f5`
 docs-only ⇒ cổng QA intermittent; (đợt một) P42/T01 hotfix certified 2026-10-14.
 
@@ -97,7 +98,7 @@ lỗi ứng dụng "đề cổng phụ huynh vẽ muộn" (mục trên đầu fi
 run 41515106575, bước 7 "QA probe" `success` 66 s) — xem §6 của chính file evidence đó.
 Việc còn mở của repo (không thuộc lát
 cắt này): T41D (merge cloud sync + race đăng nhập), T41E (cổng QA + service worker — `3. Browser QA`
-mới xanh **một** lần và đỏ lại **hai** lần nên `continue-on-error: true` vẫn để nguyên, và service worker chưa kiểm sau đổi probe),
+mới **3/9 lượt xanh** (6 đỏ · 3 xanh, hai lượt sau liên tiếp) nên `continue-on-error: true` vẫn để nguyên; service worker đã kiểm lại sau đổi probe — `qa/offline-pwa.mjs` QA PASS 10 step / 0 errors),
 8 item "Hệ quả
 chưa đóng" ở `docs/plan/TASK_PLAN.md`.
 

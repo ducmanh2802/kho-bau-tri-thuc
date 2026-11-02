@@ -126,7 +126,7 @@ Cài tự động qua `prepare` khi chạy `npm install`. Nếu bạn clone bằ
 |---|---|---|---|
 | `1. Quality` | PR + push `main` | `npm ci` → typecheck → `test:ci` | **có** |
 | `2. Build + artifact` | PR + push `main` | build → check budget → upload `dist-*` (giữ 14 ngày) | **có** |
-| `3. Browser QA` | PR + push `main` | build `dist/` trong job, cài Chromium, chạy probe | **có, nhưng chưa đóng chắc** — 2/7 lượt xanh: lần đầu ngày 2026-11-03 (run 41501753363 trên `afb9eeb`, 63 s), rồi **đỏ ở run 41504913606 trên `8e6f9f5`** (commit chỉ sửa docs) và **đỏ ở run 41508824890 trên `80c7e39`** ⇒ intermittent; nguyên nhân thật đã bắt được ở đợt ba (đề cổng phụ huynh vẽ muộn hơn khung hình đầu — lỗi app, xem `evidence/2026-11-03-QA-RACE/ci-gate-race.txt`) và **lượt xanh thứ hai đúng là run trên commit chứa bản sửa** (`2d2ca27`, run 41515106575, 66 s, bước 7 `QA probe` success) ⇒ chưa bỏ `continue-on-error: true` vì mới hai lượt |
+| `3. Browser QA` | PR + push `main` | build `dist/` trong job, cài Chromium, chạy probe | **có, nhưng chưa đóng chắc** — **3/9 lượt xanh** (6 đỏ: 41488045102 `66e0fea` · 41490451074 `77d90ce` · 41493791252 `2db8715` · 41496530836 `e777457` · 41504913606 `8e6f9f5` · 41508824890 `80c7e39`; 3 xanh: 41501753363 `afb9eeb` 63 s · 41515106575 `2d2ca27` 66 s · 41516820864 `c9fd2b4` 127 s; **hai lượt cuối liên tiếp nhau**). Nguyên nhân thật của lần đỏ cuối nằm ở **app** — đề cổng phụ huynh vẽ muộn hơn khung hình đầu (xem `evidence/2026-11-03-QA-RACE/ci-gate-race.txt`), và lượt xanh thứ hai đúng là run trên commit chứa bản sửa ⇒ chưa bỏ `continue-on-error: true` vì mới hai lượt |
 | `4. Release` | tag `v*.*.*` | full gate → zip → GitHub Release | n/a |
 
 Hai điểm phải hiểu để không mất thời gian debug:
