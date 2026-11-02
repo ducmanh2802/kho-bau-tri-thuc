@@ -41,11 +41,12 @@ jobs:
       - name: Install
         run: npm ci --no-audit --no-fund
 
-      - name: Download dist artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-${{ github.event.pull_request.number || github.sha }}
-          path: dist
+      # `actions/download-artifact@v4` chỉ thấy artefact của **cùng một workflow run**. Artefact
+      # `dist-<sha>` được "2. Build + artifact" upload ở một run khác, nên bước này chưa bao giờ
+      # lấy được `dist/` trên runner — job chết ngay đây và `continue-on-error` che thành "success".
+      # Build trực tiếp (~1 phút) đánh đổi bằng việc probe thật sự chạy được trên CI.
+      - name: Build
+        run: npm run build --silent
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
