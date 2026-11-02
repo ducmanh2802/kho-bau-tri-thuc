@@ -1,0 +1,63 @@
+KBT-ISSUE-43 — phep ablation M5: guard van du, nhung dat sai cho (review 4 lop, finding #1)
+Dong bi doi  : src/hooks/useGameStage.ts  submitWrong() — day `if (!isRunning) return;` xuong SAU setMistakesInTier
+Lenh         : npx vitest run tests/t43-game-pause.test.ts
+Hoan tac     : git checkout -- src/hooks/useGameStage.ts (chay ngay sau do)
+Y nghia      : phep thu TRUOC khi siet chi dem guard (>=2) van XANH voi loi nay; sau khi siet theo vi tri thi do dung TC-36.
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+ ❯ tests/t43-game-pause.test.ts (30 tests | 1 failed) 41ms
+   ✓ KBT-43 — hàm quyết định đồng hồ chạy hay đứng (bảng sự thật) (7)
+     ✓ đang chơi, không khoá, không tạm, không lớp phủ ⇒ đồng hồ chạy 2ms
+     ✓ bé bấm tạm dừng ⇒ đồng hồ đứng 0ms
+     ✓ lớp phủ "Chọn màn" đang mở ⇒ đồng hồ đứng (bé không bị trôi màn khi đang chọn) 0ms
+     ✓ đợi chuyển câu (locked) ⇒ đồng hồ đứng, và nhả khoá thì chạy lại 0ms
+     ✓ màn đã xong (tierComplete / allComplete) ⇒ đồng hồ đứng 0ms
+     ✓ bấm tạm ĐANG LÚC mở lớp phủ thì nhả lớp phủ vẫn còn tạm (không tự nhả hộ bé) 0ms
+     ✓ hàm là thuần tuý: cùng đầu vào cho cùng kết quả, không đọc đồng hồ hay state ngoài 0ms
+   ✓ KBT-43 — GameModalWrapper: một nguồn sự thật cho trạng thái tạm dừng (5)
+     ✓ wrapper không còn tự giữ state isPaused (đó chính là lý do đường cũ chết) 1ms
+     ✓ nút bấm gọi thẳng handler của game và không còn tự đảo state cục bộ 0ms
+     ✓ lớp phủ "Đang tạm dừng" có testid ổn định để probe không phụ thuộc câu chữ 0ms
+     ✓ nhãn nút đổi theo trạng thái để bé và bộ đọc màn hình biết đang ở đâu 0ms
+     ✓ đóng bảng chơi giữa lúc tạm thì báo về game để đồng hồ không bị treo vĩnh viễn 0ms
+   ✓ KBT-43 — render thật: nút chỉ xuất hiện với trò có đồng hồ (3)
+     ✓ trò có đồng hồ ⇒ render đúng một nút game-pause 14ms
+     ✓ trò có đồng hồ ĐANG tạm ⇒ nút thành "Tiếp tục" và vùng chơi có lớp phủ 3ms
+     ✓ trò KHÔNG có đồng hồ ⇒ không có nút tạm (không có gì để dừng) 2ms
+   ✓ KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunning (9)
+     ✓ catch_letters: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper 1ms
+     ✓ catch_letters: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần 1ms
+     ✓ falling_numbers: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper 1ms
+     ✓ falling_numbers: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần 0ms
+     ✓ color_balloon: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper 0ms
+     ✓ color_balloon: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần 0ms
+     ✓ speed_racing: truyền đủ isRealtime + trạng thái tạm + callback cho wrapper 0ms
+     ✓ speed_racing: mọi hẹn giờ và cú chạm đọc isRunning, không còn đọc phase trần 1ms
+     ✓ đường chạm của trò bắt bóng cũng bị chặn khi tạm (không farm đáp án lúc dừng) 1ms
+   ❯ KBT-43 — hook sở hữu đồng hồ và tự nhả tạm khi sang màn (4)
+     ✓ hook trả về isRunning/isPaused/togglePause/setOverlayOpen cho game đọc 0ms
+     × submitCorrect/submitWrong chặn theo isRunning — tạm là không tính điểm 7ms
+     ✓ sang màn / chơi lại / nhảy màn đều nhả trạng thái tạm của bé 0ms
+     ✓ hàm quyết định không đọc Date.now hay state ngoài (test phải tất định được) 0ms
+   ✓ KBT-43 — catalog: cờ isRealtime phải chỉ đúng trò có đồng hồ (2)
+     ✓ đúng 4 trò có đồng hồ, và Đường Đua (bị trừ lỗi khi hết giờ) không bị bỏ quên 0ms
+     ✓ thêm cờ không làm lệch bất biến 4 danh sách đăng ký trò chơi 0ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/t43-game-pause.test.ts > KBT-43 — hook sở hữu đồng hồ và tự nhả tạm khi sang màn > submitCorrect/submitWrong chặn theo isRunning — tạm là không tính điểm
+AssertionError: submitWrong: guard không nằm ngay đầu hàm: expected false to be true // Object.is equality
+- Expected
++ Received
+- true
++ false
+ ❯ tests/t43-game-pause.test.ts:237:9
+    235|         new RegExp(`const ${fn} = [^=]*=> \\{\\s*if \\(!isRunning\\) r…
+    236|         `${fn}: guard không nằm ngay đầu hàm`
+    237|       ).toBe(true);
+       |         ^
+    238|     }
+    239|   });
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+ Test Files  1 failed (1)
+      Tests  1 failed | 29 passed (30)
+   Start at  22:43:38
+   Duration  977ms (import 47%, transform 45%, tests 6%, worker 2%)

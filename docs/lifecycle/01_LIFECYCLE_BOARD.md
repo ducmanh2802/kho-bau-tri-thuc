@@ -43,11 +43,11 @@ thì để trống và ghi lý do — không viết "sẽ làm".
 
 | Lớp | Nội dung | Artifact / lệnh |
 |---|---|---|
-| Deliverable | TEST_PLAN 10 lớp, TEST_CASES 42 TC có verdict (hai lát cắt) · catalog 4 phép ablation | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) · [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md) |
+| Deliverable | TEST_PLAN 10 lớp, TEST_CASES 42 TC có verdict (hai lát cắt) · catalog 5 phép ablation | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) · [`../plan/TEST_CASES.md`](../plan/TEST_CASES.md) |
 | Quality gate | `npm run verify` EXIT=0; UI đổi phải có ảnh/probe; test phải chứng minh bắt được lỗi | [`evidence/2026-11-02-T41C/`](../../evidence/README.md) · [`evidence/2026-11-02-KBT-ISSUE-43/`](../../evidence/README.md) |
 | AI Level | **Mức 2** — AI sinh test, expected lấy từ AC do người duyệt. *Deviation:* ở các đợt sớm người duyệt không tách AC 3 nhánh ⇒ xem `06_VERIFICATION_VALIDATION.md` §4 | `TEST_CASES.md` §2 |
 | RACI | R: agent · A: người giữ repo quyết oracle · C: — | — |
-| Metrics | 88 test file / 1270 test / suite 30.69 s · 30 probe · 4 phép ablation làm đỏ đúng test | `verify.txt` · `mutation-M*.txt` |
+| Metrics | 88 test file / 1272 test / suite 21.55 s · 30 probe · 5 phép ablation làm đỏ đúng test | `verify.txt` · `mutation-M*.txt` |
 
 ### Pha 5 — Release (Phát hành)
 

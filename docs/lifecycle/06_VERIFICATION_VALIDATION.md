@@ -46,10 +46,12 @@ test phải đỏ vì đúng nguyên nhân, rồi hoàn tác.
 | M3 | `useGameStage.ts:24` bỏ `!s.pausedByUser` | TC-30, TC-32 | `2 failed \| 28 passed`, EXIT=1 | `mutation-M3-clock-decision.txt` |
 | M4 | `useGameStage.ts:139` bỏ một guard `if (!isRunning) return;` | TC-36 | `1 failed \| 29 passed`, EXIT=1 | `mutation-M4-score-guard.txt` |
 | — | hoàn tác M3+M4 | lát cắt 2 | `30 passed`, EXIT=0 | chạy lại `npx vitest run tests/t43-game-pause.test.ts` |
+| M5 | `useGameStage.ts` — **lùi** guard của `submitWrong` xuống sau `setMistakesInTier` (không bỏ dòng nào; sinh ra từ review 4 lớp vì test cũ chỉ đếm guard `>= 2`) | TC-36 | `1 failed \| 29 passed`, EXIT=1 | `mutation-M5-guard-position.txt` |
+| — | hoàn tác M5 + siết hợp đồng theo vị trí | lát cắt 2 | `30 passed`, EXIT=0 | chạy lại `npx vitest run tests/t43-game-pause.test.ts` |
 
 Công cụ mutation chạy tự động (Stryker…) **chưa** được tích hợp — thêm dependency phải hỏi trước
-(`AGENTS.md` §1.4), nên dùng ablation thủ công cho các rule then chốt. Số phép ablation đã chạy: **4**
-(M1…M4, hai lát cắt).
+(`AGENTS.md` §1.4), nên dùng ablation thủ công cho các rule then chốt. Số phép ablation đã chạy: **5**
+(M1…M5, hai lát cắt).
 
 ## 5. Test ở đâu trong pipeline
 
@@ -57,7 +59,7 @@ Công cụ mutation chạy tự động (Stryker…) **chưa** được tích h�
 |---|---|---|---|
 | Pre-commit | mỗi commit | typecheck | giây |
 | Pre-push | mỗi push | `verify:quick` | ~1 phút |
-| PR/push (workflow 01) | mỗi push/PR | typecheck + `test:ci` (1270 test) | 30.69 s cho phần test (`evidence/2026-11-02-KBT-ISSUE-43/verify.txt`) |
+| PR/push (workflow 01) | mỗi push/PR | typecheck + `test:ci` (1272 test) | 21.55 s cho phần test (`evidence/2026-11-02-KBT-ISSUE-43/verify.txt`) |
 | Build (workflow 02) | mỗi push/PR | build + `check:budget` | phút |
 | Browser (workflow 03) | mỗi push/PR | probe Playwright trên `dist/` | phút |
 | Release (workflow 04) | tag `v*.*.*` | build artifact + zip + GitHub Release | **chưa từng chạy** (không có tag) |

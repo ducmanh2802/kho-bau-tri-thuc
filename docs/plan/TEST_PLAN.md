@@ -5,8 +5,8 @@
 > coi là xanh**. Danh sách yêu cầu cần kiểm: [`SRS.md`](../specs/SRS.md); ánh xạ
 > yêu cầu ↔ test ↔ probe ↔ gate: [`RTM.md`](../specs/RTM.md); quy trình: [`../SDLC.md`](../SDLC.md).
 >
-> **Số liệu chốt 2026-11-02** (đo lại sau **KBT-ISSUE-43** — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` 30 test và probe `qa/game-pause.mjs`; đợt đo trước trong cùng ngày là T41C — bốn đường ghi tiến trình chỉ tính một lần: bằng liệu trùng chặn trước khi cộng, buổi đọc có dấu đã gập, bước ngày hoàn tác khi ghi hỏng, mỗi lượt chơi một biên lai; trước đó là T41B cửa sổ cân bằng môn và nhãn ngày trong báo cáo Ba Mẹ theo đồng hồ của caller + lịch địa phương, T41A công tắc phần thưởng chặn đúng tài nguyên, T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, T39 cắt lần tải đầu): 88 file test / 1270 test ·
-> 30 probe (29 `.mjs` + 1 `.cjs`) · 4 workflow CI · 3 git hook · main chunk `index-ChC_Vk9W.js`
+> **Số liệu chốt 2026-11-02** (đo lại sau **KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review** — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` 30 test và probe `qa/game-pause.mjs`; đợt đo trước trong cùng ngày là T41C — bốn đường ghi tiến trình chỉ tính một lần: bằng liệu trùng chặn trước khi cộng, buổi đọc có dấu đã gập, bước ngày hoàn tác khi ghi hỏng, mỗi lượt chơi một biên lai; trước đó là T41B cửa sổ cân bằng môn và nhãn ngày trong báo cáo Ba Mẹ theo đồng hồ của caller + lịch địa phương, T41A công tắc phần thưởng chặn đúng tài nguyên, T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, T39 cắt lần tải đầu): 88 file test / 1272 test ·
+> 30 probe (29 `.mjs` + 1 `.cjs`) · 4 workflow CI · 3 git hook · main chunk `index-qnZ3EVTS.js`
 > 204.2 kB / trần 600 kB / **mục tiêu 450 kB đã đạt**; đồ thị chặn lần vẽ đầu 418.5 kB (trần 500 kB
 > do `tests/t39-first-load-graph.test.ts` giữ); vendor ngoài entry và ngoài boot graph: `three-vendor` 572.6 kB, `firebase-vendor` 723.0 kB.
 
@@ -36,7 +36,7 @@ Lớp 5  Người lớn đọc to + beta trẻ thật          → §11   (2 phi
 Lớp 4  Thiết bị thật: Android/iOS, offline, audio → §7    (qa/mobile.mjs + tay người)
 Lớp 3  Probe trình duyệt trên dist/ (30 probe)    → §6    (npm run qa:smoke)
 Lớp 2  Build + ngân sách + precache               → §9    (npm run build && npm run check:budget)
-Lớp 1  Unit/integration Vitest (1270 test)        → §5    (npm run test:ci)
+Lớp 1  Unit/integration Vitest (1272 test)        → §5    (npm run test:ci)
 ────────────────────────────────────────────────────────────────────────────────────────────
               npm run verify = typecheck + Lớp 1 + Lớp 2   ← cổng duy nhất
 ```
@@ -218,7 +218,7 @@ không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại 
 | Precache | `tests/sw-precache.test.ts`, `qa/offline-pwa.mjs` | manifest đủ `/assets/*`; placeholder dev ⇒ danh sách rỗng nhưng SW vẫn sống | — |
 | Loại trừ | `node_modules`, `.git`, `dist` không vào manifest | — | — |
 
-**Số đo gần nhất (2026-11-02, sau KBT-ISSUE-43):** `index-ChC_Vk9W.js = 204.2 kB` → PASS trần 600 kB và **đã đạt** mục tiêu 450 kB (T39). Boot graph: 418.5 kB (3 file).
+**Số đo gần nhất (2026-11-02, sau KBT-ISSUE-43):** `index-qnZ3EVTS.js = 204.2 kB` → PASS trần 600 kB và **đã đạt** mục tiêu 450 kB (T39). Boot graph: 418.5 kB (3 file).
 
 ---
 

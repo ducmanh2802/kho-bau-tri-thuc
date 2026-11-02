@@ -28,7 +28,7 @@
 | Git | `scripts/hooks/pre-commit` | commit khi typecheck đỏ | có |
 | Git | `scripts/hooks/commit-msg` | message ngoài Conventional Commits | có |
 | Git | `scripts/hooks/pre-push` | push khi `verify:quick` đỏ | có |
-| CI | workflow `01-quality` | typecheck + 1270 test | có, mỗi push/PR |
+| CI | workflow `01-quality` | typecheck + 1272 test | có, mỗi push/PR |
 | CI | workflow `02-build-artifact` | build + `check:budget` (entry ≤ 600 kB) | có |
 | CI | workflow `03-qa-browser` | 30 probe Playwright trên `dist/` | có |
 | CI | workflow `04-release` | tag sai dạng `vX.Y.Z` bị từ chối | **chưa lần nào** — repo chưa có tag |
@@ -40,7 +40,7 @@
 | Runtime | `writeJSON → boolean` | ghi hỏng bị im lặng | có — T41C |
 | Cloud | `firestore.rules` | đọc/ghi hồ sơ của uid khác | có file, **chưa test end-to-end** (mock thôi) |
 
-**Đếm sensor:** 3 hook · 4 workflow · 88 test file / 1270 test · 30 probe · 1 rules file.
+**Đếm sensor:** 3 hook · 4 workflow · 88 test file / 1272 test · 30 probe · 1 rules file.
 
 ## 3. Memory — cái nhớ giữa các phiên (và vì sao nó gọn)
 
@@ -60,7 +60,7 @@ không ghi bài fix đã commit. Ghi ba loại: *thói quen của người*, *c�
 | H-2 | Không có PR thật ⇒ G-2 "review ở phiên độc lập" dựa vào người, không vào nền tảng | một người vừa viết vừa duyệt | sub-agent `kbt-reviewer` chỉ-đọc | `09` §4 mục 3.1 |
 | H-3 | `firestore.rules` chưa được test end-to-end | quyền chỉ chắn trên giấy một nửa | mock test + đọc rules | T41D |
 | H-4 | Probe deep-flow flaky vì timing | bỏ sót lỗi hoặc tốn công vô ích | chạy lại 1 lần + dán `errors[]`/`failedAt` (`TEST_PLAN.md` §5) | `09` §4 mục 3.2 (nightly) |
-| H-5 | Không có mutation tự động | test không bắt được lỗi tinh vi | ablation thủ công cho rule then chốt (4 phép đã chạy: M1…M4) | `CHECKLIST.md` C-08 |
+| H-5 | Không có mutation tự động | test không bắt được lỗi tinh vi | ablation thủ công cho rule then chốt (5 phép đã chạy: M1…M5) | `CHECKLIST.md` C-08 |
 
 ## 5. Mapping khi sang công cụ khác
 

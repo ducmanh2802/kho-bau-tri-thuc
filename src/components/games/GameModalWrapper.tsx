@@ -550,6 +550,9 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
           {isRealtime && isPaused && (
             <div
               data-testid="game-paused-veil"
+              role="status"
+              aria-live="polite"
+              aria-label="Đang tạm dừng"
               className="absolute inset-0 z-20 bg-slate-900/70 backdrop-blur-sm flex flex-col items-center justify-center gap-1 text-center p-4"
             >
               <Pause className="w-10 h-10 text-amber-200" aria-hidden="true" />

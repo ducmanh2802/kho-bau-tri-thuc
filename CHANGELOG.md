@@ -84,6 +84,16 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   rơi thêm `data-testid="falling-item"` để probe chọn được vật thể thật thay vì đoán toạ độ.
 
 ### Changed
+- **Hợp nhất `origin/main` và giữ cho `npm ci` chạy được (KBT-ISSUE-43, commit merge `c8a3725`):**
+  lane khác (`1338ca2`) xoá `package-lock.json` (3331 dòng) trong khi cả 4 workflow vẫn chạy
+  `npm ci --no-audit --no-fund` — kiểm bằng `git ls-tree --name-only origin/main | grep lock`
+  (chỉ còn `bun.lock`) ⇒ CI chết ngay bước cài đặt; và `"build": "NODE_ENV=production vite build"`
+  là cú pháp `cmd.exe` không nhận trên Windows — kiểm bằng
+  `cmd //c 'NODE_ENV=production node -e "console.log(1)"'` ⇒ `'NODE_ENV' is not recognized as an
+  internal or external command` ⇒ `npm run build`/`npm run verify` hỏng trên máy phát triển.
+  Merge giữ lại lockfile và trả build về `vite build` (Vite tự đặt mode production khi build).
+  **Hệ quả đo được:** số test tăng **1270 → 1272** (hai test của lane kia trong
+  `tests/t31-bug-hunt-fixes.test.ts`), entry đổi hash vì `GameModalWrapper` đổi CSS.
 - **Đối soát số liệu dẫn trong docs (T42):** `README.md` khai **17 ADR** trong khi
   `grep -ohE "ADR-[0-9]+" docs/specs/ARCHITECTURE.md | sort -u | wc -l` = **18**, và ghi dấu đo
   **2026-10-30** trong khi toàn bộ số hiện trạng là của đợt đo sau T41C (commit `d54f341`, ngày
@@ -237,6 +247,11 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   `git show "99edd29:<đường-dẫn>"` (xem `docs/MASTER_ROADMAP.md` §"Cấu trúc docs/ sau khi gỡ prompt").
 
 ### Fixed
+- **Lớp phủ "Đang tạm dừng" không nói gì với bộ đọc màn hình (review 4 lớp, finding #6):** màn che
+  chỉ là `div` trang trí ⇒ bé dùng trình đọc màn hình bấm tạm rồi không biết mình đang ở trạng thái
+  nào. Thêm `role="status"` + `aria-live="polite"` + `aria-label="Đang tạm dừng"`
+  (`GameModalWrapper.tsx:550`), và ba assertion vào hợp đồng nguồn trong
+  `tests/t43-game-pause.test.ts` (`grep -c 'role="status"'` trong file = 1 nên không khớp nhầm).
 - **Nút "Tạm dừng" bấm không dừng được gì (KBT-ISSUE-43):** `data-testid="game-pause"` tồn tại
   từ T32 nhưng là ống nước chết — `GameModalWrapper` giữ `isPaused` trong state riêng, không prop
   nào truyền xuống `useGameStage`, nên bé bấm tạm mà đồng hồ vẫn chạy, vẫn trừ điểm chậm, vẫn
@@ -570,6 +585,19 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
     `memory-card`, `karaoke-read-all` và `answer-option` + `data-correct` cho `spelling_duel`.
 
 ### Tests
+- **Đo lại cổng sau hai sửa review (Pha 5):** `npm run verify` **EXIT=0** — **88 file / 1272 test**,
+  `Duration 21.55s`, main chunk `index-qnZ3EVTS.js = 204.2 kB → PASS (meets 450 kB goal)`;
+  `node qa/run-one.mjs qa/game-pause.mjs` ⇒ `QA PASS — 12 step(s), 0 errors`. Log và 3 ảnh chụp lại
+  tại `evidence/2026-11-02-KBT-ISSUE-43/`; số hiện trạng trong `docs/specs` + `docs/lifecycle`
+  đổi theo (1270 → 1272, hash entry, `Duration 30.69s` → `21.55s`).
+- **Siết hợp đồng nguồn theo VỊ TRÍ (review 4 lớp, finding #1 → phép ablation M5):** hai test
+  "chặn guard" của `tests/t43-game-pause.test.ts` trước đây chỉ **đếm** (`toContain` một chuỗi,
+  `guards.length >= 2`), nên lùi guard xuống **sau** phép ghi điểm — lỗi thật, điểm vẫn cộng khi
+  đang tạm — vẫn xanh. Nay test hook đòi `const submitCorrect/submitWrong = … => {` rồi dòng đầu
+  là `if (!isRunning) return;`, và test từng trò duyệt **từng** `setInterval(` để chắc `useEffect`
+  chứa nó đã đọc `stage.isRunning`. Chứng minh bằng **M5**: đổi đúng kiểu lùi guard ⇒
+  `Tests 1 failed | 29 passed (30)` EXIT=1, hoàn tác ⇒ `30 passed`
+  (`evidence/2026-11-02-KBT-ISSUE-43/mutation-M5-guard-position.txt`).
 - `tests/t43-game-pause.test.ts` — **30 test** cho nút Tạm dừng (KBT-ISSUE-43): bảng sự thật
   `isGameClockRunning` 7 ô (đang chơi / tạm / `overlayOpen` / `locked` / màn xong / tạm-đang-lúc-mở-lớp-phủ
   / tính thuần tuý không đọc đồng hồ), hợp đồng `GameModalWrapper` 5 (không còn state riêng,

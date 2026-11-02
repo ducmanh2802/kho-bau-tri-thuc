@@ -5,13 +5,13 @@
     "A2: \"Hứng Số Rơi Rộn Ràng\" render đúng 1 nút game-pause",
     "A2: \"Đập Bóng Màu\" render đúng 1 nút game-pause",
     "A2: \"Đường Đua Thần Tốc\" render đúng 1 nút game-pause",
-    "B1 (control): chưa tạm, bóng đã rơi — 2.44693% → 17.8811% sau 1 200 ms",
-    "B2: bấm tạm → 4 bóng đứng nguyên vị trí trong 1 200 ms, aria-pressed=\"true\", lớp phủ hiện",
-    "C1: đang tạm, chạm đúng bóng đích \"đ\" → bóng còn nguyên trên màn, không nhích câu, 0 lời khen (4 bóng → 4 bóng)",
-    "D1: bấm tiếp → 0 lớp phủ, aria-pressed=\"false\", bóng rơi lại 34.3111% → 49.2474%",
+    "B1 (control): chưa tạm, bóng đã rơi — 44.75% → 61.8% sau 1 200 ms",
+    "B2: bấm tạm → 5 bóng đứng nguyên vị trí trong 1 200 ms, aria-pressed=\"true\", lớp phủ hiện",
+    "C1: đang tạm, chạm đúng bóng đích \"đ\" → bóng còn nguyên trên màn, không nhích câu, 0 lời khen (5 bóng → 5 bóng)",
+    "D1: bấm tiếp → 0 lớp phủ, aria-pressed=\"false\", bóng rơi lại 65.65% → 82.15%",
     "C2 (đối chứng): cũng cú chạm ấy lúc đang chạy xoá đúng bóng đích \"đ\" (bóng đã mount biến mất khỏi DOM) — C1 là do trạng thái tạm, không phải bóng bấm không ăn",
-    "D2: Đường Đua bấm tạm → width: 82.6667%; giữ nguyên 1 500 ms (bé không bị trừ lỗi vì việc cắt ngang)",
-    "D3: bấm tiếp → đồng hồ chạy lại (width: 82.6667%; → width: 72.6667%;)"
+    "D2: Đường Đua bấm tạm → width: 83.3333%; giữ nguyên 1 500 ms (bé không bị trừ lỗi vì việc cắt ngang)",
+    "D3: bấm tiếp → đồng hồ chạy lại (width: 83.3333%; → width: 73.3333%;)"
   ],
   "errors": [],
   "facts": {
@@ -24,32 +24,32 @@
     },
     "running": {
       "before": [
-        "2.44693%",
-        "-7.98059%"
+        "44.75%",
+        "64.75%"
       ],
       "after1200ms": [
-        "17.8811%",
-        "7.66984%"
+        "61.8%",
+        "81.8%"
       ]
     },
     "targetChar": "đ",
     "paused": {
       "ariaPressed": "true",
       "veilCount": 1,
-      "count": 4,
+      "count": 5,
       "atPause": [
-        "31.3238%",
-        "21.3009%"
+        "62.9%",
+        "82.9%"
       ],
       "after1200ms": [
-        "31.3238%",
-        "21.3009%"
+        "62.9%",
+        "82.9%"
       ]
     },
     "clickWhilePaused": {
       "targetChar": "đ",
-      "countBefore": 4,
-      "countAfterClick": 4,
+      "countBefore": 5,
+      "countAfterClick": 5,
       "bubbleStillMounted": true,
       "roundBefore": "🦉\nMàn 4/6 ▾\n· 🚀 Câu 1/7",
       "roundAfterClick": "🦉\nMàn 4/6 ▾\n· 🚀 Câu 1/7",
@@ -59,29 +59,29 @@
       "ariaPressed": "false",
       "veil": 0,
       "before": [
-        "34.3111%",
-        "24.33%"
+        "65.65%",
+        "85.65%"
       ],
       "after1200ms": [
-        "49.2474%",
-        "39.4756%"
+        "82.15%",
+        "102.15%"
       ]
     },
     "controlClickWhileRunning": {
       "targetChar": "đ",
-      "targetBubblesBefore": 2,
+      "targetBubblesBefore": 3,
       "bubbleRemoved": true,
-      "totalAfter": 4
+      "totalAfter": 5
     },
     "raceRunning": {
       "liveA": "width: 93.3333%;",
       "liveB": "width: 83.3333%;"
     },
     "racePaused": {
-      "pauseA": "width: 82.6667%;",
-      "pauseB": "width: 82.6667%;"
+      "pauseA": "width: 83.3333%;",
+      "pauseB": "width: 83.3333%;"
     },
-    "raceResumed": "width: 72.6667%;"
+    "raceResumed": "width: 73.3333%;"
   },
   "failedAt": null,
   "shots": [

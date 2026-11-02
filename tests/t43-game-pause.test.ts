@@ -111,6 +111,11 @@ describe('KBT-43 — GameModalWrapper: một nguồn sự thật cho trạng th�
 
   it('lớp phủ "Đang tạm dừng" có testid ổn định để probe không phụ thuộc câu chữ', () => {
     expect(src).toContain('data-testid="game-paused-veil"');
+    // Review 4 lớp finding #6: lớp phủ trước đây chỉ là div trang trí ⇒ bộ đọc
+    // màn hình không báo gì khi bé bấm tạm. Lớp phủ phải là một thông báo.
+    expect(src, 'lớp phủ thiếu role="status"').toContain('role="status"');
+    expect(src, 'lớp phủ thiếu aria-live').toContain('aria-live="polite"');
+    expect(src, 'lớp phủ thiếu aria-label').toContain('aria-label="Đang tạm dừng"');
   });
 
   it('nhãn nút đổi theo trạng thái để bé và bộ đọc màn hình biết đang ở đâu', () => {
@@ -183,6 +188,26 @@ describe('KBT-43 — bốn trò có đồng hồ phải tiêu thụ stage.isRunn
       expect(src, `${file}: còn nhánh so phase trần (quên trạng thái tạm)`).not.toContain(
         "stage.phase !== 'playing'"
       );
+      // Siết theo VỊ TRÍ (review 4 lớp, finding #1): guard phải nằm trong chính
+      // useEffect tạo ra từng setInterval. Đếm guard suông thì bỏ guard ở effect
+      // này, để lại ở effect khác vẫn xanh mà đồng hồ vẫn chạy khi tạm.
+      const intervals = src.split('setInterval(').length - 1;
+      expect(intervals, `${file}: trò có đồng hồ phải dùng setInterval`).toBeGreaterThan(0);
+      let cursor = 0;
+      let checked = 0;
+      for (;;) {
+        const at = src.indexOf('setInterval(', cursor);
+        if (at === -1) break;
+        const effectStart = src.lastIndexOf('useEffect(', at);
+        expect(effectStart, `${file}: setInterval nằm ngoài useEffect nào`).toBeGreaterThan(-1);
+        expect(
+          /stage\.isRunning/.test(src.slice(effectStart, at)),
+          `${file}: effect tạo hẹn giờ lúc ${at} không đọc stage.isRunning`
+        ).toBe(true);
+        checked += 1;
+        cursor = at + 'setInterval('.length;
+      }
+      expect(checked).toBe(intervals);
     });
   }
 
@@ -207,6 +232,15 @@ describe('KBT-43 — hook sở hữu đồng hồ và tự nhả tạm khi sang 
   it('submitCorrect/submitWrong chặn theo isRunning — tạm là không tính điểm', () => {
     const guards = src.match(/if \(!isRunning\) return;/g) ?? [];
     expect(guards.length).toBeGreaterThanOrEqual(2);
+    // Siết theo VỊ TRÍ (review 4 lớp, finding #1): guard phải là dòng ĐẦU của
+    // chính hai hàm ghi điểm. Đếm suông thì chuyển guard xuống cuối thân hàm
+    // (vẫn đủ 2, vẫn cộng điểm khi tạm) mà test không đỏ.
+    for (const fn of ['submitCorrect', 'submitWrong']) {
+      expect(
+        new RegExp(`const ${fn} = [^=]*=> \\{\\s*if \\(!isRunning\\) return;`).test(src),
+        `${fn}: guard không nằm ngay đầu hàm`
+      ).toBe(true);
+    }
   });
 
   it('sang màn / chơi lại / nhảy màn đều nhả trạng thái tạm của bé', () => {

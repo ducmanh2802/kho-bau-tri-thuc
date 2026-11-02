@@ -12,7 +12,7 @@ Ba rule của tài liệu này (từ `docs/SDLC.md` §1 giai đoạn 4 và `docs
 2. **Verdict chỉ có sau khi chạy.** Bốn giá trị: `Pass` · `Fail` · `Blocked` · `NotRun`.
    `NotRun` **không phải** `Pass` và phải kèm lý do.
 3. **Một TC phải bắt được lỗi.** TC nào cũng phải nói được "sửa sai chỗ nào thì dòng này đỏ".
-   Sáu TC đã kiểm chứng bằng cách tạm bỏ dòng kiểm (`§4`, bốn phép ablation M1…M4), không chỉ đoán.
+   Sáu TC đã kiểm chứng bằng cách tạm bỏ dòng kiểm (`§4`, năm phép ablation M1…M5), không chỉ đoán.
 
 ---
 
@@ -28,7 +28,7 @@ Ba rule của tài liệu này (từ `docs/SDLC.md` §1 giai đoạn 4 và `docs
 | E-4 | Probe Playwright trên `dist/` thật | 0 console error ở 4 probe | `evidence/2026-11-02-T41C/probe-*.json` · `evidence/2026-11-02-KBT-ISSUE-43/probe-game-pause.json` (12 bước, `errors: []`) |
 | E-5 | Không chặn quá mức | có TC chứng minh hai lượt thật **vẫn** được tính 2 lần | TC-04, TC-13 · lát cắt 2: TC-40 (cùng cú chạm lúc **đang chạy** phải xoá bóng) |
 | E-6 | Bằng chứng nhìn thấy được khi đổi UI | 2 ảnh trước/sau của cùng một màn | `game-rewards-on.png`, `game-rewards-off.png` · `b3-dang-tam-dung.png`, `d2-cho-tiep-tuc.png` |
-| E-7 | Test bắt được lỗi | ≥1 phép ablation làm đỏ đúng test cần đỏ | §4, 4 phép (M1…M4) |
+| E-7 | Test bắt được lỗi | ≥1 phép ablation làm đỏ đúng test cần đỏ | §4, 5 phép (M1…M5) |
 
 ---
 
@@ -110,7 +110,7 @@ Verdict: **42 Pass · 0 Fail · 0 Blocked · 0 NotRun** trong phạm vi hai lát
 
 ---
 
-## 4. Test có bắt được lỗi không — bốn phép ablation đã chạy
+## 4. Test có bắt được lỗi không — năm phép ablation đã chạy
 
 Không dùng điểm coverage làm chứng cứ. Cách kiểm: **tạm bỏ đúng dòng kiểm chứng**, chạy lại test,
 test phải đỏ vì **đúng nguyên nhân**, rồi hoàn tác.
@@ -123,6 +123,8 @@ test phải đỏ vì **đúng nguyên nhân**, rồi hoàn tác.
 | M3 | `src/hooks/useGameStage.ts:24` — bỏ `!s.pausedByUser` khỏi `isGameClockRunning` | TC-30 và TC-32 (đỏ **hai** dòng: bảng sự thật *và* nhánh "tạm đang lúc mở lớp phủ") | `Tests 2 failed \| 28 passed (30)` · EXIT=1 | [`mutation-M3-clock-decision.txt`](../../evidence/2026-11-02-KBT-ISSUE-43/mutation-M3-clock-decision.txt) |
 | M4 | `src/hooks/useGameStage.ts:139` — bỏ **một** guard `if (!isRunning) return;` trong `submitCorrect` | TC-36 | `Tests 1 failed \| 29 passed (30)` · EXIT=1 | [`mutation-M4-score-guard.txt`](../../evidence/2026-11-02-KBT-ISSUE-43/mutation-M4-score-guard.txt) |
 | — | hoàn tác M3+M4 | `tests/t43-game-pause.test.ts` | `Tests 30 passed (30)` · EXIT=0 | lại bằng `npx vitest run tests/t43-game-pause.test.ts` |
+| M5 | `src/hooks/useGameStage.ts` — **không bỏ** guard, chỉ **lùi** `if (!isRunning) return;` của `submitWrong` xuống **sau** `setMistakesInTier` (phép này do review 4 lớp sinh ra: trước khi siết, test chỉ đếm `guards.length >= 2` nên vẫn xanh với lỗi thật) | TC-36 | `Tests 1 failed \| 29 passed (30)` · EXIT=1 — đỏ vì "guard không nằm ngay đầu hàm" | [`mutation-M5-guard-position.txt`](../../evidence/2026-11-02-KBT-ISSUE-43/mutation-M5-guard-position.txt) |
+| — | hoàn tác M5 + siết lại hợp đồng | `tests/t43-game-pause.test.ts` | `Tests 30 passed (30)` · EXIT=0 | `git checkout -- src/hooks/useGameStage.ts` rồi `npx vitest run tests/t43-game-pause.test.ts` |
 
 Lệnh tái lập (chạy trên máy sạch, `git checkout -- <file>` ngay sau đó):
 
@@ -160,6 +162,9 @@ node qa/run-one.mjs qa/game-pause.mjs                                    # phả
 | UAT Given/When/Then với phụ huynh thật | chưa có | `NotRun` | Cần người dùng thật; repo chưa có telemetry aggregate (BG-01, ADR-01). |
 | 26 trò **không** có đồng hồ | chỉ 1 trò được bấm thật để chứng minh **không** có nút tạm (TC-41, "Lật Thẻ Trí Nhớ Vàng") | `NotRun` | TC-34 chứng minh quy tắc bằng SSR cho mọi trò; chưa probe 26/31 trên `dist/` thật. Điều kiện chuyển Pass: vòng lặp qua `GAME_TITLES` trong `qa/game-pause.mjs` (chi phí: ~26 lần mount game, mỗi lần ~1 s). |
 | Nút tạm trên thiết bị chạm thật (iOS Safari / Android WebView) | chưa có | `NotRun` | Probe chạy Chromium desktop với viewport 390×844; chưa có thiết bị thật trong luồng này. |
+| Bấm tạm **đúng cửa sổ 1,1 s** sau đáp án (`advanceDelayMs`, `useGameStage.ts:144`) | chưa có | `NotRun` | Review 4 lớp finding #2 (xem `docs/issues/43-game-pause.md` §6): hẹn giờ chuyển câu không theo trạng thái tạm, chưa có bước probe nào bấm vào cửa sổ đó. Điều kiện chuyển Pass: thêm bước "chạm đáp án đúng → bấm tạm trong 300 ms → chờ 1 500 ms → câu phải chưa đổi". |
+| Bóng **đứng giữa màn** trong khoảnh `locked` (900–1200 ms sau đáp án) | chưa có | `NotRun` | Review finding #3: `isGameClockRunning` là cổng của cả effect animation ⇒ hành vi mới là cố ý (bé không bị phạt lúc chuyển câu) nhưng chưa có ảnh bằng chứng cho khoảnh đó. Điều kiện chuyển Pass: một step chụp ảnh tại `locked` trong `qa/game-pause.mjs`. |
+| Lớp phủ được **bộ đọc màn hình** báo khi tạm (`role="status"` + `aria-live`) | chưa có | `NotRun` | Đã thêm thuộc tính ARIA + hợp đồng nguồn trong `tests/t43-game-pause.test.ts:112`, nhưng chưa từng bật NVDA/VoiceOver để nghe. Điều kiện chuyển Pass: một lượt kiểm tay với trình đọc màn hình thật. |
 
 ---
 

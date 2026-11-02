@@ -15,7 +15,7 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1270 test / 88 file,
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1272 test / 88 file,
    204.2 kB entry + 418.5 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-02** — lần cuối ngay sau
    KBT-ISSUE-43 (nút Tạm dừng trò chơi: đồng hồ gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts`
    30 test và probe `qa/game-pause.mjs`; entry đổi hash, **kB không đổi** vì thay đổi nằm trong chunk game đã lazy),

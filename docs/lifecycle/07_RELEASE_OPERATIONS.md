@@ -26,7 +26,7 @@ Quy tắc: một artifact chỉ chứng nhận cho commit nó được tạo ra.
 | Commit | Ngày | Bằng chứng | Verdict |
 |---|---|---|---|
 | `d54f341` | 2026-11-02 | `evidence/2026-11-02-T41C/` — verify log, 3 probe JSON, 2 ảnh, 3 log ablation/baseline | **Pass** cho V&V · **NotRun** cho Release |
-| `675be7e`+`af2d56a`+`494cce2` (nhánh `feature/43-game-pause`, chưa merge) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/` — `red-before-fix.txt` (24 lời khai FAIL), `verify.txt` (EXIT=0, 88 file / 1270 test), `probe-game-pause.json` (12 bước, 0 lỗi), 3 ảnh, 2 log ablation M3/M4 | **Pass** cho V&V · **NotRun** cho Release (CI chưa chạy — repo chưa có tag, `workflow_dispatch` chưa bật; xem §4) |
+| `675be7e`+`af2d56a`+`494cce2`+`a61920b`+`fae661c`+`c8a3725`+tip review (nhánh `feature/43-game-pause`, chưa merge vào `main`) | 2026-11-02 | `evidence/2026-11-02-KBT-ISSUE-43/` — `red-before-fix.txt` (24 test FAIL), `verify.txt` (EXIT=0, 88 file / 1272 test / `Duration 21.55s`), `probe-game-pause.json` (12 bước, 0 lỗi), 3 ảnh, 3 log ablation M3/M4/M5 | **Pass** cho V&V · **NotRun** cho Release (CI chưa chạy — repo chưa có tag, `workflow_dispatch` chưa bật; xem §4) |
 
 Không được lấy log của `7c60066` để nói `d54f341` an toàn.
 
