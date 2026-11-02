@@ -74,8 +74,8 @@ describe('T27 combo, đồng hồ và ôn câu sai trong LessonPlayerModal', () 
     expect(lp).toContain('data-testid="lesson-missed-list"');
     expect(lp).toContain('data-testid="lesson-review-missed"');
     expect(lp).toMatch(/onClick=\{handleReviewMissed\}/);
-    // Không đổi phần thưởng thật của bài (test cũ vẫn phải xanh).
-    expect(lp).toContain('+{lesson.starReward} Sao');
+    // T41 — sao/XP hiển thị là số THẬT vừa cấp (lastAward), không phải cấu trúc bài.
+    expect(lp).toContain('+{lastAward.starsAwarded} Sao');
   });
 
   it('ghi lại câu sai kèm đáp án đúng, xoá khỏi danh sách khi bé sửa đúng', () => {
@@ -113,9 +113,11 @@ describe('T27 combo, đồng hồ và ôn câu sai trong LessonPlayerModal', () 
     expect(lp).toContain('startRun(difficultyMode);');
   });
 
-  it('lượt ôn chỉ báo 5 XP luyện lại, không hứa lại Sao/Vé', () => {
+  it('lượt ôn chỉ báo XP luyện lại thật, không hứa lại Sao/Vé', () => {
     expect(lp).toContain('data-testid="lesson-review-reward"');
-    expect(lp).toContain('Ôn tập xong! +5 XP luyện lại');
+    // T41 — con số lấy từ kết quả thật của StorageService.completeLesson (+5 XP
+    // cho lượt luyện lại), không phải chữ "5" hard-code.
+    expect(lp).toContain('Ôn tập xong! +{lastAward.xpAwarded} XP luyện lại');
     const rewardStart = lp.indexOf('data-testid="lesson-review-reward"');
     const rewardEnd = lp.indexOf(') : (', rewardStart);
     expect(rewardStart).toBeGreaterThan(-1);

@@ -204,6 +204,37 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
   `git show "99edd29:<đường-dẫn>"` (xem `docs/MASTER_ROADMAP.md` §"Cấu trúc docs/ sau khi gỡ prompt").
 
 ### Fixed
+- **Công tắc "Toàn Bộ Phần Thưởng" của ba mẹ chặn không đều, và màn kết quả hứa sai (đợt T41A):**
+  tắt quỹ thưởng mà bé vẫn tiêu được sao ở một số đường vào. `storage.ts` nay kiểm tra
+  `areRewardsEnabled()` ở **mọi** chỗ phát tài nguyên — `completeLesson` (bài mới + luyện lại +5 XP),
+  rương theo chủ đề, rương ngày, quà theo cấp, phần thưởng trò chơi, quest và `checkAchievements()`
+  — còn tiến độ học (`completedLessons`, `lessonStars`, số lượt chơi, lịch sử bài làm) vẫn ghi bình
+  thường vì đó là dữ liệu học, không phải tài nguyên tiêu được. `recordQuestEvent` vẫn đếm tiến trình
+  quest nhưng trả về danh sách phần thưởng rỗng khi đang tắt, để bật lại sau không bị nhận dồn.
+  Shop thì đi vòng qua tầng dịch vụ: `AvatarShopScreen` tự cộng `unlockedItems` và tự trừ sao, nên bỏ
+  qua khoá theo cấp độ, không ghi lịch sử thưởng và **vẫn tiêu được sao khi ba mẹ đã tắt** — nay gọi
+  `StorageService.buyShopItem()` rồi đọc lý do từ chối (`rewards-off` / `level-locked` / `not-enough-stars`)
+  để nói rõ với bé bằng âm thanh; nút "Mở khóa" cũng không còn sáng xanh trên món chưa tới cấp.
+  Màn kết quả bài học in lại `lesson.xpReward`/`lesson.starReward` nên hứa "+10 Sao +1 Vé" dù lượt
+  luyện lại chỉ được +5 XP và dù thưởng đã tắt — `completeLesson` trả về `LessonAward` (số thật vừa cấp)
+  và UI chỉ in dòng thưởng khi có thưởng, ngược lại hiện `lesson-rewards-off` nói với bé là lượt học
+  không cộng Sao/XP/Vé. Máy kéo Gacha cũng dừng ở tầng giao diện, không chỉ bị từ chối âm thầm bên
+  trong dịch vụ.
+- **Luồng "bài tiếp theo" trên trang Chủ đứt hai đoạn (đợt T41A):** CTA "Bắt đầu: …" chỉ mở bản đồ môn
+  nên bé phải tự lần tìm bài được gợi ý — `App.tsx` nay giữ `autoOpenLessonId` và `SubjectScreen` mở
+  thẳng bài khi id còn hợp lệ (đã mở khoá); id lạ hoặc đã bị khoá dịch thì dừng ở bản đồ và **luôn** báo
+  `onAutoLessonConsumed` để lần sau không bật lại oan. Link "Vì sao gợi ý này?" bấm không xảy ra gì —
+  `handleOpenParent(tab)` truyền tab và `ParentDashboardModal` nhận `initialTab`, nên link mở đúng tab
+  Phân Tích & Lời Khuyên.
+- **Đồng hồ thời gian dùng máy cộng phút cả khi tab bị ẩn (đợt T41A):** `useEffect` trong `App.tsx` có
+  `isScreenTimeAlertOpen` trong deps nên mỗi lần cảnh báo bật–tắt là interval bị huỷ và tạo lại, đồng hồ
+  phút bị trôi; Android/iOS treo tab nền hàng giờ vẫn bị tính "học 60 phút" và chặn bé oan. Interval giờ
+  tạo một lần, bỏ qua tick khi `document.hidden`, và trạng thái cảnh báo cập nhật qua function-form.
+  Xoá luôn `useEffect` chết trong `Header.tsx` (tính `daysSinceLastPlay` rồi bỏ kết quả, kéo theo import
+  `StorageService` không cần thiết).
+- **Hai thành tựu quest không bao giờ mở khoá (đợt T41A):** `sanitizeMotivation` có whitelist khoá được
+  giữ lại khi đọc, và `questsCompletedTotal` nằm ngoài whitelist — bộ đếm bị đưa về 0 sau mỗi lần đọc,
+  nên rule "7/30 nhiệm vụ ngày" không bao giờ đạt. Thêm vào whitelist, có test ghim lại.
 - **Mã máy và tiếng Anh lộ trên báo cáo Ba Mẹ (đợt T40):** lịch sử phần thưởng từng in trực tiếp
   `vn-les-1`, `catch_letters tier 2`, `shop_item`, `xp` và dòng `ID: …`; nay `rewardLabels.ts`
   quy đổi id bài học/trò chơi/thành tựu/đồ vật thành tên tiếng Việt ngay lúc hiển thị, không viết
@@ -451,6 +482,22 @@ Quy trình tạo ra các mục này: xem `docs/SDLC.md` §6.
     `memory-card`, `karaoke-read-all` và `answer-option` + `data-correct` cho `spelling_duel`.
 
 ### Tests
+- `tests/t41a-parent-controls.test.ts` — **14 test** cho quyền kiểm soát của ba mẹ và luồng học:
+  `completeLesson` trả `LessonAward` đúng tài nguyên thật (bài mới đủ XP/Sao/Vé, học lại chỉ +5 XP,
+  không cấp lại Sao/Vé), **mọi** đường vào tài nguyên đều tôn trọng công tắc (bài học, rương chủ đề, rương
+  ngày, gacha, shop, quà theo cấp, quest) trong khi tiến độ học vẫn ghi và bộ đếm quest sống qua lần đọc
+  (`questsCompletedTotal` từng bị whitelist đưa về 0), `buyShopItem` từ chối
+  theo lý do `rewards-off` / `level-locked` / `not-enough-stars`, whitelist `sanitizeMotivation` giữ
+  `questsCompletedTotal`, và hợp đồng nguồn của UI (màn kết quả đọc `lastAward.*`, CTA trang Chủ gọi
+  `onOpenLesson`, `ParentDashboardModal` nhận `initialTab`, shop không tự cộng `unlockedItems`, đồng hồ
+  thời gian bỏ qua tick khi tab ẩn và không có deps khởi động lại).
+  Cập nhật hợp đồng nguồn trong `tests/t27-lesson-engagement.test.ts` và `tests/lesson-completion.test.ts`
+  sang `LessonAward`. Probe mới `qa/parent-controls.mjs` (bằng chứng nhìn thấy được trên `dist/`,
+  viewport 1280×720): 7 bước 0 lỗi — CTA mở thẳng đích, "Vì sao gợi ý này?" vào tab Phân Tích
+  (`parent-decision-report`), tắt thưởng thì Tủ Đồ không tiêu sao (999→999, 3→3 món), màn kết quả in
+  `lesson-rewards-off` và không còn dòng `+N Sao/XP/Vé`, ví của bé không đổi sau một bài, bật lại thì
+  cùng món mua được ngay (3→4 món). `npm run verify` **EXIT=0**: **85 file / 1202 test**, entry
+  `index-NKVSigwn.js` **203.4 kB PASS**, boot graph **417.8 kB**.
 - `tests/t40-parent-facing-ids.test.ts` — **15 test** cho nhãn phần thưởng/quyết định tiếng Việt,
   chuẩn hoá id kỹ năng đọc, migration `P43-v1` có gộp khoá va chạm, chữa tên kỹ năng từ catalogue,
   các producer phần thưởng thật của `StorageService` và hợp đồng không kéo `decisionEngine`/

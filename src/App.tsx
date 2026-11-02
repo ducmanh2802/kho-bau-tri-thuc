@@ -98,6 +98,9 @@ const ScreenFallback: React.FC<{ label: string }> = ({ label }) => (
 /** Quick-access destinations for the sticky bottom navigation bar (T06). */
 const BOTTOM_NAV = NAVIGATION;
 
+/** Tab mở sẵn trong bảng điều khiển ba mẹ — phải khớp `ParentDashboardModal`. */
+type ParentTab = 'progress' | 'reading' | 'insights' | 'competition' | 'kidbox' | 'settings';
+
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ActiveScreen>('home');
   const [selectedSubject, setSelectedSubject] = useState<SubjectType>('tieng-viet');
@@ -138,6 +141,10 @@ export default function App() {
 
   // Parent modal state
   const [isParentModalOpen, setIsParentModalOpen] = useState(false);
+  /** T41 — ba mẹ bấm "Vì sao gợi ý này?" ở trang Chủ thì mở thẳng tab Insight. */
+  const [parentInitialTab, setParentInitialTab] = useState<ParentTab>('progress');
+  /** T41 — "Bài học nên làm tiếp" trên trang Chủ phải vào đúng bài, không chỉ mở môn. */
+  const [autoOpenLessonId, setAutoOpenLessonId] = useState<string | null>(null);
 
   // Screen time tracking
   const [isScreenTimeAlertOpen, setIsScreenTimeAlertOpen] = useState(false);
@@ -146,24 +153,24 @@ export default function App() {
   );
 
   // Screen time interval tracker (1 min ticks)
+  // T41 — hai lỗi cũ: (a) interval bị huỷ/tạo lại mỗi lần cảnh báo bật–tắt nên
+  // đồng hồ phút bị trôi, (b) vẫn cộng phút khi tab bị ẩn — Android/iOS treo tab
+  // nền hàng giờ, bé bỏ máy vẫn bị tính "học 60 phút" và bị chặn oan.
   useEffect(() => {
     const timer = setInterval(() => {
+      if (document.hidden) return;
       StorageService.addMinutesSpent(1);
-      const analytics = StorageService.getAnalytics();
+      const minutesToday = StorageService.getAnalytics().minutesToday;
       const settings = StorageService.getParentSettings();
-      setMinutesSpentToday(analytics.minutesToday);
+      setMinutesSpentToday(minutesToday);
 
-      if (
-        settings.dailyLimitMinutes > 0 &&
-        analytics.minutesToday >= settings.dailyLimitMinutes &&
-        !isScreenTimeAlertOpen
-      ) {
-        setIsScreenTimeAlertOpen(true);
-      }
+      const overLimit =
+        settings.dailyLimitMinutes > 0 && minutesToday >= settings.dailyLimitMinutes;
+      setIsScreenTimeAlertOpen((open) => (overLimit ? true : open));
     }, 60000);
 
     return () => clearInterval(timer);
-  }, [isScreenTimeAlertOpen]);
+  }, []);
 
   // T18B — Level up celebration modal state
   const [levelUpModal, setLevelUpModal] = useState<{
@@ -210,6 +217,23 @@ export default function App() {
 
   const handleSelectSubject = (sub: SubjectType) => {
     setSelectedSubject(sub);
+    setAutoOpenLessonId(null);
+    setCurrentScreen('subject');
+  };
+
+  /** T41 — mở bảng ba mẹ tại một tab cụ thể (mặc định vẫn là tab Tiến độ). */
+  const handleOpenParent = (tab: ParentTab = 'progress') => {
+    setParentInitialTab(tab);
+    setIsParentModalOpen(true);
+  };
+
+  /**
+   * T41 — "Bài tiếp theo" trên trang Chủ từng chỉ mở môn, bé phải tự đi tìm bài.
+   * Giờ App giữ id bài và SubjectScreen mở ngay khi xác nó hợp lệ (đã mở khoá).
+   */
+  const handleOpenLesson = (subject: SubjectType, lessonId: string) => {
+    setSelectedSubject(subject);
+    setAutoOpenLessonId(lessonId);
     setCurrentScreen('subject');
   };
 
@@ -220,7 +244,7 @@ export default function App() {
         currentScreen={currentScreen}
         onNavigate={setCurrentScreen}
         profile={profile}
-        onOpenParent={() => setIsParentModalOpen(true)}
+        onOpenParent={handleOpenParent}
         onOpenShop={() => setCurrentScreen('avatar_shop')}
       />
 
@@ -238,6 +262,8 @@ export default function App() {
             onOpenDailyReview={() => setCurrentScreen('daily_review')}
             onOpenWeeklyChallenge={() => setCurrentScreen('weekly_challenge')}
             onProfileUpdate={refreshProfile}
+            onOpenParent={handleOpenParent}
+            onOpenLesson={handleOpenLesson}
           />
         )}
 
@@ -254,6 +280,8 @@ export default function App() {
             onBack={() => setCurrentScreen('world_map')}
             onProfileUpdate={refreshProfile}
             onOpenKidBox={() => setCurrentScreen('kidbox_companion')}
+            autoOpenLessonId={autoOpenLessonId}
+            onAutoLessonConsumed={() => setAutoOpenLessonId(null)}
           />
         )}
 
@@ -422,6 +450,7 @@ export default function App() {
       <Suspense fallback={null}>
         <ParentDashboardModal
           isOpen={isParentModalOpen}
+          initialTab={parentInitialTab}
           onClose={() => setIsParentModalOpen(false)}
           onDataReset={refreshProfile}
           onOpenCompetitionReal={() => {

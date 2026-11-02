@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AvatarItem, ChildProfile } from '../../types';
 import { AVATAR_SHOP_ITEMS, StorageService } from '../../services/storage';
+import { xpToLevel } from '../../services/levelEngine';
 import { sound } from '../../services/sound';
 import { fireCelebrationConfetti } from '../../services/confetti';
 import { ArrowLeft, Star, ShoppingBag, Check } from 'lucide-react';
@@ -53,28 +54,38 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
       setProfile(updated);
       StorageService.saveChildProfile(updated);
       onProfileUpdate();
-    } else {
-      // Buy with stars
-      if (fresh.stars >= item.priceStars) {
-        sound.playLevelUp();
-        fireCelebrationConfetti();
-        const updated: ChildProfile = {
-          ...fresh,
-          stars: fresh.stars - item.priceStars,
-          unlockedItems: [...fresh.unlockedItems, item.id],
-          equipped: {
-            ...fresh.equipped,
-            [item.type]: item.id,
-          },
-        };
-        setProfile(updated);
-        StorageService.saveChildProfile(updated);
-        onProfileUpdate();
-        sound.speak(`Chúc mừng bé đã mở khóa ${item.name}!`);
-      } else {
-        sound.playWrong();
-        sound.speak('Bé chưa đủ sao vàng, hãy học thêm bài để tích lũy sao nhé!');
-      }
+      return;
+    }
+
+    // T41 — màn này từng tự trừ sao + tự thêm vào unlockedItems, nên nó đi vòng
+    // qua `buyShopItem`: bỏ qua khoá theo cấp, không ghi lịch sử phần thưởng,
+    // không đếm thành tựu, và vẫn tiêu được sao dù ba mẹ đã tắt quỹ thưởng.
+    const buy = StorageService.buyShopItem(item.id);
+    if (buy.ok) {
+      sound.playLevelUp();
+      fireCelebrationConfetti();
+      const after = StorageService.getChildProfile();
+      const updated: ChildProfile = {
+        ...after,
+        equipped: {
+          ...after.equipped,
+          [item.type]: item.id,
+        },
+      };
+      setProfile(updated);
+      StorageService.saveChildProfile(updated);
+      onProfileUpdate();
+      sound.speak(`Chúc mừng bé đã mở khóa ${item.name}!`);
+      return;
+    }
+
+    sound.playWrong();
+    if (buy.reason === 'rewards-off') {
+      sound.speak('Ba mẹ đang tắt phần thưởng nên phòng thay đồ nghỉ một hôm. Bé nhờ ba mẹ bật lại trong mục Ba Mẹ nhé!');
+    } else if (buy.reason === 'level-locked') {
+      sound.speak(`Món này cần bé lên thêm ${buy.missingLevels ?? 1} cấp. Học vui để tích điểm nhé!`);
+    } else if (buy.reason === 'not-enough-stars') {
+      sound.speak(`Bé còn thiếu ${buy.missingStars ?? item.priceStars} sao. Hãy học thêm bài để tích lũy sao nhé!`);
     }
   };
 
@@ -220,6 +231,10 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
             {filteredItems.map((item) => {
               const isUnlocked = profile.unlockedItems.includes(item.id);
               const isEquipped = profile.equipped[item.type] === item.id;
+              // T41 — buyShopItem từ chối món chưa tới cấp, nhưng nút trước đây
+              // vẫn hiện "Mở khóa" sáng xanh → bé bấm, mất 0 sao, không hiểu gì.
+              const requiredLevel = item.minLevel ?? 1;
+              const isLevelLocked = !isUnlocked && xpToLevel(profile.xp) < requiredLevel;
 
               return (
                 <div
@@ -243,6 +258,8 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
                       <span className="text-[11px] font-bold text-amber-700 flex items-center gap-1 mt-0.5">
                         {isUnlocked ? (
                           <span className="text-emerald-700 font-black">Đã sở hữu</span>
+                        ) : isLevelLocked ? (
+                          <span className="text-slate-500">Cần cấp {requiredLevel}</span>
                         ) : (
                           <>
                             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500" />
@@ -260,12 +277,14 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
                         ? 'bg-emerald-600 text-white'
                         : isUnlocked
                         ? 'bg-amber-500 hover:bg-amber-600 text-white'
+                        : isLevelLocked
+                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
                         : profile.stars >= item.priceStars
                         ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                     }`}
                   >
-                    {isEquipped ? 'Tháo ra' : isUnlocked ? 'Mặc vào' : 'Mở khóa'}
+                    {isEquipped ? 'Tháo ra' : isUnlocked ? 'Mặc vào' : isLevelLocked ? `Cần cấp ${requiredLevel}` : 'Mở khóa'}
                   </button>
                 </div>
               );

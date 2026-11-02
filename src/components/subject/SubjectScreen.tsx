@@ -14,6 +14,12 @@ interface SubjectScreenProps {
   onProfileUpdate: () => void;
   /** Opens the Kid's Box Companion track (English only). */
   onOpenKidBox?: () => void;
+  /**
+   * T41 — bài "Nên làm tiếp" mà trang Chủ đã chọn. App giữ id cho tới khi màn
+   * này xác nhận (mở được hay bỏ vì id cũ), nên không lo stale closure.
+   */
+  autoOpenLessonId?: string | null;
+  onAutoLessonConsumed?: () => void;
 }
 
 interface PathPoint {
@@ -42,10 +48,14 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
   onBack,
   onProfileUpdate,
   onOpenKidBox,
+  autoOpenLessonId,
+  onAutoLessonConsumed,
 }) => {
   const topics: Topic[] = getTopicsBySubject(subject);
   const [activeLesson, setActiveLesson] = useState<Lesson | null>(null);
   const [showLessonPopup, setShowLessonPopup] = useState<Lesson | null>(null);
+  /** Bài vừa mở theo gợi ý — bản đồ cuộn đến đây thay vì "bài hiện hành". */
+  const [recommendedLesson, setRecommendedLesson] = useState<Lesson | null>(null);
   const [scrollContainerRef, setScrollContainerRef] = useState<HTMLDivElement | null>(null);
   // Popup giới thiệu bài là hộp thoại thật: phải bẫy Tab và trả focus về nút
   // bài học khi đóng, nếu không bé dùng bàn phím/switch sẽ lạc ra sau lớp phủ.
@@ -192,6 +202,13 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
   };
 
   const handleClaimChest = (topic: Topic) => {
+    // T41 — rương không mở được vì ba mẹ tắt phần thưởng thì phải nói cho bé rõ,
+    // chứ không im lặng bật tiếng sai (bé tưởng mình chưa học đủ bài).
+    if (!StorageService.areRewardsEnabled()) {
+      sound.playWrong();
+      sound.speak('Ba mẹ đang tắt phần thưởng nên rương chưa mở được. Bé nhờ ba mẹ bật lại trong mục Ba Mẹ nhé!');
+      return;
+    }
     const starsAwarded = StorageService.claimTopicChest(topic.id, subject, 3);
     if (starsAwarded > 0) {
       sound.playLevelUp();
@@ -205,18 +222,36 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
     sound.speak(lesson.description, subject === 'english' ? 'en-GB' : 'vi-VN');
   };
 
+  // T41 — "Bài tiếp theo" trên trang Chủ từng chỉ mở môn, bé phải tự lần tìm.
+  // Có id là vào thẳng bài đó. Id lạ hoặc đã bị khoá (gợi ý tính lúc trước, sau
+  // đó bé học thêm nên khoá dịch) thì chỉ dừng ở bản đồ — và luôn báo App xoá
+  // id, nếu không mỗi lần quay lại môn bài cũ lại bật lên một lần nữa.
+  useEffect(() => {
+    if (!autoOpenLessonId) return;
+    const point = pathPoints.find((p) => p.lesson.id === autoOpenLessonId);
+    onAutoLessonConsumed?.();
+    if (!point) return;
+    if (getLessonStatus(point.lesson, point.globalIdx).isLocked) return;
+    setActiveLesson(point.lesson);
+    setRecommendedLesson(point.lesson);
+    // getLessonStatus đọc profile theo từng lượt vẽ; cho vào deps sẽ cuộn/mở lại
+    // liên tục. Chỉ chạy khi có id mới là đúng ý.
+  }, [autoOpenLessonId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Auto-scroll to current lesson on mount
   useEffect(() => {
     if (scrollContainerRef) {
       const completedCount = profile.completedLessons.length;
-      const currentPoint = pathPoints.find((p) => p.globalIdx === completedCount);
-      if (currentPoint && scrollContainerRef) {
+      const target = recommendedLesson
+        ? pathPoints.find((p) => p.lesson.id === recommendedLesson.id)
+        : pathPoints.find((p) => p.globalIdx === completedCount);
+      if (target && scrollContainerRef) {
         const container = scrollContainerRef;
-        const targetY = currentPoint.y - container.clientHeight / 2 + LESSON_BUTTON_SIZE / 2;
+        const targetY = target.y - container.clientHeight / 2 + LESSON_BUTTON_SIZE / 2;
         container.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
       }
     }
-  }, [pathPoints, profile.completedLessons.length]);
+  }, [pathPoints, profile.completedLessons.length, recommendedLesson]);
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-6 md:py-8 space-y-6 select-none">
@@ -546,6 +581,7 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
           onClose={() => {
             onProfileUpdate();
             setActiveLesson(null);
+            setRecommendedLesson(null);
           }}
           onComplete={handleLessonComplete}
         />

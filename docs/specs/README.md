@@ -10,12 +10,15 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 | 3 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | *Ghép như thế nào, dữ liệu đi đâu, vì sao chọn vậy?* | 18 ADR, sơ đồ tầng + luồng dữ liệu |
 | 4 | [`RTM.md`](RTM.md) | *Yêu cầu nào được chứng minh ở đâu? Test nào không phục vụ gì?* | ma trận xuôi + ngược, tổng kết độ phủ |
 | 5 | [`../plan/TASK_PLAN.md`](../plan/TASK_PLAN.md) | *Đã làm gì (P25→P43) và sẽ làm gì tiếp (EP-A…EP-F)?* | WBS 12 gói, 4 milestone |
-| 6 | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) | *Kiểm bằng lớp nào, chạy lệnh nào, khi nào xanh?* | 5 lớp, 28 probe, bảng "đổi gì → chạy gì" |
+| 6 | [`../plan/TEST_PLAN.md`](../plan/TEST_PLAN.md) | *Kiểm bằng lớp nào, chạy lệnh nào, khi nào xanh?* | 5 lớp, 29 probe, bảng "đổi gì → chạy gì" |
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1188 test / 84 file,
-   202.3 kB entry + 416.6 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-02** — lần cuối ngay sau
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1202 test / 85 file,
+   203.4 kB entry + 417.8 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-02** — lần cuối ngay sau
+   T41A (công tắc phần thưởng của ba mẹ chặn đúng tài nguyên ở tầng service, màn kết quả
+   in đúng phần thưởng vừa cấp, CTA trang Chủ mở thẳng bài được gợi ý, "Vì sao gợi ý này?"
+   tới tab Phân Tích, đồng hồ thời lượng màn hình không tính lúc tab ẩn),
    T40 (sửa mã máy lộ trên báo cáo Ba Mẹ, chuẩn hoá kỹ năng đọc và migration `P43-v1`),
    T39 (tối ưu đồ thị tải lần đầu: màn Cờ Tướng/IOE + ngân hàng đề ra khỏi chunk khởi động,
    Firebase chỉ nạp khi người lớn mở màn tài khoản), T38 (đường lùi WebGL cho bàn cờ 3D), T37 (kẻ đậm đường ô cờ vua), T36 (Việt hoá nhãn còn sót), T35 (đường kẻ ô + tương phản sáng/tối) và T34 (bộ cờ vua giống cờ gỗ thật), vòng soát bug T31 rồi T32 (bẫy focus popup bài học, header tràn nút "Ba Mẹ", thoại gấu lẫn chữ Hàn,

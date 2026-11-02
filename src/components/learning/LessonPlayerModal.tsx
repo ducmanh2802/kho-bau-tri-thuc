@@ -9,6 +9,7 @@ import {
 } from '../../services/praiseEngine';
 import { fireCelebrationConfetti } from '../../services/confetti';
 import { StorageService } from '../../services/storage';
+import type { LessonAward } from '../../services/storage';
 import { checkAnswer } from '../../services/answerCheck';
 import {
   applyMatchingTap,
@@ -121,6 +122,13 @@ export const LessonPlayerModal: React.FC<LessonPlayerModalProps> = ({
   const [startedAt, setStartedAt] = useState<number | null>(() => Date.now());
   const [missed, setMissed] = useState<{ id: string; prompt: string; answer: string }[]>([]);
   const [reviewIds, setReviewIds] = useState<string[] | null>(null);
+  /**
+   * T41 — phần thưởng THẬT mà StorageService vừa cấp. Màn kết quả trước đây
+   * in lại `lesson.starReward`/`lesson.xpReward` từ cấu trúc bài, nên lượt học
+   * lại (chỉ +5 XP) và lúc ba mẹ tắt quỹ thưởng (không cộng gì) đều hứa hẹn
+   * sai — bé đếm sao thấy thiếu mà không hiểu vì sao.
+   */
+  const [lastAward, setLastAward] = useState<LessonAward | null>(null);
   const resultScrollRef = useRef<HTMLDivElement | null>(null);
   const questionScrollRef = useRef<HTMLDivElement | null>(null);
   const feedbackRef = useRef<HTMLDivElement | null>(null);
@@ -316,7 +324,7 @@ export const LessonPlayerModal: React.FC<LessonPlayerModalProps> = ({
       sound.playLevelUp();
       fireCelebrationConfetti();
       const earnedXp = difficultyMode === 'challenge' ? Math.round(lesson.xpReward * 1.5) : lesson.xpReward;
-      StorageService.completeLesson(lesson.id, lesson.subject, earnedXp, lesson.starReward);
+      setLastAward(StorageService.completeLesson(lesson.id, lesson.subject, earnedXp, lesson.starReward));
     }
   };
 
@@ -346,6 +354,7 @@ export const LessonPlayerModal: React.FC<LessonPlayerModalProps> = ({
     setBestCombo(0);
     setMissed([]);
     setElapsedSec(0);
+    setLastAward(null);
     setStartedAt(Date.now());
     if (questionScrollRef.current) questionScrollRef.current.scrollTop = 0;
   };
@@ -878,16 +887,31 @@ return (
               </button>
             )}
 
-            {/* Earned Rewards — wraps on a 360px phone. Lượt ôn chỉ được 5 XP
-                luyện lại (StorageService.completeLesson), không cấp lại Sao/Vé. */}
-            {reviewIds ? (
+            {/* T41 — màn kết quả in đúng phần thưởng StorageService vừa cấp
+                (lượt học lại chỉ +5 XP; ba mẹ tắt quỹ thưởng thì không cấp gì),
+                thay vì in lại cấu trúc bài khiến bé đếm sao thấy thiếu. */}
+            {!lastAward ? null
+              : lastAward.starsAwarded === 0 && lastAward.xpAwarded === 0 && lastAward.ticketsAwarded === 0 ? (
+              <div
+                data-testid="lesson-rewards-off"
+                className="flex flex-col items-center gap-1 py-3 px-4 bg-sky-50 rounded-2xl border-2 border-sky-200 mb-6 max-w-full"
+              >
+                <div className="flex items-center gap-2 text-sky-700 font-black text-base">
+                  <CheckCircle2 className="w-5 h-5 text-sky-500" aria-hidden="true" />
+                  <span>Bé hoàn thành bài rồi!</span>
+                </div>
+                <span className="text-[11px] font-bold text-sky-700 text-center">
+                  Nhà mình đang tắt phần thưởng nên lượt này không cộng Sao, XP hay Vé — Gấu vẫn ghi nhớ bài học của bé.
+                </span>
+              </div>
+            ) : reviewIds ? (
               <div
                 data-testid="lesson-review-reward"
                 className="flex flex-col items-center gap-1 py-3 px-4 bg-emerald-50 rounded-2xl border-2 border-emerald-200 mb-6 max-w-full"
               >
                 <div className="flex items-center gap-2 text-emerald-700 font-black text-base">
                   <Sparkles className="w-5 h-5 text-emerald-500" aria-hidden="true" />
-                  <span>Ôn tập xong! +5 XP luyện lại</span>
+                  <span>Ôn tập xong! +{lastAward.xpAwarded} XP luyện lại</span>
                 </div>
                 <span className="text-[11px] font-bold text-emerald-700">
                   Ôn lại không thêm Sao hay Vé — bé giữ thành tích bài đầu tiên nhé!
@@ -895,21 +919,32 @@ return (
               </div>
             ) : (
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 py-3 px-4 bg-amber-50 rounded-2xl border-2 border-amber-200 mb-6 max-w-full">
-              <div className="flex items-center gap-2 text-amber-700 font-black text-base">
-                <Star className="w-6 h-6 fill-amber-400 text-amber-500" aria-hidden="true" />
-                <span>+{lesson.starReward} Sao</span>
-              </div>
-              <div className="flex items-center gap-2 text-purple-700 font-black text-base">
-                <Sparkles className="w-6 h-6 text-purple-500" aria-hidden="true" />
-                <span>+{lesson.xpReward} XP</span>
-                {difficultyMode === 'challenge' && (
-                  <span className="text-xs bg-rose-200 text-rose-800 px-1.5 py-0.5 rounded-md font-extrabold">+50% Thử thách</span>
-                )}
-              </div>
-              <div className="flex items-center gap-1.5 text-blue-700 font-black text-base">
-                <span aria-hidden="true">🎟️</span>
-                <span>+1 Vé Chơi</span>
-              </div>
+              {lastAward.starsAwarded > 0 && (
+                <div className="flex items-center gap-2 text-amber-700 font-black text-base">
+                  <Star className="w-6 h-6 fill-amber-400 text-amber-500" aria-hidden="true" />
+                  <span>+{lastAward.starsAwarded} Sao</span>
+                </div>
+              )}
+              {lastAward.xpAwarded > 0 && (
+                <div className="flex items-center gap-2 text-purple-700 font-black text-base">
+                  <Sparkles className="w-6 h-6 text-purple-500" aria-hidden="true" />
+                  <span>+{lastAward.xpAwarded} XP</span>
+                  {lastAward.firstTime && difficultyMode === 'challenge' && (
+                    <span className="text-xs bg-rose-200 text-rose-800 px-1.5 py-0.5 rounded-md font-extrabold">+50% Thử thách</span>
+                  )}
+                </div>
+              )}
+              {lastAward.ticketsAwarded > 0 && (
+                <div className="flex items-center gap-1.5 text-blue-700 font-black text-base">
+                  <span aria-hidden="true">🎟️</span>
+                  <span>+{lastAward.ticketsAwarded} Vé Chơi</span>
+                </div>
+              )}
+              {!lastAward.firstTime && (
+                <span className="w-full text-center text-[11px] font-bold text-amber-700">
+                  Bé đã học bài này rồi — lượt này chỉ được XP luyện tập, số sao của bài đầu vẫn giữ nguyên nhé!
+                </span>
+              )}
             </div>
             )}
 

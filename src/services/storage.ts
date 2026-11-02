@@ -439,6 +439,18 @@ export interface TierRewardReceipt {
 }
 
 /**
+ * T41 — phần thưởng THẬT mà `completeLesson` vừa cấp. Màn kết quả bắt buộc đọc
+ * cái này thay vì in lại `lesson.xpReward`/`lesson.starReward`: lượt học lại chỉ
+ * +5 XP, và lúc ba mẹ tắt quỹ thưởng thì không có tài nguyên nào đổi chủ.
+ */
+export interface LessonAward {
+  firstTime: boolean;
+  xpAwarded: number;
+  starsAwarded: number;
+  ticketsAwarded: number;
+}
+
+/**
  * T39 — Ngân hàng đề của bốn môn (riêng tiếng Việt + cuộc sống đã ~350 KiB mã
  * nguồn) trước đây bị `storage.ts` import tĩnh, nên nó nằm trong chunk khởi
  * động và chặn lần vẽ đầu tiên dù bé chỉ mở màn Home. StorageService giữ nguyên
@@ -1403,6 +1415,10 @@ public static getParentSettings(): ParentSettings {
       shieldsUsedTotal: count(raw.shieldsUsedTotal),
       gachaDrawsTotal: count(raw.gachaDrawsTotal),
       shopBoughtTotal: count(raw.shopBoughtTotal),
+      // T41 — bộ đếm này nuôi rule thành tựu "7/30 nhiệm vụ ngày" (line 1540).
+      // Quên không trắng hoá ở đây nghĩa là nó về 0 sau mỗi lần đọc, và hai
+      // thành ấy không bao giờ mở khoá được dù bé hoàn thành nhiệm vụ mỗi ngày.
+      questsCompletedTotal: count(raw.questsCompletedTotal),
       comboBestAll: count(raw.comboBestAll),
       starsEarnedTotal: count(raw.starsEarnedTotal),
       storiesReadTotal: count(raw.storiesReadTotal),
@@ -1461,27 +1477,32 @@ public static getParentSettings(): ParentSettings {
       motivation.gachaDrawsTotal += 1;
     }
 
+    const rewardsEnabled = StorageService.areRewardsEnabled();
     const quests = StorageService.getDailyQuests();
     const { quests: next, newlyCompleted } = applyQuestEvent(quests, event, motivation.daily);
 
     if (next !== quests) StorageService.saveDailyQuests(next);
     if (newlyCompleted.length > 0) {
-      const profile = StorageService.getChildProfile();
-      for (const q of newlyCompleted) {
-        profile.stars += q.rewardStars;
-        profile.xp += q.rewardXp;
-        motivation.starsEarnedTotal += q.rewardStars;
-        StorageService.addRewardHistory({ type: 'quest', amount: q.rewardStars, description: `Hoàn thành nhiệm vụ: ${q.title}`, itemId: q.id });
+      if (rewardsEnabled) {
+        const profile = StorageService.getChildProfile();
+        for (const q of newlyCompleted) {
+          profile.stars += q.rewardStars;
+          profile.xp += q.rewardXp;
+          motivation.starsEarnedTotal += q.rewardStars;
+          StorageService.addRewardHistory({ type: 'quest', amount: q.rewardStars, description: `Hoàn thành nhiệm vụ: ${q.title}`, itemId: q.id });
+        }
+        StorageService.saveChildProfile(profile);
       }
       motivation.questsCompletedTotal += newlyCompleted.length;
-      StorageService.saveChildProfile(profile);
       StorageService.saveMotivationState(motivation);
     } else {
       StorageService.saveMotivationState(motivation);
     }
 
-    StorageService.checkAchievements();
-    return newlyCompleted.map((q) => q.id);
+    // T41 — thành tựu là phần thưởng; khi phụ huynh tắt, vẫn lưu tiến độ nhưng
+    // không mở khoá quà để bật lại sau không bị nhận dồn.
+    if (rewardsEnabled) StorageService.checkAchievements();
+    return rewardsEnabled ? newlyCompleted.map((q) => q.id) : [];
   }
 
   /** T18A — Bé mặc/tháo đồ cho Gấu (UI T18B gọi để xong quest vui). */
@@ -1694,25 +1715,41 @@ public static getParentSettings(): ParentSettings {
   }
 
   // Record completed lesson
-  public static completeLesson(lessonId: string, subject: SubjectType, xp: number, stars: number) {
+  public static completeLesson(
+    lessonId: string,
+    subject: SubjectType,
+    xp: number,
+    stars: number
+  ): LessonAward {
+    const rewardsEnabled = StorageService.areRewardsEnabled();
     const profile = StorageService.getChildProfile();
     const isFirstTime = !profile.completedLessons.includes(lessonId);
+    let xpAwarded = 0;
+    let starsAwarded = 0;
+    let ticketsAwarded = 0;
 
     if (isFirstTime) {
       profile.completedLessons.push(lessonId);
-      profile.xp += xp;
-      profile.stars += stars;
-      profile.tickets += 1; // Earn 1 arcade ticket per new lesson!
-      // Record stars earned for this lesson (1–3)
+      // Ghi lại thành tích theo bài dù ba mẹ tắt quỹ thưởng — đây là dữ liệu học,
+      // không phải tài nguyên tiêu được.
       profile.lessonStars[lessonId] = Math.min(Math.max(Math.round(stars), 1), 3);
-      StorageService.addRewardHistory({ type: 'xp', amount: xp, description: `Hoàn thành bài học ${lessonId}`, itemId: lessonId });
-      StorageService.addRewardHistory({ type: 'stars', amount: stars, description: `Sao bài học ${lessonId}`, itemId: lessonId });
-      StorageService.addRewardHistory({ type: 'tickets', amount: 1, description: `Vé bài học ${lessonId}`, itemId: lessonId });
-    } else {
+      if (rewardsEnabled) {
+        xpAwarded = xp;
+        starsAwarded = stars;
+        ticketsAwarded = 1; // Earn 1 arcade ticket per new lesson!
+        profile.xp += xpAwarded;
+        profile.stars += starsAwarded;
+        profile.tickets += ticketsAwarded;
+        StorageService.addRewardHistory({ type: 'xp', amount: xpAwarded, description: `Hoàn thành bài học ${lessonId}`, itemId: lessonId });
+        StorageService.addRewardHistory({ type: 'stars', amount: starsAwarded, description: `Sao bài học ${lessonId}`, itemId: lessonId });
+        StorageService.addRewardHistory({ type: 'tickets', amount: ticketsAwarded, description: `Vé bài học ${lessonId}`, itemId: lessonId });
+      }
+    } else if (rewardsEnabled) {
       // Retaking an already completed lesson grants practice review XP (+5 XP)
       // but does NOT duplicate stars/tickets (anti-farming reward integrity)
-      profile.xp += 5;
-      StorageService.addRewardHistory({ type: 'xp', amount: 5, description: `Luyện lại bài ${lessonId}`, itemId: lessonId });
+      xpAwarded = 5;
+      profile.xp += xpAwarded;
+      StorageService.addRewardHistory({ type: 'xp', amount: xpAwarded, description: `Luyện lại bài ${lessonId}`, itemId: lessonId });
     }
     StorageService.saveChildProfile(profile);
 
@@ -1721,14 +1758,15 @@ public static getParentSettings(): ParentSettings {
     StorageService.saveAnalytics(analytics);
 
     // T18A — sao kiếm được trong bài (kể cả trước khi tiêu ở Shop).
-    if (isFirstTime) {
+    if (isFirstTime && rewardsEnabled) {
       const motivation = StorageService.getMotivationState();
       motivation.starsEarnedTotal += Math.min(Math.max(Math.round(stars), 1), 3);
       StorageService.saveMotivationState(motivation);
-      // T18A — tiến trình quest qua engine chung (lesson_any/lesson_life/star_3...).
-      // recordQuestEvent tự trao thưởng quest + chấm thành tựu nên không cần thêm.
-      StorageService.recordQuestEvent({ kind: 'lesson', subject, stars });
     }
+    // Tiến trình câu hỏi/bài học vẫn được đếm kể cả khi tắt thưởng; riêng phần
+    // thưởng của quest do `recordQuestEvent` chặn ở tầng phát tài nguyên.
+    if (isFirstTime) StorageService.recordQuestEvent({ kind: 'lesson', subject, stars });
+    return { firstTime: isFirstTime, xpAwarded, starsAwarded, ticketsAwarded };
   }
 
   /**
@@ -1736,6 +1774,7 @@ public static getParentSettings(): ParentSettings {
    * Returns the stars awarded (0 if already claimed or topic not complete).
    */
   public static claimTopicChest(topicId: string, subject: SubjectType, starReward: number): number {
+    if (!StorageService.areRewardsEnabled()) return 0;
     const profile = StorageService.getChildProfile();
     if (profile.chestState[topicId]) return 0; // Already claimed
 
@@ -1771,6 +1810,7 @@ public static getParentSettings(): ParentSettings {
    * +10 sao, +50 XP) và cộng thêm đếm rương + quest vui cho bé.
    */
   public static claimDailyChest(stars = 10, xp = 50): boolean {
+    if (!StorageService.areRewardsEnabled()) return false;
     const today = getTodayString();
     const profile = StorageService.getChildProfile();
     if (profile.dailyChestClaimedDate === today) return false;
@@ -2049,14 +2089,19 @@ public static getParentSettings(): ParentSettings {
     const safePrev = Math.min(Math.max(Math.round(prevStars), 0), 3);
     const isFirstClear = safePrev === 0;
     const isNewBest = safeStars > safePrev;
-    const starsAwarded = isNewBest ? safeStars - safePrev : 0;
-    const xpAwarded = isFirstClear ? Math.round(xpFull) : Math.max(1, Math.round(xpFull * 0.2));
+    const rewardsEnabled = StorageService.areRewardsEnabled();
+    const starsAwarded = rewardsEnabled && isNewBest ? safeStars - safePrev : 0;
+    const xpAwarded = rewardsEnabled
+      ? (isFirstClear ? Math.round(xpFull) : Math.max(1, Math.round(xpFull * 0.2)))
+      : 0;
     void score;
 
     const profile = StorageService.getChildProfile();
-    profile.xp += xpAwarded;
-    profile.stars += starsAwarded;
-    StorageService.saveChildProfile(profile);
+    if (starsAwarded > 0 || xpAwarded > 0) {
+      profile.xp += xpAwarded;
+      profile.stars += starsAwarded;
+      StorageService.saveChildProfile(profile);
+    }
 
     const analytics = StorageService.getAnalytics();
     analytics.gamesPlayedCount += 1;
@@ -2076,14 +2121,17 @@ public static getParentSettings(): ParentSettings {
 
   // Record played mini game
   public static recordGamePlayed(xpReward: number = 15, starReward: number = 1, gameId?: string) {
-    const profile = StorageService.getChildProfile();
-    profile.xp += xpReward;
-    profile.stars += starReward;
-    StorageService.saveChildProfile(profile);
+    const rewardsEnabled = StorageService.areRewardsEnabled();
+    if (rewardsEnabled) {
+      const profile = StorageService.getChildProfile();
+      profile.xp += xpReward;
+      profile.stars += starReward;
+      StorageService.saveChildProfile(profile);
 
-    const motivation = StorageService.getMotivationState();
-    motivation.starsEarnedTotal += Math.max(0, Math.round(starReward));
-    StorageService.saveMotivationState(motivation);
+      const motivation = StorageService.getMotivationState();
+      motivation.starsEarnedTotal += Math.max(0, Math.round(starReward));
+      StorageService.saveMotivationState(motivation);
+    }
 
     const analytics = StorageService.getAnalytics();
     analytics.gamesPlayedCount += 1;
@@ -2158,20 +2206,23 @@ public static getParentSettings(): ParentSettings {
       motivation.daily
     );
     if (next !== quests) StorageService.saveDailyQuests(next);
+    const rewardsEnabled = StorageService.areRewardsEnabled();
     if (newlyCompleted.length > 0) {
-      const profile = StorageService.getChildProfile();
-      for (const q of newlyCompleted) {
-        profile.stars += q.rewardStars;
-        profile.xp += q.rewardXp;
-        motivation.starsEarnedTotal += q.rewardStars;
-        StorageService.addRewardHistory({ type: 'quest', amount: q.rewardStars, description: `Hoàn thành nhiệm vụ ôn tập: ${q.title}`, itemId: q.id });
+      if (rewardsEnabled) {
+        const profile = StorageService.getChildProfile();
+        for (const q of newlyCompleted) {
+          profile.stars += q.rewardStars;
+          profile.xp += q.rewardXp;
+          motivation.starsEarnedTotal += q.rewardStars;
+          StorageService.addRewardHistory({ type: 'quest', amount: q.rewardStars, description: `Hoàn thành nhiệm vụ ôn tập: ${q.title}`, itemId: q.id });
+        }
+        StorageService.saveChildProfile(profile);
       }
       motivation.questsCompletedTotal += newlyCompleted.length;
-      StorageService.saveChildProfile(profile);
       StorageService.saveMotivationState(motivation);
     }
-    StorageService.checkAchievements();
-    return newlyCompleted.map((q) => q.id);
+    if (rewardsEnabled) StorageService.checkAchievements();
+    return rewardsEnabled ? newlyCompleted.map((q) => q.id) : [];
   }
 
   /**
@@ -2344,6 +2395,11 @@ public static getParentSettings(): ParentSettings {
     };
   }
 
+  /** T41 — ba mẹ tắt phần thưởng thì chỉ học, không cộng tài nguyên. */
+  public static areRewardsEnabled(): boolean {
+    return StorageService.getParentSettings().rewardsEnabled !== false;
+  }
+
   /**
    * T18C — Ghi nhận phần thưởng vào lịch sử (tối đa 50 mục, mới nhất lên đầu).
    */
@@ -2362,6 +2418,7 @@ public static getParentSettings(): ParentSettings {
    * không trùng tới khi đủ 60 sticker. Trùng thì cứ 5 sticker trùng +2 sao an ủi.
    */
   public static drawGacha(rng?: RandomFn): GachaResult {
+    if (!StorageService.areRewardsEnabled()) return { ok: false, reason: 'rewards-off' };
     const settings = StorageService.getParentSettings();
     const maxDaily = settings.maxGachaPerDay > 0 ? settings.maxGachaPerDay : 5;
     const profile = StorageService.getChildProfile();
@@ -2401,6 +2458,14 @@ public static getParentSettings(): ParentSettings {
     const motivation = StorageService.getMotivationState();
     const pending = pendingLevels(profile.xp, motivation.claimedLevelRewards);
     const result: LevelClaimResult = { claimed: [], stars: 0, tickets: 0, stickerIds: [] };
+    if (!StorageService.areRewardsEnabled()) {
+      if (pending.length > 0) {
+        motivation.claimedLevelRewards = [...new Set([...motivation.claimedLevelRewards, ...pending])]
+          .sort((a, b) => a - b);
+        StorageService.saveMotivationState(motivation);
+      }
+      return result;
+    }
     for (const level of pending) {
       const reward = rewardForLevel(level);
       result.claimed.push(level);
@@ -2437,6 +2502,7 @@ public static getParentSettings(): ParentSettings {
    * Mặc đồ cho Gấu do UI gọi recordDressUp để xong quest vui.
    */
   public static buyShopItem(itemId: string): ShopBuyResult {
+    if (!StorageService.areRewardsEnabled()) return { ok: false, reason: 'rewards-off' };
     const profile = StorageService.getChildProfile();
     const check = canBuyShopItem(itemId, profile.unlockedItems, profile.stars, xpToLevel(profile.xp));
     if (!check.ok) return { ...check };
@@ -2483,7 +2549,7 @@ public static getParentSettings(): ParentSettings {
 // TypeScript không cho khai báo interface trong class body).
 export interface GachaResult {
   ok: boolean;
-  reason: 'no-ticket' | 'daily-limit' | 'ok';
+  reason: 'no-ticket' | 'daily-limit' | 'rewards-off' | 'ok';
   stickerId?: string;
   isNew?: boolean;
   /** Sao an ủi khi gắp trùng (mỗi 5 sticker trùng +2 sao). */
@@ -2499,7 +2565,7 @@ export interface LevelClaimResult {
 
 export interface ShopBuyResult {
   ok: boolean;
-  reason: 'unknown-item' | 'already-owned' | 'level-locked' | 'not-enough-stars' | 'ok';
+  reason: 'unknown-item' | 'already-owned' | 'level-locked' | 'not-enough-stars' | 'rewards-off' | 'ok';
   missingLevels?: number;
   missingStars?: number;
 }

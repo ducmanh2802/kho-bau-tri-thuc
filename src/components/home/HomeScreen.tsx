@@ -19,6 +19,8 @@ interface HomeScreenProps {
   onOpenDailyReview: () => void;
   onOpenWeeklyChallenge: () => void;
   onProfileUpdate: () => void;
+  onOpenParent: (tab?: 'progress' | 'reading' | 'insights' | 'competition' | 'kidbox' | 'settings') => void;
+  onOpenLesson: (subject: SubjectType, lessonId: string) => void;
 }
 
 interface SubjectCard {
@@ -142,6 +144,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onOpenDailyReview,
   onOpenWeeklyChallenge,
   onProfileUpdate,
+  onOpenParent,
+  onOpenLesson,
 }) => {
   const [quests, setQuests] = useState<DailyQuest[]>(StorageService.getDailyQuests());
   const [reading, setReading] = useState<ReadingProfile>(() => StorageService.getReadingProfile());
@@ -156,6 +160,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const handleClaimChest = useCallback(() => {
     if (!canClaimChest) return;
+    // T41 — claimDailyChest từ chối khi ba mẹ tắt quỹ thưởng; nếu chỉ `return`
+    // thì bé bấm rương mà không có phản hồi nào (app có vẻ bị lì).
+    if (!StorageService.areRewardsEnabled()) {
+      sound.playWrong();
+      sound.speak('Ba mẹ đang tắt phần thưởng nên rương hôm nay chưa mở được. Bé nhờ ba mẹ bật lại trong mục Ba Mẹ nhé!');
+      return;
+    }
     // T18A — rương ngày qua storage chung (+10 sao, +50 XP, đếm rương + quest vui).
     if (!StorageService.claimDailyChest()) return;
     sound.playLevelUp();
@@ -197,8 +208,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const handleNextBestAction = useCallback(() => {
     if (!nextBestAction?.launchRoute) return;
     sound.playClick();
+    if (nextBestAction.type === 'LEARN' && nextBestAction.lessonId) {
+      onOpenLesson(nextBestAction.subject, nextBestAction.lessonId);
+      return;
+    }
+    if (nextBestAction.launchRoute === 'subject') {
+      onSelectSubject(nextBestAction.subject);
+      return;
+    }
     onNavigate(nextBestAction.launchRoute);
-  }, [nextBestAction, onNavigate]);
+  }, [nextBestAction, onNavigate, onOpenLesson, onSelectSubject]);
 
   const handleShortcutClick = useCallback((screen: ActiveScreen) => {
     sound.playClick();
@@ -308,7 +327,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <button
                 onClick={() => {
                   sound.playClick();
-                  onNavigate('home'); // Parent modal will be opened from header
+                  onOpenParent('insights');
                 }}
                 // T20A / B-07 — 00_RULES §7: every tappable target ≥ 44px.
                 // This text link was 16px tall (min-w/44 + py-1 keeps the

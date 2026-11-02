@@ -41,7 +41,7 @@
 | FR-S03 | `src/components/home/HomeScreen.tsx`, DC-02 | `tests/t07-subject-path.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 | FR-S04 | `src/components/common/Header.tsx` | `tests/mobile-layout.test.ts` | `qa/responsive-a11y.mjs` | V,3 | ĐẠT |
 | FR-S05 | `src/components/world/WorldMapScreen.tsx`, `src/services/levelEngine.ts` | `tests/t07-subject-path.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
-| FR-S06 | `src/data/{vietnamese,math,english,life}Curriculum.ts`, `src/components/subject/SubjectScreen.tsx` | `tests/t07-subject-path.test.ts`, `tests/vietnamese-curriculum.test.ts`, `tests/math-curriculum.test.ts`, `tests/english-curriculum.test.ts`, `tests/life-curriculum.test.ts` | `qa/mobile-home.mjs` | V,3 | ĐẠT |
+| FR-S06 | `src/data/{vietnamese,math,english,life}Curriculum.ts`, `src/components/subject/SubjectScreen.tsx` | `tests/t07-subject-path.test.ts`, `tests/vietnamese-curriculum.test.ts`, `tests/math-curriculum.test.ts`, `tests/english-curriculum.test.ts`, `tests/life-curriculum.test.ts`, `tests/t41a-parent-controls.test.ts` | `qa/mobile-home.mjs`, `qa/parent-controls.mjs` | V,3 | ĐẠT |
 | FR-S07 | `src/components/parent/ParentDashboardModal.tsx:51` | `tests/parent-and-demo.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 | FR-S08 | `src/hooks/useFocusTrap.ts` | `tests/t20a-hooks-order.test.ts` | `qa/decision-engine-a11y.mjs` | V,3 | ĐẠT |
 | FR-S09 | `src/data/contentSafety.ts`, `src/index.css` | `tests/p41-font-encoding.test.ts`, `tests/math-typography.test.ts` | `qa/p41-font-visual.mjs` | V,1,3 | ĐẠT |
@@ -137,7 +137,7 @@
 
 | ID | Nguồn | Test | Probe | Gate | Trạng thái |
 |---|---|---|---|---|---|
-| FR-P01 | `src/components/parent/ParentDashboardModal.tsx`, `src/services/rewardLabels.ts` | `tests/parent-and-demo.test.ts`, `tests/t40-parent-facing-ids.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
+| FR-P01 | `src/components/parent/ParentDashboardModal.tsx`, `src/services/rewardLabels.ts` | `tests/parent-and-demo.test.ts`, `tests/t40-parent-facing-ids.test.ts`, `tests/t41a-parent-controls.test.ts` | `qa/golden-path.mjs`, `qa/parent-controls.mjs` | V,3 | ĐẠT |
 | FR-P02 | `src/components/parent/ScreenTimeModal.tsx` | `tests/t01b-ui-fixes.test.ts` | `qa/focus.mjs` | V,3 | ĐẠT |
 | FR-P03 | DC-10, `src/services/storage.ts` | `tests/t14c-storage.test.ts` | — | V,1 | ĐẠT |
 | FR-P04 | `src/services/storage.ts` (export JSON) | `tests/parent-and-demo.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
@@ -177,7 +177,7 @@
 
 | ID | Nguồn | Test | Probe | Gate | Trạng thái |
 |---|---|---|---|---|---|
-| NFR-P01 | `scripts/check-bundle-budget.mjs` (`MAIN_CHUNK_BUDGET_BYTES`) + trần boot graph 500 kB (`tests/t39-first-load-graph.test.ts`) | `tests/bundle-budget.test.ts`, `tests/t39-first-load-graph.test.ts` | — (bằng chứng trình duyệt chạy bằng script tạm ngoài `qa/`, giữ catalog 28 probe) | V,2 | ĐẠT — entry 202.3 kB / 600 kB và **dưới mục tiêu 450 kB từ T39**; boot graph 416.6 kB; `three-vendor` 572.6 + `firebase-vendor` 723.0 ở ngoài entry, có gate riêng bằng ADR-17 |
+| NFR-P01 | `scripts/check-bundle-budget.mjs` (`MAIN_CHUNK_BUDGET_BYTES`) + trần boot graph 500 kB (`tests/t39-first-load-graph.test.ts`) | `tests/bundle-budget.test.ts`, `tests/t39-first-load-graph.test.ts` | — (bằng chứng trình duyệt chạy bằng script tạm ngoài `qa/`, giữ catalog 29 probe) | V,2 | ĐẠT — entry 203.4 kB / 600 kB và **dưới mục tiêu 450 kB từ T39**; boot graph 417.8 kB; `three-vendor` 572.6 + `firebase-vendor` 723.0 ở ngoài entry, có gate riêng bằng ADR-17 |
 | NFR-P02 | `src/components/games/registry.ts` | `tests/t02c-startup-split.test.ts` | `qa/t02-smoke.mjs` | V,2 | ĐẠT |
 | NFR-P03 | `src/components/learning/cotuong/cotuongEngine.ts` (node budget) | `tests/cotuong-engine.test.ts` | — | V,1 | ĐẠT |
 | NFR-P04 | `src/config/policy.ts:297` | `tests/game-content.test.ts` | — | V,1 | ĐẠT |
@@ -199,7 +199,7 @@
 | NFR-M01 | `package.json` (`verify`, `verify:quick`) | — | — | V,H,1,2 | ĐẠT |
 | NFR-M02 | `src/config/policy.ts` (17 export, có rationale) | test theo từng policy block | — | V,1 | ĐẠT |
 | NFR-M03 | ADR-03; `src/services/answerCheck.ts` | `tests/answerCheck.test.ts`, `tests/competition-engine.test.ts` | `qa/question-types.mjs` | V,1 | ĐẠT |
-| NFR-M04 | `tests/` naming | 84 file / 1188 test | — | V,H,1 | ĐẠT |
+| NFR-M04 | `tests/` naming | 85 file / 1202 test | — | V,H,1 | ĐẠT |
 | NFR-M05 | `package.json` (8 runtime deps; `@types/three` sai chỗ — nợ #8 ARCHITECTURE §13) | `tests/t23-mcp-servers.test.ts` | — | V,H,1 | ĐẠT |
 | NFR-M06 | `mcp/lib/server.mjs` | `tests/t23-mcp-servers.test.ts` | — | V,1 | ĐẠT |
 
@@ -276,7 +276,7 @@
 
 ## 7. Ma trận ngược: test không phục vụ yêu cầu nào?
 
-84 file test đều nằm trong ít nhất một dòng §2 hoặc §3 ở trên (mới: `tests/t40-parent-facing-ids.test.ts` → FR-P01/FR-L06/FR-R04/NFR-R02/NFR-M04; `tests/t39-first-load-graph.test.ts` → NFR-P01/NFR-C01/NFR-M04 + ADR-18; `tests/t38-webgl-fallback.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/t34-chess-real-set.test.ts` → FR-C06; `tests/t33-feedback-timers.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/t32-game-stage-reset.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/chess-3d.test.ts` → FR-C06; `tests/t31-bug-hunt-fixes.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/firebase-cloud-sync.test.ts` đổi tên thành `tests/firebase-auth-sync.test.ts` → FR-Y08/Y09/NFR-C01; `tests/t24-speech-math-operators.test.ts` → FR-Y02; `tests/t25-difficulty-ladder.test.ts` → FR-G04/G05; `tests/t26-cotuong-puzzles.test.ts` → FR-C06; `tests/t27-lesson-engagement.test.ts` → FR-M01/FR-S08; `tests/t28-ui-polish.test.ts` → NFR-U01/NFR-M04; `tests/t29-lesson-smooth.test.ts` → FR-L02/NFR-M04; `tests/t30-cotuong-piece-depth.test.ts` → FR-C02), **ngoại trừ** các file sau —
+85 file test đều nằm trong ít nhất một dòng §2 hoặc §3 ở trên (mới: `tests/t41a-parent-controls.test.ts` → FR-P01/FR-S06/NFR-M04; `tests/t40-parent-facing-ids.test.ts` → FR-P01/FR-L06/FR-R04/NFR-R02/NFR-M04; `tests/t39-first-load-graph.test.ts` → NFR-P01/NFR-C01/NFR-M04 + ADR-18; `tests/t38-webgl-fallback.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/t34-chess-real-set.test.ts` → FR-C06; `tests/t33-feedback-timers.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/t32-game-stage-reset.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/chess-3d.test.ts` → FR-C06; `tests/t31-bug-hunt-fixes.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/firebase-cloud-sync.test.ts` đổi tên thành `tests/firebase-auth-sync.test.ts` → FR-Y08/Y09/NFR-C01; `tests/t24-speech-math-operators.test.ts` → FR-Y02; `tests/t25-difficulty-ladder.test.ts` → FR-G04/G05; `tests/t26-cotuong-puzzles.test.ts` → FR-C06; `tests/t27-lesson-engagement.test.ts` → FR-M01/FR-S08; `tests/t28-ui-polish.test.ts` → NFR-U01/NFR-M04; `tests/t29-lesson-smooth.test.ts` → FR-L02/NFR-M04; `tests/t30-cotuong-piece-depth.test.ts` → FR-C02), **ngoại trừ** các file sau —
 chúng bảo vệ *chất lượng nền* chứ không bảo vệ một FR riêng lẻ:
 
 | File | Vai trò thật |
@@ -297,7 +297,7 @@ chưa được ghi vào SRS (phải thêm FR hoặc xoá test).
 |---|---|---|
 | FR | 88 | **86 ĐẠT** · 1 ĐẠT MỘT PHẦN (FR-Y09 — cloud mirror mới có test mock) · 2 CHƯA ĐẠT (FR-N04, FR-P08 — cùng một nguyên nhân: thiếu nguồn giáo trình) |
 | FR có bằng chứng tự động (`tests/`) | 82/88 | 7 FR chỉ có probe (`FR-Y01`, `FR-M08`, `FR-C05`, `FR-S01`, `NFR-A04/A05`…) |
-| NFR | 25 | 24 ĐẠT · 1 đạt một phần (NFR-P01: entry 202.3 kB **đã** dưới mục tiêu 450 kB từ T39, nhưng `check:budget` vẫn chưa đo boot graph ⇒ giữ mức "một phần" cho tới khi trần boot graph vào `verify`) |
+| NFR | 25 | 24 ĐẠT · 1 đạt một phần (NFR-P01: entry 203.4 kB **đã** dưới mục tiêu 450 kB từ T39, nhưng `check:budget` vẫn chưa đo boot graph ⇒ giữ mức "một phần" cho tới khi trần boot graph vào `verify`) |
 | DC | 19 | 19 có nguồn (`STORAGE_KEYS` 17 + 2 key cục bộ) · **2 lỗ hổng thiết kế**: DC-17 `kho_bau_ioe_store` và DC-19 `kho_bau_cloud_session_hint` nằm ngoài registry |
 | Probe | 28 | 28/28 có chủ đích (27 `.mjs` + 1 `.cjs`, trừ `lib.mjs`/`run-one.mjs`) |
 | Test file | 84 | 84/84 có ánh xạ (`firebase-auth-sync` đổi tên từ `firebase-cloud-sync`; `t40-parent-facing-ids` thêm mới) |
@@ -309,5 +309,5 @@ chưa được ghi vào SRS (phải thêm FR hoặc xoá test).
 2. Xoá tính năng trong code ⇒ xoá dòng RTM và dòng SRS (giữ lại lịch sử ở `CHANGELOG.md`).
 3. Một dòng RTM chỉ chuyển sang ĐẠT khi output lệnh thật được dán vào PR/Issue —
    không dựa vào số liệu MCP (`AGENTS.md` §1.7, docs/SDLC.md §10).
-4. Số liệu kiểm kê (31 game / 475 câu / 1188 test / entry 202.3 kB + boot graph 416.6 kB…) chỉ được sửa khi vừa đo lại
+4. Số liệu kiểm kê (31 game / 475 câu / 1202 test / entry 203.4 kB + boot graph 417.8 kB…) chỉ được sửa khi vừa đo lại
    bằng `npx vitest run`, `npm run check:budget` hoặc `ls`.

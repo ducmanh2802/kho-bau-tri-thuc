@@ -36,11 +36,14 @@ import {
 } from 'lucide-react';
 import { KidBoxParentPanel } from './KidBoxParentPanel';
 
+type ParentDashboardTab = 'progress' | 'reading' | 'insights' | 'competition' | 'kidbox' | 'settings';
+
 interface ParentDashboardModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDataReset?: () => void;
   onOpenCompetitionReal?: () => void;
+  initialTab?: ParentDashboardTab;
 }
 
 export const ParentDashboardModal: React.FC<ParentDashboardModalProps> = ({
@@ -48,6 +51,7 @@ export const ParentDashboardModal: React.FC<ParentDashboardModalProps> = ({
   onClose,
   onDataReset,
   onOpenCompetitionReal,
+  initialTab = 'progress',
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [gateQuestion, setGateQuestion] = useState({ a: 15, b: 18, ans: 33 });
@@ -58,9 +62,10 @@ export const ParentDashboardModal: React.FC<ParentDashboardModalProps> = ({
   const [report, setReport] = useState<ParentDiagnosticReport | null>(null);
   const [readingReport, setReadingReport] = useState<ReadingProgressReport | null>(null);
   const [decisionReport, setDecisionReport] = useState<DecisionOutput | null>(null);
-const [activeTab, setActiveTab] = useState<
-    'progress' | 'reading' | 'insights' | 'competition' | 'kidbox' | 'settings'
-  >('progress');
+  const [unlockAllLessons, setUnlockAllLessons] = useState(
+    () => StorageService.getChildProfile().unlockAllLessons === true
+  );
+  const [activeTab, setActiveTab] = useState<ParentDashboardTab>('progress');
   const [showSeedConfirm, setShowSeedConfirm] = useState(false);
   const dialogRef = useFocusTrap<HTMLDivElement>(isOpen);
 
@@ -97,6 +102,8 @@ const [activeTab, setActiveTab] = useState<
       setGateError(false);
       setIsAuthenticated(false);
       setSettings(StorageService.getParentSettings());
+      setUnlockAllLessons(StorageService.getChildProfile().unlockAllLessons === true);
+      setActiveTab(initialTab);
     }
   }, [isOpen]);
 
@@ -202,8 +209,10 @@ const [activeTab, setActiveTab] = useState<
 
   const handleToggleUnlockAll = () => {
     const profile = StorageService.getChildProfile();
-    profile.unlockAllLessons = !profile.unlockAllLessons;
+    const next = profile.unlockAllLessons !== true;
+    profile.unlockAllLessons = next;
     StorageService.saveChildProfile(profile);
+    setUnlockAllLessons(next);
     sound.playClick();
   };
 
@@ -244,6 +253,7 @@ const [activeTab, setActiveTab] = useState<
   const handleConfirmReset = () => {
     StorageService.resetProgress();
     sound.playClick();
+    setUnlockAllLessons(false);
     showResetNotice('Đã đặt lại tiến độ về dữ liệu mới tinh ban đầu!', 3000);
     setShowResetConfirm(false);
     setReport(AdaptiveService.generateParentReport());
@@ -1105,12 +1115,12 @@ const [activeTab, setActiveTab] = useState<
                         onClick={handleToggleUnlockAll}
                         data-testid="unlock-all-lessons-toggle"
                         className={`px-3 py-1.5 rounded-lg font-bold text-xs ${
-                          StorageService.getChildProfile().unlockAllLessons
+                          unlockAllLessons
                             ? 'bg-emerald-600 text-white'
                             : 'bg-slate-300 text-slate-700'
                         }`}
                       >
-                        {StorageService.getChildProfile().unlockAllLessons ? 'Bật' : 'Tắt'}
+                        {unlockAllLessons ? 'Bật' : 'Tắt'}
                       </button>
                     </div>
                   </div>
@@ -1234,6 +1244,7 @@ const [activeTab, setActiveTab] = useState<
                       </div>
                       <button
                         onClick={handleToggleRewardsEnabled}
+                        data-testid="parent-rewards-toggle"
                         className={`px-3 py-1.5 rounded-lg font-bold text-xs ${
                           settings.rewardsEnabled ? 'bg-emerald-600 text-white' : 'bg-slate-300 text-slate-700'
                         }`}

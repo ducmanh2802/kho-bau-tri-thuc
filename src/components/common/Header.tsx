@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { ActiveScreen, ChildProfile } from '../../types';
-import { StorageService } from '../../services/storage';
 import { sound } from '../../services/sound';
 import { Star, Sparkles, Flame, Volume2, VolumeX, Shield, ShoppingBag } from 'lucide-react';
 import { KidButton, Pill } from '../ui';
@@ -92,15 +91,6 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isMuted, setIsMuted] = React.useState(sound.getMuted());
   const [lastPhraseTime, setLastPhraseTime] = useState<number>(0);
-
-  // Check days since last play using analytics todayDate
-  useEffect(() => {
-    const analytics = StorageService.getAnalytics();
-    const today = new Date().toISOString().split('T')[0];
-    const lastPlayedDate = analytics.todayDate;
-    const daysSinceLastPlay = lastPlayedDate !== today && lastPlayedDate ? 1 : 0;
-    // Just track if we played today, no complex day counting needed
-  }, []);
 
   // Play contextual greeting when component mounts or time changes
   useEffect(() => {

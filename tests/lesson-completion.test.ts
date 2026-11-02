@@ -24,8 +24,13 @@ const body = (name: string) => {
 describe('lesson result screen', () => {
   it('is rendered inside the lesson dialog with the rewards and both actions', () => {
     expect(lp).toContain('CHÚC MỪNG BÉ HOÀN THÀNH!');
-    expect(lp).toContain('+{lesson.starReward} Sao');
-    expect(lp).toContain('+{lesson.xpReward} XP');
+    // T41 — màn kết quả phải in phần thưởng THẬT vừa được cấp, không phải cấu
+    // trúc bài (lượt học lại chỉ +5 XP; tắt quỹ thưởng thì không cộng gì).
+    expect(lp).toContain('+{lastAward.starsAwarded} Sao');
+    expect(lp).toContain('+{lastAward.xpAwarded} XP');
+    expect(lp).not.toContain('+{lesson.starReward} Sao');
+    expect(lp).not.toContain('+{lesson.xpReward} XP');
+    expect(lp).toContain('data-testid="lesson-rewards-off"');
     expect(lp).toMatch(/onClick=\{handleRetryLesson\}/);
     expect(lp).toMatch(/onClick=\{handleFinishAndClose\}[\s\S]{0,300}Về bản đồ/);
     // exactly one dialog element in this component

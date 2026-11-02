@@ -61,7 +61,11 @@ export const GachaMachineScreen: React.FC<GachaMachineScreenProps> = ({
 
   const drawsToday = motivation.daily.gachaDraws;
   const drawsLeft = Math.max(0, MAX_DAILY_DRAWS - drawsToday);
-  const canDraw = profile.tickets >= 1 && drawsLeft > 0;
+  // T41 — ba mẹ tắt phần thưởng thì máy kéo phải DỪNG, không chỉ từ chối bên
+  // trong StorageService: bé bấm quay mà vé bị trừ, không ra sticker thì màn
+  // hình chỉ báo lỗi vô hình.
+  const rewardsEnabled = StorageService.areRewardsEnabled();
+  const canDraw = rewardsEnabled && profile.tickets >= 1 && drawsLeft > 0;
 
   const handleDraw = useCallback(() => {
     if (!canDraw || isSpinning) return;
@@ -265,6 +269,8 @@ export const GachaMachineScreen: React.FC<GachaMachineScreenProps> = ({
               <span className="flex items-center gap-2">
                 🎟️ Gắp Ngay ({drawsLeft} lượt còn lại)
               </span>
+            ) : !rewardsEnabled ? (
+              <span className="flex items-center gap-2">Nhà Mình Đang Tắt Phần Thưởng</span>
             ) : profile.tickets < 1 ? (
               <span className="flex items-center gap-2">Hết Vé! Học Bài Để Nhận Vé</span>
             ) : (
@@ -355,7 +361,9 @@ export const GachaMachineScreen: React.FC<GachaMachineScreenProps> = ({
                 <p className="text-lg font-bold text-slate-700 mb-4">
                   {result.reason === 'no-ticket'
                     ? 'Bé hết vé rồi. Hãy học bài để nhận thêm vé nhé!'
-                    : 'Hôm nay bé đã gắp đủ 5 lượt. Mai hãy thử lại nhé!'}
+                    : result.reason === 'rewards-off'
+                      ? 'Ba mẹ đang tắt phần thưởng nên máy kéo nghỉ một hôm. Bé bật lại trong mục Ba Mẹ nhé!'
+                      : 'Hôm nay bé đã gắp đủ 5 lượt. Mai hãy thử lại nhé!'}
                 </p>
                 <KidButton
                   variant="secondary"
