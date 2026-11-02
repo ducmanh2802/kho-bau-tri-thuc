@@ -56,23 +56,39 @@ jobs:
 
       # Log của một job Actions chỉ người có quyền admin mới tải được (`GET/…/jobs/<id>/logs` trả
       # `403 Must have admin rights to Repository`), nên lane đã ba lần thấy bước "QA probe" đỏ mà
-      # không đọc nổi dòng lỗi. Bước này chạy **sau** khi lỗi và in 4 dòng đầu tiên qua
-      # `::error::` — **đo được**: annotation đọc public bằng
-      # `GET /repos/<o>/<r>/check-runs/<id>/annotations` ⇒ HTTP 200, trong khi
-      # `$GITHUB_STEP_SUMMARY` (try ở run 41494831619, step 8 success) **không** hiện trong
-      # `output.summary` của check-run ⇒ summary không phải kênh đọc được cho lane.
+      # không đọc nổi dòng lỗi. Kênh đọc được **đã đo**: annotation trả HTTP 200 không cần token
+      # (`GET /repos/<o>/<r>/check-runs/125452831334/annotations` ⇒ 13 annotation), trong khi
+      # `$GITHUB_STEP_SUMMARY` (bước 8 ở run 41494831619, chạy thành công) **không** hiện trong
+      # `output.summary` của check-run ⇒ summary không phải kênh cho lane.
+      # Bài học lần 1 (run 41496530836): `head -c 700` chép phần **đầu** JSON, mà `state` được khai
+      # báo `{ steps, errors }` nên phần đầu là mảng `steps` — `errors`/`failedAt` nằm cuối và
+      # không lọt vào, lại một `while read` mỗi dòng một annotation nên thứ tự bị xáo. Lần này cắt
+      # đúng hai khối: tổng hợp `errors`/`failedAt`/tên bước, và đuôi log thô, mỗi khối **một**
+      # annotation nối dòng bằng `%0A` để thứ tự không đổi nghĩa.
       # Không đổi code probe: chỉ làm nguyên nhân thật trở nên quan sát được.
       - name: Đưa lỗi probe lên annotation (đọc public được)
         if: failure()
         env:
           PROBE: ${{ github.event.inputs.probe || 'qa/golden-path.mjs' }}
         run: |
-          out="$(node qa/run-one.mjs "$PROBE" 2>&1 | head -c 700 || true)"
-          printf '%s\n' "$out" | while IFS= read -r line; do
-            line="${line//$'\r'/}"
-            line="${line//%/%25}"
-            line="${line//#/%23}"
-            [ -n "$line" ] || continue
-            echo "::error file=.github/workflows/03-qa-browser.yml,line=55::$PROBE :: ${line:0:180}"
-          done
-          echo "::error file=.github/workflows/03-qa-browser.yml,line=55::runner=$(uname -sr) node=$(node -v) npm=$(npm -v) playwright=$(npx playwright --version 2>&1 | head -1) dist_root_files=$(find dist -maxdepth 1 -type f 2>/dev/null | wc -l)"
+          node qa/run-one.mjs "$PROBE" > probe-run.log 2>&1 || true
+          # Probe in JSON rồi mới in "QA FAIL" ra stderr; tách khối JSON cuối file để lấy errors.
+          summ="$(node -e '
+            const t = require("fs").readFileSync("probe-run.log", "utf8");
+            const i = t.indexOf("{"), j = t.lastIndexOf("}");
+            let o = null;
+            if (i >= 0 && j > i) { try { o = JSON.parse(t.slice(i, j + 1)); } catch {} }
+            const s = o
+              ? JSON.stringify({ ok: o.ok, failedAt: o.failedAt, errors: o.errors,
+                  lastSteps: (o.steps || []).map((x) => x.step).slice(-6) })
+              : "NO_JSON " + t.slice(-500);
+            process.stdout.write(s);
+          ' || echo "DIAG_NODE_FAIL")"
+          ctx="runner=$(uname -sr) node=$(node -v) npm=$(npm -v) playwright=$(npx playwright --version 2>&1 | head -1) dist_files=$(find dist -maxdepth 1 -type f 2>/dev/null | wc -l)"
+          emit() {
+            m="$1"
+            m="${m//$'\r'/}"; m="${m//%/%25}"; m="${m//#/%23}"; m="${m//$'\n'/%0A}"
+            echo "::error file=.github/workflows/03-qa-browser.yml,line=55::$PROBE :: ${m:0:1600}"
+          }
+          emit "$summ"
+          emit "$(tail -c 900 probe-run.log) || $ctx"
