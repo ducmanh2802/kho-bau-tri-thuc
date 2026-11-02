@@ -1,0 +1,33 @@
+Tái lập flake theo giờ — tests/fatigue-reset.test.ts
+Đồng hồ máy lúc đo: 2026-11-02 23:45:41 +0700 (cửa sổ đỏ = 30 phút trước nửa đêm địa phương)
+
+=== [1] BẢN CŨ (git show HEAD:tests/fatigue-reset.test.ts, chưa neo mốc) — npx vitest run tests/fatigue-reset.test.ts
+ ❯ tests/fatigue-reset.test.ts (7 tests | 1 failed) 20ms
+     ✓ keeps an active session untouched (same object) 2ms
+     ✓ resets after FATIGUE_SESSION_GAP_MS of inactivity 1ms
+     ✓ resets when the local day changes 0ms
+     × does not reset one millisecond before the gap boundary 10ms
+   ✓ StorageService fatigue reset (P0-2) (3)
+     ✓ clears a latched fatigue when the app is reopened after a gap 1ms
+     ✓ resets counters when evidence arrives after a long gap 3ms
+     ✓ keeps counting within an active session 1ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/fatigue-reset.test.ts > resetStaleFatigue (P0-2) > does not reset one millisecond before the gap boundary
+AssertionError: expected { …(5) } to be { …(5) } // Object.is equality
+ ❯ tests/fatigue-reset.test.ts:84:39
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  23:45:28
+   Duration  521ms (transform 46%, import 36%, tests 11%, worker 7%)
+EXIT=1
+
+=== [2] BẢN SỬA (neo NOON_ANCHOR giữa trưa + thêm ca vượt nửa đêm) — npx vitest run tests/fatigue-reset.test.ts
+ ✓ tests/fatigue-reset.test.ts (8 tests) 14ms
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  23:45:33
+   Duration  504ms (transform 48%, import 38%, tests 8%, worker 6%)
+EXIT=0
+
+Kết luận: code KHÔNG đổi (chỉ sửa test + thêm 1 ca), nên đây là lỗi test theo thời điểm,
+không phải hồi quy hành vi. Ca mới khoá đúng hành vi: phiên 23:50→00:05 vẫn reset vì đổi ngày.

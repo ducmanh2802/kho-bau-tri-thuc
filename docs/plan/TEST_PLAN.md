@@ -5,7 +5,7 @@
 > coi là xanh**. Danh sách yêu cầu cần kiểm: [`SRS.md`](../specs/SRS.md); ánh xạ
 > yêu cầu ↔ test ↔ probe ↔ gate: [`RTM.md`](../specs/RTM.md); quy trình: [`../SDLC.md`](../SDLC.md).
 >
-> **Số liệu chốt 2026-11-02** (đo lại sau **KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3`** — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` 30 test và probe `qa/game-pause.mjs`; đợt đo trước trong cùng ngày là T41C — bốn đường ghi tiến trình chỉ tính một lần: bằng liệu trùng chặn trước khi cộng, buổi đọc có dấu đã gập, bước ngày hoàn tác khi ghi hỏng, mỗi lượt chơi một biên lai; trước đó là T41B cửa sổ cân bằng môn và nhãn ngày trong báo cáo Ba Mẹ theo đồng hồ của caller + lịch địa phương, T41A công tắc phần thưởng chặn đúng tài nguyên, T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, T39 cắt lần tải đầu): 89 file test / 1277 test ·
+> **Số liệu chốt 2026-11-02** (đo lại sau **KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3` + merge release `7365830` + bản sửa flake theo giờ trong `tests/fatigue-reset.test.ts`** — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` 30 test và probe `qa/game-pause.mjs`; đợt đo trước trong cùng ngày là T41C — bốn đường ghi tiến trình chỉ tính một lần: bằng liệu trùng chặn trước khi cộng, buổi đọc có dấu đã gập, bước ngày hoàn tác khi ghi hỏng, mỗi lượt chơi một biên lai; trước đó là T41B cửa sổ cân bằng môn và nhãn ngày trong báo cáo Ba Mẹ theo đồng hồ của caller + lịch địa phương, T41A công tắc phần thưởng chặn đúng tài nguyên, T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, T39 cắt lần tải đầu): 89 file test / 1278 test ·
 > 30 probe (29 `.mjs` + 1 `.cjs`) · 4 workflow CI · 3 git hook · main chunk `index-B6au8G63.js`
 > 204.2 kB / trần 600 kB / **mục tiêu 450 kB đã đạt**; đồ thị chặn lần vẽ đầu 418.5 kB (trần 500 kB
 > do `tests/t39-first-load-graph.test.ts` giữ); vendor ngoài entry và ngoài boot graph: `three-vendor` 572.6 kB, `firebase-vendor` 723.0 kB.
@@ -36,7 +36,7 @@ Lớp 5  Người lớn đọc to + beta trẻ thật          → §11   (2 phi
 Lớp 4  Thiết bị thật: Android/iOS, offline, audio → §7    (qa/mobile.mjs + tay người)
 Lớp 3  Probe trình duyệt trên dist/ (30 probe)    → §6    (npm run qa:smoke)
 Lớp 2  Build + ngân sách + precache               → §9    (npm run build && npm run check:budget)
-Lớp 1  Unit/integration Vitest (1277 test)        → §5    (npm run test:ci)
+Lớp 1  Unit/integration Vitest (1278 test)        → §5    (npm run test:ci)
 ────────────────────────────────────────────────────────────────────────────────────────────
               npm run verify = typecheck + Lớp 1 + Lớp 2   ← cổng duy nhất
 ```
@@ -257,7 +257,8 @@ không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại 
 | Lỗi lịch sử | Fix | Test khoá |
 |---|---|---|
 | Ordering chấm sai vì đáp án là chuỗi `'a\|b\|c'` | `toPipeText` trong `src/services/answerCheck.ts` | `tests/answerCheck.test.ts` (+4 ca) |
-| Fatigue kẹt vĩnh viễn (chỉ `+= 1`) | `resetStaleFatigue()` + `FATIGUE_SESSION_GAP_MS` | `tests/fatigue-reset.test.ts` (7/7) |
+| Fatigue kẹt vĩnh viễn (chỉ `+= 1`) | `resetStaleFatigue()` + `FATIGUE_SESSION_GAP_MS` | `tests/fatigue-reset.test.ts` (8/8) |
+| **Test fatigue đỏ chỉ vì đồng hồ tường**: hai ca "không reset" lấy `Date.now()` làm mốc phiên, suite chạy trong 30 phút trước nửa đêm đẩy `now` sang ngày hôm sau ⇒ quy tắc **đổi ngày** reset, code đúng vẫn đỏ (đỏ thật lúc 23:36, 2026-11-02, khi merge release vào `main`) | neo `sessionStartTime` vào `NOON_ANCHOR` (giữa trưa) + thêm ca khoá hành vi vượt nửa đêm | `tests/fatigue-reset.test.ts` — ca "đổi ngày là lý do reset ĐỘC LẬP với ngưỡng gap"; tái lập: `git show HEAD~:tests/fatigue-reset.test.ts > tests/fatigue-reset.test.ts && npx vitest run tests/fatigue-reset.test.ts` trong khung 23:30–00:00 ⇒ 1 failed |
 | Word Safari không thể thắng (mọi item `isCorrect`) | 1 target + decoy, vị trí hash-seed | `tests/kidbox-learning-os.test.ts` |
 | Matching LessonPlayer không bao giờ nối được cặp | sửa `handleMatch` | `tests/lesson-matching.test.ts` |
 | `Math.random` làm đề không tái lập | `seededRng`/`shuffleSeeded`/`pickDistinct` | `tests/game-content.test.ts` |
@@ -321,7 +322,8 @@ không còn là bằng chứng xanh cho vùng praise/parity; muốn dùng lại 
 | 9 | Bàn cờ vua WebGL không có ca fallback khi context creation thất bại | máy cấu hình thấp chỉ thấy màn trống | test + fallback CSS (nợ #7 ARCHITECTURE §13) |
 | 6 | Quota `localStorage` đầy chưa có ca | mất tiến độ ở máy dùng lâu | task B6 |
 | 7 | Không có test đổi ngưỡng ⇒ đổi hành vi cho cả 17 policy block | ngưỡng bị "đóng băng" sai | task C5 |
-| 10 | `tests/chess-engine-performance.test.ts:43` đo `getBestMove(depth 4)` bằng **thời gian tường** (`expect(duration).toBeLessThanOrEqual(600)`, engine tự giới hạn 400 ms) | flake trên máy CI chậm hoặc lúc máy bận — đỏ mà code không sai; trong suite đầy đủ (23.85 s) chưa quan sát thấy đỏ | khi đỏ, chạy cô lập `npx vitest run tests/chess-engine-performance.test.ts` để phân biệt flake/thật; ngưỡng nới thành `deadline + buffer` nếu CI chứng minh hụt |
+| 10 | `tests/chess-engine-performance.test.ts:43` đo `getBestMove(depth 4)` bằng **thời gian tường** (`expect(duration).toBeLessThanOrEqual(600)`, engine tự giới hạn 400 ms) | flake trên máy CI chậm hoặc lúc máy bận — đỏ mà code không sai; trong suite đầy đủ (23.64 s) chưa quan sát thấy đỏ | khi đỏ, chạy cô lập `npx vitest run tests/chess-engine-performance.test.ts` để phân biệt flake/thật; ngưỡng nới thành `deadline + buffer` nếu CI chứng minh hụt |
+| 11 | **Chưa có gate nào** quét test phụ thuộc đồng hồ tường (`Date.now()` làm mốc rồi so với ngưỡng), nên lớp lỗi này chỉ lộ ra khi suite chạy vào khung giờ unlucky (đã gặp: `tests/fatigue-reset.test.ts`, sửa 2026-11-02) | flake theo giờ trong ngày, khó tái lập khi người báo chạy lại buổi sáng | grep định kỳ `grep -rln "Date.now()" tests/ \| xargs grep -Ln "useFakeTimers" \| wc -l` ⇒ **10** file ứng viên (đo 2026-11-02, chưa rà từng ca); ưu tiên `vi.setSystemTime(mốc giữa ngày)` cho mọi ca so với ngưỡng thời gian |
 
 ---
 

@@ -51,6 +51,8 @@ một ô `NotRun` vẫn phải ghi rõ vì sao chưa chạy.
 |---|---|---|
 | `verify.txt` | `npm run verify` trên tip `feature/43-game-pause` — sau merge `c8a3725` và hai sửa review (guard theo vị trí + ARIA lớp phủ) | `88` test file passed · `1272` test passed · `Duration 21.55s` · `Main chunk: index-qnZ3EVTS.js = 204.2 kB → PASS (meets 450 kB goal)` |
 | `verify-rc.txt` | `npm run verify` trên **RC commit** `3d06930` (tip nhánh sau khi merge `09511d3` của lane khác vào) — phép đo chốt để tag `v1.1.0` | `89` test file passed · `1277` test passed · `Duration 23.85s` · `Main chunk: index-B6au8G63.js = 204.2 kB → PASS (meets 450 kB goal)` |
+| `verify-main-1278.txt` | `npm run verify` trên HEAD `main` sau merge release **và** bản sửa flake theo giờ trong `tests/fatigue-reset.test.ts` — phép đo chốt để đóng tag | `89` test file · `1278` test · `Duration 23.64s` · `Main chunk: index-B6au8G63.js = 204.2 kB → PASS` (hash **không đổi** so với RC: fix chỉ đụng `tests/`, không vào bundle) |
+| `repro-fatigue-midnight.txt` | Hai lượt `npx vitest run tests/fatigue-reset.test.ts` **cô lập** trong khung 23:45 +07: lượt 1 với bản test cũ (mốc phiên = `Date.now()`), lượt 2 với bản đã neo `NOON_ANCHOR` — chứng minh đỏ là do thời điểm chạy, không phải hồi quy hành vi | cũ: `Tests 1 failed \| 6 passed (7)` EXIT=1 · mới: `Tests 8 passed (8)` EXIT=0 · `Duration 504ms` |
 | `red-before-fix.txt` | Log **trước** khi sửa source — chứng minh test bắt được bug thật, không viết ra sau khi code đã đúng | `30 tests \| 24 failed` · `Tests 24 failed \| 6 passed (30)` · EXIT=1 |
 | `verify-release-prep.txt` | `npm run verify` **sau** khi chốt hồ sơ `1.1.0` (`CHANGELOG` đổi header, `package.json` + lock lên `1.1.0`) — để chắc bước chuẩn bị release không đổi artefact | `88` test file · `1272` test · `Duration 33.43s` · entry **vẫn** `index-qnZ3EVTS.js = 204.2 kB → PASS` (mã bundle không đọc `package.json.version`) |
 | `probe-game-pause.json` | Playwright trên `dist/` thật: 4 trò đồng hồ có đúng 1 nút tạm, 1 trò không đồng hồ có 0 nút; tạm ⇒ bóng đứng nguyên 1 200 ms; chạm lúc tạm không nhích câu; bấm tiếp rơi lại; **C2 đối chứng**: cùng cú chạm lúc đang chạy thì xoá đúng bóng đích | `12` bước · `errors: []` · `ok: true` · `QA PASS — 12 step(s), 0 errors` |
@@ -74,9 +76,10 @@ rồi được hoàn tác; tính cả hai phép của đợt T41C thì tổng l�
 ### Tái lập đợt `2026-11-02-KBT-ISSUE-43`
 
 ```bash
-git checkout feature/43-game-pause        # tip nhánh = RC `3d06930` (đã merge `09511d3` + `c8a3725` của lane kia)
-npm run hooks:install && npm ci && npm run verify        # 89 file / 1277 test / 204.2 kB `index-B6au8G63.js`
-sed 's/\x1b\[[0-9;]*m//g' <log> > evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt
+git checkout main                          # HEAD `main` sau merge release (mang bản sửa flake theo giờ)
+# muốn tái lập đúng RC của Pha 4–5: git checkout 3d06930  → 89 file / 1277 test / 23.85s (`verify-rc.txt`)
+npm run hooks:install && npm ci && npm run verify        # 89 file / 1278 test / 204.2 kB `index-B6au8G63.js`
+sed 's/\x1b\[[0-9;]*m//g' <log> > evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt
 npm run build
 node qa/run-one.mjs qa/game-pause.mjs > evidence/2026-11-02-KBT-ISSUE-43/probe-game-pause.json
 # phải in QA PASS — 12 step(s), 0 errors (dòng đó nằm ngoài JSON, đã cắt khi lưu)

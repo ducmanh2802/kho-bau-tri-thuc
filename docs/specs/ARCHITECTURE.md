@@ -512,7 +512,7 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 | Export policy | 17 (693 dòng) | `src/config/policy.ts` |
 | Key `localStorage` | 19 | `STORAGE_KEYS` (17) + 2 key cục bộ (`kho_bau_ioe_store`, `kho_bau_cloud_session_hint` — hint boolean, không chứa dữ liệu bé) |
 | Dependency runtime | 8 | `package.json` → `dependencies` |
-| Test file / test | 89 / 1277 | `npx vitest run` (87 `.ts` + 2 `.tsx`) |
+| Test file / test | 89 / 1278 | `npx vitest run` (87 `.ts` + 2 `.tsx`) |
 | Probe QA | 30 (29 `.mjs` + 1 `.cjs`) | `ls qa/*.mjs qa/*.cjs` (trừ `lib.mjs`, `run-one.mjs`) |
 | Workflow CI | 4 | `.github/workflows/` |
 | MCP server / tool | 5 / 27 | `mcp/` |

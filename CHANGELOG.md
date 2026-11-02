@@ -614,6 +614,14 @@ Xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
   bị viết lại toàn bộ nên chạy lại cả ba probe: `qa:smoke` `QA PASS — 28 step(s), 0 errors`, `qa:games`
   `catalogCount: 31` + 31/31 `mounted: true` + `overflowPx` max `0`, `game-pause` `QA PASS — 12 step(s), 0 errors`
   (`ok: true`, `failedAt: null`). Bằng chứng: `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt` và ba file hậu tố `-rc`.
+- **Sửa flake theo giờ trong `tests/fatigue-reset.test.ts` (đỏ ngay trên HEAD `main` lúc 23:36):** hai ca
+  "không reset" lấy `Date.now()` làm mốc phiên, nên khi suite chạy trong **30 phút trước nửa đêm**,
+  `now = mốc + FATIGUE_SESSION_GAP_MS - 1` rơi sang **ngày hôm sau** và quy tắc *đổi ngày* của
+  `resetStaleFatigue` kích hoạt — `Tests 1 failed | 6 passed (7)` EXIT=1 **cả khi chạy cô lập**, code đúng vẫn đỏ.
+  Cách sửa: neo `sessionStartTime` vào `NOON_ANCHOR` (giữa trưa, không phụ thuộc giờ chạy) và thêm một ca mới
+  khoá đúng hành vi vượt nửa đêm (23:50 → 00:05: dưới ngưỡng gap nhưng **phải** reset vì đổi ngày).
+  Không đổi `src/`. Tổng test **1277 → 1278**; `npm run verify` **EXIT=0** · `89 file` · `Duration 23.64s` ·
+  entry **vẫn** `index-B6au8G63.js = 204.2 kB` (bundle không đọc `tests/`). Tái lập: `evidence/2026-11-02-KBT-ISSUE-43/repro-fatigue-midnight.txt`.
 - **Siết hợp đồng nguồn theo VỊ TRÍ (review 4 lớp, finding #1 → phép ablation M5):** hai test
   "chặn guard" của `tests/t43-game-pause.test.ts` trước đây chỉ **đếm** (`toContain` một chuỗi,
   `guards.length >= 2`), nên lùi guard xuống **sau** phép ghi điểm — lỗi thật, điểm vẫn cộng khi

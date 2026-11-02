@@ -12,7 +12,7 @@ chứng thì để trống và ghi lý do ngay dưới bảng — không tô h�
 | # | Artifact | Pha | Trạng thái | Bằng chứng / số đo |
 |---|---|---|---|---|
 | 01 | [Lifecycle Board](01_LIFECYCLE_BOARD.md) | cả 6 | Đủ, 1 pha `NotRun` | 6 pha × 5 lớp; ô Release trống vì `git tag` = 0 |
-| 02 | [AI Usage Charter](02_AI_USAGE_CHARTER.md) | governance | Đạt | Rule of Two 4 lớp; 3 hook + 4 workflow + 1277 test |
+| 02 | [AI Usage Charter](02_AI_USAGE_CHARTER.md) | governance | Đạt | Rule of Two 4 lớp; 3 hook + 4 workflow + 1278 test |
 | 03 | [Requirements Chain](03_REQUIREMENTS_CHAIN.md) | Requirements | Đạt cho lát cắt | 88 FR · 6 US · 42 TC · 0 test mồ côi (`RTM.md` §7) |
 | 04 | [Design Blueprint](04_DESIGN_BLUEPRINT.md) | Design | Đạt, 1 lỗ hổng | 18 ADR · 6 driver có số đo · STRIDE 6 mục · lethal trifecta đã cắt 2/3 điều kiện |
 | 05 | [Implementation Loop](05_IMPLEMENTATION_LOOP.md) | Implementation | Đạt | Guarded loop 6 bước có ví dụ thật T41C; merge gate 5 điều kiện, G-5 đang hở |
@@ -24,12 +24,12 @@ Phụ lục: [`CHECKLIST.md`](CHECKLIST.md) · [`HARNESS.md`](HARNESS.md) ·
 [`09_ADOPTION_ROADMAP.md`](09_ADOPTION_ROADMAP.md) · [`../prompts/`](../prompts/) ·
 [`../../evidence/`](../../evidence/README.md)
 
-## 2. Số đo hiện trạng (đo 2026-11-02, trên tip `feature/43-game-pause` = merge `3d06930` của `09511d3`)
+## 2. Số đo hiện trạng (đo 2026-11-02, trên HEAD `main` sau merge release `7365830` + bản sửa flake theo giờ)
 
 | Hạng | Số | Lệnh |
 |---|---|---|
-| Cổng chất lượng | `npm run verify` EXIT=0 | `evidence/2026-11-02-KBT-ISSUE-43/verify-rc.txt` (lần đo gần nhất) · `evidence/2026-11-02-KBT-ISSUE-43/verify.txt` · `evidence/2026-11-02-T41C/verify.txt` |
-| Test file / test | 89 / 1277 · suite 23.85 s | `npx vitest run` |
+| Cổng chất lượng | `npm run verify` EXIT=0 | `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` (lần đo gần nhất, trên HEAD `main`) · `verify-rc.txt` · `verify.txt` · `evidence/2026-11-02-T41C/verify.txt` |
+| Test file / test | 89 / 1278 · suite 23.64 s | `npx vitest run` |
 | Probe QA | 30 (29 `.mjs` + 1 `.cjs`) | `ls qa/*.mjs qa/*.cjs` trừ `lib.mjs`, `run-one.mjs` |
 | Entry chunk | **204.2 kB** `index-B6au8G63.js` | `npm run check:budget` |
 | Boot graph | **418.5 kB** | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sort -u` + `stat -c%s` |

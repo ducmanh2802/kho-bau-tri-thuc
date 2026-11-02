@@ -27,6 +27,12 @@ import type { SessionFatigueState } from '../src/types/learningOS';
 
 const STORE_KEY = 'kho_bau_learning_os_store';
 
+// Mốc neo giữa trưa (giờ máy). Nếu để `sessionStartTime = Date.now()` thì suite chạy trong
+// 30 phút trước nửa đêm sẽ đẩy `now` sang **ngày hôm sau**, và `resetStaleFatigue` reset vì
+// quy tắc đổi ngày chứ không vì ngưỡng gap — test đỏ dù code đúng (đỏ thật đầu tiên lúc
+// 23:36 ngày 2026-11-02, khi merge `09511d3` vào main).
+const NOON_ANCHOR = new Date(2026, 10, 12, 12, 0).getTime();
+
 function makeFatigue(overrides: Partial<SessionFatigueState> = {}): SessionFatigueState {
   return {
     sessionStartTime: Date.now(),
@@ -52,7 +58,7 @@ function recordEvidence(id: string, correct: boolean) {
 
 describe('resetStaleFatigue (P0-2)', () => {
   it('keeps an active session untouched (same object)', () => {
-    const f = makeFatigue({ questionsAnsweredThisSession: 20, isFatigued: true });
+    const f = makeFatigue({ sessionStartTime: NOON_ANCHOR, questionsAnsweredThisSession: 20, isFatigued: true });
     const now = f.sessionStartTime + 5 * 60 * 1000;
     expect(resetStaleFatigue(f, now)).toBe(f);
   });
@@ -79,9 +85,22 @@ describe('resetStaleFatigue (P0-2)', () => {
   });
 
   it('does not reset one millisecond before the gap boundary', () => {
-    const f = makeFatigue({ questionsAnsweredThisSession: 3 });
+    const f = makeFatigue({ sessionStartTime: NOON_ANCHOR, questionsAnsweredThisSession: 3 });
     const now = f.sessionStartTime + LEARNING_OS_POLICY.FATIGUE_SESSION_GAP_MS - 1;
     expect(resetStaleFatigue(f, now)).toBe(f);
+  });
+
+  it('đổi ngày là lý do reset ĐỘC LẬP với ngưỡng gap (ca vượt nửa đêm)', () => {
+    // 23:50 → 00:05 hôm sau: mới 15 phút, dưới ngưỡng gap, nhưng đã sang ngày địa phương
+    // ⇒ phải reset. Nếu ai đó "sửa" cho phiên 23:50 được giữ tới 00:20 thì ca này đỏ.
+    const start = new Date(2026, 10, 12, 23, 50).getTime();
+    const f = makeFatigue({ sessionStartTime: start, questionsAnsweredThisSession: 4, isFatigued: true });
+    const now = new Date(2026, 10, 13, 0, 5).getTime();
+    const r = resetStaleFatigue(f, now);
+    expect(r).not.toBe(f);
+    expect(r.questionsAnsweredThisSession).toBe(0);
+    expect(r.isFatigued).toBe(false);
+    expect(now - start).toBeLessThan(LEARNING_OS_POLICY.FATIGUE_SESSION_GAP_MS);
   });
 });
 

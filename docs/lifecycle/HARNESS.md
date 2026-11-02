@@ -28,7 +28,7 @@
 | Git | `scripts/hooks/pre-commit` | commit khi typecheck đỏ | có |
 | Git | `scripts/hooks/commit-msg` | message ngoài Conventional Commits | có |
 | Git | `scripts/hooks/pre-push` | push khi `verify:quick` đỏ | có |
-| CI | workflow `01-quality` | typecheck + 1277 test | có, mỗi push/PR |
+| CI | workflow `01-quality` | typecheck + 1278 test | có, mỗi push/PR |
 | CI | workflow `02-build-artifact` | build + `check:budget` (entry ≤ 600 kB) | có |
 | CI | workflow `03-qa-browser` | 30 probe Playwright trên `dist/` | có |
 | CI | workflow `04-release` | tag sai dạng `vX.Y.Z` bị từ chối | **chưa lần nào** — repo chưa có tag |
@@ -40,7 +40,7 @@
 | Runtime | `writeJSON → boolean` | ghi hỏng bị im lặng | có — T41C |
 | Cloud | `firestore.rules` | đọc/ghi hồ sơ của uid khác | có file, **chưa test end-to-end** (mock thôi) |
 
-**Đếm sensor:** 3 hook · 4 workflow · 89 test file / 1277 test · 30 probe · 1 rules file.
+**Đếm sensor:** 3 hook · 4 workflow · 89 test file / 1278 test · 30 probe · 1 rules file.
 
 ## 3. Memory — cái nhớ giữa các phiên (và vì sao nó gọn)
 
