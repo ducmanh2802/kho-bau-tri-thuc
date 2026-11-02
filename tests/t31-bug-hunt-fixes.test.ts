@@ -106,6 +106,18 @@ describe('T31 — sửa lỗi tìm được khi quét toàn bộ probe', () => {
       expect(src).toMatch(/await dismissLevelUpCelebration\(page\);\s*await openCompetitionHub\(page\);/);
     });
 
+    it('CI: annotation kể lại lần chạy THẤT BẠI, không chạy lại probe lần hai', () => {
+      // Run 41504913606 trên `8e6f9f5` (commit chỉ đổi tài liệu): bước "QA probe" failure
+      // nhưng annotation in ra `QA PASS — 28 step(s), 0 errors`. Lý do: bước chẩn đoán chạy
+      // lại probe từ đầu nên nó mô tả **lần thứ hai** (ăn may), còn lần đỏ thật thì mất.
+      const wf = read('.github/workflows/03-qa-browser.yml');
+      const diag = wf.slice(wf.indexOf('- name: Đưa lỗi probe lên annotation'));
+      expect(diag).toMatch(/\[ -s probe-run\.log \]/);
+      const probeStep = wf.slice(wf.indexOf('- name: QA probe'), wf.indexOf('- name: Đưa lỗi probe lên annotation'));
+      expect(probeStep).toContain('| tee probe-run.log');
+      expect(probeStep).toContain('PIPESTATUS[0]');
+    });
+
     it('focus: nhận diện nút bài học bằng data-testid', () => {
       const src = read('qa/focus.mjs');
       expect(src).toContain('triggerTestId');

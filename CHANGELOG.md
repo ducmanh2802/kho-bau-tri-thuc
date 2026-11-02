@@ -32,11 +32,28 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   bé thật thấy màn chúc mừng và bấm "Tuyệt Vời!" — đây là bug của probe.
   **Lần đầu xanh: run 41501753363 trên `afb9eeb` (63 s, 0 annotation lỗi).** Hệ quả còn mở: tag
   `v1.1.0` đóng ở `77d90ce` tức là *trước* bản sửa, nên gate QA của chính bản phát hành vẫn đỏ.
+  *(Bổ sung cùng ngày: câu "0 annotation lỗi" **không còn là bằng chứng** — xem mục "annotation của
+  một lần đỏ ghi QA PASS" dưới đây; và run đó là **lần xanh duy nhất cho tới hiện tại**, vì cổng đã
+  đỏ lại ở commit kế tiếp.)*
 - **Probe tự làm mù chẩn đoán.** `qa/golden-path.mjs` cắt `split('\n')[0]` của exception nên CI chỉ
   còn "Timeout 12000ms exceeded" mà không biết nút nào; nay giữ cả đầu lẫn đuôi "Call log" của
   Playwright (≤6 dòng mỗi phía) và workflow `03` nâng trần mỗi annotation lên 3000 ký tự.
+- **Cổng QA là intermittent, và bước chẩn đoán từng kể chuyện sai.** `3. Browser QA` xanh trên
+  `afb9eeb` (run 41501753363) rồi **đỏ lại trên `8e6f9f5`** (run 41504913606) — commit đó chỉ sửa 22
+  file tài liệu, `src/` và `qa/` không đổi ⇒ không có hồi quy nào để tìm; đỏ là flaky. Điều tra
+  (`evidence/2026-11-03-QA-RACE/ci-flake-second-run.txt`) cho thấy chính bước "Đưa lỗi probe lên
+  annotation" gây mù: nó **chạy lại** probe, lần hai ăn may, nên annotation của một job `failure`
+  in ra `{"errors":[]}` và `QA PASS — 28 step(s)`; chỉ dòng `Process completed with exit code 1.`
+  là thật. Sửa: bước "QA probe" lưu output của **chính lần chạy** bằng `tee probe-run.log` và trả
+  `PIPESTATUS[0]` (GitHub Actions mặc định `bash -eo pipefail`, nên `| tee` nuốt exit code), còn bước
+  chẩn đoán chỉ chạy mới khi log trống (`[ -s probe-run.log ]`). Không đổi assertions của probe.
+  `continue-on-error: true` **giữ nguyên** vì mới có một lần xanh.
 
 ### Tests
+- Test hợp đồng thứ ba trong `tests/t31-bug-hunt-fixes.test.ts` ("CI: annotation kể lại lần chạy
+  THẤT BẠI, không chạy lại probe lần hai") khoá cả hai đầu: bước "QA probe" phải có `| tee
+  probe-run.log` + `PIPESTATUS[0]`, bước chẩn đoán phải có `[ -s probe-run.log ]`. RED đo trước khi
+  sửa: `1 failed | 20 passed (21)`; GREEN: `21 passed (21)`.
 - Hai test hợp đồng nguồn trong `tests/t31-bug-hunt-fixes.test.ts` khoá lại hai điều vừa học:
   `qa/lib.mjs` phải dùng `waitFor({ state: 'visible' })` chứ không `count()` tức thời, và
   `qa/golden-path.mjs` phải dọn overlay trước `openCompetitionHub(page)`. Tổng cổng:

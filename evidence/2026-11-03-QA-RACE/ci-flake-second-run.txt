@@ -1,0 +1,102 @@
+Bằng chứng: "3. Browser QA" ĐỎ TRỞ LẠI trên commit tài liệu, và suy luận "0 annotation" là SAI
+Đo ngày 2026-11-03 bằng curl/fetch KHÔNG token, repo ducmanh2802/kho-bau-tri-thuc.
+Mọi dòng dưới đây là output thật của lệnh, không phải tóm tắt.
+
+=== 1. commit được đo ===
+git log --oneline -1  =>  8e6f9f5 docs(sync): đồng bộ số liệu 1280 test và hồ sơ "3. Browser QA" xanh lần đầu
+
+=== 2. Run "3. Browser QA" trên 8e6f9f5 (docs-only) ===
+GET /repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/41504913606/jobs  =>  HTTP 200
+JOB "golden path trên Chromium" status=completed conclusion=failure started=2026-11-02T18:54:16Z completed=2026-11-02T18:55:37Z
+   step 1 "Set up job" => success
+   step 2 "Checkout" => success
+   step 3 "Setup Node" => success
+   step 4 "Install" => success
+   step 5 "Build" => success
+   step 6 "Install Chromium" => success
+   step 7 "QA probe" => failure
+   step 8 "Đưa lỗi probe lên annotation (đọc public được)" => success
+   step 15 "Post Setup Node" => skipped
+   step 16 "Post Checkout" => success
+   step 17 "Complete job" => success
+
+=== 3. Annotation của check-run ĐỎ (id 125481620651) ===
+GET /repos/ducmanh2802/kho-bau-tri-thuc/check-runs/125481620651/annotations  =>  HTTP 200
+KIỂU DỮ LIỆU: body là một **mảng JSON trần**, KHÔNG phải object có khoá `annotations`.
+  (đây là chỗ lane vấp: `JSON.parse(t).annotations` => undefined => "count=0" => kết luận sai);
+  parse đúng: `JSON.parse(t).length`.
+count=5
+--- level=warning path=.github:2
+Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+--- level=failure path=.github/workflows/03-qa-browser.yml:55
+qa/golden-path.mjs :: eading": 1,
+          "keys": "__sentinel,kho_bau_achievements,kho_bau_analytics,kho_bau_child_profile,kho_bau_competition_history,kho_bau_daily_quests,kho_bau_learning_os_store,kho_bau_motivation,kho_bau_parent_settings,kho_bau_reading_store",
+          "origin": "http://localhost:4173",
+          "sentinel": "alive"
+        },
+        {
+          "step": "harnessGuard",
+          "origin": "http://localhost:4173",
+          "sentinel": "alive"
+        },
+        {
+          "step": "persistenceAfterReload",
+          "before": {
+            "xp": 260,
+            "lessons": 1,
+            "exams": 2,
+            "readingSessions": 1
+          },
+          "after": {
+            "xp": 260,
+            "lessons": 1,
+            "exams": 2,
+            "readingSessions": 1
+          },
+          "persisted": true
+        },
+        {
+          "step": "noDuplicateRewards",
+          "xpBefore": 260,
+          "xpAfter": 260
+        }
+      ],
+      "errors": [],
+      "removals": []
+    }
+    QA PASS — 2
+--- level=failure path=.github/workflows/03-qa-browser.yml:55
+qa/golden-path.mjs :: {"errors":[],"lastSteps":["parentReadingTab","parentCompetitionTab","SNAP_afterParent","harnessGuard","persistenceAfterReload","noDuplicateRewards"]}
+--- level=failure path=.github:86
+Process completed with exit code 1.
+--- level=notice path=.github:1
+"The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.com/actions/runner-images/issues/14748"
+
+=== 4. Đối chứng: check-run XANH trên afb9eeb (id 125470717595) ===
+GET .../check-runs/125470717595/annotations => HTTP 200 count=2
+--- level=warning path=.github:2 | Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/che
+--- level=notice path=.github:1 | "The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19, 2026. For more information, see https://github.
+check-run afb9eeb: status=completed conclusion=success completed_at=2026-11-02T18:34:48Z
+check-run 8e6f9f5: status=completed conclusion=failure completed_at=2026-11-02T18:55:37Z
+=> Annotation của lần XANH sống ít nhất tới thời điểm đo (26 phút sau run), nên "annotation bay sau vài phút" KHÔNG phải giải pháp cho count=0 ở mục 3 — đó là lỗi parse của lane.
+
+=== 5. Kết luận kỹ thuật ===
+(1) Bước "QA probe" failure trên `8e6f9f5` (commit chỉ sửa tài liệu, `src/` và `qa/` không đổi),
+    trong khi **cùng commit đó** in "QA PASS — 28 step(s), 0 errors" trong annotation. Lý do:
+    bước chẩn đoán chạy lại probe từ đầu, nên nó mô tả lần thứ hai. Lần chết thật bị mất.
+    => Đã sửa: bước "QA probe" ghi `2>&1 | tee probe-run.log` và trả `PIPESTATUS[0]`;
+       bước chẩn đoán dùng `[ -s probe-run.log ]`, chỉ chạy mới khi file trống.
+    => Khoá bằng test hợp đồng: tests/t31-bug-hunt-fixes.test.ts "CI: annotation kể lại lần
+       chạy THẤT BẠI, không chạy lại probe lần hai" (RED 20 passed|1 failed trước, 21 passed sau).
+(2) Suy luận "0 annotation ::error:: nghĩa là probe xanh" là SAI về phương pháp. Bằng chứng bền
+    là `jobs[].steps[].conclusion` và `check-run.conclusion`: afb9eeb = success (step 7 success,
+    step 8 skipped, 2 annotation toàn noise); 8e6f9f5 = failure (step 7 failure, step 8 success).
+(3) Trạng thái thật của cổng QA trên CI: XANH 1 lần (afb9eeb), ĐỎ 1 lần (8e6f9f5) với cùng bộ
+    mã probe sau khi sửa race => **intermittent**, chưa đủ căn cứ bỏ `continue-on-error: true`
+    (`03-qa-browser.yml:30`) và chưa đóng được điều kiện No-Go cho release.
+
+=== 6. Lệnh tái lập ===
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/41504913606/jobs
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/check-runs/125481620651/annotations
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/check-runs/125470717595/annotations
+# nhớ: body là mảng trần — `jq length`, không phải `jq .annotations | length`.

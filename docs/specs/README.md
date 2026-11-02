@@ -15,10 +15,11 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1280 test / 89 file,
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1281 test / 89 file,
    204.2 kB entry + 418.5 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
-   ngay sau đợt sửa race màn chúc mừng lên cấp trong `qa/lib.mjs` (thêm 2 test hợp đồng trong
-   `tests/t31-bug-hunt-fixes.test.ts` ⇒ 1280 test; `src/` không đổi nên hash entry giữ nguyên); lần đo
+   ngay sau hai đợt cùng ngày: sửa race màn chúc mừng lên cấp trong `qa/lib.mjs` rồi khoá bước
+   "QA probe" của workflow `03` bằng `tee probe-run.log` (tổng cộng 3 test hợp đồng mới trong
+   `tests/t31-bug-hunt-fixes.test.ts` ⇒ 1281 test; `src/` không đổi nên hash entry giữ nguyên); lần đo
    trước đó là **2026-11-02**, ngay sau merge release `7365830` (nhánh KBT-ISSUE-43 vào `main`) kèm bản sửa flake theo giờ trong
    `tests/fatigue-reset.test.ts`: hai test "không reset" lấy `Date.now()` làm mốc nên khi suite chạy
    trong 30 phút trước nửa đêm, `now` rơi sang **ngày hôm sau** và quy tắc đổi ngày kích hoạt —

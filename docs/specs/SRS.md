@@ -256,7 +256,7 @@ Cột **Gate** chỉ cổng nào chặn nếu vi phạm: `V` = `npm run verify` 
 | NFR-M01 | Bảo trì | Một cổng duy nhất: `npm run verify` = typecheck + test + build + budget | exit 0 | [package.json](file:///D:/trithuc/kho-bau-tri-thuc/package.json) scripts | V, C |
 | NFR-M02 | Bảo trì | Mọi ngưỡng nghiệp vụ nằm trong `src/config/policy.ts`, có rationale + test | 17 export policy, 693 dòng | `src/config/policy.ts` | V |
 | NFR-M03 | Bảo trì | UI không quyết định correctness/score/mastery/readiness | engine là chỗ chấm duy nhất | FR-L03, FR-E05, `AGENTS.md` §0 principle 1 | V |
-| NFR-M04 | Bảo trì | Tên test `tests/t<NN>-<chủ đề>.test.ts`; hành vi mới ⇒ test mới | 89 file / 1280 test | `AGENTS.md` §2 | V, H |
+| NFR-M04 | Bảo trì | Tên test `tests/t<NN>-<chủ đề>.test.ts`; hành vi mới ⇒ test mới | 89 file / 1281 test | `AGENTS.md` §2 | V, H |
 | NFR-M05 | Bảo trì | Không thêm dependency nếu chưa hỏi; runtime deps = 8 | `package.json` không đổi ngoài kế hoạch (`firebase`, `three`, `@types/three` vào repo cùng merge từ lane khác — đã ghi nợ vì `@types/three` lẽ ra thuộc `devDependencies`) | `AGENTS.md` §1.4 | H, C |
 | NFR-M06 | Bảo trì | MCP layer zero-dependency, stdio tự viết | 0 import ngoài `node:*` trong `mcp/**` | `tests/t23-mcp-servers.test.ts` | V |
 
@@ -377,7 +377,7 @@ Chi tiết từng dòng: xem [`RTM.md`](RTM.md).
 
 | Hạng | Kết quả 2026-11-02 (sau T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`) |
 |---|---|
-| `npm run verify` | **EXIT=0** — typecheck sạch · 89 file / 1280 test pass · build OK · main chunk 204.2 kB → PASS, đạt mục tiêu 450 kB (đo 2026-11-03 trên HEAD `main` sau đợt sửa probe `qa/lib.mjs`; entry `index-B6au8G63.js` — hash không đổi vì `src/` không bị đụng) |
+| `npm run verify` | **EXIT=0** — typecheck sạch · 89 file / 1281 test pass · build OK · main chunk 204.2 kB → PASS, đạt mục tiêu 450 kB (đo 2026-11-03 trên HEAD `main` sau đợt sửa probe `qa/lib.mjs`; entry `index-B6au8G63.js` — hash không đổi vì `src/` không bị đụng) |
 | Probe QA | T40 trên `dist/`: `QA PASS — 6 step(s), 0 errors`; `qa/decision-engine.mjs`: `QA PASS — 12 step(s), 0 errors`; các probe khác cần chạy lại sau thay đổi UI tương ứng (xem `docs/SDLC.md` §5) |
 | FR chưa đạt / cần nguồn | FR-N04 (Kid's Box units = 0), BG-01 (vẫn chưa đo được: sync là tuỳ chọn nên không có số liệu server), FR-Y09 mới chỉ đạt một phần (chưa test với project Firebase thật) |
 | Nợ ghi nhận | mục tiêu chunk 450 kB **đã đạt** (204.2 kB sau T41C) nhưng bốn ngân hàng đề vẫn được nạp hết sau khi mount thay vì theo từng môn bé mở; audit riêng cho track Kid's Box trước khi dùng với trẻ; `@types/three` sai chỗ; `npm install` báo 4 lỗ hổng severity cao |

@@ -498,7 +498,7 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 
 ---
 
-## 12. Kiểm kê kiến trúc (đo 2026-11-03, sau `afb9eeb` — sửa race màn chúc mừng trong `qa/lib.mjs` và thêm 2 test hợp đồng ⇒ 1280 test; `src/` không bị đụng nên entry vẫn `index-B6au8G63.js` 204.2 kB. Đợt đo trước 2026-11-02: sau KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3` — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` và probe `qa/game-pause.mjs`; `09511d3` thêm `tests/chess-engine-performance.test.ts` (5 test) và đổi engine cờ vua, không đụng số liệu khác. Nội dung học, service, component và các mục khác **không đổi** so với các đợt đo trước)
+## 12. Kiểm kê kiến trúc (đo 2026-11-03, trên HEAD `main` `8e6f9f5` cộng thay đổi chưa commit của đợt điều tra flake lần hai — `qa/lib.mjs` chờ modal lên cấp mount thay vì đếm tức thời (`afb9eeb`, 2 test hợp đồng) và `.github/workflows/03-qa-browser.yml` lưu output của **chính lần chạy đỏ** vào `probe-run.log` (thêm 1 test hợp đồng) ⇒ tổng 3 test hợp đồng so với `37fd35e` ⇒ 1281 test; `src/` không bị đụng nên entry vẫn `index-B6au8G63.js` 204.2 kB. Đợt đo trước 2026-11-02: sau KBT-ISSUE-43 + merge `c8a3725` + 2 sửa review + merge `09511d3` — đồng hồ trò chơi gom về `useGameStage`, thêm `tests/t43-game-pause.test.ts` và probe `qa/game-pause.mjs`; `09511d3` thêm `tests/chess-engine-performance.test.ts` (5 test) và đổi engine cờ vua, không đụng số liệu khác. Nội dung học, service, component và các mục khác **không đổi** so với các đợt đo trước)
 
 | Hạng | Số | Nguồn |
 |---|---|---|
@@ -512,7 +512,7 @@ Khuôn mẫu: **Bối cảnh → Lựa chọn → Quyết định → Hệ quả
 | Export policy | 17 (693 dòng) | `src/config/policy.ts` |
 | Key `localStorage` | 19 | `STORAGE_KEYS` (17) + 2 key cục bộ (`kho_bau_ioe_store`, `kho_bau_cloud_session_hint` — hint boolean, không chứa dữ liệu bé) |
 | Dependency runtime | 8 | `package.json` → `dependencies` |
-| Test file / test | 89 / 1280 | `npx vitest run` (87 `.ts` + 2 `.tsx`) |
+| Test file / test | 89 / 1281 | `npx vitest run` (87 `.ts` + 2 `.tsx`) |
 | Probe QA | 30 (29 `.mjs` + 1 `.cjs`) | `ls qa/*.mjs qa/*.cjs` (trừ `lib.mjs`, `run-one.mjs`) |
 | Workflow CI | 4 | `.github/workflows/` |
 | MCP server / tool | 5 / 27 | `mcp/` |
