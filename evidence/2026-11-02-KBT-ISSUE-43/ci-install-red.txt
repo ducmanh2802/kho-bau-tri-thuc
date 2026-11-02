@@ -1,0 +1,53 @@
+BẰNG CHỨNG · vì sao CI đỏ ở lần chạy đầu tiên của tag v1.1.0 (đo 2026-11-02)
+
+Bối cảnh: `git push origin main` (09511d3..7d92246) và `git push origin v1.1.0` kích hoạt cả 4
+workflow phía GitHub. Kết quả đọc qua API công khai
+(`https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?per_page=8`):
+
+  41486056746 | 4. Release        | push | v1.1.0 | completed failure | 7d92246
+  41485714651 | 1. Quality        | push | main   | completed failure | 7d92246
+  41485714641 | 2. Build + artifact | push | main | completed failure | 7d92246
+  41485714640 | 3. Browser QA     | push | main   | completed success | 7d92246   ← xem mục 4
+
+Chi tiết job (`/actions/runs/<id>/jobs`): cả ba workflow đỏ đúng một bước — Install — còn
+`4. Release` dừng ở bước 5 "Install" nên "Full gate", "Package dist", "Release notes",
+"Create GitHub Release" đều `skipped` ⇒ **chưa từng có GitHub Release nào được tạo**.
+
+1) LỖI GÌ
+   Bước Install = `npm ci --no-audit --no-fund` ⇒ `npm error code EUSAGE`.
+
+2) LỆNH TÁI LẬP (không cần máy chủ)
+   Sao đúng tree của commit được tag rồi chạy npm cùng phiên bản như CI:
+     mkdir -p /tmp/ci2 && git archive 7d92246 | tar -x -C /tmp/ci2 && cd /tmp/ci2
+     npx --yes npm@10 ci --no-audit --no-fund        =>   EXIT=1
+   Nguyên văn phần lỗi:
+
+     npm error code EUSAGE
+     npm error
+     npm error `npm ci` can only install packages when your package.json and package-lock.json
+     npm error or npm-shrinkwrap.json are in sync. Please update your lock file with
+     npm error `npm install` before continuing.
+     npm error
+     npm error Missing: @emnapi/core@1.11.3 from lock file
+     npm error Missing: @emnapi/runtime@1.11.3 from lock file
+
+3) ĐỐI CHỨNG TRÊN CÙNG TREE (nên lỗi không tái hiện trên máy phát triển)
+     npm ci --no-audit --no-fund   (npm 11.6.2 + Node v24.12.0, Windows)  =>  EXIT=0
+     "added 158 packages in 24s"
+   npm 11 tự suy ra hai gói `@emnapi/*` còn thiếu trong lock nên vẫn cài được; npm 10 — bản mà
+   `actions/setup-node@v4` với `node-version: "22"` mang theo — từ chối và báo EUSAGE.
+   Vì vậy `npm run verify` trên máy Windows **xong vẫn không chứng nhận CI**; đây là cổng máy chủ,
+   không phải cổng máy lokal.
+
+4) VÌ SAO "3. Browser QA" BÁO success DÙ JOB THẤT BẠI
+   `03-qa-browser.yml:30` đặt `continue-on-error: true` cho job (comment ngay trên nó: "chặn merge…
+   Xoá dòng continue-on-error khi nó xanh liên tiếp vài lần trên main"). Run kết luận `success` trong
+   khi job `golden path trên Chromium` kết luận `failure`, bước Install `failure` và hai bước sau
+   `skipped`. Lech "run success / job failure" là do chính lá chắn đó, không phải probe xanh.
+
+5) HỆ QUẢ CHO RELEASE
+   Điều kiện người dùng chốt là "tag v1.1.0 **sau khi luồng nghiệm thu xanh**". Tag đầu tiên đóng
+   trên `7d92246` thoả cổng máy (`npm run verify` EXIT=0) nhưng KHÔNG thoả cổng máy chủ (CI đỏ ở
+   Install) ⇒ hoặc sửa lockfile rồi đóng tag lại trên HEAD có CI xanh, hoặc để release dừng ở
+   trạng thái "đã tag, CI đỏ". Chọn vế đầu: lockfile là nguồn thật (`AGENTS.md` §1.6) và lỗi nằm ở
+   lock, không ở code.
