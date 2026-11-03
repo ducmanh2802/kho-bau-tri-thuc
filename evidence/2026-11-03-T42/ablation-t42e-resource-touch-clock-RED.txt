@@ -1,0 +1,29 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t42e-resource-touch-clock.test.ts (11 tests | 4 failed) 30ms
+   ✓ T42/E — mốc giờ thay đổi trạng thái do storage ghi (3)
+     ✓ tiêu vé làm mốc nhích lên 4ms
+[…lược 380 dòng stack…]
+5:   ✓ T42/E — mốc giờ thay đổi trạng thái do storage ghi (3)
+6:     ✓ tiêu vé làm mốc nhích lên 4ms
+7:     ✓ chỉ đổi XP hoặc ngày hoạt động thì mốc giữ nguyên (không được cướp quyền quyết) 1ms
+8:     ✓ bộ đồng bộ ghi kết quả hợp nhất xuống máy thì mốc không nhích 0ms
+10:     × cùng một ngày nhưng cloud tiêu vé sau ⇒ cloud thắng (bug T41D sống lại) 10ms
+11:     ✓ máy này vừa tiêu ⇒ local thắng dù cloud cùng ngày 1ms
+12:     ✓ hợp nhất hai lần liên tiếp không in thêm vé (kết quả là bất động điểm) 2ms
+13:     ✓ hồ sơ cũ chưa có mốc thì vẫn dùng ngày hoạt động (luật T41D, không hồi quy) 1ms
+14:     × mốc thắng điều khiển trang bị và khoá của ba mẹ, avatar theo cùng luật 2ms
+15:     × đọc bản cloud hợp nhất rồi ghi xuống máy (đường cloudSync) giữ nguyên mốc của bên thắng 2ms
+16:     ✓ cloudSync phải ghi kết quả hợp nhất trong ô câm (không tự nhích mốc) 1ms
+17:     × storage không được chuẩn hoá lastActiveDate rồi để cloudMerge tưởng là đồng hồ 3ms
+21: FAIL  tests/t42e-resource-touch-clock.test.ts > T42/E — hợp nhất theo mốc, không theo max > cùng một ngày nhưng cloud tiêu vé sau ⇒ cloud thắng (bug T41D sống lại)
+22:AssertionError: expected 10 to be 3 // Object.is equality
+40: FAIL  tests/t42e-resource-touch-clock.test.ts > T42/E — hợp nhất theo mốc, không theo max > mốc thắng điều khiển trang bị và khoá của ba mẹ, avatar theo cùng luật
+41:AssertionError: expected 'bear' to be 'owl' // Object.is equality
+56: FAIL  tests/t42e-resource-touch-clock.test.ts > T42/E — hợp nhất theo mốc, không theo max > đọc bản cloud hợp nhất rồi ghi xuống máy (đường cloudSync) giữ nguyên mốc của bên thắng
+57:AssertionError: expected '2026-11-03T00:00:00.000Z' to be '2026-11-03T09:30:00.000Z' // Object.is equality
+72: FAIL  tests/t42e-resource-touch-clock.test.ts > T42/E — hợp nhất theo mốc, không theo max > storage không được chuẩn hoá lastActiveDate rồi để cloudMerge tưởng là đồng hồ
+73:AssertionError: expected 'import { DEFAULT_CHILD_PROFILE } from…' to match /stateTouchedAt/
+456: Test Files  1 failed (1)
+457:      Tests  4 failed | 7 passed (11)

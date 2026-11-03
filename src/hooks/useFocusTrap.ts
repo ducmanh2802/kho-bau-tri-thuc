@@ -11,6 +11,19 @@ const FOCUSABLE_SELECTOR = [
 ].join(', ');
 
 /**
+ * T42/C — hộp thoại chỉ được kéo focus về mình khi focus **chưa** nằm trong nó.
+ *
+ * Bản cũ gọi `focus()` lên phần tử đầu tiên vô điều kiện ở ba thời điểm (mount,
+ * +50 ms, +150 ms). Ba mẹ mở Cổng Xác Nhận, bấm vào ô số và gõ ngay trong
+ * 150 ms ⇒ con trỏ bị giật về nút ✕ và chữ số mất. Focus đã ở trong hộp thoại
+ * là ý định của người dùng, không phải thứ để "re-assert".
+ */
+export function shouldMoveFocusIntoDialog(activeElement: Element | null, container: HTMLElement): boolean {
+  if (!activeElement) return true;
+  return !container.contains(activeElement);
+}
+
+/**
  * Keeps keyboard focus inside a modal and restores it on close.
  *
  * §24 accessibility: without this, a child using Tab (or a switch-capable
@@ -42,9 +55,10 @@ export function useFocusTrap<T extends HTMLElement = HTMLDivElement>(active: boo
     // Move focus into the dialog on open. The first focusable can be painted
     // a tick later (lazy chunk, layout), so re-assert once after paint.
     const focusIntoDialog = () => {
+      const current = document.activeElement;
+      if (!shouldMoveFocusIntoDialog(current, container)) return;
       const items = focusables();
       const target = items[0] ?? container;
-      // Force focus even if activeElement is the target (handles race conditions)
       target.focus({ preventScroll: true });
     };
     // Immediate focus attempt

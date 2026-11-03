@@ -15,14 +15,23 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1327 test / 92 file,
-   209.9 kB entry + 424.3 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
-   ngay sau **T41D** (phép hợp nhất hồ sơ cloud với tiến độ của máy khác và race đăng xuất/đổi tài khoản
-   giữa lúc kéo cloud: thêm `src/services/cloudMerge.ts` ⇒ **42** service module, `src/` đổi nên entry
-   **đổi cả hash lẫn kB** — `index-3QHywPiW.js` **209.9 kB** (hash của đợt đo trước không còn giá trị
-   tham chiếu) — và
-   2 file test mới `tests/t41d-cloud-merge.test.ts` (28) + `tests/t41d-cloud-sync-race.test.ts` (12)
-   ⇒ 1327 test / 92 file); các đợt đo trước cùng ngày: bỏ cờ `continue-on-error` của job
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1372 test / 99 file,
+   211.3 kB entry + 425.6 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
+   ngay sau **T42** (tám defect một đợt, bảy file test: chọn màn không còn in sao "đã chơi", thẻ *Đôi Tai Thính* luôn giữ
+   đáp án, bẫy focus không cướp con trỏ khi bé đang gõ, đọc `localStorage` hỏng không xoá cả danh sách ôn,
+   hợp nhất cloud theo đồng hồ `stateTouchedAt` thay vì `lastActiveDate`, bài "cộng/trừ một chữ số trong
+   phạm vi 100" bỏ phép có nhớ/có mượn, lưới đề dựng lại ngay khi đổi màn thay vì qua `useEffect`, và hẹn giờ
+   của bài thi thử phải được xoá lúc rời màn:
+   7 file test mới `tests/t42a-tier-picker-honest` (5) · `t42b-listen-pick-answer` (4) ·
+   `t42c-focus-trap-typing` (4) · `t42d-corrupt-storage-guard` (12) · `t42e-resource-touch-clock` (11) ·
+   `t42f-digit-lesson-no-carry` (5) · `t42g-late-state-timers` (4) ⇒ 45 test; **không** thêm service module
+   (vẫn **42**), không thêm file trong `src/services/`; `src/` đổi nên entry **đổi cả hash lẫn kB** —
+   `index-C7kpOu7n.js` **211.3 kB**, boot graph **425.6 kB**, hash của đợt đo trước không còn giá trị
+   tham chiếu); đợt **T41D** ngay trước đó (phép hợp nhất hồ sơ cloud với tiến độ của máy khác và race đăng xuất/đổi tài khoản
+   giữa lúc kéo cloud: thêm `src/services/cloudMerge.ts` ⇒ **42** service module, entry và số test của
+   lượt đo đó ghi ở `evidence/2026-11-03-T41D/` — không trích lại ở đây vì quy ước này chỉ giữ **một**
+   bộ số hiện trạng),
+   2 file test mới `tests/t41d-cloud-merge.test.ts` (28) + `tests/t41d-cloud-sync-race.test.ts` (12)); các đợt đo trước cùng ngày: bỏ cờ `continue-on-error` của job
    "3. Browser QA" (commit `3b0122c`, 1 test hợp đồng mới trong `tests/t31-bug-hunt-fixes.test.ts`
    ⇒ 1287 test, `src/` không đổi nên entry giữ nguyên hash), sửa "đề cổng phụ huynh vẽ muộn hơn khung
    hình đầu" (5 test mới `tests/t41f-parent-gate.test.ts` ⇒ 1286 test, `src/` đổi nên entry **đổi hash**
@@ -52,7 +61,8 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
    hai merge `origin/main`
    (cloud-sync + cờ vua WebGL, rồi `3727f04` auth/chess) và merge `fd3e7da` — bằng
    `npx vitest run`, `npm run check:budget` hoặc `ls`. Các số mô tả nội dung học (31/475/1570
-   câu) giữ nguyên từ đợt đo 2026-10-29 vì các đợt sửa sau không thêm chủ đề/bài/câu. Dấu ✚ trong `BRD.md`
+   câu) giữ nguyên từ đợt đo 2026-10-29: T42 chỉ đổi **dữ kiện** của 12 phép tính và một dòng mô tả
+   trong `src/data/math/calcIn100.ts`, không thêm/bớt chủ đề, bài hay câu. Dấu ✚ trong `BRD.md`
    nghĩa là "đo trực tiếp từ repo".
 2. **Code là nguồn chân lý.** Khi tài liệu cũ (`PRODUCT_SPEC.md`, `MASTER_ROADMAP.md`)
    lệch với `src/`, thì `src/` đúng và tài liệu này phải sửa theo.

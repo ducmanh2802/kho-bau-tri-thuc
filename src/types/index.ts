@@ -157,6 +157,15 @@ export interface ChildProfile {
   /** Parent override to unlock all lessons (bypasses sequential gating). */
   unlockAllLessons: boolean;
   /**
+   * Mốc giờ (ISO) lần cuối một trường "có tăng có giảm" của hồ sơ thay đổi trên
+   * thiết bị này: sao / vé / ngọc / avatar / trang bị / khoá điều khiển của ba mẹ
+   * (T42/E). `lastActiveDate` **không** dùng làm đồng hồ hợp nhất được vì bộ đọc
+   * hồ sơ chuẩn hoá nó về hôm nay ngay khi mở máy, nên hai máy trong cùng một ngày
+   * luôn hoà nhau và máy nhận bản cũ luôn "thắng". Bộ đồng bộ ghi kết quả hợp nhất
+   * xuống máy thì KHÔNG nhích mốc này.
+   */
+  stateTouchedAt?: string;
+  /**
    * True when the profile was populated by the parent-only demo seeder.
    * Demo figures are fabricated for showcasing reports and must never be
    * presented to the child (or to parents) as real learner progress.

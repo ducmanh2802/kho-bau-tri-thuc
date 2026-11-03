@@ -1,0 +1,18 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t42c-focus-trap-typing.test.ts (4 tests | 4 failed) 15ms
+   ❯ T42/C — chỉ kéo focus khi nó còn ở ngoài hộp thoại (4)
+     × đang gõ trong hộp thoại ⇒ không cướp focus 6ms
+[…lược 48 dòng stack…]
+6:     × đang gõ trong hộp thoại ⇒ không cướp focus 6ms
+7:     × focus nằm ngoài (hoặc chưa có) ⇒ kéo vào để chắn Tab 1ms
+8:     × body / html đang nhận focus vẫn được coi là chưa vào hộp thoại 1ms
+9:     × hook chỉ focus khi quyết định là "di chuyển" (nguồn không còn focus vô điều kiện) 5ms
+13: FAIL  tests/t42c-focus-trap-typing.test.ts > T42/C — chỉ kéo focus khi nó còn ở ngoài hộp thoại > đang gõ trong hộp thoại ⇒ không cướp focus
+25: FAIL  tests/t42c-focus-trap-typing.test.ts > T42/C — chỉ kéo focus khi nó còn ở ngoài hộp thoại > focus nằm ngoài (hoặc chưa có) ⇒ kéo vào để chắn Tab
+37: FAIL  tests/t42c-focus-trap-typing.test.ts > T42/C — chỉ kéo focus khi nó còn ở ngoài hộp thoại > body / html đang nhận focus vẫn được coi là chưa vào hộp thoại
+49: FAIL  tests/t42c-focus-trap-typing.test.ts > T42/C — chỉ kéo focus khi nó còn ở ngoài hộp thoại > hook chỉ focus khi quyết định là "di chuyển" (nguồn không còn focus vô điều kiện)
+50:AssertionError: expected 'const focusIntoDialog = () => {\r\n  …' to match /if \(!shouldMoveFocusIntoDialog\(curr…/
+124: Test Files  1 failed (1)
+125:      Tests  4 failed (4)

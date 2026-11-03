@@ -1,0 +1,29 @@
+# node qa/run-one.mjs tmp-t42-ui.mjs  (probe tạm, đã xoá sau khi đo)
+{
+  "errors": [],
+  "rhymeHeader": "Màn 1/6 ▾",
+  "rhymeFruits": 4,
+  "progressBeforePick": null,
+  "headerAfterPick": "Màn 4/6 ▾",
+  "progressAfterPick": {
+    "unlockedTier": 4,
+    "starsByTier": {},
+    "bestScoreByTier": {},
+    "updatedAt": "2026-11-03T11:34:24.833Z"
+  },
+  "fruitsAfterPick": 10,
+  "profileStarsAfterPick": 0,
+  "noStarsMinted": true,
+  "noBestScoreMinted": true,
+  "unlockedTierAfterPick": 4,
+  "listenCards": [
+    "sáck vở",
+    "sách vở",
+    "sách vởx",
+    "xách vở"
+  ],
+  "listenUnique": 4,
+  "ok": true
+}
+QA PASS — 0 step(s), 0 errors
+EXIT=0

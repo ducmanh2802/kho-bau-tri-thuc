@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { GameModalWrapper, useGameFeedback } from './GameModalWrapper';
 import { sound } from '../../services/sound';
 import { useGameStage } from '../../hooks/useGameStage';
@@ -16,16 +16,26 @@ export { DISTRACTOR_POOL, RHYME_FAMILIES, buildRhymeRounds, containsRhyme, strip
 
 const ROUNDS_PER_TIER = defaultRoundsPerTier();
 
+/** Bản sao round với mọi quả chưa hái — trạng thái ban đầu của một màn. */
+export function resetRhymeRounds(rounds: RhymeRound[]): RhymeRound[] {
+  return rounds.map((r) => ({ ...r, fruits: r.fruits.map((f) => ({ ...f, picked: false })) }));
+}
+
 export const RhymeHunterGame: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const stage = useGameStage({ gameId: 'rhyme_hunter', roundsPerTier: ROUNDS_PER_TIER, advanceDelayMs: 1200 });
   // T25: builder riêng theo (bậc, nonce) thay vì cạo đề từ ngân hàng câu hỏi —
   // options của bank có chuỗi dài không phải một từ, hiển thị lên quả là khó đọc.
   const rounds = useMemo(() => buildRhymeRounds(stage.tier, stage.nonce), [stage.tier, stage.nonce]);
-  const [roundsState, setRoundsState] = useState<RhymeRound[]>([]);
-
-  useEffect(() => {
-    setRoundsState(rounds.map((r) => ({ ...r, fruits: r.fruits.map((f) => ({ ...f, picked: false })) })));
-  }, [rounds]);
+  // T42/G — bản round "đã hái" phải đổi **ngay cùng lần render** với `rounds`.
+  // Bản cũ đựng nó trong state và đồng bộ bằng `useEffect`, nên một khung hình
+  // sau khi sang màn/Chơi lại, màn vẫn hiển thị đề của lần trước: bé bấm nhanh
+  // là bấm vào quả của đề đã bị vứt, cú hái biến mất không dấu vết.
+  const [roundsState, setRoundsState] = useState<RhymeRound[]>(() => resetRhymeRounds(rounds));
+  const sourceRef = useRef<RhymeRound[]>(rounds);
+  if (sourceRef.current !== rounds) {
+    sourceRef.current = rounds;
+    setRoundsState(resetRhymeRounds(rounds));
+  }
 
   const currentRound = roundsState[stage.roundIdx];
 

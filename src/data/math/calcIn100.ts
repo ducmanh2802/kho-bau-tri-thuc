@@ -240,21 +240,23 @@ const TENS_SUB: CalcItem[] = [
   { a: 100, op: '-', b: 40 },
 ];
 
+// T42/F — bài này dạy "giữ nguyên hàng chục, chỉ tính hàng đơn vị" nên mọi đề
+// phải là cộng KHÔNG nhớ / trừ KHÔNG mượn (luật lớp 1 ở `data/games/mathUtils.ts`).
 const DIGIT_ADD: CalcItem[] = [
   { a: 23, op: '+', b: 6 },
-  { a: 48, op: '+', b: 5 },
-  { a: 36, op: '+', b: 7 },
-  { a: 57, op: '+', b: 4 },
-  { a: 65, op: '+', b: 8 },
-  { a: 29, op: '+', b: 5 },
+  { a: 42, op: '+', b: 5 },
+  { a: 32, op: '+', b: 7 },
+  { a: 53, op: '+', b: 4 },
+  { a: 61, op: '+', b: 8 },
+  { a: 74, op: '+', b: 5 },
 ];
 const DIGIT_SUB: CalcItem[] = [
-  { a: 43, op: '-', b: 6 },
-  { a: 58, op: '-', b: 7 },
-  { a: 62, op: '-', b: 8 },
+  { a: 48, op: '-', b: 6 },
+  { a: 57, op: '-', b: 7 },
+  { a: 69, op: '-', b: 8 },
   { a: 95, op: '-', b: 5 },
-  { a: 71, op: '-', b: 4 },
-  { a: 86, op: '-', b: 3 },
+  { a: 36, op: '-', b: 6 },
+  { a: 87, op: '-', b: 3 },
 ];
 
 const TWO_ADD: CalcItem[] = [
@@ -290,7 +292,7 @@ export const LESSONS: Lesson[] = [
     TOPIC,
     'math-les-100-digit',
     'Số hai chữ số cộng trừ một chữ số',
-    '45 + 7 = ?, 52 − 8 = ?',
+    '42 + 5 = ?, 48 − 6 = ?',
     'Gấu Bút Chì nhắc: giữ nguyên hàng chục, chỉ tính hàng đơn vị!',
     'math_add_digit_100',
     'math_sub_digit_100',

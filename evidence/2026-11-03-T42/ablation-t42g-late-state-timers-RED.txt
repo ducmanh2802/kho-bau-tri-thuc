@@ -1,0 +1,21 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t42g-late-state-timers.test.ts (4 tests | 4 failed) 18ms
+   ❯ T42/G — round mới phải sạch dấu "đã hái" ngay lần render (2)
+     × resetRhymeRounds sao chép và vứt mọi dấu đã hái 6ms
+[…lược 1169 dòng stack…]
+6:     × resetRhymeRounds sao chép và vứt mọi dấu đã hái 6ms
+7:     × không còn đồng bộ rounds qua useEffect (khung hình đề cũ) 6ms
+9:     × hẹn giờ nằm trong ref và có cleanup unmount 2ms
+10:     × không còn setTimeout trần trong MockExam 2ms
+14: FAIL  tests/t42g-late-state-timers.test.ts > T42/G — round mới phải sạch dấu "đã hái" ngay lần render > resetRhymeRounds sao chép và vứt mọi dấu đã hái
+26: FAIL  tests/t42g-late-state-timers.test.ts > T42/G — round mới phải sạch dấu "đã hái" ngay lần render > không còn đồng bộ rounds qua useEffect (khung hình đề cũ)
+27:AssertionError: expected 'import React, { useEffect, useMemo, u…' not to match /useEffect\(\s*\(\)\s*=>\s*\{?\s*setRo…/
+177:                <span className=\"text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full mt-1\">✓ Đúng</span>
+202: FAIL  tests/t42g-late-state-timers.test.ts > T42/H — hẹn giờ sang câu của bài thi thử phải bị xoá khi rời màn > hẹn giờ nằm trong ref và có cleanup unmount
+203:AssertionError: expected 'import React, { useEffect, useMemo, u…' to match /const advanceTimer = useRef<number \|…/
+723: FAIL  tests/t42g-late-state-timers.test.ts > T42/H — hẹn giờ sang câu của bài thi thử phải bị xoá khi rời màn > không còn setTimeout trần trong MockExam
+724:AssertionError: expected 'import React, { useEffect, useMemo, u…' not to match /[^.]window\.setTimeout\(\(\) => \{\s*…/
+1245: Test Files  1 failed (1)
+1246:      Tests  4 failed (4)

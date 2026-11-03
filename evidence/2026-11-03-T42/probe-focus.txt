@@ -1,0 +1,40 @@
+# node qa/run-one.mjs qa/focus.mjs  (dist từ npm run build, 2026-11-03)
+{
+  "tests": [
+    {
+      "dialog": "lesson",
+      "focusEnteredDialog": true,
+      "forwardTabStayedInside": true,
+      "backwardTabStayedInside": true,
+      "landedOn": "Đóng",
+      "focusRestoredToTrigger": true,
+      "landedAfterClose": "Bài Chữ A, B, C thân thương, đang học"
+    },
+    {
+      "dialog": "game",
+      "focusEnteredDialog": true,
+      "forwardTabStayedInside": true,
+      "landedOn": "Đóng trò chơi và quay lại",
+      "focusRestoredToTrigger": true
+    },
+    {
+      "dialog": "parent",
+      "focusEnteredDialog": true,
+      "forwardTabStayedInside": true,
+      "landedOn": "Khu vực dành cho phụ huynh"
+    },
+    {
+      "dialog": "screentime",
+      "focusEnteredDialog": true,
+      "forwardTabStayedInside": true,
+      "backwardTabStayedInside": true,
+      "escapeKeptOpen": true,
+      "landedOn": "Nghỉ ngơi thôi nào!",
+      "closedFrom": "Nghỉ ngơi thôi nào!",
+      "restoredTag": "body"
+    }
+  ],
+  "errors": []
+}
+QA PASS — 0 step(s), 0 errors
+EXIT=0

@@ -218,7 +218,8 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
       onSelectTier(t);
     } else if (gameId) {
       try {
-        StorageService.completeGameTier(gameId, Math.max(1, t - 1), 3, 0);
+        // T42/A — chọn màn chỉ mở khoá; sao/điểm chỉ do lượt chơi thật ghi.
+        StorageService.selectGameTier(gameId, t);
       } catch {
         // ignore
       }

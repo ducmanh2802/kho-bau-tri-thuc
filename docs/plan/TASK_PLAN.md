@@ -161,12 +161,34 @@ merge `main`. Trạng thái: `docs/opencode/TRANG_THAI.md`; báo cáo: `docs/ope
 
 | Commit + push + cổng CI cho T41D (2026-11-03, ngay sau dòng trên) | Chạy lại ablation M6 **lấy log đầy đủ** (trước chỉ lưu 12 dòng tên test, thiếu dòng tổng kết ⇒ không tự chứng minh được): revert hai file cloud về HEAD ⇒ `Test Files 1 failed (1)` · `Tests 5 failed \| 7 passed (12)` · **EXIT=1**, restore bằng `cp` từ bản sao `/tmp` (md5 khớp) ⇒ `Tests 40 passed (40)` · EXIT=0. Đo lại cổng trên **đúng nội dung commit**: `npm run verify` **EXIT=0** · `92 passed (92)` / `1327 passed (1327)` · `Duration 22.42s` (lần đầu 22.32 s, chỉ thời gian tường thuật dao động) · `index-3QHywPiW.js` **209.9 kB** PASS. Commit `06b8962` (32 file, **+2243/−219**), push `1cac775..06b8962`, `HEAD == origin/main`. Cổng server trên chính commit: `1. Quality` run 41537247071 · `2. Build + artifact` run 41537247192 · **`3. Browser QA` run 41537247288** job 125592106681 `success` 62 s (bước 7 `success`, bước 8 `skipped`) ⇒ **8/14 lượt xanh, bảy lượt cuối liên tiếp, bốn lượt cuối không còn lưới** *(tính tới `06b8962`)*. Đồng bộ "quy tắc dừng": `docs/SDLC.md` §4 + `docs/lifecycle/{README,HARNESS}` + `BRD.md` R-04 + `evidence/README.md`. **Không** đụng: 6 ảnh `docs/opencode/reports/img/*.png` của lane khác (git status vẫn ` M`, không stage), `package-lock.json` còn nguyên, tag `v1.1.0` vẫn ở `77d90ce`. | `git show --shortstat 06b8962` · `curl -s …/commits/06b8962…/check-runs` · `curl -s …/actions/runs/41537247288/jobs` · `evidence/2026-11-03-T41D/verify-t41d-rerun.txt` · `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §14 |
 
-**Hệ quả chưa đóng:** EP-G (G1…G6) — cloud sync chưa test với project thật, chưa có UI xoá
-dữ liệu cloud, `@types/three` sai chỗ, 4 lỗ hổng npm chưa đọc. Nợ T32 ghi thêm: `isRealtime`
-trong `gamesCatalog` (3 trò) và prop `isRealtime` của `GameModalWrapper` **không game nào truyền**,
-nên nút `data-testid="game-pause"` không bao giờ render và `isPaused` không ảnh hưởng gì —
-muốn có nút tạm dừng cho trò đếm giờ phải nối `isPaused` xuống `useGameStage`/context rồi mới
-bật prop, nếu không sẽ thêm nút bấm không làm gì (xấu hơn hiện trạng).
+| T42 — tám defect còn lại (2026-11-03, lần sáu) | Người dùng: "check bug và fix". Hai nhánh Explore lập 18 ứng viên ⇒ soát từng chỗ trong source, giữ lại **8 defect thật** (ứng vào **7 file test**) và sửa: (A) bảng "Chọn Màn & Độ Khó" gọi `completeGameTier(gameId, t−1, 3, 0)` nên **in 3 sao** cho màn bé chưa chơi, và lượt thật đầu tiên đọc `prevBestStars = 3` ⇒ bị tính "luyện lại", mất sao + chỉ ăn 20 % XP — thêm `StorageService.selectGameTier` (chỉ nâng `unlockedTier` bằng `Math.max`, kẹp 1…6) và bỏ hẳn đường gọi cũ; (B) `ListenPickPhonicsGame` cắt `slice(0, 4)` trên array đã xáo ⇒ có vòng **mất đáp án**, không thể trả lời — `pickCardOptions` giữ đáp án, xáo phương án nhiễu tất định theo `hashText(item.id) + seed·7919`; (C) `useFocusTrap` focus vào hộp thoại **vô điều kiện** ⇒ cướp con trỏ khi bé đang gõ — tách vị từ thuần `shouldMoveFocusIntoDialog` và chỉ focus khi thực sự chưa vào trong; (D) `getAnalytics` chỉ lọc **cả mảng** `recentErrors` ⇒ một phần tử `null` lọt vào làm `cloudMerge` đọc `entry.questionId` crash **cả lần đồng bộ** và mất sạch danh sách ôn — lọc **từng phần tử** theo shape, `cloudMerge` cũng lọc phía cloud; (E) luật đồng hồ T41D ("tài nguyên tiêu được theo hồ sơ hoạt động") **không bao giờ kích hoạt** vì `getChildProfile()` chuẩn hoá `lastActiveDate` về hôm nay ở mọi lần đọc ⇒ hai máy luôn bằng nhau — thêm `ChildProfile.stateTouchedAt` (chỉ nhích khi một trường LWW thật sự đổi, mute bằng `StorageService.withoutStateTouch` khi chính bộ đồng bộ ghi), `cloudMerge` dùng nó với fallback `lastActiveDate`; (F) bài "Số hai chữ số cộng/trừ **một** chữ số" nhét phép **có nhớ/có mượn** (`45 + 7`, `52 − 8`) trái chuẩn GDPT 2018 lớp 1 — đổi 12 phép trong `src/data/math/calcIn100.ts` sang không nhớ/không mượn + sửa dòng mô tả; (G) `RhymeHunterGame` đồng bộ `roundsState` qua `useEffect` ⇒ một khung hình vẽ **đề của màn cũ** với dấu đã hái còn nguyên — chuyển sang đối chiếu ref ở thì render; (H) `MockExam` trong `EnglishIoeScreen.tsx` hẹn giờ 600 ms không cất trong ref ⇒ `setState` sau unmount — cất vào `advanceTimer` ref và xoá lúc unmount. Test mới **7 file / 45 test** `tests/t42a…` → `tests/t42g…`. **Bằng chứng ablation:** từng file T42 chạy đỏ (`1·4·4·7·4·2·4` test failed) khi `git checkout HEAD --` đúng nguồn bị sửa, restore ⇒ `7 passed (7)` / `45 passed (45)` (`evidence/2026-11-03-T42/ablation-*-RED.txt`). **Bằng chứng nhìn thấy được** (probe tạm `evidence/2026-11-03-T42/probe-t42-ui.mjs`, chạy trên `dist/`): mở *Săn Vần* → chọn Màn 4 ⇒ header `Màn 4/6 ▾`, `kho_bau_game_progress.rhyme_hunter = {unlockedTier: 4, starsByTier: {}, bestScoreByTier: {}}`, `child_profile.stars = 0`, lưới quả dựng lại 4 → 10; *Đôi Tai Thính* render đúng 4 thẻ, 4 nhãn phân biệt; hồi quy `qa/focus.mjs` / `qa/games.mjs` (`catalogCount 31`, `mountOnlyAwardedNothing: true`) / `qa/tier6-ladder-evidence.mjs` đều `QA PASS — 0 errors`. `npm run verify` **EXIT=0** · `99 passed (99)` / `1372 passed (1372)` · `Duration 24.14s` · đo lại trên đúng nội dung commit trước khi commit: **EXIT=0** · `99 passed (99)` / `1372 passed (1372)` · `Duration 21.38s` (thời gian tường thuật dao động; hash và kB entry không đổi) · `index-C7kpOu7n.js` **211.3 kB** · boot graph **425.6 kB** (`435849 total` byte) · không thêm service module (vẫn 42) · không thêm dependency | `output npm run verify`, `evidence/2026-11-03-T42/` (verify · check-budget · 7 ablation RED · 4 probe · 2 ảnh), `npx vitest run tests/t42a…g` |
+
+**Hệ quả chưa đóng (soát lại 2026-11-03, đợt T42):** EP-G (G1…G6) — cloud sync chưa test với
+project Firebase thật, chưa có UI xoá dữ liệu cloud, `@types/three` sai chỗ.
+Hai tuyên bố cũ trong ô này **đã sai**, sửa lại bằng chứng đo được:
+(a) *"`isRealtime` của `GameModalWrapper` không game nào truyền"* — **không còn đúng**: cờ
+`isRealtime` được truyền và KBT-ISSUE-43 đã nối `isPaused` xuống `useGameStage`
+(`tests/t43-game-pause.test.ts` 30 test, probe `qa/game-pause.mjs`);
+(b) *"4 lỗ hổng npm chưa đọc"* — **đã đọc**: `npm audit --json` cho **4 advisory high**
+(`@grpc/grpc-js` · `@firebase/firestore` · `@firebase/firestore-compat` · `firebase`), tất cả
+**một chuỗi** `firebase@13.1.0 → @firebase/firestore@4.19.0 → @grpc/grpc-js@1.9.16`, và
+`fixAvailable` của cả bốn phần tử là `firebase@9.14.0` với `isSemVerMajor: true` — nghĩa là bản
+ vá duy nhất npm đề xuất là **hạ major** (thay đổi API `firebase-vendor` 723.0 kB) ⇒ **quyết định
+của người giữ repo**, không tự hạ.
+Nợ mới ghi nhận ở đợt T42 (sửa có chủ đích, cần quyết định thiết kế/sư phạm chứ không phải một dòng):
+*_minutes_today:summed_ phồng khi cộng dồn hai máy (cần mô hình đóng góp theo thiết bị);
+*Toán có nhớ / có mượn* vẫn nằm trong curriculum (`math-les-100-two`, `math-les-100-column`
+"Đặt tính rồi tính") trong khi chuẩn lớp 1 GDPT 2018 không dạy — T42 chỉ sửa bài *một chữ số*
+(`tests/t42f`), phần còn lại chờ người quyết;
+*Đôi Tai Thính* gắn cùng một `emoji` cho cả bốn thẻ, nên với phương án chính tả
+(`sách vở / xách vở / sách vởx / sáck vở` — nguồn `src/data/vietnameseCurriculum.ts:1180`) bé thấy
+bốn hình giống hệt nhau trong khi hướng dẫn ghi "chọn hình đúng" (bằng chứng
+`evidence/2026-11-03-T42/t42b-listen-pick-cards.png`);
+`Math.random` còn trong `CatchFallingLettersGame` / `EnglishColorBalloonGame` (đi ngược FR-G05,
+đổi builder sẽ làm đề khác đi ⇒ cần test nội dung mới);
+âm thanh lời khen bị lời hướng dẫn tự đọc đè (sửa có thể phá mechanic "nghe");
+5 hộp thoại chưa có `useFocusTrap`; thứ tự cleanup của `useModalHistory`;
+engine cờ vua / cờ tướng còn lỗ hổng chưa khoanh vùng.
 
 **Hệ quả chưa đóng của đợt T34:** `three-vendor` tăng 545.4 → **572.6 kB** vì quân Staunton
 dùng `ExtrudeGeometry` + bevel (chunk nằm sau `React.lazy` nên entry không đổi, nhưng đây là
@@ -264,7 +286,7 @@ chunk WebGL lớn nhất từ trước tới nay); `src/components/learning/ches
 |---|---|---|
 | K-01 | **T03B — component Mascot Gấu Bút Chì (SVG) + avatar mặc đồ**: task P42 duy nhất còn nợ, prompt giữ lại ở `docs/opencode/queue/05_T03B_linh_vat_minh_hoa.md`; T03A/T04/T06 đang dùng emoji thay thế | `npm run verify` + screenshot 390 px | 
 | K-02 | `AGENTS.md` §0 slot "Công cụ MCP" đã có — thêm slot "Bộ tài liệu specs" | docs |
-| K-03 | Số liệu kiểm kê trong specs (31 game / 475 câu / 92 file test / 1327 test / entry `index-3QHywPiW.js` 209.9 kB + boot graph 424.3 kB / 42 service module / 8 deps / 19 key — đo 2026-11-03 **lần năm trong ngày** — nội dung = HEAD `main` `1cac775` cộng **T41D** (`src/services/cloudMerge.ts` mới + sửa `cloudSync.ts`/`firebase.ts`/`storage.ts` + 2 file test mới), **chạy `npm run verify` trên working tree: EXIT=0 · 92 file / 1327 test · `Duration 22.32s`** ⇒ `src/` đổi nên entry **đổi cả hash lẫn kB** (+5.7 kB so với đợt đo trước, đúng phần luật hợp nhất cloud vào entry) cần refresh mỗi lần `verify` | `kbt-docs → project_state` |
+| K-03 | Số liệu kiểm kê trong specs (31 game / 475 câu / 99 file test / 1372 test / entry `index-C7kpOu7n.js` 211.3 kB + boot graph 425.6 kB / 42 service module / 8 deps / 19 key — đo 2026-11-03 **lần sáu trong ngày** — nội dung = HEAD `main` `1deb859` cộng **T42** (tám sửa lỗi trong `storage.ts`/`cloudMerge.ts`/`cloudSync.ts` + 4 màn game + `useFocusTrap.ts` + `calcIn100.ts` + `types/index.ts` + 7 file test mới), **chạy `npm run verify` trên working tree: EXIT=0 · 99 file / 1372 test · `Duration 24.14s`** ⇒ `src/` đổi nên entry **đổi cả hash lẫn kB** (+1.4 kB so với đợt đo trước) cần refresh mỗi lần `verify` | `kbt-docs → project_state` |
 | K-04 | `qa/p38-browser-probe.cjs` (`.cjs` duy nhất) — chuyển `.mjs` cho đồng bộ | QA |
 
 ---

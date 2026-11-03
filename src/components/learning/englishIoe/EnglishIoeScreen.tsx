@@ -193,6 +193,19 @@ function MockExam({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expired]);
 
+  // T42/H — hẹn giờ 600 ms tự sang câu/bắn điểm là hẹn giờ **sống ngoài** component.
+  // Bé bấm đáp án rồi thoát bài thi thử trong 600 ms thì `finish` vẫn chạy và ghi
+  // điểm của một lượt đã bỏ vào hồ sơ (ba mẹ thấy "đã làm bài" dù bé mới bấm một
+  // câu rồi tắt). Hẹn giờ phải nằm trong ref và bị xoá khi gỡ màn.
+  const advanceTimer = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (advanceTimer.current !== null) window.clearTimeout(advanceTimer.current);
+      advanceTimer.current = null;
+    },
+    []
+  );
+
   if (!q) return null;
 
   const pick = (i: number) => {
@@ -204,7 +217,9 @@ function MockExam({
     setCorrect(nextScore);
     if (ok) sound.playCorrect();
     else sound.playWrong();
-    window.setTimeout(() => {
+    window.clearTimeout(advanceTimer.current ?? undefined);
+    advanceTimer.current = window.setTimeout(() => {
+      advanceTimer.current = null;
       if (idx + 1 >= questions.length) finish(nextScore);
       else {
         setPicked(null);

@@ -41,6 +41,51 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T42 — tám defect: chọn màn không còn in sao, thẻ *Đôi Tai Thính* luôn có đáp án, bẫy focus
+  không cướp con trỏ khi bé gõ, một mục hỏng không xoá cả danh sách ôn, đồng hồ hợp nhất cloud
+  thật sự chạy, bài Toán lớp 1 bỏ phép có nhớ/có mượn, lưới đề sạch dấu ngay khung hình đầu, hẹn
+  giờ bị xoá lúc rời màn.** Người dùng: "check bug và fix". Hai nhánh Explore lập 18 ứng viên,
+  từng chỗ được mở ra đọc lại; giữ **8 defect xác nhận được** và sửa cả tám:
+  (A) bảng "Chọn Màn & Độ Khó" trong `GameModalWrapper.tsx` gọi `completeGameTier(gameId, t−1, 3, 0)`
+  nên màn bé **chưa chơi** bị đóng dấu 3 sao, và vì `useGameStage` đọc `prevBestStars = 3` lượt thật
+  đầu tiên bị tính là "luyện lại" — bé mất sao và chỉ nhận 20 % XP. Thêm `StorageService.selectGameTier`
+  (chỉ nâng `unlockedTier` bằng `Math.max`, kẹp 1…`GAME_LEVEL_POLICY.MAX_TIER`, **không** đụng
+  `starsByTier`/`bestScoreByTier`) và bỏ hẳn đường gọi cũ, có comment chặn quay lại.
+  (B) `ListenPickPhonicsGame.tsx` `slice(0, 4)` trên mảng đã xáo nên **đáp án có vòng bị cắt mất**,
+  bé không thể trả lời đúng — thay bằng `pickCardOptions(options, answer, seed)` luôn giữ đáp án, xáo
+  phương án nhiễu tất định theo `hashText(item.id) + seed·7919`, `LISTEN_PICK_CARD_COUNT = 4`.
+  (C) `useFocusTrap.ts` focus vào hộp thoại **vô điều kiện** ⇒ mỗi lần mở là con trỏ bị cướp, bé đang
+  gõ thì mất chỗ gõ — tách vị từ thuần `shouldMoveFocusIntoDialog(activeElement, container)` và chỉ
+  focus khi nó trả `true`. (D) `getAnalytics` chỉ kiểm tra **cả mảng** `recentErrors`: một mục
+  `null` lọt qua `JSON.parse` là xuống tới `cloudMerge.ts:359`, nơi dựng khoá chống trùng bằng
+  `${entry.questionId}@${entry.timestamp}` ⇒ `TypeError` đánh sập **toàn bộ** lần đồng bộ và danh sách
+  ôn mất trắng; nay lọc **từng phần tử** theo shape ở cả hai đầu — `storage.ts:1290` cho dữ liệu máy
+  này, `usableErrors` (`cloudMerge.ts:363`) cho dữ liệu cloud.
+  (E) T41D đã đề ra luật "tài nguyên **tiêu được** lấy theo hồ sơ hoạt động sau nhất", nhưng luật đó
+  **không bao giờ kích hoạt**: `getChildProfile()` chuẩn hoá `lastActiveDate` về *hôm nay* ở **mọi** lần
+  đọc nên hai máy luôn bằng nhau. Thêm `ChildProfile.stateTouchedAt` (`src/types/index.ts`) chỉ nhích
+  khi một trường LWW thật sự đổi (so `lwwFingerprint`), và `StorageService.withoutStateTouch` mute
+  đúng cú ghi của chính bộ đồng bộ; `cloudMerge` dùng mốc mới với fallback `lastActiveDate` cho hồ sơ cũ.
+  (F) bài "Số hai chữ số cộng/trừ một chữ số" trong `src/data/math/calcIn100.ts` nhét 12 phép **có nhớ /
+  có mượn** (`45 + 7`, `52 − 8`) trái chương trình lớp 1 (GDPT 2018 dạy không nhớ trước) — đổi sang cặp
+  không nhớ/không mượn và sửa luôn dòng mô tả in trên đề.
+  (G+H) `RhymeHunterGame.tsx` đồng bộ `roundsState` bằng `useEffect` ⇒ một khung hình vẫn vẽ **đề của
+  màn cũ** với dấu "đã hái" còn nguyên (nhìn như đã làm xong), nay đối chiếu `sourceRef` ngay ở thì
+  render; `MockExam` trong `EnglishIoeScreen.tsx` hẹn giờ 600 ms bằng `window.setTimeout` trần không cất
+  vào ref ⇒ `setState` sau unmount, nay là `advanceTimer` ref + cleanup.
+  Bằng chứng nhìn thấy được (`evidence/2026-11-03-T42/`): probe tạm chạy trên `dist/` mở *Săn Vần*,
+  chọn Màn 4 ⇒ `headerAfterPick: "Màn 4/6 ▾"`, `kho_bau_game_progress.rhyme_hunter =
+  {unlockedTier: 4, starsByTier: {}, bestScoreByTier: {}}`, `profileStarsAfterPick: 0`,
+  `noStarsMinted: true`, lưới quả dựng lại 4 → 10; *Đôi Tai Thính* ra `listenUnique: 4` thẻ và đáp án
+  `"sách vở"` luôn nằm trong danh sách; ảnh `t42a-tier4-no-stars.png` + `t42b-listen-pick-cards.png`.
+  Hồi quy `qa/focus.mjs`, `qa/games.mjs` (`catalogCount: 31`, `mountOnlyAwardedNothing: true`),
+  `qa/tier6-ladder-evidence.mjs` đều `QA PASS`, `errors: []`. Cổng: `npm run verify` **EXIT=0** ·
+  `99 passed (99)` / `1372 passed (1372)` · `Duration 24.14s` · `index-C7kpOu7n.js` **211.3 kB → PASS
+  (meets 450 kB goal)** · boot graph **425.6 kB** · T42 không thêm service module (vẫn 42), không thêm
+  dependency; chạy lại cổng trên **đúng nội dung commit** trước khi commit: EXIT=0 · `99 passed (99)` /
+  `1372 passed (1372)` · `Duration 21.38s` (thời gian tường thuật dao động, hash và kB entry không đổi) —
+  `evidence/2026-11-03-T42/verify-precommit.txt`. **Chưa sửa, đã ghi rõ ở `docs/plan/TASK_PLAN.md`:** `buildRoundsFromGameItems` gán cùng một
+  `item.emoji` cho cả 4 thẻ nên hình không phân biệt được (thiên về quyết định sư phạm, có ảnh bằng chứng).
 - **T41D — hợp nhất hồ sơ cloud không còn in tài nguyên, và kết quả của phiên đăng nhập cũ không
   đè lên phiên mới.** Người dùng yêu cầu "check tất cả các bug, liệt kê ra đã, fix dần"; ô T41D
   được ghi lịch ở `.ai/CURRENT.md`, `docs/lifecycle/CHECKLIST.md` C-06 và `HARNESS.md` H-3 nhưng
@@ -137,6 +182,29 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   `continue-on-error: true` **giữ nguyên** vì mới có một lần xanh.
 
 ### Tests
+- **T42 — 7 file / 45 test mới, ablation từng defect, và bằng chứng nhìn thấy được cho hai lỗi UI.**
+  `t42a-tier-picker-honest` (5): `selectGameTier` chỉ nâng `unlockedTier` (kẹp 1…6), **không** ghi vào
+  `starsByTier`/`bestScoreByTier`, lượt chơi thật đầu tiên sau khi chọn màn vẫn trả đủ XP + sao, và hợp
+  đồng nguồn cấm `GameModalWrapper` gọi `completeGameTier`. `t42b-listen-pick-answer` (4): `pickCardOptions`
+  luôn giữ đáp án trong 4 thẻ, tất định theo `(item.id, seed)`, không trùng phương án.
+  `t42c-focus-trap-typing` (4): `shouldMoveFocusIntoDialog` trả `false` khi focus đã ở trong hộp thoại,
+  `true` khi ở `body`/`html`/ngoài, và hook chỉ `.focus()` bên trong nhánh `if (!shouldMove…)`.
+  `t42d-corrupt-storage-guard` (12): mục `null`/thiếu trường bị loại **từng phần tử** thay vì làm sập cả mảng,
+  `lastActiveDate` rác rơi về hôm nay, `cloudMerge` lọc cả phía cloud. `t42e-resource-touch-clock` (11):
+  mốc `stateTouchedAt` nhích đúng một lần khi trường LWW đổi, không nhích khi chỉ chuẩn hoá `lastActiveDate`,
+  `withoutStateTouch` mute cú ghi của bộ đồng bộ, và hợp nhất hai máy chọn bên **hoạt động sau nhất** chứ
+  không lấy `max`. `t42f-digit-lesson-no-carry` (5): mọi phép trong `calcIn100` không nhớ/không mượn + đề
+  in ra khớp lời dạy. `t42g-late-state-timers` (4, gồm hai nhóm `T42/G` và `T42/H`): `roundsState` dựng lại
+  ở thì render, `advanceTimer` nằm trong ref + cleanup, không còn `window.setTimeout` trần gọi `setState`.
+  **Ablation từng cái** (`git checkout HEAD --` đúng nguồn bị sửa rồi chạy riêng file): t42a `1 failed |
+  4 passed (5)` · t42b `4 failed (4)` · t42c `4 failed (4)` · t42d `7 failed | 5 passed (12)` · t42e
+  `4 failed | 7 passed (11)` · t42f `2 failed | 3 passed (5)` · t42g `4 failed (4)`; restore ⇒
+  `7 passed (7)` / `45 passed (45)` (`evidence/2026-11-03-T42/ablation-*-RED.txt`, `t42-tests-green.txt`).
+  **Bằng chứng nhìn thấy được:** probe tạm `evidence/2026-11-03-T42/probe-t42-ui.mjs` chạy trên `dist/`
+  qua `node qa/run-one.mjs ./tmp-t42-ui.mjs` (đặt ở gốc repo, **đã xoá** sau khi đo — không bỏ trong `qa/`
+  vì `qa/*.mjs` được đếm là probe) ⇒ `ok: true`, `errors: []`, kèm 2 ảnh chụp. Tổng cổng: **99 file /
+  1372 test**, `npm run verify` EXIT=0 · `Duration 24.14s` · `index-C7kpOu7n.js = 211.3 kB PASS`
+  (`evidence/2026-11-03-T42/verify.txt`, `check-budget.txt`).
 - **T41D — 40 test mới, kèm bằng chứng phép thử thật (ablation).**
   `tests/t41d-cloud-merge.test.ts` (28) kiểm luật hợp nhất như hàm thuần: bộ đếm luỹ kế lấy `max`;
   **sao/vé/ngọc/trang bị/chuỗi không được dùng `max`** (kịch bản in tiền: máy A còn 9 sao, máy B đã tiêu

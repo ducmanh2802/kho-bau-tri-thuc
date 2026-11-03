@@ -1,0 +1,67 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t42b-listen-pick-answer.test.ts (4 tests | 4 failed) 8ms
+   ❯ T42/B — thẻ chọn phải chứa đáp án (4)
+     × đáp án ở vị trí 5/6 vẫn nằm trong các thẻ 5ms
+     × vị trí đáp án thay đổi theo seed chứ không cố định một chỗ 1ms
+     × phương án ít hơn trần thì giữ nguyên, không bịa thêm 0ms
+     × toàn bộ đáp án của mọi item đều xuất hiện trong cards của round 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t42b-listen-pick-answer.test.ts > T42/B — thẻ chọn phải chứa đáp án > đáp án ở vị trí 5/6 vẫn nằm trong các thẻ
+TypeError: pickCardOptions is not a function
+ ❯ tests/t42b-listen-pick-answer.test.ts:35:21
+     33|   it('đáp án ở vị trí 5/6 vẫn nằm trong các thẻ', () => {
+     34|     for (const seed of [1, 7, 42, 99, 2026]) {
+     35|       const shown = pickCardOptions(item({}).options, item({}).answer,…
+       |                     ^
+     36|       expect(shown).toContain('Con vịt');
+     37|       expect(shown.length).toBeLessThanOrEqual(4);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/t42b-listen-pick-answer.test.ts > T42/B — thẻ chọn phải chứa đáp án > vị trí đáp án thay đổi theo seed chứ không cố định một chỗ
+TypeError: pickCardOptions is not a function
+ ❯ tests/t42b-listen-pick-answer.test.ts:43:53
+     41|
+     42|   it('vị trí đáp án thay đổi theo seed chứ không cố định một chỗ', () …
+     43|     const idx = [1, 2, 3, 4, 5, 6, 7, 8].map((s) => pickCardOptions(it…
+       |                                                     ^
+     44|     expect(new Set(idx).size).toBeGreaterThan(1);
+     45|     expect(idx.every((i) => i >= 0)).toBe(true);
+ ❯ tests/t42b-listen-pick-answer.test.ts:43:42
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/t42b-listen-pick-answer.test.ts > T42/B — thẻ chọn phải chứa đáp án > phương án ít hơn trần thì giữ nguyên, không bịa thêm
+TypeError: pickCardOptions is not a function
+ ❯ tests/t42b-listen-pick-answer.test.ts:50:19
+     48|   it('phương án ít hơn trần thì giữ nguyên, không bịa thêm', () => {
+     49|     const three = ['Con mèo', 'Con chó', 'Con vịt'];
+     50|     const shown = pickCardOptions(three, 'Con vịt', 9);
+       |                   ^
+     51|     expect(shown.sort()).toEqual([...three].sort());
+     52|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/t42b-listen-pick-answer.test.ts > T42/B — thẻ chọn phải chứa đáp án > toàn bộ đáp án của mọi item đều xuất hiện trong cards của round
+TypeError: buildRoundsFromGameItems is not a function
+ ❯ tests/t42b-listen-pick-answer.test.ts:55:20
+     53|
+     54|   it('toàn bộ đáp án của mọi item đều xuất hiện trong cards của round'…
+     55|     const rounds = buildRoundsFromGameItems([item({}), item({ id: 'q2'…
+       |                    ^
+     56|     expect(rounds).toHaveLength(2);
+     57|     for (const round of rounds) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  18:30:39
+   Duration  1.03s (transform 49%, import 48%, worker 2%, tests 1%)
+

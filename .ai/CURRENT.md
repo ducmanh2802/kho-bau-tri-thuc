@@ -1,5 +1,34 @@
 # CURRENT — KHO BÁU TRI THỨC (Lớp 1)
 
+**Cập nhật 2026-11-03 (đợt sáu) — lát cắt này là của T42, lane khác không bị đụng:** người dùng nói
+"check bug và fix"; hai nhánh Explore lập 18 ứng viên, soát lại từng chỗ trong source và giữ **8 defect
+thật** ⇒ **7 file test mới / 45 test** (`tests/t42a…` → `tests/t42g…`, mô tả `T42/G` + `T42/H` cùng nằm
+trong `t42g-late-state-timers.test.ts`). Sửa: `StorageService.selectGameTier` mới thay cho
+`completeGameTier(gameId, t−1, 3, 0)` trong `GameModalWrapper` (chọn màn chỉ **mở khoá**, không in sao,
+lượt thật đầu không bị tính "luyện lại" 20 % XP); `pickCardOptions` mới giữ đáp án luôn có mặt trong 4
+thẻ *Đôi Tai Thính*; `shouldMoveFocusIntoDialog` mới để `useFocusTrap` không cướp con trỏ khi bé đang
+gõ; lọc **từng phần tử** `recentErrors` ở cả `storage.ts:1290` và `usableErrors` (`cloudMerge.ts:363`)
+thay cho kiểm tra cả mảng; đồng hồ hợp nhất cloud chuyển sang `ChildProfile.stateTouchedAt` mới (kèm
+`StorageService.withoutStateTouch` mute cú ghi của chính bộ đồng bộ) vì `lastActiveDate` bị chuẩn hoá về
+hôm nay ở mọi lần đọc nên luật T41D không bao giờ chạy; 12 phép có nhớ/có mượn bỏ khỏi
+`src/data/math/calcIn100.ts`; *Săn Vần* dựng lại lưới đề ở thì render và `MockExam` cất hẹn giờ vào
+`advanceTimer` ref + cleanup. Ablation **từng defect**: t42a `1 failed | 4 passed (5)` · t42b `4 failed
+(4)` · t42c `4 failed (4)` · t42d `7 failed | 5 passed (12)` · t42e `4 failed | 7 passed (11)` · t42f
+`2 failed | 3 passed (5)` · t42g `4 failed (4)`, restore ⇒ `7 passed (7)` / `45 passed (45)`.
+Bằng chứng nhìn thấy được: probe tạm `evidence/2026-11-03-T42/probe-t42-ui.mjs` (chạy qua
+`node qa/run-one.mjs ./tmp-t42-ui.mjs` rồi **xoá**, không nằm trong `qa/`) ⇒ `ok: true`, `errors: []`,
+`headerAfterPick "Màn 4/6 ▾"` với `starsByTier: {}` + `profileStarsAfterPick: 0`, `listenUnique: 4`; cộng
+hồi quy `qa/focus.mjs` / `qa/games.mjs` / `qa/tier6-ladder-evidence.mjs` và 2 ảnh. Cổng máy
+`npm run verify` **EXIT=0** · **99 file / 1372 test** · `Duration 24.14s`, đo lại trên đúng nội dung
+commit: **EXIT=0** · `99 passed (99)` / `1372 passed (1372)` · `Duration 21.38s` (`verify-precommit.txt`) ·
+`index-C7kpOu7n.js`
+**211.3 kB** (boot graph **425.6 kB**, `435849 total`) · vẫn **42** service module, không thêm dependency.
+Bằng chứng `evidence/2026-11-03-T42/`. **Không stage:** 6 ảnh `docs/opencode/reports/img/*.png` và
+`docs/step-by-step-guidance.md` (của lane khác) vẫn để nguyên trong working tree; `package-lock.json`
+còn nguyên. Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ**; tag `v1.1.0` vẫn ở `77d90ce`; chữ ký Go/No-Go
+vẫn trống — việc của người giữ repo.
+
+
 **Cập nhật 2026-11-03 (đợt năm) — lát cắt này là của T41D, lane khác không bị đụng:** 9 defect hợp
 nhất hồ sơ cloud + race đăng nhập đã sửa và commit thành `06b8962` (32 file, +2243/−219), push
 `1cac775..06b8962`, `HEAD == origin/main`. Module mới `src/services/cloudMerge.ts` (364 dòng, luật

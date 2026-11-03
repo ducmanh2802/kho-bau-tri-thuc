@@ -208,10 +208,17 @@ export function mergeCloudState({
 }
 
 function coerceCloudProfile(local: ChildProfile, cloud: Partial<ChildProfile>, trace: MergeTrace): ChildProfile {
-  // "Máy nào chạm gần đây nhất" là đồng hồ duy nhất có trong hồ sơ; hai bên bằng
-  // ngày thì máy này thắng vì bé đang ngồi ở đây.
+  // T42/E — "máy nào chạm gần đây nhất" phải là **mốc giờ đổi trạng thái**, không
+  // phải `lastActiveDate`: `getChildProfile()` chuẩn hoá ngày về hôm ngay ở bước
+  // đọc, nên hai máy trong cùng một ngày luôn hoà nhau ⇒ luật "máy chạm muộn hơn
+  // thắng" của T41D không bao giờ chạy và vé bị in lại. Hồ sơ cũ chưa có mốc thì
+  // mới quay về so ngày (giữ nguyên hành vi T41D cho dữ liệu đã lưu từ trước).
+  const localTouch = asText(local.stateTouchedAt) || '';
+  const cloudTouch = asText(cloud.stateTouchedAt) || '';
   const cloudLastActive = asText(cloud.lastActiveDate) || '';
-  const cloudWinsTheClock = cloudLastActive > (local.lastActiveDate || '');
+  const cloudWinsTheClock = cloudTouch !== localTouch
+    ? cloudTouch > localTouch
+    : cloudLastActive > (local.lastActiveDate || '');
 
   const merged: ChildProfile = {
     ...local,
@@ -251,6 +258,11 @@ function coerceCloudProfile(local: ChildProfile, cloud: Partial<ChildProfile>, t
       cloudWinsTheClock
     ),
     lastActiveDate: (cloudLastActive > (local.lastActiveDate || '') ? cloudLastActive : local.lastActiveDate) || '',
+    // Mốc thắng là mốc **lớn nhất**, không phải của bên thắng dữ liệu: hai bên
+    // bằng nhau thì lần hợp nhất sau vẫn hoà và máy này giữ quyền (bé đang ngồi
+    // ở đây). Đây cũng là chỗ làm phép hợp nhất thành **bất động điểm** — ghi
+    // kết quả xuống máy không làm mốc nhích (`withoutStateTouch`).
+    stateTouchedAt: (cloudTouch > localTouch ? cloudTouch : localTouch) || undefined,
     dailyChestClaimedDate: (() => {
       const cloudDate = asText(cloud.dailyChestClaimedDate);
       const localDate = asText(local.dailyChestClaimedDate);
@@ -296,6 +308,7 @@ function takeCloudProfile(local: ChildProfile, cloud: Partial<ChildProfile>): Ch
     lastActiveDate: asText(cloud.lastActiveDate) || local.lastActiveDate,
     dailyChestClaimedDate: asText(cloud.dailyChestClaimedDate),
     unlockAllLessons: cloud.unlockAllLessons === true,
+    stateTouchedAt: asText(cloud.stateTouchedAt),
     isDemoData: false,
   };
 }
@@ -344,7 +357,17 @@ function mergeAnalytics(
 
   const cloudErrors = Array.isArray(cloud.recentErrors) ? cloud.recentErrors : [];
   const seen = new Set(local.recentErrors.map((entry) => `${entry.questionId}@${entry.timestamp}`));
-  const freshErrors = cloudErrors.filter((entry) => entry && !seen.has(`${entry.questionId}@${entry.timestamp}`));
+  // T42/D —cloud là chỗ người khác ghi vào, nên từng MỤC phải qua cửa hình dạng
+  // trước khi được xếp vào danh sách cần ôn (mục hỏng từng làm `.map(entry =>
+  // entry.questionId)` và bảng báo cáo crash).
+  const usableErrors = cloudErrors.filter(
+    (entry): entry is LearningAnalytics['recentErrors'][number] =>
+      !!entry &&
+      typeof entry === 'object' &&
+      typeof (entry as { questionId?: unknown }).questionId === 'string' &&
+      typeof (entry as { timestamp?: unknown }).timestamp === 'string'
+  );
+  const freshErrors = usableErrors.filter((entry) => !seen.has(`${entry.questionId}@${entry.timestamp}`));
   if (freshErrors.length > 0) trace.push(`recent_errors:cloud_added=${freshErrors.length}`);
   // `recordQuestionAnswer` giữ danh sách **mới nhất ở đầu, trần 20**. Gộp hai máy
   // phải theo đúng thứ tự đó — nếu chỉ cộng vào đuôi thì bản của máy này đã đầy

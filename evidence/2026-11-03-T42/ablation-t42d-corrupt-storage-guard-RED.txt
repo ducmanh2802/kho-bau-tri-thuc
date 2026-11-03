@@ -1,0 +1,33 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t42d-corrupt-storage-guard.test.ts (12 tests | 7 failed) 31ms
+   ❯ T42/D — key ngày hỏng không phá chuỗi ngày (10)
+     ✓ ngày hôm qua hợp lệ vẫn cộng chuỗi lên 10 4ms
+[…lược 2340 dòng stack…]
+6:     ✓ ngày hôm qua hợp lệ vẫn cộng chuỗi lên 10 4ms
+7:     × giá trị "03/11/2026" không được ép chuỗi 9 về 1 9ms
+8:     × giá trị "2026-02-30" không được ép chuỗi 9 về 1 1ms
+9:     × giá trị "hôm qua" không được ép chuỗi 9 về 1 1ms
+10:     × giá trị "" không được ép chuỗi 9 về 1 1ms
+11:     × giá trị "2026-13-01" không được ép chuỗi 9 về 1 1ms
+12:     ✓ giá trị 12345 không được ép chuỗi 9 về 1 0ms
+13:     ✓ giá trị null không được ép chuỗi 9 về 1 0ms
+14:     ✓ key hỏng được sửa lại thành hôm nay nên lần đọc sau không lặp lại bước ngày 1ms
+15:     × nguồn đọc hồ sơ phải kiểm tra định dạng ngày chứ không chỉ typeof 5ms
+17:     × mục null / thiếu trường bị loại chứ không làm crash bộ đồng bộ 3ms
+18:     ✓ mục lỗi từ cloud cũng bị chặn ở cửa hợp nhất 2ms
+22: FAIL  tests/t42d-corrupt-storage-guard.test.ts > T42/D — key ngày hỏng không phá chuỗi ngày > giá trị "03/11/2026" không được ép chuỗi 9 về 1
+23: FAIL  tests/t42d-corrupt-storage-guard.test.ts > T42/D — key ngày hỏng không phá chuỗi ngày > giá trị "2026-02-30" không được ép chuỗi 9 về 1
+24: FAIL  tests/t42d-corrupt-storage-guard.test.ts > T42/D — key ngày hỏng không phá chuỗi ngày > giá trị "hôm qua" không được ép chuỗi 9 về 1
+25: FAIL  tests/t42d-corrupt-storage-guard.test.ts > T42/D — key ngày hỏng không phá chuỗi ngày > giá trị "" không được ép chuỗi 9 về 1
+26: FAIL  tests/t42d-corrupt-storage-guard.test.ts > T42/D — key ngày hỏng không phá chuỗi ngày > giá trị "2026-13-01" không được ép chuỗi 9 về 1
+27:AssertionError: expected 1 to be 9 // Object.is equality
+45: FAIL  tests/t42d-corrupt-storage-guard.test.ts > T42/D — key ngày hỏng không phá chuỗi ngày > nguồn đọc hồ sơ phải kiểm tra định dạng ngày chứ không chỉ typeof
+46:AssertionError: expected 'import {\r\n  Achievement,\r\n  Avata…' to match /isRealDateKey\(raw\.lastActiveDate\)/
+716:  /** Alias kept for names expected by callers/tests. */
+739:  /** Alias kept for names expected by callers/tests. */
+744:  /** Alias kept for names expected by callers/tests. */
+2402: FAIL  tests/t42d-corrupt-storage-guard.test.ts > T42/D — mục lỗi trong danh sách câu sai > mục null / thiếu trường bị loại chứ không làm crash bộ đồng bộ
+2416: Test Files  1 failed (1)
+2417:      Tests  7 failed | 5 passed (12)

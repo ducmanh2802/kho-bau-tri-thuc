@@ -1,0 +1,15 @@
+Bundle budget (T02C: main chunk must stay ≤ 600 kB, goal ≤ 450 kB):
+     723.0 kB  firebase-vendor-CHgyFgl9.js
+     572.6 kB  three-vendor-DmepbH5g.js
+     263.5 kB  curriculum-Dkq-x4AA.js
+     213.6 kB  react-vendor-BNCMh3YF.js
+     211.3 kB  index-C7kpOu7n.js  ← main
+     186.0 kB  english-bank-CBDGF6Vb.js
+     143.0 kB  ReadingFluencyScreen-DS4p9pI1.js
+     130.4 kB  competitionQuestions-boIslmox.js
+     124.1 kB  math-bank-BaP_gCx8.js
+      70.7 kB  ParentDashboardModal-BUmgiWYG.js
+      56.2 kB  ChessScreen-DzhD94HQ.js
+      54.3 kB  CompetitionHubScreen-BvAREgZl.js
+  ... +84 more chunks
+Main chunk: index-C7kpOu7n.js = 211.3 kB → PASS (meets 450 kB goal)

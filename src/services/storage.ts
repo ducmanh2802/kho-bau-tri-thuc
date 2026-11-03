@@ -362,6 +362,13 @@ export const DEFAULT_CHILD_PROFILE: ChildProfile = {
   isDemoData: false,
 };
 
+/**
+ * T42/E — cờ "ghi mà không nhích mốc trạng thái" (xem `withoutStateTouch`).
+ * Đặt ở scope module vì `saveChildProfile` là đường ghi duy nhất của hồ sơ và
+ * không thể thêm tham số mà phải sửa hàng chục chỗ gọi.
+ */
+let stateTouchMuted = false;
+
 const DEFAULT_PARENT_SETTINGS: ParentSettings = {
   dailyLimitMinutes: 20, // 20 minutes safe recommendation for 6-7 y/o
   soundEnabled: true,
@@ -1013,7 +1020,12 @@ export class StorageService {
             gems: typeof raw.gems === 'number' && !isNaN(raw.gems) && raw.gems >= 0 ? raw.gems : 0,
             tickets: typeof raw.tickets === 'number' && !isNaN(raw.tickets) && raw.tickets >= 0 ? raw.tickets : 0,
             streak: typeof raw.streak === 'number' && !isNaN(raw.streak) && raw.streak >= 1 ? raw.streak : 1,
-            lastActiveDate: typeof raw.lastActiveDate === 'string' ? raw.lastActiveDate : getTodayString(),
+            // T42/D — `isRealDateKey` (T14C) đã tồn tại nhưng chỗ này chỉ kiểm
+            // tra `typeof === 'string'`. Một key hỏng ("03/11/2026", số, chuỗi lạ
+            // do máy khác/cloud trôi về) làm `diffDateKeys` trả null ⇒ rơi vào
+            // nhánh "nghỉ quá 2 ngày" và **xoá sạch chuỗi ngày của bé**; coi nó
+            // như hôm nay thì không tính bước ngày, không phá chuỗi.
+            lastActiveDate: isRealDateKey(raw.lastActiveDate) ? raw.lastActiveDate : getTodayString(),
             unlockedItems: Array.isArray(raw.unlockedItems)
               ? raw.unlockedItems
               : [...DEFAULT_CHILD_PROFILE.unlockedItems],
@@ -1037,6 +1049,7 @@ export class StorageService {
                 )
               : {},
             unlockAllLessons: raw.unlockAllLessons === true,
+            stateTouchedAt: typeof raw.stateTouchedAt === 'string' ? raw.stateTouchedAt : undefined,
             isDemoData: raw.isDemoData === true,
           };
 
@@ -1129,7 +1142,64 @@ export class StorageService {
   }
 
   public static saveChildProfile(profile: ChildProfile): boolean {
-    return writeJSON(STORAGE_KEYS.CHILD_PROFILE, profile);
+    return writeJSON(STORAGE_KEYS.CHILD_PROFILE, StorageService.stampStateTouch(profile));
+  }
+
+  /**
+   * T42/E — dấu "máy này vừa đổi trạng thái tiêu được", để bộ đồng bộ biết bên
+   * nào mới thật sự thay đổi. `lastActiveDate` không làm được việc này: lần đọc
+   * hồ sơ nào cũng chuẩn hoá nó về hôm nay ⇒ hai máy cùng ngày luôn hoà nhau và
+   * bản cũ trên cloud không bao giờ thắng được (vé bị in lại — xem T42/E).
+   *
+   * Chỉ nhóm trường **có tăng có giảm** được tính: sao, vé, ngọc, avatar, trang
+   * bị, khoá "mở hết bài" của ba mẹ. XP/bài học/rương là số cộng dồn (hợp nhất
+   * theo max hoặc union) nên để chúng nhích mốc sẽ cho phép một máy chỉ vừa học
+   * cướp quyền quyết định ví vé của máy kia.
+   */
+  private static lwwFingerprint(profile: Record<string, unknown>): string {
+    return [
+      profile.stars,
+      profile.tickets,
+      profile.gems,
+      profile.avatarBase,
+      profile.unlockAllLessons,
+      JSON.stringify(profile.equipped ?? {}),
+    ].join('|');
+  }
+
+  private static storedLwwFingerprint(): string | null {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.CHILD_PROFILE);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return null;
+      return StorageService.lwwFingerprint(parsed as Record<string, unknown>);
+    } catch {
+      return null;
+    }
+  }
+
+  private static stampStateTouch(profile: ChildProfile): ChildProfile {
+    if (stateTouchMuted) return profile;
+    const before = StorageService.storedLwwFingerprint();
+    if (before === null) return profile;
+    if (before === StorageService.lwwFingerprint(profile as unknown as Record<string, unknown>)) return profile;
+    return { ...profile, stateTouchedAt: new Date().toISOString() };
+  }
+
+  /**
+   * Chạy một đoạn ghi hồ sơ mà **không** nhích `stateTouchedAt`. Bộ đồng bộ dùng
+   * khi ghi kết quả hợp nhất từ cloud xuống: đó là bản sao trạng thái đã có mốc
+   * riêng, không phải bé vừa đổi gì trên máy này. Nếu nó cũng nhích thì mỗi lần
+   * đồng bộ là một lần máy này "mới hơn" và máy kia vĩnh viễn thua.
+   */
+  public static withoutStateTouch<T>(run: () => T): T {
+    stateTouchMuted = true;
+    try {
+      return run();
+    } finally {
+      stateTouchMuted = false;
+    }
   }
 
 public static getParentSettings(): ParentSettings {
@@ -1213,7 +1283,18 @@ public static getParentSettings(): ParentSettings {
             lessonsCompletedCount: typeof parsed.lessonsCompletedCount === 'number' ? parsed.lessonsCompletedCount : 0,
             gamesPlayedCount: typeof parsed.gamesPlayedCount === 'number' ? parsed.gamesPlayedCount : 0,
             skillMastery: parsed.skillMastery && typeof parsed.skillMastery === 'object' ? parsed.skillMastery : {},
-            recentErrors: Array.isArray(parsed.recentErrors) ? parsed.recentErrors : [],
+            // T42/D — lọc từng MỤC, không chỉ từng mảng: một phần tử `null` lọt
+            // vào đây là đủ làm `cloudMerge` đọc `entry.questionId` crash cả lần
+            // đồng bộ, và danh sách cần ôn mất hết dữ liệu.
+            recentErrors: Array.isArray(parsed.recentErrors)
+              ? parsed.recentErrors.filter(
+                  (entry: unknown): entry is LearningAnalytics['recentErrors'][number] =>
+                    !!entry &&
+                    typeof entry === 'object' &&
+                    typeof (entry as { questionId?: unknown }).questionId === 'string' &&
+                    typeof (entry as { timestamp?: unknown }).timestamp === 'string'
+                )
+              : [],
           };
         }
       }
@@ -1963,6 +2044,36 @@ public static getParentSettings(): ParentSettings {
       unlockedTier: Math.max(current.unlockedTier, Math.min(safeTier + 1, GAME_LEVEL_POLICY.MAX_TIER)),
       starsByTier: { ...current.starsByTier, [safeTier]: Math.max(current.starsByTier[safeTier] ?? 0, safeStars) },
       bestScoreByTier: { ...current.bestScoreByTier, [safeTier]: Math.max(current.bestScoreByTier[safeTier] ?? 0, Math.round(score)) },
+      updatedAt: new Date().toISOString(),
+    };
+    store.games[gameId] = next;
+    store.updatedAt = next.updatedAt;
+    StorageService.saveGameProgressStore(store);
+    return next;
+  }
+
+  /**
+   * T42/A — "Chọn Màn" trong bảng trò chơi CHỈ mở khoá.
+   *
+   * Đường cũ gọi `completeGameTier(gameId, t - 1, 3, 0)` để `unlockedTier` nhảy
+   * tới bậc bé chọn, nhưng nó kèm theo hai tác phụ: màn bên dưới nhận 3 sao dù
+   * chưa chơi lần nào, và lượt chơi thật đầu tiên của màn đó đọc
+   * `prevBestStars = 3` nên bị tính là "luyện lại" — bé mất sao và chỉ ăn 20%
+   * XP. Sao/điểm tốt nhất vì vậy chỉ do `completeGameTier` (lượt chơi thật) ghi.
+   */
+  public static selectGameTier(gameId: string, tier: number): GameLevelProgress {
+    const store = StorageService.getGameProgressStore();
+    const current = store.games[gameId] ?? {
+      unlockedTier: 1,
+      starsByTier: {},
+      bestScoreByTier: {},
+      updatedAt: new Date().toISOString(),
+    };
+    const safeTier = Math.min(Math.max(Math.round(tier), 1), GAME_LEVEL_POLICY.MAX_TIER);
+    const next: GameLevelProgress = {
+      unlockedTier: Math.max(current.unlockedTier, safeTier),
+      starsByTier: { ...current.starsByTier },
+      bestScoreByTier: { ...current.bestScoreByTier },
       updatedAt: new Date().toISOString(),
     };
     store.games[gameId] = next;

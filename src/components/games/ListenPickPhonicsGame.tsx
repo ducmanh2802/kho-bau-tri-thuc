@@ -5,6 +5,7 @@ import { Volume2 } from 'lucide-react';
 import { useGameStage } from '../../hooks/useGameStage';
 import { defaultRoundsPerTier, getTierMeta } from '../../data/gameLevels';
 import { THEMES, buildPhonicsRounds } from '../../data/games/listen_pick';
+import { seededRng, shuffleSeeded } from '../../data/gameLevels';
 import { getGameItems, GameItem } from '../../services/gameContent';
 import type { PhonicsCard, PhonicsRound } from '../../data/games/listen_pick';
 
@@ -16,17 +17,38 @@ interface ListenPickItem extends GameItem {
   cards: PhonicsCard[];
 }
 
-function buildRoundsFromGameItems(items: GameItem[], tier: number, seed: number): ListenPickItem[] {
+/** Số thẻ tối đa một vòng — khớp lưới `grid-cols-2` 2×2 của màn chơi. */
+export const LISTEN_PICK_CARD_COUNT = 4;
+
+function hashText(value: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < value.length; i += 1) {
+    h = Math.imul(h ^ value.charCodeAt(i), 16777619);
+  }
+  return h >>> 0;
+}
+
+/**
+ * T42/B — `getGameItems` đã xáo phương án theo seed và câu thật có 5–6 lựa chọn,
+ * nên `slice(0, 4)` cũ có thể cắt **mất đáp án** ⇒ vòng không thể trả lời. Ở đây
+ * đáp án luôn được giữ, phần còn lại là phương án nhiễu lấy tất định theo seed,
+ * và thứ tự đảo lại để đáp án không đứng một chỗ cố định.
+ */
+export function pickCardOptions(options: string[], answer: string, seed: number): string[] {
+  const distractors = Array.from(new Set(options.filter((opt) => opt !== answer)));
+  const picked = shuffleSeeded(distractors, seededRng(seed)).slice(0, LISTEN_PICK_CARD_COUNT - 1);
+  return shuffleSeeded([answer, ...picked], seededRng(seed + 1));
+}
+
+export function buildRoundsFromGameItems(items: GameItem[], tier: number, seed: number): ListenPickItem[] {
   const rounds: ListenPickItem[] = [];
   for (const item of items) {
-    const options = item.options.slice(0, 4);
+    const options = pickCardOptions(item.options, item.answer, hashText(item.id) + seed * 7919);
     const cards: PhonicsCard[] = options.map(opt => ({
       word: opt,
       emoji: item.emoji || '❓',
       spokenText: item.audioText || opt,
     }));
-    const targetIdx = options.indexOf(item.answer);
-    const target = cards[targetIdx >= 0 ? targetIdx : 0];
     rounds.push({
       ...item,
       spokenPrompt: item.audioText || item.prompt,

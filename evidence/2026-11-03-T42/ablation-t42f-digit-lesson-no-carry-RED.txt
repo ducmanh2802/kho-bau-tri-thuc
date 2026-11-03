@@ -1,0 +1,57 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t42f-digit-lesson-no-carry.test.ts (5 tests | 2 failed) 17ms
+   ❯ T42/F — lời dạy và đề bài phải khớp nhau (5)
+     ✓ bài tồn tại và có đề sinh từ calc 3ms
+     × mọi phép cộng trong bài đều KHÔNG nhớ 9ms
+     × mọi phép trừ trong bài đều KHÔNG mượn 1ms
+     ✓ đáp số của mỗi câu vẫn đúng theo a op b 1ms
+     ✓ cả bài vẫn có đủ phép cộng lẫn phép trừ 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t42f-digit-lesson-no-carry.test.ts > T42/F — lời dạy và đề bài phải khớp nhau > mọi phép cộng trong bài đều KHÔNG nhớ
+AssertionError: 48 + 5: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/t42f-digit-lesson-no-carry.test.ts:37:57
+     35|   it('mọi phép cộng trong bài đều KHÔNG nhớ', () => {
+     36|     for (const c of calcs(digitLesson!).filter((c) => c.op === '+')) {
+     37|       expect(isNoCarryAdd(c.a, c.b), `${c.a} + ${c.b}`).toBe(true);
+       |                                                         ^
+     38|     }
+     39|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/t42f-digit-lesson-no-carry.test.ts > T42/F — lời dạy và đề bài phải khớp nhau > mọi phép trừ trong bài đều KHÔNG mượn
+AssertionError: 43 − 6: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/t42f-digit-lesson-no-carry.test.ts:43:58
+     41|   it('mọi phép trừ trong bài đều KHÔNG mượn', () => {
+     42|     for (const c of calcs(digitLesson!).filter((c) => c.op === '-')) {
+     43|       expect(isNoBorrowSub(c.a, c.b), `${c.a} − ${c.b}`).toBe(true);
+       |                                                          ^
+     44|     }
+     45|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)
+   Start at  18:30:23
+   Duration  451ms (import 40%, transform 26%, tests 20%, worker 14%)
+

@@ -259,6 +259,9 @@ class CloudSyncManager {
       cloudAnalytics: (cloudData.analytics as Record<string, unknown>) || null,
     });
 
+    // T42/E — ghi kết quả hợp nhất xuống máy là bản sao trạng thái đã có mốc
+    // riêng, không phải bé vừa đổi gì. Không câm ở đây thì mỗi lần đồng bộ làm
+    // máy này "mới hơn" và máy kia vĩnh viễn thua ⇒ vé tiêu ở máy kia bị in lại.
     this.withMutedLocalWrites(() => StorageService.saveChildProfile(outcome.profile));
 
     // Đẩy cả analytics đã hợp nhất. Bản cũ chỉ gửi analytics của máy này nên báo
@@ -278,12 +281,13 @@ class CloudSyncManager {
 
   /**
    * Chạy một đoạn đọc/ghi `localStorage` của riêng bộ đồng bộ mà không cho nó
-   * tự kích hoạt lần đồng bộ kế tiếp (xem `writingOwnState`).
+   * tự kích hoạt lần đồng bộ kế tiếp (xem `writingOwnState`), và không để nó
+   * tự nhích `stateTouchedAt` (xem T42/E — `StorageService.withoutStateTouch`).
    */
   private withMutedLocalWrites<T>(run: () => T): T {
     this.writingOwnState = true;
     try {
-      return run();
+      return StorageService.withoutStateTouch(run);
     } finally {
       this.writingOwnState = false;
     }

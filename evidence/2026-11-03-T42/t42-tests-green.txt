@@ -1,0 +1,19 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t42a-tier-picker-honest.test.ts (5 tests) 17ms
+ ✓ tests/t42e-resource-touch-clock.test.ts (11 tests) 19ms
+ ✓ tests/t42d-corrupt-storage-guard.test.ts (12 tests) 28ms
+ ✓ tests/t42f-digit-lesson-no-carry.test.ts (5 tests) 6ms
+ ✓ tests/t42c-focus-trap-typing.test.ts (4 tests) 6ms
+ ✓ tests/t42g-late-state-timers.test.ts (4 tests) 9ms
+ ✓ tests/t42b-listen-pick-answer.test.ts (4 tests) 7ms
+
+ Test Files  7 passed (7)
+      Tests  45 passed (45)
+   Start at  18:31:08
+   Duration  2.11s (import 54%, transform 37%, worker 4%, tests 4%)
+
+    Isolate  7 workers spawned · ~382ms startup each (spawn + environment, per file)
+             at least ~510ms faster with isolate: false — reuses workers across files instead of one per file
+

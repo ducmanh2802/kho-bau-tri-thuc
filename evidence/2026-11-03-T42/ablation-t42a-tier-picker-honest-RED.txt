@@ -1,0 +1,16 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t42a-tier-picker-honest.test.ts (5 tests | 1 failed) 24ms
+   ❯ T42/A — chọn màn chỉ mở khoá, không in sao (5)
+     ✓ nhảy lên Màn 5 không để lại sao hay điểm nào 4ms
+[…lược 698 dòng stack…]
+6:     ✓ nhảy lên Màn 5 không để lại sao hay điểm nào 4ms
+7:     ✓ màn đã mở rồi thì chọn màn thấp hơn không kéo tiến độ về sau 1ms
+8:     ✓ bậc ngoài 1..MAX_TIER bị kẹp, không mở khoá âm 0ms
+9:     ✓ lượt chơi THẬT đầu tiên sau khi chọn màn vẫn được trả đủ XP + sao 9ms
+10:     × wrapper không còn gọi completeGameTier, và không còn đường nào in sao khi chọn màn 9ms
+14: FAIL  tests/t42a-tier-picker-honest.test.ts > T42/A — chọn màn chỉ mở khoá, không in sao > wrapper không còn gọi completeGameTier, và không còn đường nào in sao khi chọn màn
+15:AssertionError: expected 'import React, { createContext, useCon…' not to match /completeGameTier\s*\(/
+774: Test Files  1 failed (1)
+775:      Tests  1 failed | 4 passed (5)

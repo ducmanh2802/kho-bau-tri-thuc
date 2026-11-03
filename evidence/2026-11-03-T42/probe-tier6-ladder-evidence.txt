@@ -1,0 +1,204 @@
+# node qa/run-one.mjs qa/tier6-ladder-evidence.mjs  (dist từ npm run build, 2026-11-03)
+{
+  "errors": [],
+  "shots": [
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t26\\syllable_builder-tier6.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t26\\rhyme_hunter-tier6.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t26\\listen_pick-tier6.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t26\\animal_safari-tier6.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t26\\treasure_coding-tier6.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t26\\memory_cards-tier6.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t26\\connect_dots-tier6.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t26\\shadow_match-tier6.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t26\\pixel_mosaic-tier6.png"
+  ],
+  "facts": {
+    "syllable_builder": {
+      "header": "👑 Màn 6/6 ▾ · 🚀 Câu 1/8 · Vua Trò Chơi",
+      "tier": 6,
+      "roundTotal": 8,
+      "overflowPx": 0,
+      "scrollOverflowPx": {
+        "scrollPx": 11326,
+        "belowFoldPx": 0,
+        "minButtonH": 54
+      },
+      "maxGridButtons": 6,
+      "answerOptions": 0,
+      "shadowOptions": 0,
+      "memoryCards": 0,
+      "mosaicCells": 0,
+      "connectDots": 0,
+      "mosaicCols": 0,
+      "gridLabels": [],
+      "memoryCols": 0
+    },
+    "rhyme_hunter": {
+      "header": "👑 Màn 6/6 ▾ · 🚀 Câu 1/8 · Vua Trò Chơi",
+      "tier": 6,
+      "roundTotal": 8,
+      "overflowPx": 0,
+      "scrollOverflowPx": {
+        "scrollPx": 11326,
+        "belowFoldPx": 0,
+        "minButtonH": 109
+      },
+      "maxGridButtons": 12,
+      "answerOptions": 0,
+      "shadowOptions": 0,
+      "memoryCards": 0,
+      "mosaicCells": 0,
+      "connectDots": 0,
+      "mosaicCols": 0,
+      "gridLabels": [],
+      "memoryCols": 0
+    },
+    "listen_pick": {
+      "header": "👑 Màn 6/6 ▾ · 🚀 Câu 1/8 · Vua Trò Chơi",
+      "tier": 6,
+      "roundTotal": 8,
+      "overflowPx": 0,
+      "scrollOverflowPx": {
+        "scrollPx": 11326,
+        "belowFoldPx": 0,
+        "minButtonH": 54
+      },
+      "maxGridButtons": 6,
+      "answerOptions": 0,
+      "shadowOptions": 0,
+      "memoryCards": 0,
+      "mosaicCells": 0,
+      "connectDots": 0,
+      "mosaicCols": 0,
+      "gridLabels": [],
+      "memoryCols": 0
+    },
+    "animal_safari": {
+      "header": "👑 Màn 6/6 ▾ · 🚀 Câu 1/8 · Vua Trò Chơi",
+      "tier": 6,
+      "roundTotal": 8,
+      "overflowPx": 0,
+      "scrollOverflowPx": {
+        "scrollPx": 11326,
+        "belowFoldPx": 0,
+        "minButtonH": 54
+      },
+      "maxGridButtons": 6,
+      "answerOptions": 0,
+      "shadowOptions": 0,
+      "memoryCards": 0,
+      "mosaicCells": 0,
+      "connectDots": 0,
+      "mosaicCols": 0,
+      "gridLabels": [],
+      "memoryCols": 0
+    },
+    "treasure_coding": {
+      "header": "👑 Màn 6/6 ▾ · 🚀 Câu 1/8 · Vua Trò Chơi",
+      "tier": 6,
+      "roundTotal": 8,
+      "overflowPx": 0,
+      "scrollOverflowPx": {
+        "scrollPx": 11326,
+        "belowFoldPx": 0,
+        "minButtonH": 54
+      },
+      "maxGridButtons": 6,
+      "answerOptions": 4,
+      "shadowOptions": 0,
+      "memoryCards": 0,
+      "mosaicCells": 0,
+      "connectDots": 0,
+      "mosaicCols": 0,
+      "gridLabels": [
+        "Bản đồ 8 nhân 8"
+      ],
+      "memoryCols": 0
+    },
+    "memory_cards": {
+      "header": "👑 Màn 6/6 ▾ · 🚀 Câu 1/1 · Vua Trò Chơi",
+      "tier": 6,
+      "roundTotal": 1,
+      "overflowPx": 0,
+      "scrollOverflowPx": {
+        "scrollPx": 11326,
+        "belowFoldPx": 0,
+        "minButtonH": 80
+      },
+      "maxGridButtons": 24,
+      "answerOptions": 0,
+      "shadowOptions": 0,
+      "memoryCards": 24,
+      "mosaicCells": 0,
+      "connectDots": 0,
+      "mosaicCols": 0,
+      "gridLabels": [],
+      "memoryCols": 5
+    },
+    "connect_dots": {
+      "header": "👑 Màn 6/6 ▾ · 🚀 Câu 1/8 · Vua Trò Chơi",
+      "tier": 6,
+      "roundTotal": 8,
+      "overflowPx": 0,
+      "scrollOverflowPx": {
+        "scrollPx": 11326,
+        "belowFoldPx": 0,
+        "minButtonH": 54
+      },
+      "maxGridButtons": 6,
+      "answerOptions": 0,
+      "shadowOptions": 0,
+      "memoryCards": 0,
+      "mosaicCells": 0,
+      "connectDots": 16,
+      "mosaicCols": 0,
+      "gridLabels": [],
+      "memoryCols": 0
+    },
+    "shadow_match": {
+      "header": "👑 Màn 6/6 ▾ · 🚀 Câu 1/8 · Vua Trò Chơi",
+      "tier": 6,
+      "roundTotal": 8,
+      "overflowPx": 0,
+      "scrollOverflowPx": {
+        "scrollPx": 11326,
+        "belowFoldPx": 0,
+        "minButtonH": 54
+      },
+      "maxGridButtons": 6,
+      "answerOptions": 0,
+      "shadowOptions": 6,
+      "memoryCards": 0,
+      "mosaicCells": 0,
+      "connectDots": 0,
+      "mosaicCols": 0,
+      "gridLabels": [],
+      "memoryCols": 0
+    },
+    "pixel_mosaic": {
+      "header": "👑 Màn 6/6 ▾ · 🚀 Câu 1/4 · Vua Trò Chơi",
+      "tier": 6,
+      "roundTotal": 4,
+      "overflowPx": 0,
+      "scrollOverflowPx": {
+        "scrollPx": 11326,
+        "belowFoldPx": 0,
+        "minButtonH": 45
+      },
+      "maxGridButtons": 28,
+      "answerOptions": 0,
+      "shadowOptions": 0,
+      "memoryCards": 0,
+      "mosaicCells": 28,
+      "connectDots": 0,
+      "mosaicCols": 6,
+      "gridLabels": [
+        "Bức tranh Con bướm lớn"
+      ],
+      "memoryCols": 0
+    }
+  },
+  "ok": true
+}
+QA PASS — 0 step(s), 0 errors
+EXIT=0
