@@ -897,3 +897,56 @@ Vòng kiểm kê **chốt** (§23 + ba lượt vừa đo trực tiếp ở bản
 
 Lưu ý khi đọc "chuỗi xanh = 1": lần này chuỗi ngắn **không** là tín hiệu chất lượng. commit code
 T47 xanh cả ba bước probe; nó chỉ mang nhãn `cancelled` vì lịch push của chính phiên làm việc.
+
+
+================================================================================
+§25 — Đo CI cho T47F: lượt đầu sau T43 mà commit code vừa có đủ ba run vừa khép cả ba run — 2026-11-04
+================================================================================
+
+Mục hiện trạng của tỷ lệ cổng QA **chuyển từ §24 sang §25 này** (vì lần này có commit **code** mới,
+`4e47ff7033b7fbb28b29811793c05f2a059e2287`).
+
+Hai commit mới kể từ tip `e0fcb6f` của §24, tra bằng **SHA đủ 40 ký tự**:
+
+| commit | loại | run | kết quả |
+|---|---|---|---|
+| `789520e4f82cdbeae4b91ed58bd41bf47535337e` | docs (§24) | 41714416891 `1. Quality` · 41714417004 `2. Build + artifact` · 41714417041 `3. Browser QA` | cả ba `completed success`; job `126190556353` "golden path trên Chromium" **success** `20:38:26Z→20:39:30Z` = **64 s**, bước "QA probe" `success` |
+| `4e47ff7033b7fbb28b29811793c05f2a059e2287` | **code T47F** | 41722648381 `1. Quality` · 41722648457 `2. Build + artifact` · 41722648459 `3. Browser QA` | `total_count` = **3**, cả ba `completed success` |
+
+Ba job của commit code (đọc `jobs[].conclusion`, không đọc cấp run — lời dẫn §18/§23):
+
+```
+126219168193  typecheck + tests          success 21:32:03Z → 21:32:43Z = 40 s
+126219168185  build + bundle budget      success 21:32:03Z → 21:32:31Z = 28 s
+126219168895  golden path trên Chromium  success 21:32:03Z → 21:33:08Z = 65 s
+              bước "QA probe" **success** · bước annotation chẩn đoán `skipped` vì không có lỗi
+```
+
+**Điều mới thứ nhất — điều kiện (2) của `RISK-16` được thực thi lần đầu, và nó cho đúng kết quả dự
+đoán.** §24 kết luận cách né là **hai** điều kiện: (1) commit code đi một lệnh push riêng, (2) chờ lượt
+CI của commit đó khép rồi mới push lượt sau. §24 chưa kiểm chứng được (2) vì chính lượt docs của T47 push
+sau lượt code **47 giây** ⇒ `3. Browser QA` bị `cancel-in-progress` cắt. Lần này khoảng cách giữa hai
+lệnh push là **≈ 8 phút**: ba run của `4e47ff7` khởi động `21:32:00Z`, khép `21:33:09Z`, còn commit docs
+`5b361a7` (số liệu kiểm kê + §25 này) được đẩy sau `21:40Z`. Không run nào của commit code bị cắt; nếu
+probe đỏ thì bằng chứng đỏ đã nằm lại trong run đã khép thay vì bay cùng lệnh hủy.
+
+**Điều mới thứ hai — phát biểu "lần đầu" phải có phạm vi.** Đây **không** phải lần đầu một commit code
+có cả ba workflow xanh: `caff32a` (T42, §16) và `3eb7d12` (T43, §17) đã làm được. Cái đứt là khoảng
+T44→T47, nơi commit code luôn đi chung lệnh push với commit docs (`6a07883e…` · `c2a8626e…` ·
+`8083b106…` ⇒ `total_count: 0`, §19/§20/§21) rồi `198a6d9` bị hủy (§24). Phát biểu đúng: **lượt đầu
+tiên sau `3eb7d12` mà một commit code vừa được cấp đủ ba run, vừa khép đủ ba run.**
+
+Vòng kiểm kê **chốt** (một request `…/actions/workflows/03-qa-browser.yml/runs?branch=main&per_page=100`,
+đếm phần tử `run_number ≥ 37`; `#51` không tồn tại trên `main`):
+
+  số lượt workflow `03` trên `main` : **37** (`#37` `66e0fea` → `#74` `4e47ff7`) — §24: 35, cộng đúng hai lượt mới
+  cấp run                          : `{"success":35,"cancelled":2}` ← vẫn **không** dùng làm tỷ lệ (§23)
+  cấp job toàn sổ (suy ra)         : **26/37 lượt xanh · 9 đỏ · 2 cancelled** — §24: 24/35, hai lượt mới đều xanh cấp job
+  chuỗi xanh tới tip               : **3 lượt liên tiếp** (`#72` `e0fcb6f` → `#74` `4e47ff7`); đứt ở `#71` `198a6d9` vì *bị hủy*, không phải vì đỏ
+  Ô 13                             : **vẫn MỞ** — 26 lượt xanh liên tiếp vẫn chưa có một lần đỏ *thật* bị cổng chặn sau `3b0122c`
+
+Ghi chú phương pháp cho vòng sau: `workflow_runs[].conclusion` phản ánh **attempt mới nhất**, nên 9 lượt
+đỏ mà §18 kiểm kê trực tiếp bằng `jobs[].conclusion` **biến mất** khỏi cái nhìn cấp run — ai chỉ đọc cấp
+run sẽ kết luận sai rằng "chưa từng có lượt đỏ". Vì lệnh job-level tốn một request/lượt, phần `#37→#72`
+giữ nguyên kết luận job-level của §24 (không có lượt nào trong khoảng đó bị chạy lại), chỉ hai lượt mới
+`#73`/`#74` được tra cấp job ở bảng trên.

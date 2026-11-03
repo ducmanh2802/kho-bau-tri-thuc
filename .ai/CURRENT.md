@@ -444,6 +444,16 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug 
   ảnh), `DEF-019` vẫn MỞ. **Việc của lane sau**: docs sync đã xong trong phiên này (`measure.mjs` exit
   0), commit tách **code** (6 file `src/` + test + `evidence/2026-11-04-T47F/`) rồi push **một mình**,
   chờ ~90 s hãy push commit docs (`RISK-16`).
+- **CI (đo 2026-11-04, hồ sơ §25 — mục hiện trạng mới, thay cho §24):** điều kiện (2) mà §24 mới rút ra
+  được thực thi lần đầu — `4e47ff7…` (code) push lúc `21:32:00Z`, ba run khép lúc `21:33:09Z`, commit docs
+  `5b361a7` push sau `21:40Z` (≈ **8 phút**, không phải 47 s như lượt T47). Kết quả đúng dự đoán: `total_count: 3`
+  và **cả ba `completed success`**, `3. Browser QA` job `126219168895` **65 s**, bước "QA probe" `success`
+  ⇒ lần đầu sau `3eb7d12` (T43) một commit code vừa được cấp đủ ba run vừa khép đủ ba run; **không** phải
+  "lần đầu" tuyệt đối — `caff32a` (T42) và `3eb7d12` (T43) đã làm được, cái đứt nằm ở khoảng T44→T47.
+  Kiểm kê `#37`→`#74`: **37 lượt · cấp job 26/37 xanh · 9 đỏ · 2 cancelled** (§24: 24/35), chuỗi xanh tới tip
+  **3 lượt** (`e0fcb6f` → `4e47ff7`, đứt ở `198a6d9` *bị hủy*). **Cạm bẫy mới ghi lại:** `workflow_runs[].conclusion`
+  là attempt **mới nhất** nên 9 lượt đỏ kiểm kê §18 biến mất khỏi cái nhìn cấp run (`{"success":35,"cancelled":2}`)
+  — ai đọc cấp run sẽ kết luận sai "chưa từng có lượt đỏ". Ô 13 **vẫn MỞ**.
 
 
 

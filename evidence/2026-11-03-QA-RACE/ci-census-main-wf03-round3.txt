@@ -1,0 +1,54 @@
+Kiểm kê workflow `3. Browser QA` (id 401675040) trên `main`, cửa sổ `#37` -> `#74` (đo 2026-11-04, hồ sơ §25)
+==========================================================================================================
+
+Lệnh: curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/workflows/03-qa-browser.yml/runs?branch=main&per_page=100"
+      -> 65 run head_branch=main; lọc run_number >= 37 -> 37 dòng bên dưới (#51 không tồn tại trên main).
+
+CAUTION: các dòng dưới đây là cấp RUN (workflow_runs[].conclusion) và là **attempt mới nhất**.
+Trước commit 3b0122c job qa-smoke mang continue-on-error: true, nên run vẫn success dù job đỏ;
+vì vậy tổng "success" cấp run KHÔNG dùng làm tỷ lệ cổng QA. Tỷ lệ cấp job của chính cửa sổ này
+(26 xanh / 9 đỏ / 2 cancelled) lấy từ kiểm kê jobs[].conclusion ở §18 + hai lượt mới tra cấp job:
+
+  run 73 (docs 789520e) job 126190556353 golden path tren Chromium success 20:38:26Z->20:39:30Z 64s  step "QA probe"=success
+  run 74 (code 4e47ff7) job 126219168895 golden path tren Chromium success 21:32:03Z->21:33:08Z 65s  step "QA probe"=success
+  run 74 (code 4e47ff7) job 126219168193 typecheck + tests        success 21:32:03Z->21:32:43Z 40s
+  run 74 (code 4e47ff7) job 126219168185 build + bundle budget    success 21:32:03Z->21:32:31Z 28s
+
+# len 37
+37 41488045102 66e0fea completed success 66s
+38 41490451074 77d90ce completed success 109s
+39 41493791252 2db8715 completed success 67s
+40 41494831619 bd3f2a7 completed success 117s
+41 41496530836 e777457 completed success 105s
+42 41498110362 08eacc7 completed success 92s
+43 41499645998 37fd35e completed success 105s
+44 41501753363 afb9eeb completed success 63s
+45 41504913606 8e6f9f5 completed success 86s
+46 41508824890 80c7e39 completed success 80s
+47 41515106575 2d2ca27 completed success 70s
+48 41516820864 c9fd2b4 completed success 131s
+49 41518983585 eb4b7b2 completed success 74s
+50 41523226603 3b0122c completed success 73s
+52 41526285381 6e30794 completed success 77s
+53 41527657645 e961815 completed success 62s
+54 41528603801 1cac775 completed success 66s
+55 41537247288 06b8962 completed success 67s
+56 41538711482 1deb859 completed success 57s
+57 41632118172 caff32a completed success 81s
+58 41633585126 195a4be completed success 86s
+59 41642318907 3eb7d12 completed success 64s
+60 41646599254 c7e9a00 completed success 61s
+61 41647428035 8e27cd5 completed cancelled 245s
+62 41648001797 fc861f3 completed success 77s
+63 41663622006 58020e5 completed success 63s
+64 41666323856 8d73ff1 completed success 61s
+65 41683815872 e171e6e completed success 65s
+66 41686215360 0c92915 completed success 92s
+67 41692600066 cb56720 completed success 68s
+68 41693926095 4659d99 completed success 86s
+69 41696285755 a6c472b completed success 91s
+70 41698778061 f1764f7 completed success 87s
+71 41711756710 198a6d9 completed cancelled 66s
+72 41711874130 e0fcb6f completed success 89s
+73 41714417041 789520e completed success 69s
+74 41722648459 4e47ff7 completed success 69s

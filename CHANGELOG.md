@@ -17,6 +17,24 @@ asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện 
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
 ### Changed
+- **`RISK-16`: điều kiện thứ hai nay có dữ liệu — commit code T47F khép đủ ba run vì lượt docs chờ lượt CI khép.**
+  `4e47ff7033b7fbb28b29811793c05f2a059e2287` (code) push lúc `21:32:00Z`, ba run `completed success` lúc
+  `21:33:09Z`; commit docs `5b361a7` (số liệu kiểm kê + §25) chỉ được đẩy sau `21:40Z` — khoảng cách **≈ 8
+  phút** thay vì **47 s** như lượt T47 (§24). `total_count: 3` và **không** run nào bị `cancel-in-progress`
+  cắt: `1. Quality` job 126219168193 `success` **40 s** · `2. Build + artifact` 126219168185 `success`
+  **28 s** · `3. Browser QA` 126219168895 `success` `21:32:03Z→21:33:08Z` = **65 s**, bước "QA probe"
+  `success`, bước 8 `skipped` vì không có lỗi. Docs `789520e` (§24) cũng có đủ ba run, QA job 126190556353
+  **64 s**. **Phát biểu phải có phạm vi:** đây **không** phải lần đầu một commit code xanh cả ba workflow —
+  `caff32a` (T42, §16) và `3eb7d12` (T43, §17) đã làm được; đúng là *lượt đầu sau `3eb7d12`* vì khoảng
+  T44→T47 commit code luôn đi chung lệnh push với docs (`total_count: 0`) rồi `198a6d9` bị hủy. Kiểm kê
+  chốt: workflow `03` trên `main` = **37 lượt** (`#37` `66e0fea` → `#74` `4e47ff7`), **cấp job 26/37 xanh ·
+  9 đỏ · 2 cancelled** (§24: 24/35), chuỗi xanh tới tip **3 lượt** (`#72`→`#74`; đứt ở `#71` *bị hủy*, không
+  vì đỏ). **Cạm bẫy mới cho người đọc sổ:** `workflow_runs[].conclusion` là **attempt mới nhất**, nên cấp run
+  hôm nay báo `{"success":35,"cancelled":2}` — **chín lượt đỏ** mà §18 kiểm kê trực tiếp bằng
+  `jobs[].conclusion` biến mất khỏi cái nhìn cấp run; chỉ đọc cấp run sẽ kết luận sai "chưa từng có lượt đỏ".
+  **§25 thành mục hiện trạng**, thay §24; `docs/SDLC.md` §CI thôi *chép số* (§23 đã cảnh báo số chép sẽ lệch
+  theo từng commit docs) và dẫn `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §25 kèm "tính tới tip
+  `4e47ff7`". Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ**: 26 lượt xanh chưa có một lần đỏ *thật* bị cổng chặn sau `3b0122c`.
 - **Cách né `RISK-16` có hiệu lực nhưng chỉ một nửa — điều kiện thứ hai vừa bị chính phiên T47 lộ ra.**
   Commit code `198a6d9a2ff787669394da4349d277c1990acb6f` được push **một mình một lệnh** ⇒
   `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=$(git rev-parse 198a6d9)`
