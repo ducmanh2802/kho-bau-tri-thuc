@@ -1,0 +1,57 @@
+{
+  "steps": [
+    "A2 (đối chứng): không còn lớp phủ ⇒ Esc lần hai thoát game bình thường (entry history còn nguyên)",
+    "B1: query getByRole(button, name=\"Nghe lại đề\") trả 1 kết quả — nút loa đã có tên",
+    "B2: quét DOM thật của [role=\"dialog\"] — không còn nút icon-only nào thiếu aria-label/title",
+    "B3 (đối chứng): bấm nút đó tạo 1 lời đọc — có tên mà vẫn là lối nghe lại thật",
+    "C1: streak=4 ⇒ Header nói \"Tối rồi, bé nhớ ngủ sớm nhé! Bé học đều lắm, giỏi quá!\" — câu chào theo giờ còn nguyên, lời khen là phụ"
+  ],
+  "errors": [
+    "A: Esc lần một đóng lớp phủ NHƯNG cũng thoát luôn trò chơi — hành vi cũ của DEF-013",
+    "A3: đóng bằng X rồi mở lại, Esc không còn đúng (lớp phủ 0, bảng ếch 0) — trạng thái bị bắt một lần"
+  ],
+  "facts": {
+    "esc1": {
+      "overlayAfterEsc1": 0,
+      "boardAfterEsc1": 0
+    },
+    "esc2": {
+      "boardAfterEsc2": 0
+    },
+    "reopen": {
+      "closedByX": 0,
+      "overlayAfterReopen": 0,
+      "boardAfterReopen": 0
+    },
+    "speakerByName": 1,
+    "liveUnnamed": {
+      "noDialog": false,
+      "offenders": []
+    },
+    "speakerClick": {
+      "before": 3,
+      "after": 4,
+      "clicked": true
+    },
+    "hour": 0,
+    "expectedGreeting": "Tối rồi, bé nhớ ngủ sớm nhé!",
+    "spoken": [
+      "Tối rồi, bé nhớ ngủ sớm nhé! Bé học đều lắm, giỏi quá!"
+    ],
+    "greetings": [
+      "Tối rồi, bé nhớ ngủ sớm nhé! Bé học đều lắm, giỏi quá!"
+    ],
+    "hasSpeech": true,
+    "firstGreeting": "Tối rồi, bé nhớ ngủ sớm nhé! Bé học đều lắm, giỏi quá!"
+  },
+  "failedAt": "A",
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T46\\a1-lop-phu-dang-mo.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T46\\a2-sau-esc-lan-mot.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T46\\a3-sau-mo-lai-dong-bang-esc.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T46\\b1-nut-loa-co-ten.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T46\\c1-loi-chao-header.png"
+  ],
+  "ok": false
+}
+QA FAIL — 2 error(s) at A

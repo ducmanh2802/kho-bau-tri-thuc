@@ -199,7 +199,12 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
   const [receipt, setReceipt] = React.useState<GameRewardReceipt | null>(null);
   const rewardsEnabled = StorageService.areRewardsEnabled();
   const dialogRef = useFocusTrap<HTMLDivElement>(true);
-  const { requestClose } = useModalHistory(onExit);
+  const { requestClose } = useModalHistory(onExit, {
+    // T46C: bảng "Chọn Màn & Độ Khó" che bằng CSS còn keydown thì nghe trên `window`,
+    // nên Esc phải đóng lớp phủ trước — lần Esc kế tiếp mới thoát trò chơi.
+    overlayOpen: showTierModal,
+    onCloseOverlay: () => setShowTierModal(false),
+  });
 
   // Bé tắt trò chơi khi gấu còn đang nói → cắt tiếng, kẻo lời khen vang ở màn hình khác.
   React.useEffect(() => () => sound.stopSpeaking(), []);

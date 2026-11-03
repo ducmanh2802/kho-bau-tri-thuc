@@ -156,6 +156,7 @@ const ListenPickStage: React.FC<{
           <button
             onClick={playVoice}
             disabled={stage.locked || !currentRound}
+            aria-label="Nghe lại đề"
             className="w-24 h-24 md:w-28 md:h-28 bg-gradient-to-tr from-amber-400 to-yellow-300 hover:from-amber-500 hover:to-yellow-400 rounded-full shadow-xl flex items-center justify-center border-4 border-white active:scale-95 transition-all cursor-pointer animate-pulse-subtle"
           >
             <Volume2 className="w-12 h-12 text-amber-950" />

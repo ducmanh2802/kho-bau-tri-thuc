@@ -1,0 +1,265 @@
+
+# RED (tái lập 2026-11-04, sau khi GREEN): khôi phục đúng 4 file chưa sửa từ HEAD
+#   git checkout HEAD -- src/components/common/Header.tsx src/components/games/GameModalWrapper.tsx \
+#     src/components/games/ListenPickPhonicsGame.tsx src/hooks/useModalHistory.ts
+# rồi chạy lệnh ở dòng dưới. Bản sửa được sao lưu trước (md5) và khôi phục sau — bảng md5 trong README.
+# RED lần viết-test-trước-khi-sửa thật cũng là 12 failed | 7 passed (19): t46a 5, t46b 2, t46c 5.
+# Lệnh: npx vitest run tests/t46a-header-greeting.test.ts tests/t46b-speaker-button-name.test.ts tests/t46c-escape-closes-overlay-first.test.ts
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t46c-escape-closes-overlay-first.test.ts (7 tests | 5 failed) 19ms
+   ❯ T46C — Esc ưu tiên lớp phủ đang mở (7)
+     × bảng chọn màn đang mở ⇒ Esc thuộc về lớp phủ 5ms
+     × không có lớp phủ ⇒ Esc vẫn thoát game (hành vi cũ, không nuốt phím) 1ms
+     × lớp phủ mở nhưng nơi gọi không đưa lối đóng ⇒ Esc không bị mất (không có handler thì không chặn) 0ms
+     × hook nhận options và gọi quyết định này TRƯỚC khi đụng history.back() 8ms
+     × GameModalWrapper nối đúng nguồn trạng thái lớp phủ (showTierModal) vào hook 2ms
+     ✓ không dựng một listener keydown thứ hai cho lớp phủ (tránh Esc bắn đúp) 1ms
+     ✓ hồi quy diện rộng: caller khác của useModalHistory không truyền options rỗng làm đổi hành vi 1ms
+ ❯ tests/t46b-speaker-button-name.test.ts (6 tests | 2 failed) 42ms
+   ❯ T46B — nút icon-only phải có tên truy cập được (6)
+     ✓ máy quét bắt đúng ca thật (self-test): nút ListenPickPhonics chưa sửa là vi phạm 3ms
+     ✓ máy quét không báo oan: aria-label hoặc title đều được tính là có tên 1ms
+     ✓ máy quét bỏ qua nút có chữ (không icon-only) 0ms
+     × ListenPickPhonicsGame: nút loa có aria-label tiếng Việt 11ms
+     × diện rộng: toàn bộ src/components/games không còn nút icon-only vô danh 19ms
+     ✓ không đổi nhãn nhìn thấy — dòng "Bấm vào loa để nghe lại" còn nguyên (probe/reader khỏi lệch) 5ms
+ ❯ tests/t46a-header-greeting.test.ts (6 tests | 5 failed) 14ms
+   ❯ T46A — câu chào theo giờ không bị lời khen streak đè (6)
+     × ca có streak: vẫn mở đầu bằng đúng câu chào của buổi 5ms
+     × ca không streak: chỉ có câu chào, không kèm lời khen 1ms
+     × lời khen streak còn nguyên văn để nhận ra (không đổi giọng) 1ms
+     × chuỗi nói ra không quá dài cho bé lớp 1 (≤ 120 ký tự) 0ms
+     × hồi quy diện rộng: không còn `return` trần bỏ mất phrases[timeOfDay] 5ms
+     ✓ vẫn chỉ có MỘT lời thoại mỗi lần gắn Header (một `sound.speak` trong hiệu ứng chào) 0ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t46a-header-greeting.test.ts > T46A — câu chào theo giờ không bị lời khen streak đè > ca có streak: vẫn mở đầu bằng đúng câu chào của buổi
+Error: Header.tsx phải export getEncouragementPhrase để hành vi chào/testing được khoá
+ ❯ phraseFn tests/t46a-header-greeting.test.ts:24:11
+     22|   const fn = (mod as unknown as Record<string, unknown>).getEncouragem…
+     23|   if (typeof fn !== 'function') {
+     24|     throw new Error('Header.tsx phải export getEncouragementPhrase để …
+       |           ^
+     25|   }
+     26|   return fn as (timeOfDay: 'sáng' | 'chiều' | 'tối', hasStreak: boolea…
+ ❯ tests/t46a-header-greeting.test.ts:38:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  tests/t46a-header-greeting.test.ts > T46A — câu chào theo giờ không bị lời khen streak đè > ca không streak: chỉ có câu chào, không kèm lời khen
+Error: Header.tsx phải export getEncouragementPhrase để hành vi chào/testing được khoá
+ ❯ phraseFn tests/t46a-header-greeting.test.ts:24:11
+     22|   const fn = (mod as unknown as Record<string, unknown>).getEncouragem…
+     23|   if (typeof fn !== 'function') {
+     24|     throw new Error('Header.tsx phải export getEncouragementPhrase để …
+       |           ^
+     25|   }
+     26|   return fn as (timeOfDay: 'sáng' | 'chiều' | 'tối', hasStreak: boolea…
+ ❯ tests/t46a-header-greeting.test.ts:45:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  tests/t46a-header-greeting.test.ts > T46A — câu chào theo giờ không bị lời khen streak đè > lời khen streak còn nguyên văn để nhận ra (không đổi giọng)
+Error: Header.tsx phải export getEncouragementPhrase để hành vi chào/testing được khoá
+ ❯ phraseFn tests/t46a-header-greeting.test.ts:24:11
+     22|   const fn = (mod as unknown as Record<string, unknown>).getEncouragem…
+     23|   if (typeof fn !== 'function') {
+     24|     throw new Error('Header.tsx phải export getEncouragementPhrase để …
+       |           ^
+     25|   }
+     26|   return fn as (timeOfDay: 'sáng' | 'chiều' | 'tối', hasStreak: boolea…
+ ❯ tests/t46a-header-greeting.test.ts:50:24
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  tests/t46a-header-greeting.test.ts > T46A — câu chào theo giờ không bị lời khen streak đè > chuỗi nói ra không quá dài cho bé lớp 1 (≤ 120 ký tự)
+Error: Header.tsx phải export getEncouragementPhrase để hành vi chào/testing được khoá
+ ❯ phraseFn tests/t46a-header-greeting.test.ts:24:11
+     22|   const fn = (mod as unknown as Record<string, unknown>).getEncouragem…
+     23|   if (typeof fn !== 'function') {
+     24|     throw new Error('Header.tsx phải export getEncouragementPhrase để …
+       |           ^
+     25|   }
+     26|   return fn as (timeOfDay: 'sáng' | 'chiều' | 'tối', hasStreak: boolea…
+ ❯ tests/t46a-header-greeting.test.ts:57:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  tests/t46a-header-greeting.test.ts > T46A — câu chào theo giờ không bị lời khen streak đè > hồi quy diện rộng: không còn `return` trần bỏ mất phrases[timeOfDay]
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/t46a-header-greeting.test.ts:68:64
+     66|     expect(body).toContain('phrases[timeOfDay]');
+     67|     // nhánh streak phải nối vào câu chào, không trả về chuỗi đứng một…
+     68|     expect(/return\s+'Bé học đều lắm, giỏi quá!';/.test(body)).toBe(fa…
+       |                                                                ^
+     69|   });
+     70|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  tests/t46b-speaker-button-name.test.ts > T46B — nút icon-only phải có tên truy cập được > ListenPickPhonicsGame: nút loa có aria-label tiếng Việt
+AssertionError: expected '<button\r\n            onClick={playV…' to contain 'aria-label='
+
+- Expected
++ Received
+
+- aria-label=
++ <button
++             onClick={playVoice}
++             disabled={stage.locked || !currentRound}
++             className="w-24 h-24 md:w-28 md:h-28 bg-gradient-to-tr from-amber-400 to-yellow-300 hover:from-amber-500 hover:to-yellow-400 rounded-full shadow-xl flex items-center justify-center border-4 border-white active:scale-95 transition-all cursor-pointer animate-pulse-subtle"
++           >
++             <Volume2 className="w-12 h-12 text-amber-950" />
++           
+
+ ❯ tests/t46b-speaker-button-name.test.ts:105:21
+    103|     expect(open).toBeGreaterThan(-1);
+    104|     const speaker = src.slice(open, src.indexOf('</button>', handler));
+    105|     expect(speaker).toContain('aria-label=');
+       |                     ^
+    106|     expect(/aria-label="Nghe lại đề"/.test(src)).toBe(true);
+    107|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  tests/t46b-speaker-button-name.test.ts > T46B — nút icon-only phải có tên truy cập được > diện rộng: toàn bộ src/components/games không còn nút icon-only vô danh
+AssertionError: expected [ { …(3) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "file": "ListenPickPhonicsGame.tsx",
++     "icon": "Volume2",
++     "line": 156,
++   },
++ ]
+
+ ❯ tests/t46b-speaker-button-name.test.ts:110:29
+    108|
+    109|   it('diện rộng: toàn bộ src/components/games không còn nút icon-only …
+    110|     expect(sweepAllGames()).toEqual([]);
+       |                             ^
+    111|   });
+    112|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  tests/t46c-escape-closes-overlay-first.test.ts > T46C — Esc ưu tiên lớp phủ đang mở > bảng chọn màn đang mở ⇒ Esc thuộc về lớp phủ
+Error: useModalHistory.ts phải export shouldEscapeCloseOverlay(overlayOpen, hasCloseHandler)
+ ❯ route tests/t46c-escape-closes-overlay-first.test.ts:29:11
+     27|   const fn = (mod as unknown as Record<string, unknown>).shouldEscapeC…
+     28|   if (typeof fn !== 'function') {
+     29|     throw new Error('useModalHistory.ts phải export shouldEscapeCloseO…
+       |           ^
+     30|   }
+     31|   return fn as (overlayOpen: boolean, hasCloseHandler: boolean) => boo…
+ ❯ tests/t46c-escape-closes-overlay-first.test.ts:36:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  tests/t46c-escape-closes-overlay-first.test.ts > T46C — Esc ưu tiên lớp phủ đang mở > không có lớp phủ ⇒ Esc vẫn thoát game (hành vi cũ, không nuốt phím)
+Error: useModalHistory.ts phải export shouldEscapeCloseOverlay(overlayOpen, hasCloseHandler)
+ ❯ route tests/t46c-escape-closes-overlay-first.test.ts:29:11
+     27|   const fn = (mod as unknown as Record<string, unknown>).shouldEscapeC…
+     28|   if (typeof fn !== 'function') {
+     29|     throw new Error('useModalHistory.ts phải export shouldEscapeCloseO…
+       |           ^
+     30|   }
+     31|   return fn as (overlayOpen: boolean, hasCloseHandler: boolean) => boo…
+ ❯ tests/t46c-escape-closes-overlay-first.test.ts:40:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  tests/t46c-escape-closes-overlay-first.test.ts > T46C — Esc ưu tiên lớp phủ đang mở > lớp phủ mở nhưng nơi gọi không đưa lối đóng ⇒ Esc không bị mất (không có handler thì không chặn)
+Error: useModalHistory.ts phải export shouldEscapeCloseOverlay(overlayOpen, hasCloseHandler)
+ ❯ route tests/t46c-escape-closes-overlay-first.test.ts:29:11
+     27|   const fn = (mod as unknown as Record<string, unknown>).shouldEscapeC…
+     28|   if (typeof fn !== 'function') {
+     29|     throw new Error('useModalHistory.ts phải export shouldEscapeCloseO…
+       |           ^
+     30|   }
+     31|   return fn as (overlayOpen: boolean, hasCloseHandler: boolean) => boo…
+ ❯ tests/t46c-escape-closes-overlay-first.test.ts:45:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  tests/t46c-escape-closes-overlay-first.test.ts > T46C — Esc ưu tiên lớp phủ đang mở > hook nhận options và gọi quyết định này TRƯỚC khi đụng history.back()
+AssertionError: expected 'event.key === \'Escape\') {\r\n      …' to contain 'shouldEscapeCloseOverlay'
+
+- Expected
++ Received
+
+- shouldEscapeCloseOverlay
++ event.key === 'Escape') {
++         event.preventDefault();
++         // Đi qua history để entry được bóc gọn, popstate sẽ gọi onExit.
++         if (pushedRef.current) {
++           try {
++             window.history.back();
++             return;
++           } catch {
++             /* rớt xuống gọi trực tiếp */
++           }
++         }
++         pushedRef.current = false;
++         exitRef.current();
++       }
++     };
++ 
++     
+
+ ❯ tests/t46c-escape-closes-overlay-first.test.ts:50:26
+     48|   it('hook nhận options và gọi quyết định này TRƯỚC khi đụng history.b…
+     49|     const escapeBranch = hookSrc.slice(hookSrc.indexOf("event.key === …
+     50|     expect(escapeBranch).toContain('shouldEscapeCloseOverlay');
+       |                          ^
+     51|     expect(escapeBranch.indexOf('shouldEscapeCloseOverlay')).toBeLessT…
+     52|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  tests/t46c-escape-closes-overlay-first.test.ts > T46C — Esc ưu tiên lớp phủ đang mở > GameModalWrapper nối đúng nguồn trạng thái lớp phủ (showTierModal) vào hook
+AssertionError: expected 'useModalHistory(onExit);\r\n\r\n  // …' to contain 'overlayOpen'
+
+- Expected
++ Received
+
+- overlayOpen
++ useModalHistory(onExit);
++ 
++   // Bé tắt trò chơi khi gấu còn đang nói → cắt tiếng, kẻo lời khen vang ở màn hình khác.
++   React.useEffect(() => () => sound.stopSpeaking(), []);
++ 
++   // Hai hẹn giờ phản hồi phải nằm trong ref: bé trả lời liên tiếp trong vòng
++   // 1,5s/2,5s thì hẹn giờ của lượt trước vẫn còn chạy và xoá mất phản hồi của
++   // lượt mới (bóng gấu + lời khen biến mất giữa chừng, trông 
+
+ ❯ tests/t46c-escape-closes-overlay-first.test.ts:56:18
+     54|   it('GameModalWrapper nối đúng nguồn trạng thái lớp phủ (showTierModa…
+     55|     const call = wrapperSrc.slice(wrapperSrc.indexOf('useModalHistory(…
+     56|     expect(call).toContain('overlayOpen');
+       |                  ^
+     57|     expect(call).toContain('showTierModal');
+     58|     expect(call).toContain('onCloseOverlay');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  12 failed | 7 passed (19)
+   Start at  01:05:45
+   Duration  855ms (import 42%, transform 40%, tests 12%, worker 6%)
+

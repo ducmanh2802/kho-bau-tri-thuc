@@ -1,0 +1,40 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t46c-escape-closes-overlay-first.test.ts (7 tests | 1 failed) 14ms
+   ❯ T46C — Esc ưu tiên lớp phủ đang mở (7)
+     × bảng chọn màn đang mở ⇒ Esc thuộc về lớp phủ 9ms
+     ✓ không có lớp phủ ⇒ Esc vẫn thoát game (hành vi cũ, không nuốt phím) 0ms
+     ✓ lớp phủ mở nhưng nơi gọi không đưa lối đóng ⇒ Esc không bị mất (không có handler thì không chặn) 0ms
+     ✓ hook nhận options và gọi quyết định này TRƯỚC khi đụng history.back() 0ms
+     ✓ GameModalWrapper nối đúng nguồn trạng thái lớp phủ (showTierModal) vào hook 0ms
+     ✓ không dựng một listener keydown thứ hai cho lớp phủ (tránh Esc bắn đúp) 0ms
+     ✓ hồi quy diện rộng: caller khác của useModalHistory không truyền options rỗng làm đổi hành vi 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t46c-escape-closes-overlay-first.test.ts > T46C — Esc ưu tiên lớp phủ đang mở > bảng chọn màn đang mở ⇒ Esc thuộc về lớp phủ
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/t46c-escape-closes-overlay-first.test.ts:36:33
+     34| describe('T46C — Esc ưu tiên lớp phủ đang mở', () => {
+     35|   it('bảng chọn màn đang mở ⇒ Esc thuộc về lớp phủ', () => {
+     36|     expect(route()(true, true)).toBe(true);
+       |                                 ^
+     37|   });
+     38|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  00:51:16
+   Duration  452ms (transform 41%, import 36%, tests 13%, worker 11%)
+

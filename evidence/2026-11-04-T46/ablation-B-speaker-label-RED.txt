@@ -1,0 +1,70 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t46b-speaker-button-name.test.ts (6 tests | 2 failed) 33ms
+   ❯ T46B — nút icon-only phải có tên truy cập được (6)
+     ✓ máy quét bắt đúng ca thật (self-test): nút ListenPickPhonics chưa sửa là vi phạm 3ms
+     ✓ máy quét không báo oan: aria-label hoặc title đều được tính là có tên 0ms
+     ✓ máy quét bỏ qua nút có chữ (không icon-only) 0ms
+     × ListenPickPhonicsGame: nút loa có aria-label tiếng Việt 11ms
+     × diện rộng: toàn bộ src/components/games không còn nút icon-only vô danh 15ms
+     ✓ không đổi nhãn nhìn thấy — dòng "Bấm vào loa để nghe lại" còn nguyên (probe/reader khỏi lệch) 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t46b-speaker-button-name.test.ts > T46B — nút icon-only phải có tên truy cập được > ListenPickPhonicsGame: nút loa có aria-label tiếng Việt
+AssertionError: expected '<button\r\n            onClick={playV…' to contain 'aria-label='
+
+- Expected
++ Received
+
+- aria-label=
++ <button
++             onClick={playVoice}
++             disabled={stage.locked || !currentRound}
++             className="w-24 h-24 md:w-28 md:h-28 bg-gradient-to-tr from-amber-400 to-yellow-300 hover:from-amber-500 hover:to-yellow-400 rounded-full shadow-xl flex items-center justify-center border-4 border-white active:scale-95 transition-all cursor-pointer animate-pulse-subtle"
++           >
++             <Volume2 className="w-12 h-12 text-amber-950" />
++           
+
+ ❯ tests/t46b-speaker-button-name.test.ts:105:21
+    103|     expect(open).toBeGreaterThan(-1);
+    104|     const speaker = src.slice(open, src.indexOf('</button>', handler));
+    105|     expect(speaker).toContain('aria-label=');
+       |                     ^
+    106|     expect(/aria-label="Nghe lại đề"/.test(src)).toBe(true);
+    107|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/t46b-speaker-button-name.test.ts > T46B — nút icon-only phải có tên truy cập được > diện rộng: toàn bộ src/components/games không còn nút icon-only vô danh
+AssertionError: expected [ { …(3) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "file": "ListenPickPhonicsGame.tsx",
++     "icon": "Volume2",
++     "line": 156,
++   },
++ ]
+
+ ❯ tests/t46b-speaker-button-name.test.ts:110:29
+    108|
+    109|   it('diện rộng: toàn bộ src/components/games không còn nút icon-only …
+    110|     expect(sweepAllGames()).toEqual([]);
+       |                             ^
+    111|   });
+    112|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  00:50:51
+   Duration  405ms (tests 42%, import 32%, worker 14%, transform 12%)
+

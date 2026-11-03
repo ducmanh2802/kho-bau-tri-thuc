@@ -21,16 +21,19 @@ const getTimeOfDay = (): 'sáng' | 'chiều' | 'tối' => {
   return 'tối';
 };
 
-const getEncouragementPhrase = (timeOfDay: 'sáng' | 'chiều' | 'tối', hasStreak: boolean): string => {
+export const getEncouragementPhrase = (timeOfDay: 'sáng' | 'chiều' | 'tối', hasStreak: boolean): string => {
   const phrases: Record<'sáng' | 'chiều' | 'tối', string> = {
     sáng: 'Chào buổi sáng, bé ơi!',
     chiều: 'Chào buổi chiều, bé làm tốt lắm!',
     tối: 'Tối rồi, bé nhớ ngủ sớm nhé!',
   };
+  // T46A: câu chào theo giờ phải luôn vang lên trước. Bản cũ `return` chuỗi khen trần
+  // nên bé đã có streak (tức hầu hết bé quay lại lần hai) không bao giờ được nghe chào.
+  const greeting = phrases[timeOfDay];
   if (hasStreak) {
-    return 'Bé học đều lắm, giỏi quá!';
+    return `${greeting} Bé học đều lắm, giỏi quá!`;
   }
-  return phrases[timeOfDay];
+  return greeting;
 };
 
 const NavLink: React.FC<{

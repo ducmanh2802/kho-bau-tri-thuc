@@ -1,0 +1,15 @@
+
+# GREEN: cùng lệnh vitest với tests-RED.txt, chạy trên đúng 4 file đã khôi phục bản sửa
+# (md5 khớp bản sao lưu lập trước khi tái lập RED — bảng md5 trong README). 19 passed.
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t46b-speaker-button-name.test.ts (6 tests) 19ms
+ ✓ tests/t46c-escape-closes-overlay-first.test.ts (7 tests) 6ms
+ ✓ tests/t46a-header-greeting.test.ts (6 tests) 6ms
+
+ Test Files  3 passed (3)
+      Tests  19 passed (19)
+   Start at  01:05:58
+   Duration  709ms (import 53%, transform 33%, worker 7%, tests 6%)
+
