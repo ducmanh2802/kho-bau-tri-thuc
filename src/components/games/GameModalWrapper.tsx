@@ -589,7 +589,7 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
 
           {/* Game Stage Area */}
           <div className="w-full flex-1 relative overflow-hidden p-3 md:p-6 flex flex-col items-center justify-center min-h-0">
-            <div className="w-full h-full flex-1 min-w-0 min-h-0 flex flex-col items-center justify-center overflow-hidden self-stretch">
+            <div className="w-full h-full flex-1 min-w-0 min-h-0 flex flex-col items-center justify-center overflow-hidden self-stretch [&>*]:w-full [&>*]:self-stretch">
               {children}
             </div>
 

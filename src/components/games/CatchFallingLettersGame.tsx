@@ -190,7 +190,12 @@ const CatchFallingStage: React.FC<{
   };
 
   return (
-      <div className="w-full h-full min-h-[360px] min-w-full self-stretch relative rounded-2xl bg-gradient-to-b from-sky-200 via-sky-100 to-amber-100 overflow-hidden border-2 border-sky-300 select-none">
+      <div
+        className="w-full h-full min-h-[360px] min-w-full self-stretch relative rounded-2xl bg-gradient-to-b from-sky-200 via-sky-100 to-amber-100 overflow-hidden border-2 border-sky-300 select-none game-stage-canvas"
+        style={{ width: '100%', minWidth: '100%', alignSelf: 'stretch' }}
+      >
+        {/* In-flow sizer: chống co hẹp 0px trên trình duyệt khi mọi phần tử con đều absolute */}
+        <div className="w-full h-full min-h-[360px] invisible pointer-events-none select-none" aria-hidden="true" style={{ width: '100%', minWidth: '100%' }} />
         <div className="absolute top-4 left-6 text-4xl opacity-70 animate-float">☁️</div>
         <div className="absolute top-10 right-10 text-5xl opacity-60 animate-float" style={{ animationDelay: '1.5s' }}>☁️</div>
         <div className="absolute bottom-2 left-0 right-0 h-14 bg-gradient-to-t from-emerald-400 to-emerald-300 rounded-b-xl flex items-center justify-around text-2xl">

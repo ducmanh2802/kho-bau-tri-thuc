@@ -137,7 +137,12 @@ export const EnglishColorBalloonGame: React.FC<{ onExit: () => void }> = ({ onEx
       onTogglePause={stage.togglePause}
       onOverlayOpenChange={stage.setOverlayOpen}
     >
-      <div className="w-full h-full min-h-[360px] min-w-full self-stretch relative rounded-3xl bg-gradient-to-b from-sky-200 via-sky-100 to-indigo-100 overflow-hidden border-3 border-sky-300 select-none">
+      <div
+        className="w-full h-full min-h-[360px] min-w-full self-stretch relative rounded-3xl bg-gradient-to-b from-sky-200 via-sky-100 to-indigo-100 overflow-hidden border-3 border-sky-300 select-none game-stage-canvas"
+        style={{ width: '100%', minWidth: '100%', alignSelf: 'stretch' }}
+      >
+        {/* In-flow sizer: chống co hẹp 0px trên trình duyệt khi mọi phần tử con đều absolute */}
+        <div className="w-full h-full min-h-[360px] invisible pointer-events-none select-none" aria-hidden="true" style={{ width: '100%', minWidth: '100%' }} />
         {/* Sky Clouds */}
         <div className="absolute top-4 left-6 text-3xl opacity-60 animate-float">☁️</div>
         <div className="absolute top-12 right-12 text-4xl opacity-50 animate-float" style={{ animationDelay: '1.4s' }}>☁️</div>

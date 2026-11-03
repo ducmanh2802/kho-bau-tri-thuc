@@ -533,6 +533,7 @@
   position: relative;
   width: 100%;
   margin: 0 auto;
+  container-type: inline-size;
   transform: rotateX(var(--ct-tilt)) translateZ(0);
   transform-style: preserve-3d;
   transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.25, 1);
@@ -570,7 +571,6 @@
   position: absolute;
   inset: 0;
   border-radius: 9px;
-  container-type: inline-size;
   transform-style: preserve-3d;
   background:
     radial-gradient(120% 85% at 28% 18%, rgba(255, 248, 226, 0.95), rgba(255, 248, 226, 0) 62%),
@@ -586,7 +586,8 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  transform: translateZ(0.4px);
+  transform: translateZ(0.1px);
+  z-index: 1;
   pointer-events: none;
   overflow: visible;
 }
@@ -612,7 +613,8 @@
 
 .ct-river-label {
   position: absolute;
-  transform: translate(-50%, -50%) translateZ(0.6px);
+  transform: translate(-50%, -50%) translateZ(0.2px);
+  z-index: 1;
   font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
   font-size: clamp(11px, 3.4vw, 22px);
   font-size: 3.4cqw;
@@ -628,13 +630,19 @@
 .ct-piece {
   position: absolute;
   aspect-ratio: 1;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) translateZ(4px);
   transform-style: preserve-3d;
   pointer-events: none;
+  z-index: 10;
   transition:
     left 0.34s cubic-bezier(0.2, 0.85, 0.3, 1),
     top 0.34s cubic-bezier(0.2, 0.85, 0.3, 1);
   animation: ct-drop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+
+.ct-piece.is-selected {
+  transform: translate(-50%, -50%) translateZ(10px);
+  z-index: 20;
 }
 
 /* Bóng tiếp đất nằm DƯỚI quân và lấn ra ngoài đĩa — bản cũ lọt hoàn toàn
@@ -697,7 +705,7 @@
 
 .ct-piece__char {
   position: relative;
-  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Microsoft YaHei', 'PingFang SC', serif;
   font-weight: 900;
   line-height: 1;
   font-size: clamp(14px, 4.6vw, 30px);
@@ -707,12 +715,12 @@
 
 .ct-piece[data-color='red'] .ct-piece__char {
   color: #b91c1c;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 -1px 0 rgba(140, 20, 20, 0.35);
 }
 
 .ct-piece[data-color='black'] .ct-piece__char {
-  color: #1f2937;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  color: #1e293b;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 -1px 0 rgba(0, 0, 0, 0.45);
 }
 
 .ct-piece__viet-only {
@@ -724,6 +732,26 @@
   font-size: 3.2cqw;
   letter-spacing: -0.02em;
   transform: translateZ(0.8px);
+}
+
+.ct-coord {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.32px;
+  fill: #8a5424;
+  opacity: 0.72;
+  user-select: none;
+  pointer-events: none;
+}
+
+.theme-ebony .ct-coord {
+  fill: #d4af37;
+  opacity: 0.85;
+}
+
+.theme-bamboo .ct-coord {
+  fill: #735122;
+  opacity: 0.85;
 }
 
 .ct-piece[data-color='red'] .ct-piece__viet-only {
@@ -851,19 +879,21 @@
 
 .ct-cells {
   position: absolute;
-  display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  grid-template-rows: repeat(10, 1fr);
-  transform: translateZ(1.6px);
+  inset: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  z-index: 15;
 }
 
 .ct-cell {
+  position: absolute;
   appearance: none;
   background: transparent;
   border: 0;
   padding: 0;
   cursor: pointer;
-  border-radius: 12px;
+  border-radius: 9999px;
+  pointer-events: auto;
   transition: background 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
@@ -938,11 +968,11 @@
 @keyframes ct-drop {
   0% {
     opacity: 0;
-    transform: translate(-50%, -95%) scale(0.85);
+    transform: translate(-50%, -95%) translateZ(24px) scale(0.85);
   }
   100% {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) translateZ(4px) scale(1);
   }
 }
 
@@ -984,3 +1014,15 @@
     font-size: 5.4cqw;
   }
 }
+
+/* Sân chơi game bên trong GameModalWrapper:
+ * Ngăn chặn lỗi co hẹp về 0px (biến thành sợi chỉ đứng) trong Chromium/WebKit
+ * khi component con chỉ chứa các phần tử tuyệt đối (position: absolute).
+ */
+.game-stage-canvas,
+[role="dialog"] .self-stretch > * {
+  width: 100% !important;
+  min-width: 100% !important;
+  align-self: stretch !important;
+}
+

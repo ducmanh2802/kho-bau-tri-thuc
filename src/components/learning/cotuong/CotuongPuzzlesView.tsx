@@ -86,6 +86,9 @@ export const CotuongPuzzlesView: React.FC = () => {
         setSelected(null);
         setLegal([]);
         if (verdict === 'mate') {
+          const target = board[mv.to[0]][mv.to[1]];
+          if (target) sound.playCotuongCapture();
+          else sound.playCotuongMove();
           setBoard(E.applyMove(board, mv));
           setLastMove(mv);
           solve();
@@ -93,11 +96,14 @@ export const CotuongPuzzlesView: React.FC = () => {
         }
         if (verdict === 'check') {
           // Cho bé thấy nước chiếu (và đường thoát của Tướng) rồi trả lại bàn cờ.
+          const target = board[mv.to[0]][mv.to[1]];
+          if (target) sound.playCotuongCapture();
+          else sound.playCotuongMove();
+          sound.playCotuongCheck();
           setBoard(E.applyMove(board, mv));
           setLastMove(mv);
           setStatus('check');
           setMisses((n) => n + 1);
-          sound.playPop();
           revertTimer.current = window.setTimeout(() => {
             setBoard(activePuzzle.createBoard());
             setLastMove(null);
@@ -125,7 +131,7 @@ export const CotuongPuzzlesView: React.FC = () => {
       setStatus('playing');
       setSelected([r, c]);
       setLegal(E.legalMoves(board, [r, c]));
-      sound.playClick();
+      sound.playCotuongSelect();
     } else {
       setSelected(null);
       setLegal([]);

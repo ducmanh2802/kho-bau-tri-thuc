@@ -105,7 +105,7 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
   // Voice check alert
   useEffect(() => {
     if (checkAt && !result) {
-      sound.speak('Chiếu tướng!');
+      sound.playCotuongCheck();
     }
   }, [checkAt, result]);
 
@@ -135,12 +135,12 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
     ]);
     clearSelection();
     if (target) {
-      sound.playPop();
+      sound.playCotuongCapture();
       setCaptureFx({ r: m.to[0], c: m.to[1], key: Date.now() });
       if (fxTimer.current) window.clearTimeout(fxTimer.current);
       fxTimer.current = window.setTimeout(() => setCaptureFx(null), 700);
     } else {
-      sound.playClick();
+      sound.playCotuongMove();
     }
     setTurn(turn === 'red' ? 'black' : 'red');
   };
@@ -263,7 +263,7 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
     if (p && p.color === 'red') {
       setSelected([r, c]);
       setLegal(E.legalMoves(board, [r, c]));
-      sound.playClick();
+      sound.playCotuongSelect();
     } else {
       clearSelection();
     }
