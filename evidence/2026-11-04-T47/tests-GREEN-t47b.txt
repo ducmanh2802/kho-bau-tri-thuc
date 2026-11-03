@@ -1,0 +1,10 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t47b-unlimited-daily-budget.test.ts (10 tests) 10ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  02:21:34
+   Duration  823ms (transform 55%, import 40%, worker 2%, tests 2%)
+

@@ -803,6 +803,32 @@ export interface CollectedEvidence {
   totalAttempts: number;
 }
 
+/**
+ * T47B — quy định của ba mẹ xuống ngân sách kế hoạch.
+ *
+ * `dailyLimitMinutes: 0` nghĩa là **"Không giới hạn"** (`src/types/index.ts:194`, và màn hình
+ * cũng chặn theo `overLimit = dailyLimitMinutes > 0` trong `App.tsx`), chứ không phải "chưa cài
+ * đặt". Code cũ
+ * lấy `DEFAULT_BUDGET_MINUTES` làm nhánh phải của phép `||`, nên lựa chọn của ba mẹ bị đổi
+ * thành 20 phút ngay trong engine. Ở đây 0 là một giá trị có nghĩa; mặc định chỉ còn dành cho
+ * cài đặt hỏng (âm / NaN / thiếu).
+ */
+export function resolveDailyBudgetMinutes(
+  inputBudgetMinutes: number | undefined,
+  parentDailyLimitMinutes: number,
+): number {
+  if (typeof inputBudgetMinutes === 'number' && inputBudgetMinutes > 0) return inputBudgetMinutes;
+  if (
+    typeof parentDailyLimitMinutes !== 'number' ||
+    !Number.isFinite(parentDailyLimitMinutes) ||
+    parentDailyLimitMinutes < 0
+  ) {
+    return P39_DECISION_POLICY.DEFAULT_BUDGET_MINUTES;
+  }
+  if (parentDailyLimitMinutes === 0) return P39_DECISION_POLICY.UNLIMITED_BUDGET_MINUTES;
+  return parentDailyLimitMinutes;
+}
+
 export class DecisionEngine {
   /**
    * Collects real evidence from Learning OS, Kid's Box, Competition and storage.
@@ -1131,10 +1157,10 @@ export class DecisionEngine {
     const nextBestAction = uniqueBySkill[0] ?? null;
 
     // Daily plan: 3–5 meaningful actions, evidence-driven, budget-aware.
-    const budgetMinutes =
-      input.budgetMinutes ??
-      (StorageService.getParentSettings().dailyLimitMinutes ||
-        P39_DECISION_POLICY.DEFAULT_BUDGET_MINUTES);
+    const budgetMinutes = resolveDailyBudgetMinutes(
+      input.budgetMinutes,
+      StorageService.getParentSettings().dailyLimitMinutes,
+    );
 
     const dailyPlan = this.buildDailyPlan(uniqueBySkill, {
       now,

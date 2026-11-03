@@ -52,9 +52,14 @@ describe('T46C — Esc ưu tiên lớp phủ đang mở', () => {
   });
 
   it('GameModalWrapper nối đúng nguồn trạng thái lớp phủ (showTierModal) vào hook', () => {
-    const call = wrapperSrc.slice(wrapperSrc.indexOf('useModalHistory(onExit'), wrapperSrc.indexOf('useModalHistory(onExit') + 400);
+    const atCall = wrapperSrc.indexOf('useModalHistory(onExit');
+    // T47A refactor: bảng chọn màn đi vào hook qua `escapeOverlayKind` chứ không còn là
+    // `overlayOpen: showTierModal` trực tiếp — bất biến "trạng thái bảng chọn phải tới được Esc"
+    // vẫn khoá, chỉ đổi chỗ khai báo.
+    const wiring = wrapperSrc.slice(wrapperSrc.indexOf('escapeOverlayKind({'), atCall + 400);
+    expect(wiring).toContain('tierPickerOpen: showTierModal');
+    const call = wrapperSrc.slice(atCall, atCall + 400);
     expect(call).toContain('overlayOpen');
-    expect(call).toContain('showTierModal');
     expect(call).toContain('onCloseOverlay');
     expect(call).toContain('setShowTierModal(false)');
   });

@@ -4,7 +4,7 @@ import { sound } from '../../services/sound';
 import { fireCelebrationConfetti } from '../../services/confetti';
 import { StorageService } from '../../services/storage';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
-import { useModalHistory } from '../../hooks/useModalHistory';
+import { useModalHistory, escapeOverlayKind } from '../../hooks/useModalHistory';
 import { resolvePraise, speakPraise, PraiseSubject, PraiseOutcome, resetPraiseEngineForTests } from '../../services/praiseEngine';
 import { GAME_LEVEL_POLICY } from '../../config/policy';
 
@@ -44,7 +44,7 @@ interface GameModalWrapperProps {
   score: number;
   maxScore?: number;
   isGameOver: boolean;
-  onRestart: () => void;
+  onRestart: (targetTier?: number) => void;
   onExit: () => void;
   children: React.ReactNode;
   instructions: string;
@@ -199,11 +199,19 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
   const [receipt, setReceipt] = React.useState<GameRewardReceipt | null>(null);
   const rewardsEnabled = StorageService.areRewardsEnabled();
   const dialogRef = useFocusTrap<HTMLDivElement>(true);
+  // T47A: `Esc` đóng **một** lớp phủ mỗi lần, từ trên xuống — bảng "Chọn Màn & Độ Khó" (z-50)
+  // rồi tới tấm che "Đang tạm dừng" (z-20). Tấm che chỉ được tính khi mở khoá được: khai một
+  // lớp phủ không có cách đóng sẽ nuốt phím, bé mất luôn lối thoát bằng bàn phím.
+  const pauseVeilOpen = isRealtime && isPaused && Boolean(onTogglePause);
+  const topOverlay = escapeOverlayKind({ tierPickerOpen: showTierModal, pauseVeilOpen });
   const { requestClose } = useModalHistory(onExit, {
-    // T46C: bảng "Chọn Màn & Độ Khó" che bằng CSS còn keydown thì nghe trên `window`,
-    // nên Esc phải đóng lớp phủ trước — lần Esc kế tiếp mới thoát trò chơi.
-    overlayOpen: showTierModal,
-    onCloseOverlay: () => setShowTierModal(false),
+    // T46C: bảng chọn màn che bằng CSS còn `keydown` thì nghe trên `window`, nên Esc phải
+    // đóng lớp phủ trước — lần Esc kế tiếp (không còn lớp phủ nào) mới thoát trò chơi.
+    overlayOpen: topOverlay !== null,
+    onCloseOverlay: () => {
+      if (topOverlay === 'tierPicker') setShowTierModal(false);
+      else if (topOverlay === 'pauseVeil') onTogglePause?.();
+    },
   });
 
   // Bé tắt trò chơi khi gấu còn đang nói → cắt tiếng, kẻo lời khen vang ở màn hình khác.
@@ -228,7 +236,10 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
       } catch {
         // ignore
       }
-      onRestart();
+      // T47E — truyền chính màn bé bấm: `selectGameTier` chỉ mở khoá (Math.max) nên nếu
+      // gọi `onRestart` không tham số thì bảng luôn về màn khó nhất từng mở; bé chọn màn
+      // dễ hơn chỉ mất điểm mà bảng không đổi.
+      onRestart(t);
     }
   };
 

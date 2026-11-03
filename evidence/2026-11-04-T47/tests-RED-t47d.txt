@@ -1,0 +1,89 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t47d-weekly-challenge-zero-reward-row.test.ts (6 tests | 4 failed) 43ms
+   ❯ T47D — Thử Thách Tuần không ghi dòng thưởng +0 lặp lại (6)
+     × bấm hoàn thành 3 lần ⇒ lịch sử không nhận 3 dòng về cùng một thử thách 12ms
+     × lần bấm lặp không làm lịch sử phần thưởng dài thêm 6ms
+     × không còn dòng giả "+0 XP" cho thử thách (nguyên tắc T41C: chỉ in số thật vào túi bé) 1ms
+     ✓ tiến độ vẫn đúng: id chỉ được ghi một lần vào completedWeeklyChallenges 1ms
+     ✓ đường ghi phần thưởng thật (engine nhiệm vụ) vẫn còn, không bị xoá kèm 0ms
+     × hồi quy diện rộng: 50 mục lịch sử không bị dòng vô nghĩa chiếm chỗ 20ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t47d-weekly-challenge-zero-reward-row.test.ts > T47D — Thử Thách Tuần không ghi dòng thưởng +0 lặp lại > bấm hoàn thành 3 lần ⇒ lịch sử không nhận 3 dòng về cùng một thử thách
+AssertionError: expected 3 to be less than or equal to 1
+ ❯ tests/t47d-weekly-challenge-zero-reward-row.test.ts:71:42
+     69|     StorageService.recordWeeklyChallengeCompleted(CHALLENGE);
+     70|     StorageService.recordWeeklyChallengeCompleted(CHALLENGE);
+     71|     expect(historyForChallenge().length).toBeLessThanOrEqual(1);
+       |                                          ^
+     72|   });
+     73|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/t47d-weekly-challenge-zero-reward-row.test.ts > T47D — Thử Thách Tuần không ghi dòng thưởng +0 lặp lại > lần bấm lặp không làm lịch sử phần thưởng dài thêm
+AssertionError: expected 4 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 4
+
+ ❯ tests/t47d-weekly-challenge-zero-reward-row.test.ts:79:69
+     77|     StorageService.recordWeeklyChallengeCompleted(CHALLENGE);
+     78|     StorageService.recordWeeklyChallengeCompleted(CHALLENGE);
+     79|     expect(StorageService.getParentSettings().rewardHistory.length).to…
+       |                                                                     ^
+     80|   });
+     81|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/t47d-weekly-challenge-zero-reward-row.test.ts > T47D — Thử Thách Tuần không ghi dòng thưởng +0 lặp lại > không còn dòng giả "+0 XP" cho thử thách (nguyên tắc T41C: chỉ in số thật vào túi bé)
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ tests/t47d-weekly-challenge-zero-reward-row.test.ts:85:25
+     83|     StorageService.recordWeeklyChallengeCompleted(CHALLENGE);
+     84|     const zero = historyForChallenge().filter((e) => e.type === 'xp' &…
+     85|     expect(zero.length).toBe(0);
+       |                         ^
+     86|   });
+     87|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/t47d-weekly-challenge-zero-reward-row.test.ts > T47D — Thử Thách Tuần không ghi dòng thưởng +0 lặp lại > hồi quy diện rộng: 50 mục lịch sử không bị dòng vô nghĩa chiếm chỗ
+AssertionError: expected 50 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 50
+
+ ❯ tests/t47d-weekly-challenge-zero-reward-row.test.ts:105:58
+    103|     const history = StorageService.getParentSettings().rewardHistory;
+    104|     expect(history.length).toBeLessThanOrEqual(50);
+    105|     expect(history.filter((e) => e.amount === 0).length).toBe(0);
+       |                                                          ^
+    106|   });
+    107| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 2 passed (6)
+   Start at  02:24:21
+   Duration  572ms (transform 38%, import 35%, tests 22%, worker 5%)
+

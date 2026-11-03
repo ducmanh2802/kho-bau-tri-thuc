@@ -1,0 +1,39 @@
+{
+  "steps": [
+    "A1: tấm che đang phủ ⇒ Esc MỞ KHOÁ (veil 1→0) mà ván chơi còn nguyên (còn nút đóng)",
+    "A3: đối chứng — Esc kế tiếp khi không còn lớp phủ vẫn thoát thật (ván 1→0)",
+    "B1: trò không tấm che ⇒ một lần Esc thoát ngay, lối thoát bằng bàn phím còn nguyên",
+    "C1: còn bảng chọn màn thì Esc thuộc về bảng (z-50), không đụng tấm che cũng không thoát ván"
+  ],
+  "errors": [],
+  "facts": {
+    "pauseButtonsOnClockGame": 1,
+    "veilAfterPause": 1,
+    "esc1": {
+      "veilAfterEsc": 0,
+      "stillInGame": 1
+    },
+    "esc2": {
+      "veilAgain": 1,
+      "veilAfterSecondPauseEsc": 0,
+      "inGameAfterOneEsc": 1,
+      "inGameAfterTwoEsc": 0
+    },
+    "pauseButtonsOnNoClockGame": 0,
+    "noClockAfterEsc": 0,
+    "tierAfterEsc": {
+      "panelAfterEsc": 0,
+      "gameAfterTierEsc": 1
+    }
+  },
+  "failedAt": null,
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47\\a1-dang-tam-dung.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47\\a2-sau-esc-lan-mot.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47\\a3-da-thoat-game.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47\\b1-khong-co-tam-che.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47\\c1-bang-chon-man-dong-truoc.png"
+  ],
+  "ok": true
+}
+QA PASS — 4 step(s), 0 errors

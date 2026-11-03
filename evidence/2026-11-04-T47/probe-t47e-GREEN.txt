@@ -1,0 +1,25 @@
+{
+  "steps": [
+    "D1: tiến độ Màn 5 ⇒ bảng đúng mở Màn 5",
+    "D2: chọn Màn 2 ⇒ bảng về đúng Màn 2 (bản cũ vẫn Màn 5, chỉ mất điểm)",
+    "D3: unlockedTier vẫn 5 — chọn màn dễ không phạt mất tiến độ",
+    "D4: hết lớp phủ ⇒ Esc vẫn thoát ván, lối thoát bàn phím còn nguyên"
+  ],
+  "errors": [],
+  "facts": {
+    "headerBefore": "🌟 Màn 5/6 ▾ · 🚀 Câu 1/8",
+    "headerAfterPick": "🐥 Màn 2/6 ▾ · 🚀 Câu 1/6",
+    "progressAfterPick": {
+      "unlockedTier": 5,
+      "stars": 4
+    },
+    "inGameAfterEsc": 0
+  },
+  "failedAt": null,
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47\\d1-bang-chon-man-dang-mo.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47\\d2-sau-khi-chon-man-2.png"
+  ],
+  "ok": true
+}
+QA PASS — 4 step(s), 0 errors

@@ -256,6 +256,18 @@ export const P39_DECISION_POLICY = {
 
   /** Parent screen-time default when settings are unavailable. */
   DEFAULT_BUDGET_MINUTES: 20,
+
+  /**
+   * T47B — "Không giới hạn" của ba mẹ (`dailyLimitMinutes: 0`) quy về ngân sách này.
+   * 240 phút = cả ngày học của bé lớp 1, cao hơn trần *đo được* của một kế hoạch ngày:
+   * `RECOMMEND_MAX: 5` hoạt động × `estimatedMinutes` lớn nhất ghi trong `src/`
+   * (`grep -rho "estimatedMinutes: [0-9]*" src/ | grep -o "[0-9]*" | sort -n | tail -1` ⇒ 6)
+   * = 30 phút, nên không hoạt động nào bị cắt. Dùng **số hữu hạn**, không dùng `Infinity`:
+   * `JSON.stringify(Infinity)` ra `null` ⇒ kế hoạch lưu xuống máy hỏng mà không ai báo.
+   * Trần một phiên vẫn do `SESSION.FULL_MAX_MINUTES` giữ — "không giới hạn" là quyền về
+   * tổng thời gian trong ngày, không phải giấy phép cho một phiên ngồi không có điểm dừng.
+   */
+  UNLIMITED_BUDGET_MINUTES: 240,
 } as const;
 
 /** Launchable game ids the runtime can actually open (§23 availability). */

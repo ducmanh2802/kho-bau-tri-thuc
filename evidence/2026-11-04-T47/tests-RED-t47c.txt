@@ -1,0 +1,61 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t47c-parent-settings-broadcast.test.ts (7 tests | 2 failed) 19ms
+   ❯ T47C — saveParentSettings phải phát kho_bau_storage_change (7)
+     ✓ kho khác (child profile) đã phát event — chứng minh bộ giả window bắt đúng 3ms
+     × lưu cài đặt ba mẹ ⇒ phát kho_bau_storage_change với đúng key 6ms
+     ✓ dữ liệu vẫn ghi xuống và đọc lại đúng (sửa không làm hỏng round-trip) 0ms
+     × không còn `localStorage.setItem` thô trong saveParentSettings 5ms
+     ✓ hồi quy: localStorage hỏng (private mode / hết chỗ) ⇒ không ném, bé vẫn dùng tiếp 1ms
+     ✓ writer mà màn Ba Mẹ dùng chính là hàm này (không phải setItem ở UI) 1ms
+     ✓ writeJSON giữ nguyên hành vi làm tham chiếu (kéo được từ cùng source) 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t47c-parent-settings-broadcast.test.ts > T47C — saveParentSettings phải phát kho_bau_storage_change > lưu cài đặt ba mẹ ⇒ phát kho_bau_storage_change với đúng key
+AssertionError: expected [] to include 'kho_bau_parent_settings'
+ ❯ tests/t47c-parent-settings-broadcast.test.ts:100:18
+     98|       .filter((e) => e.type === 'kho_bau_storage_change')
+     99|       .map((e) => e.detail?.key);
+    100|     expect(keys).toContain(STORAGE_KEYS.PARENT_SETTINGS);
+       |                  ^
+    101|   });
+    102|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/t47c-parent-settings-broadcast.test.ts > T47C — saveParentSettings phải phát kho_bau_storage_change > không còn `localStorage.setItem` thô trong saveParentSettings
+AssertionError: expected 'public static saveParentSettings(sett…' to contain 'writeJSON(STORAGE_KEYS.PARENT_SETTINGS'
+
+- Expected
++ Received
+
+- writeJSON(STORAGE_KEYS.PARENT_SETTINGS
++ public static saveParentSettings(settings: ParentSettings) {
++     try {
++       localStorage.setItem(STORAGE_KEYS.PARENT_SETTINGS, JSON.stringify(settings));
++     } catch {
++       // Ignore
++     }
++   }
++ 
++   public static getAnalytics(): LearningAnalytics {
++    
+
+ ❯ tests/t47c-parent-settings-broadcast.test.ts:112:18
+    110|     const at = storageSrc.indexOf('public static saveParentSettings');
+    111|     const body = storageSrc.slice(at, at + 260);
+    112|     expect(body).toContain('writeJSON(STORAGE_KEYS.PARENT_SETTINGS');
+       |                  ^
+    113|     expect(body).not.toMatch(/localStorage\.setItem\(/);
+    114|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 5 passed (7)
+   Start at  02:22:32
+   Duration  506ms (transform 42%, import 39%, tests 12%, worker 7%)
+

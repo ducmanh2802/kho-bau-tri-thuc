@@ -1265,12 +1265,14 @@ public static getParentSettings(): ParentSettings {
     };
   }
 
+  /**
+   * T47C — ghi qua `writeJSON`, không `setItem` thô. `writeJSON` là chỗ duy nhất phát
+   * `kho_bau_storage_change`, mà `cloudSync.ts:106` nghe để hẹn giờ auto-sync.
+   * Bản cũ bỏ qua bước này ⇒ quyền kiểm soát của ba mẹ (giờ học, phần thưởng, độ khó)
+   * không bao giờ rời khỏi máy đang gõ, kể cả khi người lớn đã bật đồng bộ.
+   */
   public static saveParentSettings(settings: ParentSettings) {
-    try {
-      localStorage.setItem(STORAGE_KEYS.PARENT_SETTINGS, JSON.stringify(settings));
-    } catch {
-      // Ignore
-    }
+    writeJSON(STORAGE_KEYS.PARENT_SETTINGS, settings);
   }
 
   public static getAnalytics(): LearningAnalytics {
@@ -2423,7 +2425,10 @@ public static getParentSettings(): ParentSettings {
     }
     // T18A — quest "Thử Thách Tuần" qua engine chung.
     StorageService.recordQuestEvent({ kind: 'weekly' });
-    StorageService.addRewardHistory({ type: 'xp', amount: 0, description: 'Hoàn thành Thử Thách Tuần', itemId: challengeId });
+    // T47D — bản cũ ghi thêm một dòng `{ type: 'xp', amount: 0 }` **ngoài** nhánh "lần đầu",
+    // nên mỗi lần mở lại bảng là lịch sử phần thưởng của ba mẹ nhận thêm một dòng +0, và
+    // trần 50 mục (`addRewardHistory`) bị số vô nghĩa chiếm chỗ. Phần thưởng thật đã do
+    // engine nhiệm vụ ghi (`addRewardHistory({ type: 'quest', amount: q.rewardStars })`).
   }
 
   /**

@@ -16,6 +16,25 @@ export function shouldEscapeCloseOverlay(overlayOpen: boolean, hasCloseHandler: 
   return overlayOpen && hasCloseHandler;
 }
 
+export type GameOverlayState = {
+  /** Bảng "Chọn Màn & Độ Khó" đang che khung chơi (`z-50`). */
+  tierPickerOpen: boolean;
+  /** Tấm che "Đang tạm dừng" đang che khung chơi (`z-20`) **và** mở khoá được. */
+  pauseVeilOpen: boolean;
+};
+
+/**
+ * T47A — `Esc` đóng **một** lớp phủ mỗi lần, theo thứ tự từ trên xuống: bảng chọn màn
+ * (`z-50`) trước, tấm che tạm dừng (`z-20`) sau, rồi lần kế tiếp mới tới `onExit`.
+ * `pauseVeilOpen` do nơi gọi tính sẵn và **đã** gồm điều kiện "có lối mở khoá" — đưa một
+ * lớp phủ không đóng được vào đây thì phím bị nuốt, bé mất luôn lối thoát bằng bàn phím.
+ */
+export function escapeOverlayKind(state: GameOverlayState): 'tierPicker' | 'pauseVeil' | null {
+  if (state.tierPickerOpen) return 'tierPicker';
+  if (state.pauseVeilOpen) return 'pauseVeil';
+  return null;
+}
+
 /**
  * T01B/1 — Esc + nút Back của trình duyệt/điện thoại đóng modal game & bài học.
  *

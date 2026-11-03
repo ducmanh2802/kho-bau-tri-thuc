@@ -1,0 +1,18 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t31-bug-hunt-fixes.test.ts (22 tests) 17ms
+ ✓ tests/t32-game-stage-reset.test.ts (20 tests) 89ms
+ ✓ tests/t47e-tier-picker-easier.test.ts (7 tests) 15ms
+ ✓ tests/t47a-escape-resumes-pause-veil.test.ts (7 tests) 6ms
+ ✓ tests/t43-game-pause.test.ts (30 tests) 34ms
+ ✓ tests/t46c-escape-closes-overlay-first.test.ts (7 tests) 7ms
+
+ Test Files  6 passed (6)
+      Tests  93 passed (93)
+   Start at  02:28:17
+   Duration  1.28s (import 46%, transform 33%, tests 14%, worker 7%)
+
+    Isolate  6 workers spawned · ~336ms startup each (spawn + environment, per file)
+             at least ~336ms faster with isolate: false — reuses workers across files instead of one per file
+

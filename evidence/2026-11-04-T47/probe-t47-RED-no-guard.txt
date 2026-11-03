@@ -1,0 +1,76 @@
+T47A — probe-level RED: bằng chứng hành vi trên build **không có** chốt chắn
+=============================================================================
+
+Bối cảnh
+--------
+Test nguồn (`tests/t47a-escape-resumes-pause-veil.test.ts`) khoá *khai báo* lớp phủ,
+nó không tự chứng minh điều gì xảy ra trên màn hình. Nên đợt này dựng hẳn một build
+**bỏ chốt** rồi chạy đúng probe nghiệm thu:
+
+    # src/components/games/GameModalWrapper.tsx:205
+    - const pauseVeilOpen = isRealtime && isPaused && Boolean(onTogglePause);
+    + const pauseVeilOpen = false; // ABLATION
+
+    npm run build
+    node qa/run-one.mjs evidence/2026-11-04-T47/probe-t47-escape-pause.mjs
+
+`mutation-1-veil-declared.txt` (cùng ablation, cấp unit) chỉ làm đỏ **1** test —
+khuôn `overlayOpen: …topOverlay…` vẫn khớp vì cái tên còn nguyên trong nguồn. Vì vậy
+bằng chứng thật của DEF-013 là output dưới đây, không phải test nguồn.
+
+Output nguyên văn (in từ lần chạy thật, exit QA FAIL)
+-----------------------------------------------------
+{
+  "steps": [
+    "B1: trò không tấm che ⇒ một lần Esc thoát ngay, lối thoát bằng bàn phím còn nguyên",
+    "C1: còn bảng chọn màn thì Esc thuộc về bảng (z-50), không đụng tấm che cũng không thoát ván"
+  ],
+  "errors": [
+    "A: Esc lần một mở khoá NHƯNG cũng thoát luôn trò chơi — hành vi cũ của DEF-013",
+    "A: không bấm được nút Tạm dừng: locator.click: Timeout 15000ms exceeded.\nCall log:\n  - waiting for locator('[data-testid=\"game-pause\"]').first()\n",
+    "A3: Esc chỉ mở khoá mà ván đã bị thoát (game-close = 0)"
+  ],
+  "facts": {
+    "pauseButtonsOnClockGame": 1,
+    "veilAfterPause": 1,
+    "esc1": {
+      "veilAfterEsc": 0,
+      "stillInGame": 0
+    },
+    "esc2": {
+      "veilAgain": 0,
+      "veilAfterSecondPauseEsc": 0,
+      "inGameAfterOneEsc": 0,
+      "inGameAfterTwoEsc": 0
+    },
+    "pauseButtonsOnNoClockGame": 0,
+    "noClockAfterEsc": 0,
+    "tierAfterEsc": {
+      "panelAfterEsc": 0,
+      "gameAfterTierEsc": 1
+    }
+  },
+  "failedAt": "A",
+  "ok": false
+}
+
+QA FAIL — 3 error(s) at A
+
+Đọc số
+------
+- `esc1.stillInGame = 0`: tấm che "Đang tạm dừng" đang phủ bảng, bé bấm Esc để chơi tiếp
+  ⇒ ván bị **bóc khỏi DOM luôn**. Đúng bệnh DEF-013.
+- `esc2.veilAgain = 0` + các bước A sau không chạy được: hết ván nên không còn nút
+  Tạm dừng để bấm ⇒ chuỗi lỗi dây chuyền (`errors[1]` timeout là **hệ quả**, không
+  phải nguyên nhân).
+- `failedAt = "A"` ⇒ các đoạn B (trò không đồng hồ) và C (bảng chọn màn) vẫn chạy và
+  vẫn đúng — chốt bị bỏ chỉ ảnh hưởng tấm che tạm dừng, bằng chứng phạm vi sửa hẹp.
+
+Build nghiệm thu xanh tương ứng: `probe-t47-GREEN.txt` (`esc1.stillInGame = 1`,
+`inGameAfterTwoEsc = 0`, `ok: true`, QA PASS 4 bước / 0 lỗi).
+
+Hoàn tác
+--------
+`cp /tmp/GameModalWrapper.GREEN.tsx src/components/games/GameModalWrapper.tsx`
+(lưu ý quy trình: **không** dùng `git checkout --` cho file đang có sửa chưa commit —
+bài học ghi ở `.ai/CURRENT.md`). Đối chiếu md5 trước/sau trong `README.md` thư mục này.

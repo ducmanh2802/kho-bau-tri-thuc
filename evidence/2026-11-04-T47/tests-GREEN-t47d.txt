@@ -1,0 +1,10 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t47d-weekly-challenge-zero-reward-row.test.ts (6 tests) 27ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  02:24:48
+   Duration  474ms (transform 39%, import 37%, tests 17%, worker 6%)
+

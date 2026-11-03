@@ -1,0 +1,10 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t47c-parent-settings-broadcast.test.ts (7 tests) 14ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  02:23:04
+   Duration  492ms (import 42%, transform 41%, tests 9%, worker 8%)
+

@@ -86,8 +86,11 @@ export interface GameStage {
   submitCorrect: (starsOverride?: number) => void;
   submitWrong: () => void;
   startNextTier: () => void;
-  restartGame: () => void;
-  jumpToTier: (targetTier: number) => void;
+  /**
+   * T47E — `targetTier` là màn bé **chọn** trong bảng "Chọn Màn & Độ Khó". Không truyền thì
+   * chơi lại màn đang mở khoá cao nhất (hành vi cũ của nút "Chơi lại").
+   */
+  restartGame: (targetTier?: number) => void;
 }
 
 /** T02/B1 — stars from real performance (single source of truth). */
@@ -212,10 +215,13 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
     setPrevBestStars(0);
   };
 
-  const restartGame = () => {
+  const restartGame = (targetTier?: number) => {
     if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = null;
-    const resumeTier = clampTier(StorageService.getGameProgress(gameId).unlockedTier);
+    // T47E: bảng chọn màn phải đưa bảng về **đúng** màn bé bấm. `selectGameTier` chỉ mở khoá
+    // (`Math.max` trong `StorageService.selectGameTier`) nên đọc `unlockedTier` một cách mù luôn trả màn khó nhất
+    // từng mở — bé đang bí ở Màn 5 mà chọn Màn 1 thì bảng nạp lại Màn 5, chỉ tổ mất điểm.
+    const resumeTier = clampTier(targetTier ?? StorageService.getGameProgress(gameId).unlockedTier);
     setTier(resumeTier);
     setRoundIdx(0);
     setScore(0);
@@ -229,27 +235,6 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
     // T02/B5 — replaying the same tier counts as a new play for shuffling.
     try {
       setNonce(StorageService.bumpPlayNonce(gameId, resumeTier));
-    } catch {
-      setNonce((n) => n + 1);
-    }
-  };
-
-  const jumpToTier = (targetTier: number) => {
-    if (timerRef.current) window.clearTimeout(timerRef.current);
-    timerRef.current = null;
-    const safeTarget = clampTier(targetTier);
-    setTier(safeTarget);
-    setRoundIdx(0);
-    setScore(0);
-    setTierScore(0);
-    setMistakesInTier(0);
-    setLocked(false);
-    setPhase('playing');
-    setPausedByUser(false);
-    setStarsEarned(0);
-    setPrevBestStars(0);
-    try {
-      setNonce(StorageService.bumpPlayNonce(gameId, safeTarget));
     } catch {
       setNonce((n) => n + 1);
     }
@@ -282,6 +267,5 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
     submitWrong,
     startNextTier,
     restartGame,
-    jumpToTier,
   };
 }

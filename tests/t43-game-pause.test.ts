@@ -243,10 +243,14 @@ describe('KBT-43 — hook sở hữu đồng hồ và tự nhả tạm khi sang 
     }
   });
 
-  it('sang màn / chơi lại / nhảy màn đều nhả trạng thái tạm của bé', () => {
+  it('sang màn / chơi lại đều nhả trạng thái tạm của bé', () => {
     const resets = src.match(/setPausedByUser\(false\);/g) ?? [];
-    // togglePause + 3 đường đổi màn
-    expect(resets.length).toBeGreaterThanOrEqual(4);
+    // togglePause + các đường đổi màn. T47E: `jumpToTier` (không nơi nào gọi) gộp vào
+    // `restartGame(targetTier)` ⇒ đường đổi màn còn startNextTier + restartGame, không
+    // phải ba; số chốt vẫn ≥ 3 để "mọi lối đổi màn đều nhả tạm" còn bị khoá.
+    expect(resets.length).toBeGreaterThanOrEqual(3);
+    expect(src).toContain('const restartGame = (targetTier?: number)');
+    expect(src).toContain('const startNextTier = ');
   });
 
   it('hàm quyết định không đọc Date.now hay state ngoài (test phải tất định được)', () => {

@@ -1,0 +1,26 @@
+{
+  "steps": [
+    "D1: tiến độ Màn 5 ⇒ bảng đúng mở Màn 5",
+    "D3: unlockedTier vẫn 5 — chọn màn dễ không phạt mất tiến độ",
+    "D4: hết lớp phủ ⇒ Esc vẫn thoát ván, lối thoát bàn phím còn nguyên"
+  ],
+  "errors": [
+    "D2: bé chọn Màn 2 mà bảng vẫn ở \"🌟 Màn 5/6 ▾ · 🚀 Câu 1/8\" — hành vi cũ của T47E"
+  ],
+  "facts": {
+    "headerBefore": "🌟 Màn 5/6 ▾ · 🚀 Câu 1/8",
+    "headerAfterPick": "🌟 Màn 5/6 ▾ · 🚀 Câu 1/8",
+    "progressAfterPick": {
+      "unlockedTier": 5,
+      "stars": 4
+    },
+    "inGameAfterEsc": 0
+  },
+  "failedAt": "D2",
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47\\d1-bang-chon-man-dang-mo.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47\\d2-sau-khi-chon-man-2.png"
+  ],
+  "ok": false
+}
+QA FAIL — 1 error(s) at D2
