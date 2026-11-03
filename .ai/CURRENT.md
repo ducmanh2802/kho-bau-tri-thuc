@@ -23,7 +23,13 @@ hồi quy `qa/focus.mjs` / `qa/games.mjs` / `qa/tier6-ladder-evidence.mjs` và 2
 commit: **EXIT=0** · `99 passed (99)` / `1372 passed (1372)` · `Duration 21.38s` (`verify-precommit.txt`) ·
 `index-C7kpOu7n.js`
 **211.3 kB** (boot graph **425.6 kB**, `435849 total`) · vẫn **42** service module, không thêm dependency.
-Bằng chứng `evidence/2026-11-03-T42/`. **Không stage:** 6 ảnh `docs/opencode/reports/img/*.png` và
+Bằng chứng `evidence/2026-11-03-T42/`. **Commit + cổng server:** `caff32a` (46 file, **+2670/−76**),
+push `1deb859..caff32a`, `HEAD == origin/main`; trên chính commit cả ba workflow xanh — `1. Quality`
+41632118293 · `2. Build + artifact` 41632118234 · **`3. Browser QA` 41632118172** job 125904033974
+`success` `12:00:44Z`→`12:02:00Z` = **76 s** (bước 7 "QA probe" `success`, bước 8 `skipped`) ⇒
+**10/16 lượt xanh, chín lượt cuối liên tiếp, sáu lượt cuối không còn cờ** *(tính tới `caff32a`; lượt
+của `1deb859` — docs-only, 54 s — chưa được ghi lúc nó chạy, nay bổ ở §15)* — §15–§16
+`evidence/2026-11-03-QA-RACE/ci-gate-race.txt`. **Không stage:** 6 ảnh `docs/opencode/reports/img/*.png` và
 `docs/step-by-step-guidance.md` (của lane khác) vẫn để nguyên trong working tree; `package-lock.json`
 còn nguyên. Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ**; tag `v1.1.0` vẫn ở `77d90ce`; chữ ký Go/No-Go
 vẫn trống — việc của người giữ repo.

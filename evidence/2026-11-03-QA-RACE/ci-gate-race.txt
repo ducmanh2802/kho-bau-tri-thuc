@@ -449,3 +449,50 @@ commit `06b8962`*. Con số này sẽ lệch ở lượt kế; nguồn sự th�
 Điều **chưa** đổi: chưa lần nào thấy một probe đỏ *thật* bị cổng chặn ⇒ ô 13
 `docs/plan/TEST_PLAN.md` §16 giữ nguyên MỞ. Một lượt xanh trên commit đổi `src/` chứng minh
 cổng **không chặn oan**, chứ không chứng minh cổng **chặn đúng**.
+
+## 15. Bắt kịp: lượt CI của `1deb859` (docs-only) chưa từng được ghi ở §14
+
+§14 chốt tỷ lệ "tính tới `06b8962`" nhưng ngay sau đó lane docs push `1deb859` và **mọi** push vào
+`main` đều sinh thêm một lượt QA. Đo lại bằng đúng hai lệnh ở §13:
+
+```
+curl -s "…/actions/runs?head_sha=$(git rev-parse 1deb859)"
+  3. Browser QA        run 41538711482 success
+  1. Quality           run 41538711383 success
+  2. Build + artifact  run 41538711382 success
+curl -s "…/actions/runs/41538711482/jobs"
+  job 125597058223 golden path trên Chromium success 2026-11-02T22:36:37Z→22:37:31Z (54 s)
+      bước 7 "QA probe" = success · bước 8 annotation = skipped
+```
+
+⇒ lượt này **xanh**, và vì commit chỉ đụng `docs/` + `evidence/` nên nó không phải bằng chứng về app;
+nó chỉ chứng minh cổng không đỏ oan trên một push docs.
+
+## 16. Lượt CI **thứ năm** không còn lưới — XANH, trên chính commit T42 `caff32a`
+
+`caff32a fix(t42): tam defect …` (46 file, **+2670/−76**), push `1deb859..caff32a`, `HEAD == origin/main`.
+
+```
+curl -s "…/actions/runs?head_sha=caff32a8d1825d5a04708f0317aff1638c7ec525"
+  2. Build + artifact  run 41632118234 success
+  1. Quality           run 41632118293 success
+  3. Browser QA        run 41632118172 success
+curl -s "…/actions/runs/41632118172/jobs"
+  job 125904033974 golden path trên Chromium success 2026-11-03T12:00:44Z→12:02:00Z (76 s)
+      bước 1–6 success · bước 7 "QA probe" = success · bước 8 annotation = skipped
+check-runs trên commit: 125904035182 typecheck + tests success (12:00:42Z→12:01:18Z = 36 s)
+                        125904034335 build + bundle budget success (12:00:42Z→12:00:59Z = 17 s)
+                        125904033974 golden path trên Chromium success (76 s)
+```
+
+Cổng máy trước push: `npm run verify` **EXIT=0** · `99 passed (99)` / `1372 passed (1372)` ·
+`Duration 21.38s` · `index-C7kpOu7n.js` **211.3 kB** PASS (`evidence/2026-11-03-T42/verify-precommit.txt`);
+lần đo đầu trong ngày trên cùng nội dung: `24.14s` (`verify.txt`). Pre-push hook chạy lại `verify` ⇒ pass.
+
+Tỷ lệ theo quy tắc dừng §13 (cộng cả §15): **10/16 lượt xanh** (6 đỏ · 10 xanh), **chín lượt cuối liên
+tiếp**, **sáu lượt cuối chạy khi không còn cờ** — `3b0122c` `6e30794` `e961815` `06b8962` `1deb859`
+`caff32a` — *tính tới commit `caff32a`*. Đây là lượt **thứ hai không lưới trên commit đổi `src/`**.
+
+Điều **chưa** đổi: chưa lần nào thấy một probe đỏ *thật* bị cổng chặn ⇒ ô 13 `docs/plan/TEST_PLAN.md`
+§16 vẫn MỞ. T42 sửa 8 defect nhưng không có defect nào biểu hiện thành probe đỏ, nên lượt xanh này cũng
+không điền được ô đó.
