@@ -1,0 +1,17 @@
+# Hoi quy tren CUNG dist cua dot T48B (build sau khi dat lai guard, npm run verify EXIT=0)
+# lenh: node qa/run-one.mjs <probe>  (chi giu dong step/error + ma ket qua)
+
+== qa/gacha-machine.mjs ==
+  "errors": [],
+      "step": "pileLayout",
+      "step": "spinAnimation",
+      "step": "drawResult",
+      "ticketsLeft": 4
+      "step": "history",
+QA PASS — 4 step(s), 0 errors
+GACHA_EXIT=0
+
+== qa/t33-feedback-timers.mjs ==
+  "errors": [],
+QA PASS — 6 step(s), 0 errors
+T33_EXIT=0

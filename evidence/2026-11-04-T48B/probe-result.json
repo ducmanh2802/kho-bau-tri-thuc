@@ -1,0 +1,89 @@
+{
+  "errors": [],
+  "shots": [
+    "01-A-luu-duoc.png",
+    "02-B-khong-luu-duoc.png"
+  ],
+  "facts": {
+    "A": {
+      "beforeA": {
+        "tickets": 5,
+        "stars": 50,
+        "stickerKinds": 0,
+        "drawsTotal": 0
+      },
+      "afterA": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      }
+    },
+    "B": {
+      "beforeB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "afterB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "blockedWrites": 2
+    }
+  },
+  "steps": [
+    {
+      "step": "A-lưu-được",
+      "text": "🚂 Sticker Mới! Bé nhận được Tàu Hoả Xình Xịch! 0 Đã lưu vào Bộ Sưu Tập! Tuyệt Vời!",
+      "beforeA": {
+        "tickets": 5,
+        "stars": 50,
+        "stickerKinds": 0,
+        "drawsTotal": 0
+      },
+      "afterA": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      }
+    },
+    {
+      "step": "B-khong-luu-duoc",
+      "text": "😢 Không Thể Gắp Máy không lưu được sticker vào máy này. Bé nhờ ba mẹ bật lại phần lưu nhé! Hiểu Rồi",
+      "beforeB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "afterB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "blockedWrites": 2
+    },
+    {
+      "step": "C-may-dung-nguyen",
+      "beforeB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "afterB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      }
+    }
+  ],
+  "ok": true
+}

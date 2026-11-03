@@ -1,0 +1,98 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t48b-gacha-result-honest.test.ts (8 tests | 4 failed) 28ms
+   ❯ T48B — máy gắp không được báo "đã lưu" khi trình duyệt từ chối ghi (8)
+     ✓ storage ghi được ⇒ ok, trừ vé, lưu sticker (characterization: hành vi tốt phải giữ nguyên) 7ms
+     × chặn ghi hồ sơ + động lực ⇒ không được trả ok (lỗi: ok:true, UI bắn confetti) 9ms
+     × khi không ghi được, kết quả không được kèm stickerId/isNew (nguồn của nhãn "Đã lưu") 2ms
+     × chặn riêng key động lực (sticker mất) ⇒ vẫn honest (lỗi: chỉ lo key hồ sơ) 1ms
+     × chặn riêng key hồ sơ (vé mất) ⇒ vẫn honest, không khoe "+2 sao an ủi" ảo 2ms
+     ✓ hộp kết quả nói số lượt theo cài đặt ba mẹ, không hardcode "5 lượt" 1ms
+     ✓ thất bại lưu trữ phải có nhãn riêng, không rơi vào nhãn "hết lượt" 2ms
+     ✓ toàn bộ lời hứa của drawGacha đi qua một cửa: không còn chỗ nào bỏ qua writeJSON false 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t48b-gacha-result-honest.test.ts > T48B — máy gắp không được báo "đã lưu" khi trình duyệt từ chối ghi > chặn ghi hồ sơ + động lực ⇒ không được trả ok (lỗi: ok:true, UI bắn confetti)
+AssertionError: writeJSON trả false mà vẫn báo thành công: {"ok":true,"reason":"ok","stickerId":"st_tet_3","isNew":true,"consolationStars":0}: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/t48b-gacha-result-honest.test.ts:84:95
+     82|     ls.block([STORAGE_KEYS.CHILD_PROFILE, STORAGE_KEYS.MOTIVATION]);
+     83|     const result = StorageService.drawGacha();
+     84|     expect(result.ok, `writeJSON trả false mà vẫn báo thành công: ${JS…
+       |                                                                                               ^
+     85|     expect(result.reason).toBe('storage-unavailable');
+     86|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/t48b-gacha-result-honest.test.ts > T48B — máy gắp không được báo "đã lưu" khi trình duyệt từ chối ghi > khi không ghi được, kết quả không được kèm stickerId/isNew (nguồn của nhãn "Đã lưu")
+AssertionError: sticker không nằm xuống máy ⇒ không có sticker để khoe: expected 'st_dino_3' to be undefined
+
+- Expected:
+undefined
+
++ Received:
+"st_dino_3"
+
+ ❯ tests/t48b-gacha-result-honest.test.ts:92:88
+     90|     ls.block([STORAGE_KEYS.CHILD_PROFILE, STORAGE_KEYS.MOTIVATION]);
+     91|     const result = StorageService.drawGacha();
+     92|     expect(result.stickerId, 'sticker không nằm xuống máy ⇒ không có s…
+       |                                                                                        ^
+     93|     expect(!!result.isNew).toBe(false);
+     94|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/t48b-gacha-result-honest.test.ts > T48B — máy gắp không được báo "đã lưu" khi trình duyệt từ chối ghi > chặn riêng key động lực (sticker mất) ⇒ vẫn honest (lỗi: chỉ lo key hồ sơ)
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/t48b-gacha-result-honest.test.ts:100:23
+     98|     ls.block([STORAGE_KEYS.MOTIVATION]);
+     99|     const result = StorageService.drawGacha();
+    100|     expect(result.ok).toBe(false);
+       |                       ^
+    101|     expect(savedStickerCount()).toBe(0);
+    102|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/t48b-gacha-result-honest.test.ts > T48B — máy gắp không được báo "đã lưu" khi trình duyệt từ chối ghi > chặn riêng key hồ sơ (vé mất) ⇒ vẫn honest, không khoe "+2 sao an ủi" ảo
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/t48b-gacha-result-honest.test.ts:116:23
+    114|     // rng = 0 ⇒ STICKERS[0], một sticker đã trùng ⇒isNew false, sao a…
+    115|     const result = StorageService.drawGacha(() => 0);
+    116|     expect(result.ok).toBe(false);
+       |                       ^
+    117|     expect(result.consolationStars || 0).toBe(0);
+    118|     // Lịch sử phần thưởng nằm ở key **cài đặt ba mẹ** (không bị chặn)…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 4 passed (8)
+   Start at  06:40:55
+   Duration  649ms (transform 60%, import 25%, tests 10%, worker 4%)
+

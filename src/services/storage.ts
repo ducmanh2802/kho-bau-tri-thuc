@@ -2648,11 +2648,21 @@ public static getParentSettings(): ParentSettings {
         consolationStars = 2;
         profile.stars += 2;
         motivation.starsEarnedTotal += 2;
-        StorageService.addRewardHistory({ type: 'stars', amount: 2, description: '5 sticker trùng tặng 2 sao an ủi', itemId: stickerId });
       }
     }
-    StorageService.saveChildProfile(profile);
-    StorageService.saveMotivationState(motivation);
+    // T48B — `writeJSON` trả `false` khi trình duyệt chặn ghi (private mode) hoặc
+    // hết quota. Bản cũ bỏ qua con số đó và vẫn trả `ok: true`, nên màn gắp bắn
+    // confetti + "Đã lưu vào Bộ Sưu Tập!" rồi tải lại trang mất sticker lẫn vé.
+    const profileSaved = StorageService.saveChildProfile(profile);
+    const motivationSaved = StorageService.saveMotivationState(motivation);
+    if (!profileSaved || !motivationSaved) {
+      return { ok: false, reason: 'storage-unavailable' };
+    }
+    // Biên lai chỉ được viết sau khi phần thưởng thật nằm xuống máy, kể cả sao
+    // an ủi — lịch sử "+2 sao" cho một lượt chưa lưu là bằng chứng giả.
+    if (consolationStars > 0) {
+      StorageService.addRewardHistory({ type: 'stars', amount: consolationStars, description: '5 sticker trùng tặng 2 sao an ủi', itemId: stickerId });
+    }
     StorageService.recordQuestEvent({ kind: 'gacha' });
     if (stickerId) {
       StorageService.addRewardHistory({ type: 'sticker', amount: 1, description: `Nhận sticker từ máy gắp`, itemId: stickerId });
@@ -2753,7 +2763,13 @@ public static getParentSettings(): ParentSettings {
 // TypeScript không cho khai báo interface trong class body).
 export interface GachaResult {
   ok: boolean;
-  reason: 'no-ticket' | 'daily-limit' | 'rewards-off' | 'ok';
+  /**
+   * T48B — `storage-unavailable` là thất bại **của máy** (trình duyệt chặn ghi
+   * hoặc hết dung lượng), khác hẳn `no-ticket`/`daily-limit`/`rewards-off`: bé
+   * vẫn còn vé, còn lượt, nhưng phần thưởng không nằm xuống được nên không có
+   * gì để khoe. UI phải có nhãn riêng — rơi vào nhãn "hết lượt" là nói sai.
+   */
+  reason: 'no-ticket' | 'daily-limit' | 'rewards-off' | 'storage-unavailable' | 'ok';
   stickerId?: string;
   isNew?: boolean;
   /** Sao an ủi khi gắp trùng (mỗi 5 sticker trùng +2 sao). */

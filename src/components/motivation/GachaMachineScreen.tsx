@@ -371,7 +371,11 @@ export const GachaMachineScreen: React.FC<GachaMachineScreenProps> = ({
                     ? 'Bé hết vé rồi. Hãy học bài để nhận thêm vé nhé!'
                     : result.reason === 'rewards-off'
                       ? 'Ba mẹ đang tắt phần thưởng nên máy kéo nghỉ một hôm. Bé bật lại trong mục Ba Mẹ nhé!'
-                      : 'Hôm nay bé đã gắp đủ 5 lượt. Mai hãy thử lại nhé!'}
+                      : result.reason === 'storage-unavailable'
+                        // T48B — nói "hết lượt" ở đây là một lời dối khác: bé còn vé, còn lượt,
+                        // chỉ là phần thưởng không nằm xuống máy được.
+                        ? 'Máy không lưu được sticker vào máy này. Bé nhờ ba mẹ bật lại phần lưu nhé!'
+                        : `Hôm nay bé đã gắp đủ ${dailyLimitLabel} lượt. Mai hãy thử lại nhé!`}
                 </p>
                 <KidButton
                   variant="secondary"

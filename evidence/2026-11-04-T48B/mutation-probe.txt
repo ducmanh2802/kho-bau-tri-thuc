@@ -1,0 +1,93 @@
+{
+  "errors": [
+    "B: máy KHÔNG ghi được mà vẫn hứa đã lưu: \"⛵ Sticker Mới! Bé nhận được Thuyền Buồm Ra Khơi! 0 Đã lưu vào Bộ Sưu Tập! Tuyệt Vời!\"",
+    "B: hộp kết quả không nói thẳng là không lưu được: \"⛵ Sticker Mới! Bé nhận được Thuyền Buồm Ra Khơi! 0 Đã lưu vào Bộ Sưu Tập! Tuyệt Vời!\""
+  ],
+  "shots": [
+    "01-A-luu-duoc.png",
+    "02-B-khong-luu-duoc.png"
+  ],
+  "facts": {
+    "A": {
+      "beforeA": {
+        "tickets": 5,
+        "stars": 50,
+        "stickerKinds": 0,
+        "drawsTotal": 0
+      },
+      "afterA": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      }
+    },
+    "B": {
+      "beforeB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "afterB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "blockedWrites": 3
+    }
+  },
+  "steps": [
+    {
+      "step": "A-lưu-được",
+      "text": "🛰️ Sticker Mới! Bé nhận được Vệ Tinh Bay Quanh Đất! 0 Đã lưu vào Bộ Sưu Tập! Tuyệt Vời!",
+      "beforeA": {
+        "tickets": 5,
+        "stars": 50,
+        "stickerKinds": 0,
+        "drawsTotal": 0
+      },
+      "afterA": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      }
+    },
+    {
+      "step": "B-khong-luu-duoc",
+      "text": "⛵ Sticker Mới! Bé nhận được Thuyền Buồm Ra Khơi! 0 Đã lưu vào Bộ Sưu Tập! Tuyệt Vời!",
+      "beforeB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "afterB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "blockedWrites": 3
+    },
+    {
+      "step": "C-may-dung-nguyen",
+      "beforeB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "afterB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      }
+    }
+  ],
+  "ok": false
+}
+QA FAIL — 2 error(s)

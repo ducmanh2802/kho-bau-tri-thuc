@@ -1,0 +1,41 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t48b-gacha-result-honest.test.ts (8 tests | 1 failed) 23ms
+   ❯ T48B — máy gắp không được báo "đã lưu" khi trình duyệt từ chối ghi (8)
+     ✓ storage ghi được ⇒ ok, trừ vé, lưu sticker (characterization: hành vi tốt phải giữ nguyên) 7ms
+     ✓ chặn ghi hồ sơ + động lực ⇒ không được trả ok (lỗi: ok:true, UI bắn confetti) 1ms
+     ✓ khi không ghi được, kết quả không được kèm stickerId/isNew (nguồn của nhãn "Đã lưu") 0ms
+     ✓ chặn riêng key động lực (sticker mất) ⇒ vẫn honest (lỗi: chỉ lo key hồ sơ) 0ms
+     × chặn riêng key hồ sơ (vé mất) ⇒ vẫn honest, không khoe "+2 sao an ủi" ảo 9ms
+     ✓ hộp kết quả nói số lượt theo cài đặt ba mẹ, không hardcode "5 lượt" 1ms
+     ✓ thất bại lưu trữ phải có nhãn riêng, không rơi vào nhãn "hết lượt" 1ms
+     ✓ toàn bộ lời hứa của drawGacha đi qua một cửa: không còn chỗ nào bỏ qua writeJSON false 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t48b-gacha-result-honest.test.ts > T48B — máy gắp không được báo "đã lưu" khi trình duyệt từ chối ghi > chặn riêng key hồ sơ (vé mất) ⇒ vẫn honest, không khoe "+2 sao an ủi" ảo
+AssertionError: biên lai sao an ủi xuất hiện dù lượt gắp không lưu được: [{"date":"2026-11-04","type":"stars","amount":2,"description":"5 sticker trùng tặng 2 sao an ủi","itemId":"st_dongvat_1"}]: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/t48b-gacha-result-honest.test.ts:124:7
+    122|       history.some((h) => (h.description ?? '').includes('sao an ủi')),
+    123|       `biên lai sao an ủi xuất hiện dù lượt gắp không lưu được: ${JSON…
+    124|     ).toBe(false);
+       |       ^
+    125|   });
+    126|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 passed (8)
+   Start at  06:38:17
+   Duration  538ms (transform 49%, import 33%, tests 12%, worker 6%)
+
