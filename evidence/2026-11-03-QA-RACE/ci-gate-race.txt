@@ -652,7 +652,7 @@ Tally trên `ci-census-main-wf03-round2-raw.txt` (28 dòng): `grep -c success` =
 (không thêm đỏ mới), chuỗi xanh tính tới tip = **bốn lượt liên tiếp** #62→#65 và **bốn lượt cuối đều
 không còn cờ** `continue-on-error`.
 
-**Commit code `c2a8626` không có lượt CI nào** (`actions/runs?head_sha=c2a8626` ⇒ `total_count: 0`) —
+**Commit code `c2a8626` không có lượt CI nào** (`actions/runs?head_sha=c2a8626ee766762c39bba93f2584a57b3651ccb2` ⇒ `total_count: 0`) —
 đúng khuôn `RISK-16` đã ghi sau T44: hai commit đi trong một lệnh push nên chỉ tip được probe. Đây là
 lần **thứ hai** gặp khuôn này, và là bằng chứng mạnh hơn cho `RISK-16` (lần đầu là `6a07883`).
 
@@ -702,7 +702,7 @@ Lượt #66 (`0c92915`, docs-only của T45) cũng ba workflow success: runs 416
 41686215360. **Cấp run của hai lượt mới này = cấp job** vì từ `3b0122c` cờ `continue-on-error` đã bị
 xoá — đó chính là điều kiện để lần đo này được phép dùng một request thay cho hai mươi.
 
-**Commit code `8083b10` không có lượt CI nào**: `actions/runs?head_sha=8083b1062…` ⇒ `total_count: 0`.
+**Commit code `8083b10` không có lượt CI nào**: `actions/runs?head_sha=8083b1062b9241de1a1d69773d42cd6cb67cbe54` ⇒ `total_count: 0`.
 Lần **thứ ba** gặp khuôn "hai commit một push ⇒ chỉ tip được probe" (`6a07883` T44, `c2a8626` T45,
 `8083b10` T46) ⇒ `RISK-16` vẫn MỞ và hệ quả lặp lại: không lượt CI nào chạy `qa/golden-path.mjs` trên
 đúng bộ `src/` của T46 — bằng chứng probe của đợt này chỉ có ở cấp máy (mục "Hồi quy" trong
@@ -722,3 +722,76 @@ Kiểm kê tỷ lệ cổng QA (vòng ba, chỉ **một** request vì dùng cấ
 một commit hỏng, vì chưa từng có probe đỏ *thật* nào xảy ra sau khi bỏ cờ ở `3b0122c` (và cũng chưa có
 lượt đỏ *giả* nào bị chặn oan). Muốn đóng ô này cần một commit cố tình làm probe đỏ trên nhánh thử
 nghiệm — quyết định của người giữ repo, không tự làm.
+
+
+================================================================================
+§22 — Cạm bẫy `head_sha` dạng ngắn + vòng kiểm kê ba-b (sau commit hồ sơ `4659d99`) — 2026-11-04
+================================================================================
+
+Sự việc: ngay sau khi push `4659d99` (chính là commit ghi hồ sơ §21), hai lệnh tra run cho **cùng một
+commit** cho kết quả mâu thuẫn:
+
+  curl -s ".../actions/runs?head_sha=4659d99"               ->  "total_count": 0            ← dạng NGẮN
+  curl -s ".../actions/runs?branch=main&per_page=3"         ->  ba lượt `run_number` 68, `head_sha`
+                                                                 4659d99fd48edbc488d37b685d4c31158c511a0c,
+                                                                 cả ba `completed success`
+  curl -s ".../actions/runs?head_sha=4659d99fd48edbc4…a0c"  ->  "total_count": 3            ← dạng ĐỦ
+
+Nghĩa là `?head_sha=` **không chấp nhận SHA rút ngắn** — GitHub so khớp nguyên chuỗi 40 ký tự nên mọi
+SHA 7 ký tự trả `total_count: 0` bất kể commit đó có bao nhiêu run. Đây đúng là loại cảm biến đo rỗng
+mà báo thành phát hiện: nếu không đối chiếu, khuôn "commit code không có lượt CI nào" tái lập được cho
+**mọi** commit và `RISK-16` trở thành tuyên bố không thể sai — tức vô giá trị.
+
+Đo lại **bằng SHA đủ** cho cả ba commit code bị nêu ở §19/§20/§21 (mỗi lệnh một request):
+
+  for c in 6a07883 c2a8626 8083b10; do
+    sha=$(git rev-parse $c)
+    curl -s ".../actions/runs?head_sha=$sha" | grep -m1 '"total_count"'
+  done
+    6a07883e093d3a0f9013dde4650a029b8b6a5b27  ->  "total_count": 0
+    c2a8626ee766762c39bba93f2584a57b3651ccb2  ->  "total_count": 0
+    8083b1062b9241de1a1d69773d42cd6cb67cbe54  ->  "total_count": 0
+
+⇒ **kết luận `RISK-16` đứng nguyên** (ba lần liên tiếp, không phải sản phẩm của SHA ngắn), nhưng **lệnh
+dẫn chứng** trong hồ sơ cũ viết ở dạng ngắn thì sai và đã được sửa sang SHA đủ: §20 dòng "Commit code
+`c2a8626` không có lượt CI nào" của file này, `docs/plan/TASK_PLAN.md` §II hai hàng "Đo CI cho T45/T46",
+`.ai/CURRENT.md` mục T45/T46, `evidence/README.md` các dòng `2026-11-03-T45` / `§20` / `2026-11-04-T46`.
+
+Vòng kiểm kê **ba-b** (một request `workflows/401675040/runs?branch=main&per_page=100`, lọc
+`id>=41488045102` vì toàn bộ khoảng đang xét không còn cờ):
+
+  số lượt workflow `03` trên `main`      : **31** (`#37` `66e0fea` → `#68` `4659d99`; `total_count` của
+                                            workflow = 59 vì tính cả nhánh khác)
+  cấp run trên 31 lượt                   : {"success":30,"cancelled":1}  ← **vẫn không dùng làm tỷ lệ**:
+                                            `#37`–`#50` còn `continue-on-error`
+  index của `3b0122c`                    : 13/31 ⇒ khoảng **không còn cờ** = **18 lượt**
+                                            = **17 success + 1 cancelled + 0 failure**
+  cấp job toàn sổ (suy ra)               : **21/31 lượt xanh · 9 đỏ · 1 `cancelled`**
+                                            = 18/28 đo trực tiếp bằng `jobs[].conclusion` ở §20, cộng ba
+                                            lượt mới `#66` `0c92915` · `#67` `cb56720` · `#68` `4659d99`
+                                            (cả ba thuộc khoảng không còn cờ nên cấp run == cấp job)
+  chuỗi xanh tính tới tip                : **7 lượt liên tiếp** (`#62` `fc861f3` → `#68` `4659d99`)
+
+Chi tiết lượt `#68` (`4659d99`, **chỉ sửa docs/evidence**, không đụng `src/`): `1. Quality` 41693925966
+· `2. Build + artifact` 41693925955 · **`3. Browser QA` 41693926095** job 126119341251 `golden path
+trên Chromium` `success` `18:27:07Z→18:28:29Z` = **82 s**, bước 7 "QA probe" `success`.
+
+Ý nghĩa của `#68`: bộ trigger **không lọc theo loại file** — một commit docs-only vẫn chạy đủ ba cổng
+và xanh. Vì vậy việc `8083b10` (commit **code** của T46) có `total_count: 0` chắc chắn là hệ quả của
+khuôn "hai commit trong một lệnh push ⇒ GitHub schedule run cho **tip**", chứ không phải vì commit code
+bị bỏ qua theo nội dung. Cách né: **push riêng commit code** (hoặc push `--atomic` từng commit một).
+
+Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ** sau §22: 21 lượt xanh vẫn chưa chứng minh cổng *cắt* được
+một commit hỏng — chưa có đỏ *thật* nào sau `3b0122c`, cũng chưa có đỏ *giả* nào bị chặn oan.
+
+**Nợ cũ đóng bằng chính phép đo này** — vòng kiểm kê lần một (`ci-census-main-wf03.txt:141`) để lại một
+quy tắc treo: *"**không** viết 'CI xanh' cho `c7e9a00` ở bất kỳ tài liệu nào cho tới khi
+`runs?head_sha=…` trả kết quả thật"*, vì khi đó hạn mức 60 request/giờ đã cạn. Nay tra được bằng SHA
+đủ `c7e9a00cf47fc1c987ad5467d630096d8b762350` ⇒ `total_count: 3`, cả ba `completed success`
+(`1. Quality` 41646599133 · `2. Build + artifact` 41646599117 · **`3. Browser QA` 41646599254**,
+`run_number` 60). Quy tắc treo đó đã đóng — commit docs-only đầu tiên bị nghi "không có lượt nào" hóa
+ra **có** lượt và xanh, đúng như dự đoán ở `#68`.
+
+Bài học quy trình: một **cảm biến giả** không cần cờ `continue-on-error` — chỉ cần cú pháp lệnh sai là
+đủ. `RISK-16` trước đó được ghi bằng lệnh SHA ngắn, tức hoàn toàn có thể là sản phẩm của cú pháp chứ
+không phải của GitHub; phải đo lại bằng SHA đủ mới kết luận được.

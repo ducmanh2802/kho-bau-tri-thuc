@@ -17,6 +17,32 @@ asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện 
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
 ### Changed
+- **Lệnh đo CI trong hồ sơ sai cú pháp, và sửa nó làm `RISK-16` *chắc chắn hơn* chứ không mất đi.**
+  Tra `https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=<7 ký tự>` trả
+  `total_count: 0` cho **mọi** commit — GitHub so khớp nguyên SHA 40 ký tự. Bằng chứng ngay trên commit
+  vừa push `4659d99`: dạng ngắn ⇒ `0`, dạng đủ ⇒ **3 lượt** `run_number` 68 tất cả `completed success`
+  (`1. Quality` 41693925966 · `2. Build + artifact` 41693925955 · **`3. Browser QA` 41693926095**, job
+  126119341251 `golden path trên Chromium` `success` `18:27:07Z→18:28:29Z` = **82 s**, bước 7 `success`).
+  Nghĩa là khuôn "commit code không có lượt CI nào" trước đây **có thể** chỉ là sản phẩm của cú pháp.
+  Đo lại ba commit code bằng SHA đủ (`6a07883e093d3a0f9013dde4650a029b8b6a5b27` ·
+  `c2a8626ee766762c39bba93f2584a57b3651ccb2` · `8083b1062b9241de1a1d69773d42cd6cb67cbe54`) ⇒ cả ba vẫn
+  `total_count: 0` ⇒ `RISK-16` **đứng**, còn các *lệnh dẫn chứng* thì sai và đã sửa
+  (`evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §20, `ci-census-main-wf03-round2.txt`,
+  `evidence/2026-11-03-T45/README.md`, `evidence/README.md`, `docs/plan/TASK_PLAN.md` §II,
+  `.ai/CURRENT.md`). Vòng kiểm kê **ba-b** (một request vì khoảng đang xét không còn cờ
+  `continue-on-error`): workflow `03` trên `main` = **31 lượt** (`#37` `66e0fea` → `#68` `4659d99`), cấp
+  run `{"success":30,"cancelled":1}` **không** dùng làm tỷ lệ, khoảng không còn cờ = **18 lượt** =
+  **17 xanh + 1 `cancelled` + 0 đỏ**, **cấp job toàn sổ suy ra 21/31 xanh · 9 đỏ · 1 cancelled**, chuỗi
+  xanh tới tip = **7**. Phát hiện phụ có giá trị nghiệp vụ: lượt `#68` là commit **chỉ sửa
+  docs/evidence** mà vẫn chạy đủ ba cổng và xanh ⇒ trigger **không** lọc theo loại file, nên cách né
+  `RISK-16` là **push commit code riêng một lượt**, không phải "đẩy kèm docs cho tiện". Đóng một nợ cũ:
+  quy tắc treo ở vòng kiểm kê một ("không viết CI xanh cho `c7e9a00` cho tới khi tra được") nay tra
+  được `c7e9a00cf47fc1c987ad5467d630096d8b762350` ⇒ `total_count: 3`, cả ba success (`#60`). Vùng hiện
+  trạng cập nhật: `docs/SDLC.md` §4, `docs/specs/BRD.md` R-04, `docs/plan/RISK_REGISTER.md` `RISK-10` +
+  `RISK-16`, `docs/plan/TEST_PLAN.md` §16 ô 13, `docs/lifecycle/README.md` — và **hai chỗ sót** từ đợt
+  §20 (`docs/lifecycle/HARNESS.md`, `docs/lifecycle/07_RELEASE_OPERATIONS.md` vẫn ghi **13/22**). Ô 13
+  **vẫn MỞ**: 21 lượt xanh chưa chứng minh cổng *cắt* được commit hỏng. Dòng lịch sử giữ nguyên số theo
+  quy ước `docs/specs/README.md` §"Quy ước chung" 1. Bằng chứng: §22 `evidence/2026-11-03-QA-RACE/ci-gate-race.txt`.
 - **Tỷ lệ cổng QA chuyển từ "đếm cộng dần" sang kiểm kê — và kiểm kê bắt ba chỗ hồ sơ sai.**
   Cách đếm cũ ("4/10", "8/14", "10/16") là *số đã công bố + lượt mới*, nên không có lệnh nào tái tạo
   ra nó và mỗi lượt bị bỏ quên làm lệch vĩnh viễn. Đo lại một lượt, lấy **mọi** run

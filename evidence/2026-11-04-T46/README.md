@@ -173,7 +173,28 @@ workflow `03` nay **30 lượt**, khoảng **không còn cờ** từ `3b0122c` =
 + 0 đỏ**, chuỗi xanh tới tip = **6**; cấp job toàn sổ suy ra **20/30 xanh · 9 đỏ · 1 cancelled**. Ô 13
 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ**.
 
+**Bổ sung ngay sau đó (§22 — sửa chính phép đo ở mục này)**: commit hồ sơ `4659d99` được tra bằng
+`head_sha=4659d99` ⇒ `total_count: 0`, nhưng tra bằng SHA đủ `4659d99fd48edbc488d37b685d4c31158c511a0c`
+⇒ **3 lượt** `run_number` 68, cả ba `completed success` (`1. Quality` 41693925966 · `2. Build + artifact`
+41693925955 · **`3. Browser QA` 41693926095**, job 126119341251 `golden path trên Chromium` `success`
+`18:27:07Z→18:28:29Z` = **82 s**, bước 7 `success`). tức `?head_sha=` **chỉ nhận SHA 40 ký tự**; mọi số
+"không có run nào" ghi bằng dạng rút gọn đều phải đo lại. Ba commit code của T44/T45/T46 tra lại bằng
+SHA đủ ⇒ vẫn `total_count: 0` nên kết luận `RISK-16` không đổi, còn **lệnh** trong hồ sơ thì đã sửa.
+Vòng ba-b vì thế là **31 lượt / 21 xanh cấp job suy ra / chuỗi xanh tới tip 7** — các con số 30 · 20/30 ·
+6 ở đoạn trên là của khoảnh khắc đo **trước** khi `4659d99` chạy CI. Chi tiết:
+`../2026-11-03-QA-RACE/ci-gate-race.txt` §22.
+
 ## Ảnh
 
 `a1-lop-phu-dang-mo.png`, `a2-sau-esc-lan-mot.png`, `a3-sau-mo-lai-dong-bang-esc.png`,
 `b1-nut-loa-co-ten.png`, `c1-loi-chao-header.png` — chụp ở viewport 390×844 (iPhone giả lập trong probe).
+
+**Chụp lại lần hai (2026-11-04 01:39, sau khi sửa một comment trong probe)**:
+`node qa/run-one.mjs evidence/2026-11-04-T46/probe-t46-escape-a11y.mjs` ⇒ `QA PASS — 7 step(s), 0
+errors`, exit 0, vẫn đúng 5 ảnh trên và `spoken: ["Tối rồi, bé nhớ ngủ sớm nhé! Bé học đều lắm, giỏi
+quá!"]` **giống nguyên văn** lần đầu — tức các mục A/B/C không phụ thuộc thời điểm chụp, và năm ảnh
+hiện trong thư mục là của lần này (nội dung như nhau, byte khác). Lý do sửa comment: VI-TEXT bắt **ba
+codepoint Thái** (`U+0E1E U+0E39 U+0E14`) ở dòng 62 của chính probe — một từ "nói" bị gõ nhầm theo bố
+cục bàn phím Thái — và `evidence/` **cũng nằm trong vùng quét**, không chỉ `docs/`. Ghi chú cho lần
+sau: chỉ ghi mã codepoint, **không dán glyph** của ngôn ngữ khác vào hồ sơ (quy tắc đã chốt ở lần chữ
+Hán bị quét).

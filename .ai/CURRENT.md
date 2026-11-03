@@ -249,7 +249,7 @@ Người dùng: "push code và check bug tiếp" ⇒ chạy skill `kho-bau-chang
 - **CI phía server (đo 2026-11-04, §20)**: push `8d73ff1..e171e6e` xanh cả ba cổng trên tip `e171e6e`
   (`1. Quality` 41683815885 · `2. Build + artifact` 41683815929 · **`3. Browser QA` 41683815872**, job
   126084122217 `golden path trên Chromium` success `17:23:44Z→17:24:44Z` = **60 s**, bước 7 `success`,
-  bước 8 `skipped`). Commit code `c2a8626` **không có run nào** (`actions/runs?head_sha=c2a8626` ⇒
+  bước 8 `skipped`). Commit code `c2a8626` **không có run nào** (`actions/runs?head_sha=c2a8626ee766762c39bba93f2584a57b3651ccb2` ⇒
   `total_count: 0`) — lần **thứ hai** gặp khuôn này (`6a07883` của T44 là lần đầu) ⇒ `RISK-16` có thêm
   bằng chứng. Kiểm kê lại **toàn bộ** workflow `03` trên `main` bằng `jobs[].conclusion` ⇒ **28 lượt =
   18 xanh · 9 đỏ · 1 `cancelled`**; chuỗi xanh tới tip = **4**; mười lăm lượt cuối không còn cờ = **14
@@ -306,7 +306,7 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 9 của bug h
   tip `cb56720` có đủ ba lượt xanh — `1. Quality` 41692600202 · `2. Build + artifact` 41692599879 ·
   **`3. Browser QA` 41692600066** (job 126114749872 `golden path trên Chromium` success
   `18:18:56Z→18:20:00Z` = **64 s**, bước 7 `success`, bước 8 `skipped`). **Commit code `8083b10`
-  không có run nào** (`actions/runs?head_sha=8083b10…` ⇒ `total_count: 0`) ⇒ khuôn "push hai commit
+  không có run nào** (`actions/runs?head_sha=8083b1062b9241de1a1d69773d42cd6cb67cbe54` ⇒ `total_count: 0`) ⇒ khuôn "push hai commit
   thì commit code không được probe lượt nào" tái diễn **lần thứ ba** (`6a07883` T44 · `c2a8626` T45 ·
   `8083b10` T46) ⇒ `RISK-16` vẫn MỞ, và vì CI chỉ chạy `qa/golden-path.mjs` (`RISK-18`) nên **không**
   lượt CI nào chạm chốt T46C. Vòng kiểm kê §21 (`evidence/2026-11-03-QA-RACE/ci-gate-race.txt`): toàn
@@ -314,6 +314,21 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 9 của bug h
   + 0 đỏ**; chuỗi xanh tới tip = **6**; cấp job toàn sổ suy ra **20/30 xanh · 9 đỏ · 1 cancelled**.
   Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ** — chưa có đỏ *thật* nào sau khi bỏ cờ ⇒ cổng chưa
   *chứng minh* được nó cắt commit hỏng.
+- **§22 — lệnh đo CI trong hồ sơ sai cú pháp (phát hiện ngay trên commit `4659d99` vừa push)**:
+  `actions/runs?head_sha=<7 ký tự>` trả `total_count: 0` cho **mọi** commit — GitHub so khớp nguyên SHA
+  40 ký tự. Đối chứng trên đúng `4659d99`: dạng ngắn ⇒ `0`, dạng đủ ⇒ **3 lượt** #68 đều success
+  (`3. Browser QA` run 41693926095, job 126119341251 `success` **82 s**, bước 7 `success`). ⇒ Mọi kết
+  luận "commit không được CI chạy" ghi bằng SHA ngắn **mất giá trị chứng minh**; đã tra lại ba commit
+  code bằng SHA đủ (`6a07883e…b27` · `c2a8626e…cb2` · `8083b106…e54`) ⇒ cả ba vẫn `0`, **`RISK-16` đứng**;
+  đã sửa lệnh dẫn chứng ở `ci-gate-race.txt` §20, `ci-census-main-wf03-round2.txt`,
+  `evidence/2026-11-03-T45/README.md`, `evidence/README.md`, `TASK_PLAN.md` §II, file này.
+  **Số hiện trạng mới (vòng ba-b)**: workflow `03` trên `main` = **31 lượt** (`#37` `66e0fea` → `#68`
+  `4659d99`); khoảng không còn cờ = **18 lượt = 17 xanh + 1 cancelled + 0 đỏ**; **cấp job toàn sổ suy ra
+  21/31 xanh · 9 đỏ · 1 cancelled**; chuỗi xanh tới tip = **7**; đóng nợ cũ của vòng một: `c7e9a00` có
+  đủ **3** lượt success (#60) ⇒ không còn "chưa tra được". Hệ quả nghiệp vụ: vì commit docs-only vẫn
+  chạy đủ ba cổng, cách né `RISK-16` là **push commit code riêng một lượt** — đã ghi vào `RISK-16`.
+  **Hai chỗ lệch bị phát hiện khi quét**: `docs/lifecycle/HARNESS.md` và
+  `docs/lifecycle/07_RELEASE_OPERATIONS.md` vẫn ghi **13/22** (đợt §20 quên quét `docs/lifecycle/`).
 - **Bài học quy trình (lần đầu trả giá thật):** `git checkout -- <file>` trong pha ablation đã **xoá mất
   bản sửa chưa commit** của `useModalHistory.ts` ⇒ phải viết lại tay. Từ đó: ablation restore từ
   `/tmp/*.GREEN.*`, và `tests-RED.txt` (RED **tái lập** bằng `git checkout HEAD --` đúng 4 file) có bảng

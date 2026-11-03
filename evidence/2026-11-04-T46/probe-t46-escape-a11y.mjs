@@ -59,7 +59,7 @@ async function measure(page, ui, out) {
   });
   page.on('pageerror', (e) => out.errors.push(`pageerror: ${e.message}`));
 
-  // C cần thấy lờiพูด mà Header gọi: gắn móc vào speechSynthesis TRƯỚC khi app boot.
+  // C cần thấy lời nói mà Header gọi: gắn móc vào speechSynthesis TRƯỚC khi app boot.
   await page.addInitScript(() => {
     window.__kbtSpoken = [];
     try {
