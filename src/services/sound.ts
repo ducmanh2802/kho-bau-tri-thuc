@@ -304,6 +304,160 @@ class SoundService {
     }
   }
 
+  /**
+   * Âm thanh di chuyển quân cờ tướng: tiếng quân cờ gỗ gõ xuống mặt bàn cờ ("cộp!" chắc nịch)
+   */
+  public playCotuongMove(): void {
+    if (this.isMuted) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const now = ctx.currentTime;
+      // 1. Tiếng va đập gỗ sắc nét (attack click)
+      const clickOsc = ctx.createOscillator();
+      const clickGain = ctx.createGain();
+      clickOsc.type = 'triangle';
+      clickOsc.frequency.setValueAtTime(820, now);
+      clickOsc.frequency.exponentialRampToValueAtTime(160, now + 0.035);
+      clickGain.gain.setValueAtTime(0.48, now);
+      clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      clickOsc.connect(clickGain);
+      clickGain.connect(ctx.destination);
+      clickOsc.start(now);
+      clickOsc.stop(now + 0.045);
+
+      // 2. Thân gỗ vang trầm ("thock" gỗ hương đặc)
+      const bodyOsc = ctx.createOscillator();
+      const bodyGain = ctx.createGain();
+      bodyOsc.type = 'sine';
+      bodyOsc.frequency.setValueAtTime(280, now);
+      bodyOsc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+      bodyGain.gain.setValueAtTime(0.38, now);
+      bodyGain.gain.exponentialRampToValueAtTime(0.001, now + 0.085);
+      bodyOsc.connect(bodyGain);
+      bodyGain.connect(ctx.destination);
+      bodyOsc.start(now);
+      bodyOsc.stop(now + 0.09);
+    } catch {
+      // Ignore audio error
+    }
+  }
+
+  /**
+   * Âm thanh ăn quân cờ tướng: hai đĩa gỗ đập vào nhau rồi gõ xuống bàn ("chát-cộp!" uy lực)
+   */
+  public playCotuongCapture(): void {
+    if (this.isMuted) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const now = ctx.currentTime;
+      // Cú đập 1: Hai quân cờ chạm nhau tạo tiếng đanh ("chát")
+      const clashOsc = ctx.createOscillator();
+      const clashGain = ctx.createGain();
+      clashOsc.type = 'sawtooth';
+      clashOsc.frequency.setValueAtTime(1300, now);
+      clashOsc.frequency.exponentialRampToValueAtTime(320, now + 0.032);
+      clashGain.gain.setValueAtTime(0.4, now);
+      clashGain.gain.exponentialRampToValueAtTime(0.001, now + 0.038);
+      clashOsc.connect(clashGain);
+      clashGain.connect(ctx.destination);
+      clashOsc.start(now);
+      clashOsc.stop(now + 0.042);
+
+      // Cú đập 2: Quân cờ cắm xuống mặt bàn cờ cách 18ms ("cộp" trầm uy lực)
+      const strikeTime = now + 0.018;
+      const strikeOsc = ctx.createOscillator();
+      const strikeGain = ctx.createGain();
+      strikeOsc.type = 'triangle';
+      strikeOsc.frequency.setValueAtTime(420, strikeTime);
+      strikeOsc.frequency.exponentialRampToValueAtTime(90, strikeTime + 0.12);
+      strikeGain.gain.setValueAtTime(0.65, strikeTime);
+      strikeGain.gain.exponentialRampToValueAtTime(0.001, strikeTime + 0.13);
+      strikeOsc.connect(strikeGain);
+      strikeGain.connect(ctx.destination);
+      strikeOsc.start(strikeTime);
+      strikeOsc.stop(strikeTime + 0.14);
+
+      // Độ cộng hưởng mặt bàn gỗ
+      const subOsc = ctx.createOscillator();
+      const subGain = ctx.createGain();
+      subOsc.type = 'sine';
+      subOsc.frequency.setValueAtTime(170, strikeTime);
+      subOsc.frequency.exponentialRampToValueAtTime(60, strikeTime + 0.14);
+      subGain.gain.setValueAtTime(0.42, strikeTime);
+      subGain.gain.exponentialRampToValueAtTime(0.001, strikeTime + 0.15);
+      subOsc.connect(subGain);
+      subGain.connect(ctx.destination);
+      subOsc.start(strikeTime);
+      subOsc.stop(strikeTime + 0.16);
+    } catch {
+      // Ignore audio error
+    }
+  }
+
+  /**
+   * Âm thanh chiếu tướng kịch tính: chuỗi hợp âm chiêng đồng ngân vang cảnh báo + phát âm "Chiếu tướng!"
+   */
+  public playCotuongCheck(): void {
+    if (this.isMuted) return;
+    const ctx = this.getAudioContext();
+    if (ctx) {
+      try {
+        const now = ctx.currentTime;
+        // Chuỗi hài âm chiêng đồng báo động (quãng 5 và bát độ)
+        const freqs = [330, 495, 660, 990];
+        freqs.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+          osc.frequency.setValueAtTime(freq, now);
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.96, now + 0.55);
+
+          gain.gain.setValueAtTime(0.24 / (idx + 1), now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.52);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.58);
+        });
+      } catch {
+        // Ignore audio error
+      }
+    }
+    // Lời nhắc giọng nói dõng dạc
+    this.speak('Chiếu tướng!');
+  }
+
+  /**
+   * Âm thanh nhấc / chọn quân cờ gỗ
+   */
+  public playCotuongSelect(): void {
+    if (this.isMuted) return;
+    const ctx = this.getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(540, now);
+      osc.frequency.exponentialRampToValueAtTime(820, now + 0.038);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.042);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.045);
+    } catch {
+      // Ignore audio error
+    }
+  }
+
   // Text to speech (Vietnamese & English)
   public speak(
     text: string,

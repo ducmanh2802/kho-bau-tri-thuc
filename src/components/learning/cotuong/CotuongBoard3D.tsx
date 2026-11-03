@@ -91,13 +91,17 @@ interface Props {
 }
 
 function gridMarks(r: number, c: number): string {
-  const o = 0.15;
-  const l = 0.12;
+  const o = 0.14;
+  const l = 0.10;
   let d = '';
-  for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]] as const) {
-    const x = c + sx * o;
-    const y = r + sy * o;
-    d += `M${x},${y - sy * l} L${x},${y} L${x - sx * l},${y} `;
+  // Quân tốt ở biên (c=0 và c=8) chỉ vẽ ngoặc quay vào phía trong bàn cờ
+  const xSigns = c === 0 ? [1] : c === 8 ? [-1] : [-1, 1];
+  for (const sx of xSigns) {
+    for (const sy of [-1, 1]) {
+      const x = c + sx * o;
+      const y = r + sy * o;
+      d += `M${x},${y - sy * l} L${x},${y} L${x - sx * l},${y} `;
+    }
   }
   return d;
 }
@@ -136,12 +140,42 @@ const BoardSvg: React.FC = () => {
           mỗi quân sẽ lệch gần một ô và hàng/cột cuối nằm ngoài đường biên. */}
       <g transform={`translate(${M} ${M})`}>
         {lines}
+        {/* Đường chéo hai Cung Tướng */}
         <path d="M3,0 L5,2 M5,0 L3,2" />
         <path d="M3,7 L5,9 M5,7 L3,9" />
+        {/* Điểm đánh dấu vị trí Pháo và Tốt */}
         {MARKS.map(([r, c]) => (
           <path key={`m${r}-${c}`} d={gridMarks(r, c)} className="ct-mark" />
         ))}
+        {/* Nét sóng sông mềm mại */}
+        <path
+          d="M0.3,4.35 Q2,4.18 4,4.35 T7.7,4.35 M0.3,4.65 Q2,4.82 4,4.65 T7.7,4.65"
+          className="ct-mark opacity-40"
+        />
       </g>
+      {/* Đánh số lộ / cột chuẩn quốc tế và Việt Nam (Đen: 1..9, Đỏ: 9..1) */}
+      {Array.from({ length: 9 }).map((_, c) => (
+        <React.Fragment key={`coord-${c}`}>
+          <text
+            x={M + c}
+            y={M - 0.28}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="ct-coord"
+          >
+            {c + 1}
+          </text>
+          <text
+            x={M + c}
+            y={VH - M + 0.38}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="ct-coord"
+          >
+            {9 - c}
+          </text>
+        </React.Fragment>
+      ))}
     </svg>
   );
 };
@@ -207,14 +241,14 @@ export const CotuongBoard3D: React.FC<Props> = ({
               style={{ left: `${xPct(2)}%`, top: `${yPct(4.5)}%` }}
               aria-hidden="true"
             >
-              楚 河
+              {labelMode === 'viet' ? 'SỞ HÀ' : labelMode === 'dual' ? 'SỞ HÀ · 楚河' : '楚 河'}
             </span>
             <span
               className="ct-river-label"
               style={{ left: `${xPct(6)}%`, top: `${yPct(4.5)}%` }}
               aria-hidden="true"
             >
-              漢 界
+              {labelMode === 'viet' ? 'HÁN GIỚI' : labelMode === 'dual' ? 'HÁN GIỚI · 漢界' : '漢 界'}
             </span>
 
             {/* Hint Arrow overlay */}
@@ -317,11 +351,20 @@ export const CotuongBoard3D: React.FC<Props> = ({
                       {PIECE_VIET_NAME[`${piece.color}-${piece.type}`]}
                     </span>
                   ) : labelMode === 'dual' ? (
-                    <div className="flex flex-col items-center justify-center leading-none select-none">
-                      <span className="ct-piece__char text-[3.8cqw] sm:text-[4.2cqw]">
+                    <div
+                      className="flex flex-col items-center justify-center leading-none select-none"
+                      style={{ transform: 'translateZ(0.8px)' }}
+                    >
+                      <span className="ct-piece__char text-[3.6cqw] sm:text-[4cqw] leading-none">
                         {PIECE_CHAR[`${piece.color}-${piece.type}`]}
                       </span>
-                      <span className={`text-[1.8cqw] font-black tracking-tight uppercase opacity-90 mt-0.5 ${piece.color === 'red' ? 'text-rose-700' : 'text-slate-800'}`}>
+                      <span
+                        className={`text-[1.8cqw] sm:text-[2cqw] font-black tracking-tight uppercase px-1 py-0.2 rounded-full mt-0.5 leading-none shadow-2xs ${
+                          piece.color === 'red'
+                            ? 'text-red-700 bg-red-100/80 border border-red-200/60'
+                            : 'text-slate-800 bg-slate-200/90 border border-slate-300/60'
+                        }`}
+                      >
                         {PIECE_VIET_NAME[`${piece.color}-${piece.type}`]}
                       </span>
                     </div>
@@ -352,15 +395,7 @@ export const CotuongBoard3D: React.FC<Props> = ({
               </span>
             )}
 
-            <div
-              className="ct-cells"
-              style={{
-                top: `${(M / VH) * 100}%`,
-                bottom: `${(M / VH) * 100}%`,
-                left: `${(M / VW) * 100}%`,
-                right: `${(M / VW) * 100}%`,
-              }}
-            >
+            <div className="ct-cells">
               {Array.from({ length: E.BOARD_ROWS }, (_, r) =>
                 Array.from({ length: E.BOARD_COLS }, (_, c) => {
                   const p = board[r][c];
@@ -377,6 +412,13 @@ export const CotuongBoard3D: React.FC<Props> = ({
                       disabled={disabled}
                       aria-label={label}
                       data-testid={`ct-cell-${r}-${c}`}
+                      style={{
+                        left: `${xPct(c)}%`,
+                        top: `${yPct(r)}%`,
+                        width: `${CELL_W_PCT}%`,
+                        height: `${(1 / VH) * 100}%`,
+                        transform: 'translate(-50%, -50%) translateZ(1.6px)',
+                      }}
                     />
                   );
                 })
