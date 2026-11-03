@@ -223,6 +223,47 @@ RTM, `TEST_PLAN.md` header/§4/§9, `TASK_PLAN.md` `K-03` + hai hàng §II, `doc
 `CHANGELOG.md`, `evidence/README.md` + `evidence/2026-11-03-T43/`). **Hygiene:** 6 file
 `docs/opencode/reports/img/*.png` đang modified **không phải của lane này** — không stage.
 
+## T44 + T45 — hai lát cắt bug hunt liên tiếp (2026-11-03 → 11-04, lane này)
+
+Người dùng: "push code và check bug tiếp" ⇒ chạy skill `kho-bau-change` trên `main`, hai đợt liền.
+
+- **T44** (năm lát cắt — registry key, sinh đề tất định, chuỗi UI, 44 đích chạm < 44px, lượt sai có
+  lý do) đã commit `6a07883` + docs `58020e5`, số đo ở `evidence/2026-11-03-T44/`, sổ lỗi
+  `DEF-002`…`DEF-004`.
+- **T45** (năm defect: `DEF-005` máy gắp bỏ qua `maxGachaPerDay` · `DEF-006` "Tắt phần thưởng" bị
+  đường thi đấu/thành tựu đi vòng · `DEF-007` bé tự nới 10 phút không qua cổng · `DEF-008` phím vẫn
+  nộp đáp án khi lớp phủ "Chọn Màn & Độ Khó" che bảng · `DEF-009` Thử Thách Tuần trùng id) +
+  5 file test `tests/t45a…t45e` = **+31 test**. Vùng `src/` lane này đang giữ:
+  `src/services/{storage,streakEngine}.ts`, `src/hooks/useGameStage.ts`, `src/App.tsx`,
+  `src/components/{parent/ScreenTimeModal,motivation/GachaMachineScreen,challenge/WeeklyChallengeScreen}.tsx`,
+  10 file `src/components/games/*.tsx` (ClockBuilder, LittleScientist, NumberHop, ReadAndDo,
+  RhymeTrain, SimonSays, TenFrameMarket, TonePaint, TreasureCoding, WordTrain).
+- Cổng: `npm run verify` **EXIT=0** · `110 file / 1441 test` · `Duration 25.82s` ·
+  `index-C5J1ceAM.js` **211.2 kB** · boot graph `435696 total` byte (log `evidence/2026-11-03-T45/verify.txt`).
+- Bằng chứng UI: `node qa/run-one.mjs evidence/2026-11-03-T45/probe-t45-gating.mjs` ⇒ 9 bước / 0 lỗi /
+  exit 0 / 6 ảnh PNG. **Probe này đặt ngoài `qa/`** để không bị đếm thành probe thứ 31; nếu cần chạy
+  lại, chạy qua `run-one.mjs` và nhớ `npm run build` trước. Ablation năm log cùng thư mục. Hồi quy
+  chạy tay **năm** probe vì CI chỉ chạy golden-path (`RISK-18`): `games` (`catalogCount: 31`, 0 errors),
+  `golden-path` (28 bước), `parent-controls` (7 bước), `focus`, `mobile` — tất cả exit 0,
+  log ở `evidence/2026-11-03-T45/qa/`.
+- Số hiện trạng đã sync **lần chín trong ngày** (BRD §7/Phụ lục A, `ARCHITECTURE.md` §12, SRS §11 +
+  NFR-M04, RTM §3/§7, `TEST_PLAN.md` header/§2/§9, `TASK_PLAN.md` `K-03` + một hàng §II,
+  `CHANGELOG.md`, `evidence/README.md` + `evidence/2026-11-03-T45/`); `measure.mjs` **exit 0**.
+- **Cố ý để mở, cần người duyệt**: `RISK-17` (đề Thử Thách Tuần vẫn là 8 câu cố định — sửa là đổi
+  nội dung học, không phải lỗi kỹ thuật) và `RISK-18` (một lượt CI chỉ chạy `qa/golden-path.mjs`,
+  29 probe còn lại phải chạy tay; `qa:smoke` cũng chỉ một probe).
+- **Backlog đã đo mà chưa sửa** (kế tiếp picking up): `DEF-010` câu chào theo giờ bị streak chặn
+  (`src/components/common/Header.tsx:24-33`) · `DEF-011` `bySkill.total` đếm theo lượt làm, không
+  theo câu ⇒ tỉ lệ "theo kỹ năng" báo thấp (`EnglishIoeScreen.tsx:269-286`) · `DEF-012` nút loa
+  `ListenPickPhonicsGame.tsx:156` không `aria-label`/`title` · `DEF-013` `Esc` thoát hẳn trò chơi khi
+  lớp phủ "Chọn Màn & Độ Khó" đang che (`useModalHistory.ts:32-45`, hệ quả còn lại của `DEF-008`).
+  Hàng `K-05` trong `docs/plan/TASK_PLAN.md` §3.8. **Đã loại hai ứng viên vì code đúng**: submit cộng
+  hai lần khi hết giờ (`submittedRef`, `CompetitionExamModal.tsx:142`) và `starsByTier`/`shields`
+  không kẹp biên (đều có `Math.min/Math.max` ở `storage.ts:1540-1541`, `:2060`).
+- **Hygiene:** 6 file `docs/opencode/reports/img/*.png` modified **không phải của lane này** — không
+  stage; `docs/step-by-step-guidance.md` là file untracked của lane khác (`?? `) — không đụng, không
+  commit; `package-lock.json` vẫn được theo dõi (kiểm trước mỗi commit).
+
 ## Tree hygiene note (2026-10-06)
 
 P36, P38, P39 sessions share this working tree concurrently. Each lane left its

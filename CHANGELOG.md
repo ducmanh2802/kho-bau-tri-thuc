@@ -65,6 +65,34 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T45 — năm defect: hai quyền của ba mẹ bị code bỏ qua, một lớp phủ không chặn bàn phím, một thành tựu không thể đạt.**
+  (a) **`maxGachaPerDay` chỉ dashboard đọc, máy gắp thì bỏ qua**: `GachaMachineScreen.tsx` tự đặt
+  `MAX_DAILY_DRAWS = 5` còn `drawGacha()` quy `0 → 5`, trong khi chính UI ba mẹ và `tests/t18a` ghi
+  "0 nghĩa là không giới hạn" ⇒ ba mẹ cho 10 lượt thì bé vẫn dừng ở lượt 5, ba mẹ mở ∞ thì màn vẫn
+  in "x / 5". Thêm `StorageService.getGachaDailyLimit()` (`null` = không giới hạn) dùng chung cho
+  **service lẫn màn**, nhãn `∞` thay cho `Infinity`. Bằng chứng (probe
+  `evidence/2026-11-03-T45/probe-t45-gating.mjs`, mục C): `maxGachaPerDay = 0` ⇒ "Hôm nay: 6 / ∞ lượt",
+  vé 8 còn 2, không hiện "Hết Lượt Hôm Nay".
+  (b) **"Tắt phần thưởng" vẫn rò hai đường**: `checkAchievements()` và `recordCompetitionResult()` cộng
+  XP/sao mà không hỏi `areRewardsEnabled()` — 4 nơi gọi thì 2 nơi có chốt, 2 nơi không. Chuyển chốt vào
+  **trong hàm** để không phụ thuộc người gọi, và giữ nguyên việc lưu kết quả thi + phân tích vì đó là dữ
+  liệu học chứ không phải phần thưởng.
+  (c) **bé tự nới giờ học không cần người lớn**: nút nhãn "Ba mẹ: Cho phép học thêm 10 phút" gọi
+  `onExtend`, và `App.tsx` ghi thẳng `dailyLimitMinutes + 10` vào cài đặt vĩnh viễn. Prop đổi thành
+  `onAskParent`; lối này chỉ mở bảng Ba Mẹ ở tab Cài đặt, giới hạn chỉ đổi sau cổng phép tính. Probe mục
+  B: `dailyLimitMinutes` **vẫn 1** khi chưa trả lời cổng.
+  (d) **lớp phủ "Chọn Màn & Độ Khó" che bảng nhưng không chặn phím**: màn che là `absolute inset-0 z-50`
+  nên chuột bị chặn thật (hit-test `elementFromPoint` trả `<div>`, phủ 390×844 px), còn `keydown` gắn trên
+  `window` nằm ngoài cây DOM đó ⇒ bé bấm phím là nộp đáp án sau lớp phủ, mở ra đã thấy "Chưa đúng". Thêm
+  `isGameInputBlocked()` + `stage.inputBlocked` trong `src/hooks/useGameStage.ts`, **10** trò chơi bàn phím
+  dùng chốt này. Probe mục A có hai bước đối chứng: không che ⇒ 2 phím làm đổi ô ếch, che ⇒ 4 phím đứng
+  nguyên kể cả nhãn "Câu 2/5", đóng lớp phủ ⇒ phím lại ăn.
+  (e) **Thử Thách Tuần phát id cố định** `weekly-challenge-week-1`, mà `completedWeeklyChallenges` là một
+  **tập id** ⇒ hoàn thành tuần thứ hai không thêm phần tử nào, stat `weeklyChallenges` kẹt ở 1 và thành
+  tựu `ach_weekly_3` ("Vượt qua 3 Thử Thách Tuần") là điều kiện không thể đạt. Nay `weeklyChallengeIdOf()`
+  sinh id theo `weekKeyOf(localDateKey())` (`src/services/streakEngine.ts`), nhãn đổi thành "Thử Thách
+  Tuần Này". **Chưa sửa**: pool câu vẫn lấy từ `getAllQuestions()` nên mọi tuần cùng một đề — ghi ở
+  `docs/plan/RISK_REGISTER.md`.
 - **T44 — bốn lỗi người dùng chạm tới, trong đó một lỗi chỉ probe render mới thấy.**
   (a) **`disabled` làm lời giải thích không bao giờ tới bé**: ô bài bị khoá và rương chủ đề trên
   `src/components/subject/SubjectScreen.tsx` dùng `disabled`, nên cú chạm bị trình duyệt chặn ngay
@@ -255,6 +283,26 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   `continue-on-error: true` **giữ nguyên** vì mới có một lần xanh.
 
 ### Tests
+- **T45 — 5 file / 31 test mới, ablation từng chốt và một probe gating đặt *ngoài* `qa/`.**
+  `tests/t45a-gacha-parent-limit.test.ts` (5): `maxGachaPerDay = 3` chặn lượt 4 (baseline giữ hành vi cũ),
+  `0` ⇒ 12 lượt liên tiếp đều ăn, `10` ⇒ chặn đúng lượt 11, `getGachaDailyLimit()` trả `null` khi `0`, và
+  hợp đồng mã nguồn cấm `GachaMachineScreen.tsx` tự đặt trần. `t45b-rewards-off-competition` (6): khi
+  **TẮT** phần thưởng, đề thi không cộng xp/sao **nhưng kết quả + phân tích vẫn lưu**; `checkAchievements`
+  không cộng XP và không mở thành tựu; khi **BẬT** lại thì thành tựu vẫn mở (chốt không thành cửa chết);
+  hai hợp đồng mã nguồn bắt chốt nằm *trong* hàm và phần thưởng thi đấu nằm trong nhánh có điều kiện.
+  `t45c-screen-time-parent-gate` (6): `App.tsx` không còn tự cộng 10 phút, `ScreenTimeModal` không được ghi
+  cài đặt ba mẹ từ trong linh kiện, prop là `onAskParent` chứ không `onExtend`, dashboard vẫn chặn sau
+  `!isAuthenticated`, và Esc không thoát được lời nhắc nghỉ mắt. `t45d-overlay-blocks-keyboard` (7):
+  `isGameInputBlocked()` chặn theo `overlayOpen`/`pausedByUser`, `stage` phải trả `inputBlocked`, **mọi** trò
+  nghe phím phải dùng `stage.inputBlocked` (không phải `stage.locked` trần) và khai báo lớp phủ "Chọn Màn",
+  kèm chốt hồi quy diện rộng trên 30 trò. `t45e-weekly-challenge-rotation` (7): id xoay theo
+  `weekKeyOf` (hai ngày cùng tuần ⇒ cùng id, tuần sau ⇒ khác), ba tuần liên tiếp cho `weeklyChallenges = 3`
+  và mở `ach_weekly_3`, hai lần trong **cùng** tuần chỉ tính một (chống farm), màn không còn hard-code id.
+  Ablation từng chốt — bỏ guard, chạy file test tương ứng, log nguyên văn trong `evidence/2026-11-03-T45/`:
+  A1 `checkAchievements` → `2 failed | 4 passed (6)` · A2 nhánh thưởng thi đấu → `2 failed | 4 passed (6)` ·
+  A3 `drawGacha` đổi `0 → 5` → `2 failed | 3 passed (5)` · A4 `inputBlocked` bỏ `overlayOpen` →
+  `1 failed | 6 passed (7)` · A5 id tuần cố định → `4 failed | 3 passed (7)`; mỗi lần hoàn tác ngay bằng
+  `git checkout --` nên `git status` không còn `src/` modified.
 - **T43 — 1 file / 5 test mới, ablation đúng một hàm.** `tests/t43a-reset-progress-sweeps-child-data.test.ts`:
   hai test **cấu trúc** ("xoá mọi khoá dữ liệu bé, kể cả ba khoá vốn bị sót" — danh sách xoá phải lấy
   từ `STORAGE_KEYS` trừ allowlist; "giữ thiết lập và phiên đăng nhập của người lớn" —

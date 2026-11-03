@@ -15,9 +15,19 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1410 test / 105 file,
-   211.0 kB entry + 425.3 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
-   ngay sau **T44** (năm lát cắt: `kho_bau_ioe_store` được đưa vào `STORAGE_KEYS` ⇒ **18** key trong registry
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1441 test / 110 file,
+   211.2 kB entry + 425.5 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
+   ngay sau **T45** (năm defect một đợt: máy gắp bỏ qua trần `maxGachaPerDay` nên ba mẹ đặt **0** (= không
+   giới hạn) bị hiểu thành 5 lượt, "Tắt phần thưởng" vẫn để thi đấu + thành tựu cộng XP/Sao, hết giờ học bé
+   tự nới thêm 10 phút mà không qua cổng ba mẹ, phím vẫn thao tác bàn chơi khi lớp phủ "Chọn Màn & Độ Khó"
+   đã che bảng, và Thử Thách Tuần phát id cứng `weekly-challenge-week-1` nên mọi tuần trùng nhau ⇒ thành tựu
+   3 tuần không thể đạt; **5** file test mới
+   `tests/t45a-gacha-parent-limit` (5) · `t45b-rewards-off-competition` (6) ·
+   `t45c-screen-time-parent-gate` (6) · `t45d-overlay-blocks-keyboard` (7) ·
+   `t45e-weekly-challenge-rotation` (7) ⇒ 31 test; vẫn **42** service module, vẫn **30** probe QA
+   (probe bằng chứng đặt trong `evidence/2026-11-03-T45/`, không tính vào `qa/`); `src/` đổi nên entry
+   **đổi cả hash lẫn kB** — bằng chứng `evidence/2026-11-03-T45/`),
+   đợt **T44** liền trước (năm lát cắt: `kho_bau_ioe_store` được đưa vào `STORAGE_KEYS` ⇒ **18** key trong registry
    (tổng vẫn **19** vì `kho_bau_cloud_session_hint` nằm ngoài), đường sinh đề hết `Math.random`, chuỗi máy/Anh
    còn lộ trên UI, **44** hộp chạm < 44px mà probe render đo được ở 375×812 dù quét class trong source không thấy,
    và lượt sai phải có **lý do** bằng chữ + tiếng chứ không chỉ một tiếng bíp; **5** file test mới
