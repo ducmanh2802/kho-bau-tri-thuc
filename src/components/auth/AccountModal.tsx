@@ -134,7 +134,7 @@ export const AccountModal: React.FC<AccountModalProps> = ({
             onClose();
           }}
           aria-label="Đóng bảng tài khoản"
-          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center text-slate-600 transition-colors cursor-pointer"
+          className="absolute top-4 right-4 w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 flex items-center justify-center text-slate-600 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>

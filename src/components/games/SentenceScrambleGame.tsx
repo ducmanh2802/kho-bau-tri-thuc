@@ -168,7 +168,7 @@ export const SentenceScrambleGame: React.FC<{ onExit: () => void }> = ({ onExit 
           <button
             onClick={handleResetAssembled}
             disabled={trainDriving}
-            className="flex items-center gap-1.5 px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold text-xs md:text-sm active:scale-95"
+            className="flex items-center gap-1.5 px-4 min-h-[44px] bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold text-xs md:text-sm active:scale-95"
           >
             <RotateCcw className="w-4 h-4" />
             Xếp lại từ đầu

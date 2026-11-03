@@ -13,7 +13,7 @@ import {
 import { isKidBoxSkillId } from '../data/kidBoxTaxonomy';
 import { KIDBOX_BRIDGE_UNIT_ID, KIDBOX_COURSE_ID, KIDBOX_LEVEL_ID } from '../data/kidBoxCurriculum';
 import { KIDBOX_POLICY } from '../config/policy';
-import { readJSONObject, writeJSON } from './storage';
+import { readJSONObject, writeJSON, STORAGE_KEYS } from './storage';
 import { localDateKey } from './dateUtils';
 
 /**
@@ -32,7 +32,7 @@ import { localDateKey } from './dateUtils';
  * and never throws.
  */
 
-export const KIDBOX_STORE_KEY = 'kho_bau_kidbox_store';
+export const KIDBOX_STORE_KEY = STORAGE_KEYS.KIDBOX_STORE;
 export const KIDBOX_STORE_SCHEMA_VERSION = 'kidbox-store-v1';
 export const DAY_MS = 86400000;
 

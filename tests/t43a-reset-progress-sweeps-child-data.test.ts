@@ -62,6 +62,10 @@ const CHILD_DATA_KEYS = [
   'kho_bau_tree_water',
   'kho_bau_motivation',
   'kho_bau_cotuong_puzzles',
+  // T44A — màn IOE từng tự viết literal ngoài `STORAGE_KEYS`, nên cả danh sách này
+  // lẫn `resetProgress` đều không thấy nó; `t44a-storage-key-coverage` chặn
+  // tình trạng lệch nhau trở lại.
+  'kho_bau_ioe_store',
 ] as const;
 
 /** Thiết lập của người lớn (đêm/sẩm/âm thanh) — reset tiến độ không được đụng vào. */

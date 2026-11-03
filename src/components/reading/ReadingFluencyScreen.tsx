@@ -11,6 +11,7 @@ import { ReadingEngine } from '../../services/readingEngine';
 import { adaptReadingQuestion } from '../../services/readingAdapter';
 import { ChoiceQuestion } from '../learning/questions/ChoiceQuestion';
 import { READING_POLICY } from '../../config/policy';
+import { READING_SKILLS } from '../../data/readingTaxonomy';
 import { StorageService } from '../../services/storage';
 import { sound } from '../../services/sound';
 import { useSpeak } from '../../hooks/useSpeak';
@@ -938,20 +939,11 @@ function isSpokenItem(q: ReadingQuestion): boolean {
 }
 
 function skillLabel(skillId: string): string {
-  const map: Record<string, string> = {
-    'RF-WORD-RECOGNITION': 'Nhận diện từ',
-    'RF-SYLLABLE-FLUENCY': 'Ghép âm đều nhịp',
-    'RF-PHRASE-FLUENCY': 'Đọc cụm từ',
-    'RF-SENTENCE-FLUENCY': 'Đọc câu mạch lạc',
-    'RF-READ-ALOUD-ACCURACY': 'Đọc to chính xác',
-    'RF-READ-ALOUD-SPEED': 'Đọc nhanh mà rõ',
-    'RF-PUNCTUATION-PAUSE': 'Ngắt hơi theo dấu câu',
-    'RF-READING-COMPREHENSION': 'Hiểu nội dung',
-    'RF-KEYWORD-FINDING': 'Tìm từ khóa',
-    'RF-QUESTION-UNDERSTANDING': 'Hiểu câu hỏi',
-    'RF-ANSWER-SELECTION-SPEED': 'Chọn đáp án nhanh',
-  };
-  return map[skillId] ?? skillId;
+  // Tên lấy thẳng từ taxonomy (`src/data/readingTaxonomy.ts`) — bản map viết tay
+  // ở đây từng để lộ id `RF-…` ra màn hình mỗi khi id đến ở dạng chuẩn hoá
+  // (chữ thường, `rf_word_recognition` — xem T40) hoặc khi taxonomy thêm kỹ năng.
+  const wanted = skillId.trim().toLowerCase();
+  return READING_SKILLS.find((skill) => skill.skillId.toLowerCase() === wanted)?.skillName ?? 'Kỹ năng đọc (chưa có tên)';
 }
 
 function errorLabel(category: string): string {

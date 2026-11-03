@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { GameModalWrapper, useGameFeedback } from './GameModalWrapper';
 import { sound } from '../../services/sound';
 import { useGameStage } from '../../hooks/useGameStage';
-import { defaultRoundsPerTier, getTierMeta } from '../../data/gameLevels';
+import { defaultRoundsPerTier, getTierMeta, pickDistinct, seededRng } from '../../data/gameLevels';
 import { BUBBLE_COLORS, TIER_CONFIG, buildRounds, poolForTier } from '../../data/games/catch_letters';
 import { getGameItems } from '../../services/gameContent';
 
@@ -48,9 +48,13 @@ export const CatchFallingLettersGame: React.FC<{ onExit: () => void }> = ({ onEx
 
   const pickNewTarget = () => {
     const pool = targetPool.length > 0 ? targetPool : config.pool;
-    const randomChar = pool[Math.floor(Math.random() * pool.length)];
-    setTargetChar(randomChar);
-    sound.speak(`Hãy tìm và bắt chữ ${randomChar} nhé!`);
+    // Chữ cần bắt là **nội dung câu hỏi**, không phải hiệu ứng — nên lấy theo
+    // seed (vòng chơi, nonce) thay vì `Math.random`: cùng một lượt chơi dựng lại
+    // được đúng chuỗi chữ để debug, còn nonce đổi (bấm "chơi lại") vẫn ra bộ khác.
+    const [nextChar] = pickDistinct(pool, 1, seededRng(stage.nonce * 100 + currentRoundIdx));
+    const target = nextChar ?? config.pool[0];
+    setTargetChar(target);
+    sound.speak(`Hãy tìm và bắt chữ ${target} nhé!`);
   };
 
   useEffect(() => {

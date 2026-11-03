@@ -118,7 +118,7 @@ export const StickerAlbumScreen: React.FC<StickerAlbumScreenProps> = ({
             </div>
           </div>
 
-          {/* Page indicator dots */}
+          {/* Page indicator dots — vùng chạm 44px (AGENTS §3), chấm nhỏ là nội dung hiển thị */}
           <div className="flex items-center justify-center gap-1.5 mt-6">
             {STICKER_SETS.map((_, idx) => (
               <button
@@ -127,13 +127,16 @@ export const StickerAlbumScreen: React.FC<StickerAlbumScreenProps> = ({
                   sound.playClick();
                   setCurrentSetIndex(idx);
                 }}
-                className={`w-2.5 h-2.5 rounded-full transition-all ${
-                  idx === currentSetIndex
-                    ? 'bg-white w-6'
-                    : 'bg-white/40 hover:bg-white/60'
-                }`}
+                className="w-11 h-11 -mx-2 flex items-center justify-center transition-all"
                 aria-label={`Bộ ${idx + 1}: ${STICKER_SETS[idx].name}`}
-              />
+                aria-current={idx === currentSetIndex ? 'true' : undefined}
+              >
+                <span
+                  className={`block rounded-full transition-all ${
+                    idx === currentSetIndex ? 'bg-white w-6 h-2.5' : 'bg-white/40 hover:bg-white/60 w-2.5 h-2.5'
+                  }`}
+                />
+              </button>
             ))}
           </div>
         </div>

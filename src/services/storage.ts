@@ -57,7 +57,7 @@ import type {
 import type { CompetitionExamResult, ErrorCategory } from '../types/competition';
 import type { ReadingMetrics, ReadingParentRating, ReadingProfile, ReadingSkillState, ReadingStage, ReadingStageState } from '../types/reading';
 
-const STORAGE_KEYS = {
+export const STORAGE_KEYS = {
   CHILD_PROFILE: 'kho_bau_child_profile',
   ANALYTICS: 'kho_bau_analytics',
   PARENT_SETTINGS: 'kho_bau_parent_settings',
@@ -81,6 +81,10 @@ const STORAGE_KEYS = {
   MOTIVATION: 'kho_bau_motivation',
   // T26 — id các thế cờ tướng bé đã giải (mảng chuỗi ngắn). Key mới hoàn toàn.
   COTUONG_PUZZLES: 'kho_bau_cotuong_puzzles',
+  // T44A — tiến độ luyện/then VO-iOE (câu đã làm, điểm đúng theo kỹ năng, điểm
+  // thi thử). Trước đây màn IOE tự viết literal riêng nên mọi danh sách lấy từ
+  // map — gồm cả `resetProgress` — đều bỏ sót nó.
+  ENGLISH_IOE_STORE: 'kho_bau_ioe_store',
 };
 
 /**

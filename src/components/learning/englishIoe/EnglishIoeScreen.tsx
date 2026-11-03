@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
 import { sound } from '../../../services/sound';
-import { IOE_WEEKS, getAllIoeQuestions, type IoeQuestion } from '../../../data/englishIoe';
+import { STORAGE_KEYS } from '../../../services/storage';
+import { IOE_WEEKS, type IoeQuestion } from '../../../data/englishIoe';
+import { pickIoePracticeQuestions, pickIoeMockQuestions } from '../../../data/englishIoe/selection';
 
-const STORAGE_KEY = 'kho_bau_ioe_store';
+const STORAGE_KEY = STORAGE_KEYS.ENGLISH_IOE_STORE;
 
 type MainTab = 'learn' | 'practice' | 'mock' | 'report';
 
@@ -33,15 +35,6 @@ function saveStore(store: IoeStore) {
   } catch {
     /* lưu trữ bị chặn — vẫn học được, chỉ không giữ tiến độ */
   }
-}
-
-function shuffle<T>(items: T[]): T[] {
-  const arr = [...items];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
 }
 
 function OptionButtons({
@@ -264,6 +257,9 @@ export const EnglishIoeScreen: React.FC<{ onBack: () => void }> = ({ onBack }) =
   const [store, setStore] = useState<IoeStore>(() => loadStore());
   const [practiceKey, setPracticeKey] = useState(0);
   const [mockQuestions, setMockQuestions] = useState<IoeQuestion[]>([]);
+  // Seed tăng theo lần bấm "Bắt đầu thi thử" — đề đổi có kiểm soát được, không
+  // phụ thuộc đồng hồ hay Math.random (AGENTS §2).
+  const mockAttempt = useRef(0);
   const [secondsLeft, setSecondsLeft] = useState(300);
   const timer = useRef<number | null>(null);
 
@@ -289,7 +285,7 @@ export const EnglishIoeScreen: React.FC<{ onBack: () => void }> = ({ onBack }) =
     });
   };
 
-  const practiceQuestions = useMemo(() => shuffle(getAllIoeQuestions()).slice(0, 8), [practiceKey]);
+  const practiceQuestions = useMemo(() => pickIoePracticeQuestions(practiceKey), [practiceKey]);
 
   useEffect(() => {
     if (tab !== 'mock' || mockQuestions.length === 0) return;
@@ -427,7 +423,7 @@ export const EnglishIoeScreen: React.FC<{ onBack: () => void }> = ({ onBack }) =
               <button
                 onClick={() => {
                   sound.playClick();
-                  setMockQuestions(shuffle(getAllIoeQuestions()).slice(0, 15));
+                  setMockQuestions(pickIoeMockQuestions((mockAttempt.current += 1)));
                   setSecondsLeft(300);
                 }}
                 className="px-5 py-2 bg-emerald-500 text-white font-bold rounded-xl"

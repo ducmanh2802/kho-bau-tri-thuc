@@ -406,7 +406,7 @@ export const CompetitionExamModal: React.FC<CompetitionExamModalProps> = ({
                   key={q.id}
                   onClick={() => handleNavigate(idx)}
                   aria-label={`Đến câu ${idx + 1}${isAnswered ? ' (đã trả lời)' : ''}`}
-                  className={`min-w-[36px] h-9 px-1 rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer ${
+                  className={`min-w-[44px] h-11 px-1 rounded-xl font-bold text-xs flex items-center justify-center transition-all cursor-pointer ${
                     isCurrent
                       ? 'bg-amber-500 text-white ring-2 ring-amber-400 ring-offset-1 scale-105'
                       : isAnswered

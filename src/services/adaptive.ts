@@ -1,8 +1,24 @@
 import { Question, SkillMastery, SubjectType } from '../types';
 import { getAllQuestions, getAllSkills } from '../data/curriculum';
+import { seededRng, shuffleSeeded } from '../data/gameLevels';
 import { StorageService } from './storage';
+import { localDateKey } from './dateUtils';
 import { READING_SKILLS } from '../data/readingTaxonomy';
 import type { ReadingProfile, ReadingStage } from '../types/reading';
+
+/**
+ * Seed mặc định của bộ ôn tập: băm của **ngày hôm nay** (giờ máy). Cùng một ngày
+ * ⇒ cùng một đề, nên bé tải lại trang không mất bộ câu đang làm dở và một lỗi đề
+ * tái hiện được trong test. Muốn đổi đề, caller truyền seed khác.
+ */
+function seedForLocalDay(now: Date = new Date()): number {
+  let h = 2166136261;
+  for (const ch of `kbt-daily-review:${localDateKey(now)}`) {
+    h ^= ch.codePointAt(0) ?? 0;
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
 
 export interface SmartReviewSet {
   questions: Question[];
@@ -53,7 +69,8 @@ export class AdaptiveService {
    * 3. Skills with status 'LEARNING'
    * 4. Random review from 'MASTERED' to combat forgetting curve
    */
-  public static generateDailyReview(): SmartReviewSet {
+  public static generateDailyReview(seed: number = seedForLocalDay()): SmartReviewSet {
+    const rng = seededRng(seed);
     const analytics = StorageService.getAnalytics();
     const allQuestions = getAllQuestions();
     const masteryMap = analytics.skillMastery;
@@ -76,7 +93,7 @@ export class AdaptiveService {
     // 1. Pick 3 questions from weak skills (or recent errors)
     if (weakSkillIds.length > 0) {
       const candidates = allQuestions.filter((q) => weakSkillIds.includes(q.skillId));
-      this.shuffle(candidates).slice(0, 3).forEach((q) => {
+      shuffleSeeded(candidates, rng).slice(0, 3).forEach((q) => {
         if (!usedIds.has(q.id)) {
           selectedQuestions.push(q);
           usedIds.add(q.id);
@@ -87,7 +104,7 @@ export class AdaptiveService {
     // 2. Pick 3 questions from practicing skills
     if (practicingSkillIds.length > 0) {
       const candidates = allQuestions.filter((q) => practicingSkillIds.includes(q.skillId));
-      this.shuffle(candidates).slice(0, 3).forEach((q) => {
+      shuffleSeeded(candidates, rng).slice(0, 3).forEach((q) => {
         if (!usedIds.has(q.id)) {
           selectedQuestions.push(q);
           usedIds.add(q.id);
@@ -98,7 +115,7 @@ export class AdaptiveService {
     // 3. Pick 1 question from mastered skills to maintain memory retention
     if (masteredSkillIds.length > 0) {
       const candidates = allQuestions.filter((q) => masteredSkillIds.includes(q.skillId));
-      this.shuffle(candidates).slice(0, 1).forEach((q) => {
+      shuffleSeeded(candidates, rng).slice(0, 1).forEach((q) => {
         if (!usedIds.has(q.id)) {
           selectedQuestions.push(q);
           usedIds.add(q.id);
@@ -109,7 +126,7 @@ export class AdaptiveService {
     // 4. If fewer than 6 questions, fill with balanced cross-subject questions
     if (selectedQuestions.length < 6) {
       const remaining = allQuestions.filter((q) => !usedIds.has(q.id));
-      this.shuffle(remaining)
+      shuffleSeeded(remaining, rng)
         .slice(0, 6 - selectedQuestions.length)
         .forEach((q) => {
           selectedQuestions.push(q);
@@ -330,14 +347,5 @@ export class AdaptiveService {
       stageRows,
       adviceList,
     };
-  }
-
-  private static shuffle<T>(array: T[]): T[] {
-    const arr = [...array];
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
   }
 }

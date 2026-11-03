@@ -100,7 +100,7 @@ export const SyllableBuilderGame: React.FC<{ onExit: () => void }> = ({ onExit }
               <span className="text-4xl font-black text-amber-900 font-display">{current.word}</span>
               <button
                 onClick={() => sound.speak(current.word)}
-                className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full"
+                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full"
                 title="Nghe từ"
               >
                 <Volume2 className="w-5 h-5" />
@@ -199,7 +199,7 @@ export const SyllableBuilderGame: React.FC<{ onExit: () => void }> = ({ onExit }
                     sound.playClick();
                     setSelectedTone(t.val);
                   }}
-                  className={`px-3 py-1.5 rounded-xl font-bold text-xs md:text-sm border-2 transition-all active:scale-95 ${
+                  className={`px-3 min-h-[44px] rounded-xl font-bold text-xs md:text-sm border-2 transition-all active:scale-95 flex items-center ${
                     selectedTone === t.val
                       ? 'bg-rose-600 text-white border-rose-700 shadow-md scale-105'
                       : 'bg-rose-50 text-rose-900 border-rose-200 hover:bg-rose-100'

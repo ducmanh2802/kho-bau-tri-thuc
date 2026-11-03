@@ -129,7 +129,7 @@ export const FallingNumbersMathGame: React.FC<{ onExit: () => void }> = ({ onExi
           </span>
           <button
             onClick={() => sound.speak(condition.speech)}
-            className="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-2 py-1 rounded-lg font-bold"
+            className="text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-800 px-2 min-w-[44px] min-h-[44px] rounded-lg font-bold inline-flex items-center justify-center"
           >
             🔊 Nghe
           </button>

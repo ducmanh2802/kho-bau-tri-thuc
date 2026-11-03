@@ -255,7 +255,7 @@ export const ColoringCanvasGame: React.FC<{ onExit: () => void }> = ({ onExit })
                   sound.playClick();
                   setSelectedTemplate(tpl);
                 }}
-                className={`px-2.5 py-1 rounded-xl text-xs font-bold flex items-center gap-1 transition-all ${
+                className={`px-2.5 min-w-[44px] min-h-[44px] rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all ${
                   selectedTemplate.name === tpl.name
                     ? 'bg-amber-400 text-amber-950 shadow-sm'
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
@@ -274,7 +274,7 @@ export const ColoringCanvasGame: React.FC<{ onExit: () => void }> = ({ onExit })
               <button
                 key={icon}
                 onClick={() => stampIcon(icon)}
-                className="w-8 h-8 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-300 flex items-center justify-center text-lg active:scale-95 transition-transform"
+                className="w-11 h-11 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-300 flex items-center justify-center text-lg active:scale-95 transition-transform"
                 title="Dán hình"
               >
                 {icon}
@@ -313,7 +313,7 @@ export const ColoringCanvasGame: React.FC<{ onExit: () => void }> = ({ onExit })
                   setIsEraser(false);
                 }}
                 style={{ backgroundColor: c }}
-                className={`w-7 h-7 rounded-full border-2 transition-transform ${
+                className={`w-11 h-11 rounded-full border-2 transition-transform ${
                   !isEraser && selectedColor === c
                     ? 'border-amber-900 scale-125 shadow-md'
                     : 'border-white hover:scale-110'
@@ -330,7 +330,7 @@ export const ColoringCanvasGame: React.FC<{ onExit: () => void }> = ({ onExit })
                 sound.playClick();
                 setIsEraser(!isEraser);
               }}
-              className={`p-2 rounded-xl border flex items-center gap-1 text-xs font-bold transition-all ${
+              className={`p-2 min-h-[44px] rounded-xl border flex items-center gap-1 text-xs font-bold transition-all ${
                 isEraser
                   ? 'bg-rose-500 text-white border-rose-600'
                   : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300'
@@ -343,7 +343,7 @@ export const ColoringCanvasGame: React.FC<{ onExit: () => void }> = ({ onExit })
             {/* Clear */}
             <button
               onClick={clearCanvas}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center gap-1 text-xs font-bold"
+              className="p-2 min-h-[44px] rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 flex items-center gap-1 text-xs font-bold"
             >
               <Trash2 className="w-4 h-4" />
               <span>Xóa hết</span>

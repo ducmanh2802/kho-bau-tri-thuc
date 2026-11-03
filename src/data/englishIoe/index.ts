@@ -29,7 +29,7 @@ export const IOE_WEEKS: IoeWeek[] = [
     id: 'ioe-w1',
     week: 1,
     title: 'Tuần 1 — Ôn từ vựng cơ bản',
-    topics: ['Colors', 'Numbers 1–10', 'School things', 'Animals'],
+    topics: ['Màu sắc · Colors', 'Số 1–10 · Numbers', 'Đồ dùng lớp học · School things', 'Con vật · Animals'],
     lessons: [
       {
         id: 'ioe-w1-l1',
@@ -72,7 +72,7 @@ export const IOE_WEEKS: IoeWeek[] = [
     id: 'ioe-w2',
     week: 2,
     title: 'Tuần 2 — Đánh vần và nhận diện từ',
-    topics: ['Family', 'Toys', 'Body parts', 'Ôn từ tuần 1'],
+    topics: ['Gia đình · Family', 'Đồ chơi · Toys', 'Cơ thể · Body parts', 'Ôn từ tuần 1'],
     lessons: [
       {
         id: 'ioe-w2-l1',
@@ -142,7 +142,7 @@ export const IOE_WEEKS: IoeWeek[] = [
     id: 'ioe-w5',
     week: 5,
     title: 'Tuần 5 — Gia đình, trường học và hội thoại',
-    topics: ['Family', 'Classroom', 'Food', 'Daily actions'],
+    topics: ['Gia đình · Family', 'Lớp học · Classroom', 'Đồ ăn · Food', 'Việc hằng ngày · Daily actions'],
     lessons: [
       {
         id: 'ioe-w5-l1',

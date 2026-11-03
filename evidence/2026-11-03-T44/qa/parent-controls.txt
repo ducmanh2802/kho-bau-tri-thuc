@@ -1,0 +1,91 @@
+{
+  "errors": [],
+  "shots": [
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\01-vi-sao-mo-insight.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\02-tat-phan-thuong.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\03-shop-tat-thuong.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\04-ket-qua-khi-tat-thuong.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\05-shop-sau-khi-bat.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\06-cta-mo-dich.png"
+  ],
+  "facts": {
+    "section": "6-cta",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "steps": [
+    {
+      "step": "whyOpensInsights",
+      "report": true
+    },
+    {
+      "step": "rewardsSwitch",
+      "rewardsEnabled": false
+    },
+    {
+      "step": "shopWhileOff",
+      "beforeShop": {
+        "stars": 999,
+        "xp": 5000,
+        "tickets": 0,
+        "owned": 3
+      },
+      "afterShop": {
+        "stars": 999,
+        "xp": 5000,
+        "tickets": 0,
+        "owned": 3
+      }
+    },
+    {
+      "step": "lessonWhileOff",
+      "answered": 11,
+      "reachedResult": true,
+      "rewardsOffVisible": true,
+      "rewardsOffText": "Bé hoàn thành bài rồi! Nhà mình đang tắt phần thưởng nên lượt này không cộng Sao, XP hay Vé — Gấu vẫn ghi nhớ bài học của bé.",
+      "resultText": "🐻 Chữ A, B, C thân thương Câu hỏi 11 / 11 · ⏱ 0:06 Chuẩn Nâng cao 🔥 4 đúng Một sao! Bé thử lại cho chắc nhé! CHÚC MỪNG BÉ HOÀN THÀNH! Bé đã làm đúng 4 / 11 câ",
+      "beforeLesson": {
+        "stars": 999,
+        "xp": 5000,
+        "tickets": 0,
+        "owned": 3
+      },
+      "afterLesson": {
+        "stars": 999,
+        "xp": 5000,
+        "tickets": 0,
+        "owned": 3
+      }
+    },
+    {
+      "step": "rewardsBackOn",
+      "rewardsEnabled": true
+    },
+    {
+      "step": "shopAfterReopen",
+      "beforeBuy": {
+        "stars": 999,
+        "xp": 5000,
+        "tickets": 0,
+        "owned": 3
+      },
+      "afterBuy": {
+        "stars": 992,
+        "xp": 5850,
+        "tickets": 1,
+        "owned": 4
+      }
+    },
+    {
+      "step": "ctaRouting",
+      "ctaLabel": "Bắt đầu: Trò Chơi: Bóng Bay Màu Sắc",
+      "playerOpen": false,
+      "gameOpen": false,
+      "gamesHub": true,
+      "onSubjectMap": false
+    }
+  ],
+  "ok": true
+}

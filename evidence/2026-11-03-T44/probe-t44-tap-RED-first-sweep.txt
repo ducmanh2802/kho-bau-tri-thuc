@@ -1,0 +1,334 @@
+{
+  "viewport": "375x812",
+  "tap": [
+    {
+      "screen": "Nối Số Tô Màu",
+      "closeButton": {
+        "count": 1,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      },
+      "chấm nối số": {
+        "count": 6,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      }
+    },
+    {
+      "screen": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+      "closeButton": {
+        "count": 1,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      },
+      "ô màu bảng palette": {
+        "count": 10,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      },
+      "con dấu (stamp)": {
+        "count": 4,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      }
+    },
+    {
+      "screen": "Xưởng Ghép Tiếng Lớp 1",
+      "closeButton": {
+        "count": 1,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      },
+      "hàng thanh điệu": {
+        "count": 10,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      }
+    },
+    {
+      "screen": "Bộ Sưu Tập — chấm phân trang",
+      "dot": {
+        "count": 6,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "case": "bài bị khoá",
+      "activation": "mouse",
+      "clickError": null,
+      "hintVisible": true,
+      "hintText": "Bài Đếm tiếp từ 6 đến 10 vẫn còn khoá. Bé học xong bài trước đó để mở nhé!",
+      "hintBox": {
+        "w": 188,
+        "h": 104
+      },
+      "spoken": [
+        "Bài Đếm tiếp từ 6 đến 10 vẫn còn khoá. Bé học xong bài trước đó để mở nhé!"
+      ]
+    },
+    {
+      "case": "rương chưa đủ bài",
+      "activation": "mouse",
+      "clickError": null,
+      "hintVisible": true,
+      "hintText": "Bé chưa học hết các bài của chủ đề này nên rương vẫn còn khoá.",
+      "hintBox": {
+        "w": 188,
+        "h": 84
+      },
+      "spoken": [
+        "Bé chưa học hết các bài của chủ đề này nên rương vẫn còn khoá.",
+        "Bé chưa học hết các bài của chủ đề này nên rương vẫn còn khoá."
+      ]
+    }
+  ],
+  "errors": [
+    "44 hộp chạm < 44px trong 31/31 trò: Bắt Chữ Cái Bay»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Xưởng Ghép Tiếng Lớp 1»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Xưởng Ghép Tiếng Lớp 1»BUTTON 36x36; Săn Vần Trong Vườn Cây»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Đoàn Tàu Xếp Câu»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Đoàn Tàu Xếp Câu»Xếp lại từ đầu 131x32; Đôi Tai Thính — Nghe & Chọn»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Đấu Trường Chính Tả»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Tô Dấu Thanh»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Đoàn Tàu Ghép Vần»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Đọc Câu Làm Theo»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Hứng Số Rơi Rộn Ràng»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Hứng Số Rơi Rộn Ràng»🔊 Nghe 46x40; Đường Đua Thần Tốc»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Đường Đua Thần Tốc»🔊 42x44; Xây Tháp Số Lên Mây»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Câu Cá Đại Dương Xanh»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Câu Cá Đại Dương Xanh»🔊 38x40; Phân Loại Hình Học»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Thám Hiểm Giờ & Tiền Việt»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Chuyện Kể Toán Học»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Chợ Khung 10»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Ếch Nhảy Tia Số»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Thợ Sửa Đồng Hồ»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Safari Tiếng Anh — Loài Vật»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Đập Bóng Màu»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Đập Bóng Màu»BUTTON 28x28; Phonics Pop — Bắn Âm»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Simon Says — Gấu Ra Lệnh»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Word Train — Tàu Chữ Tiếng Anh»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Lập Trình Tìm Kho Báu»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Nhà Khoa Học Nhí»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Lật Thẻ Trí Nhớ Vàng»🐣 Màn 1/6 ▾ · 🚀 Câu 1/1 · Khởi Động 152x14; Bé Tập Vẽ & Tô Màu Diệu Kỳ»🐣 Màn 1/6 ▾ · 🚀 Câu 1/1 · Khởi Động 152x14; Bé Tập Vẽ & Tô Màu Diệu Kỳ»🏠Ngôi Nhà Thân Thương 35x24; Bé Tập Vẽ & Tô Màu Diệu Kỳ»🐻Chú Gấu Nhí 36x24; Bé Tập Vẽ & Tô Màu Diệu Kỳ»🌸Bông Hoa Rực Rỡ 36x24; Bé Tập Vẽ & Tô Màu Diệu Kỳ»🍎Quả Táo Ngọt Ngào 36x24; Bé Tập Vẽ & Tô Màu Diệu Kỳ»🐠Chú Cá Đáng Yêu 36x24; Bé Tập Vẽ & Tô Màu Diệu Kỳ»🎂Chiếc Bánh Sinh Nhật 36x24; Bé Tập Vẽ & Tô Màu Diệu Kỳ»Tẩy 58x34; Nối Số Tô Màu»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Đoán Bóng Hình»🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động 152x14; Bé Xếp Hình Mosaic»🐣 Màn 1/6 ▾ · 🚀 Câu 1/2 · Khởi Động 152x14"
+  ],
+  "ok": false,
+  "sweep": {
+    "gamesInHub": 31,
+    "gamesChecked": 31,
+    "offenders": [
+      {
+        "game": "Bắt Chữ Cái Bay",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Xưởng Ghép Tiếng Lớp 1",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Xưởng Ghép Tiếng Lớp 1",
+        "name": "BUTTON",
+        "box": "36x36"
+      },
+      {
+        "game": "Săn Vần Trong Vườn Cây",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Đoàn Tàu Xếp Câu",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Đoàn Tàu Xếp Câu",
+        "name": "Xếp lại từ đầu",
+        "box": "131x32"
+      },
+      {
+        "game": "Đôi Tai Thính — Nghe & Chọn",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Đấu Trường Chính Tả",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Tô Dấu Thanh",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Đoàn Tàu Ghép Vần",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Đọc Câu Làm Theo",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Hứng Số Rơi Rộn Ràng",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Hứng Số Rơi Rộn Ràng",
+        "name": "🔊 Nghe",
+        "box": "46x40"
+      },
+      {
+        "game": "Đường Đua Thần Tốc",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Đường Đua Thần Tốc",
+        "name": "🔊",
+        "box": "42x44"
+      },
+      {
+        "game": "Xây Tháp Số Lên Mây",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Câu Cá Đại Dương Xanh",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Câu Cá Đại Dương Xanh",
+        "name": "🔊",
+        "box": "38x40"
+      },
+      {
+        "game": "Phân Loại Hình Học",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Thám Hiểm Giờ & Tiền Việt",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Chuyện Kể Toán Học",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Chợ Khung 10",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Ếch Nhảy Tia Số",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Thợ Sửa Đồng Hồ",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Safari Tiếng Anh — Loài Vật",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Đập Bóng Màu",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Đập Bóng Màu",
+        "name": "BUTTON",
+        "box": "28x28"
+      },
+      {
+        "game": "Phonics Pop — Bắn Âm",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Simon Says — Gấu Ra Lệnh",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Word Train — Tàu Chữ Tiếng Anh",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Lập Trình Tìm Kho Báu",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Nhà Khoa Học Nhí",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Lật Thẻ Trí Nhớ Vàng",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/1 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/1 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+        "name": "🏠Ngôi Nhà Thân Thương",
+        "box": "35x24"
+      },
+      {
+        "game": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+        "name": "🐻Chú Gấu Nhí",
+        "box": "36x24"
+      },
+      {
+        "game": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+        "name": "🌸Bông Hoa Rực Rỡ",
+        "box": "36x24"
+      },
+      {
+        "game": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+        "name": "🍎Quả Táo Ngọt Ngào",
+        "box": "36x24"
+      },
+      {
+        "game": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+        "name": "🐠Chú Cá Đáng Yêu",
+        "box": "36x24"
+      },
+      {
+        "game": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+        "name": "🎂Chiếc Bánh Sinh Nhật",
+        "box": "36x24"
+      },
+      {
+        "game": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+        "name": "Tẩy",
+        "box": "58x34"
+      },
+      {
+        "game": "Nối Số Tô Màu",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Đoán Bóng Hình",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/5 · Khởi Động",
+        "box": "152x14"
+      },
+      {
+        "game": "Bé Xếp Hình Mosaic",
+        "name": "🐣 Màn 1/6 ▾ · 🚀 Câu 1/2 · Khởi Động",
+        "box": "152x14"
+      }
+    ]
+  }
+}

@@ -144,7 +144,7 @@ const ConnectDotsStage: React.FC<{ stage: GameStage; round: ConnectRound }> = ({
                 aria-label={`Chấm số ${dot.n}${done ? ' đã nối' : ''}`}
                 aria-pressed={done}
                 data-testid="connect-dot"
-                className={`absolute -translate-x-1/2 -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 rounded-full border-2 font-black text-sm md:text-base flex items-center justify-center transition-all duration-200 active:scale-90 ${
+                className={`absolute -translate-x-1/2 -translate-y-1/2 w-11 h-11 md:w-12 md:h-12 rounded-full border-2 font-black text-sm md:text-base flex items-center justify-center transition-all duration-200 active:scale-90 ${
                   done
                     ? 'text-white border-white/70 shadow-lg scale-95'
                     : 'bg-white text-slate-700 border-slate-300 shadow-md hover:scale-110'

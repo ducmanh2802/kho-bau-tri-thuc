@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { KIDBOX_STRAND_LABELS, KidBoxStrand } from '../../types/kidBox';
-import { getKidBoxCourse, getKidBoxUnitLabel } from '../../data/kidBoxCurriculum';
+import { getKidBoxCourse, getKidBoxUnitLabel, kidBoxContentStatusLabel } from '../../data/kidBoxCurriculum';
 import { parseKidBoxSourceJson } from '../../data/kidBoxIngest';
 import {
   analyseEnglishProfile,
@@ -261,7 +261,7 @@ export const KidBoxParentPanel: React.FC<KidBoxParentPanelProps> = ({ onDataChan
           Nội dung Nguồn Còn Thiếu
         </h4>
         <p className="text-[11px] font-bold text-amber-900">
-          Trạng thái: <strong>{contentSummary.status}</strong> · đã ánh xạ {contentSummary.mappedUnits} Unit giáo trình.
+          Trạng thái: <strong>{kidBoxContentStatusLabel(contentSummary.status)}</strong> · đã ánh xạ {contentSummary.mappedUnits} Unit giáo trình.
         </p>
         <ul className="text-[11px] font-bold text-amber-900 list-disc pl-5 space-y-0.5">
           {contentSummary.missingArtifacts.map((a) => (

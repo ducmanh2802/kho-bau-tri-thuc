@@ -151,7 +151,7 @@ export const EnglishColorBalloonGame: React.FC<{ onExit: () => void }> = ({ onEx
           </span>
           <button
             onClick={playVoice}
-            className="p-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full"
+            className="p-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-full"
             title="Nghe màu"
           >
             <Volume2 className="w-4 h-4" />

@@ -1,0 +1,110 @@
+{
+  "viewport": "375x812",
+  "tap": [
+    {
+      "screen": "Nối Số Tô Màu",
+      "closeButton": {
+        "count": 1,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      },
+      "chấm nối số": {
+        "count": 6,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      }
+    },
+    {
+      "screen": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+      "closeButton": {
+        "count": 1,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      },
+      "ô màu bảng palette": {
+        "count": 10,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      },
+      "con dấu (stamp)": {
+        "count": 4,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      }
+    },
+    {
+      "screen": "Xưởng Ghép Tiếng Lớp 1",
+      "closeButton": {
+        "count": 1,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      },
+      "hàng thanh điệu": {
+        "count": 12,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      }
+    },
+    {
+      "screen": "Bộ Sưu Tập — chấm phân trang",
+      "dot": {
+        "count": 6,
+        "hidden": 0,
+        "minW": 44,
+        "minH": 44,
+        "small": []
+      }
+    }
+  ],
+  "blocked": [
+    {
+      "case": "bài bị khoá",
+      "activation": "mouse",
+      "clickError": null,
+      "hintVisible": true,
+      "hintText": "Bài Đếm tiếp từ 6 đến 10 vẫn còn khoá. Bé học xong bài trước đó để mở nhé!",
+      "hintBox": {
+        "w": 188,
+        "h": 104
+      },
+      "spoken": [
+        "Bài Đếm tiếp từ 6 đến 10 vẫn còn khoá. Bé học xong bài trước đó để mở nhé!"
+      ]
+    },
+    {
+      "case": "rương chưa đủ bài",
+      "activation": "mouse",
+      "clickError": null,
+      "hintVisible": true,
+      "hintText": "Bé chưa học hết các bài của chủ đề này nên rương vẫn còn khoá.",
+      "hintBox": {
+        "w": 188,
+        "h": 84
+      },
+      "spoken": [
+        "Bé chưa học hết các bài của chủ đề này nên rương vẫn còn khoá."
+      ]
+    }
+  ],
+  "errors": [],
+  "ok": true,
+  "sweep": {
+    "gamesInHub": 31,
+    "gamesChecked": 31,
+    "offenders": []
+  }
+}

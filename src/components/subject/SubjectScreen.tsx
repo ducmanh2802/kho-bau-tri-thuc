@@ -57,6 +57,26 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
   /** Bài vừa mở theo gợi ý — bản đồ cuộn đến đây thay vì "bài hiện hành". */
   const [recommendedLesson, setRecommendedLesson] = useState<Lesson | null>(null);
   const [scrollContainerRef, setScrollContainerRef] = useState<HTMLDivElement | null>(null);
+  /**
+   * T44E — lời giải thích cho một lượt "không được". Bé lớp 1 không đọc được
+   * trạng thái khoá từ màu nút, nên mỗi lần bị chặn phải thấy chữ trên màn hình
+   * chứ không chỉ nghe tiếng "sai".
+   */
+  const [hint, setHint] = useState<string | null>(null);
+  const hintTimer = useRef<number | null>(null);
+  const rejectTurn = (message: string) => {
+    sound.playWrong();
+    sound.speak(message);
+    setHint(message);
+    if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    hintTimer.current = window.setTimeout(() => setHint(null), 5000);
+  };
+  useEffect(
+    () => () => {
+      if (hintTimer.current) window.clearTimeout(hintTimer.current);
+    },
+    []
+  );
   // Popup giới thiệu bài là hộp thoại thật: phải bẫy Tab và trả focus về nút
   // bài học khi đóng, nếu không bé dùng bàn phím/switch sẽ lạc ra sau lớp phủ.
   const lessonPopupRef = useFocusTrap<HTMLDivElement>(!!showLessonPopup);
@@ -165,7 +185,7 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
   const handleLessonClick = (lesson: Lesson, globalIdx: number) => {
     const status = getLessonStatus(lesson, globalIdx);
     if (status.isLocked) {
-      sound.playWrong();
+      rejectTurn(`Bài ${lesson.title} vẫn còn khoá. Bé học xong bài trước đó để mở nhé!`);
       return;
     }
     sound.playClick();
@@ -205,8 +225,18 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
     // T41 — rương không mở được vì ba mẹ tắt phần thưởng thì phải nói cho bé rõ,
     // chứ không im lặng bật tiếng sai (bé tưởng mình chưa học đủ bài).
     if (!StorageService.areRewardsEnabled()) {
-      sound.playWrong();
-      sound.speak('Ba mẹ đang tắt phần thưởng nên rương chưa mở được. Bé nhờ ba mẹ bật lại trong mục Ba Mẹ nhé!');
+      rejectTurn('Ba mẹ đang tắt phần thưởng nên rương chưa mở được. Bé nhờ ba mẹ bật lại trong mục Ba Mẹ nhé!');
+      return;
+    }
+    // T44E — trước đây nút rương bị `disabled` nên hai lời giải thích dưới đây
+    // KHÔNG BAO GIỜ chạy tới được: bé bấm vào rương khoá là thinh lặng tuyệt đối.
+    const status = getChestStatus(topic);
+    if (status.isClaimed) {
+      rejectTurn('Rương này bé đã mở rồi, học chủ đề khác để nhận thêm sao nhé!');
+      return;
+    }
+    if (!status.allCompleted) {
+      rejectTurn('Bé chưa học hết các bài của chủ đề này nên rương vẫn còn khoá.');
       return;
     }
     const starsAwarded = StorageService.claimTopicChest(topic.id, subject, 3);
@@ -214,7 +244,10 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
       sound.playLevelUp();
       onProfileUpdate();
     } else {
-      sound.playWrong();
+      // `claimTopicChest` vẫn trả 0 khi kho dữ liệu chưa nạp xong cho môn này
+      // (`storage.ts` đối chiếu bài theo catalogue) — bé cần thấy phản hồi, không
+      // phải một cú bấm rơi vào im lặng.
+      rejectTurn('Rương chưa mở được ngay, bé thử lại sau chút nhé!');
     }
   };
 
@@ -386,7 +419,7 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
               <button
                 key={point.lesson.id}
                 onClick={() => handleLessonClick(point.lesson, point.globalIdx)}
-                disabled={status.isLocked}
+                aria-disabled={status.isLocked}
                 className="absolute pointer-events-auto transition-all duration-300 z-10"
                 style={{
                   left: `${point.x - LESSON_BUTTON_SIZE / 2}px`,
@@ -440,7 +473,7 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
               <button
                 key={`chest-${chest.topic.id}`}
                 onClick={() => handleClaimChest(chest.topic)}
-                disabled={!chestStatus.canClaim}
+                aria-disabled={!chestStatus.canClaim}
                 className="absolute pointer-events-auto transition-all duration-300 z-10"
                 style={{
                   left: isLeftSide ? `${chest.x - 50}px` : `${chest.x - 50}px`,
@@ -498,7 +531,7 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-[11px] font-black uppercase tracking-wider text-emerald-50">
-                      British English · en-GB
+                      Giọng thật · Anh–Anh
                     </span>
                     <span className="block text-base md:text-lg font-black font-display">Kid's Box Companion</span>
                     <span className="block text-xs font-bold text-emerald-50 mt-0.5">
@@ -511,6 +544,19 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
             </div>
           )}
         </div>
+        {hint && (
+          // T44E — bản tin hình cho lượt bị chặn: giọng đọc có thể bị tắt, nhưng
+          // chữ thì bé vẫn thấy. `role=status` để trình đọc màn hình thông báo
+          // mà không cắt mất những gì bé đang nghe.
+          <div
+            role="status"
+            aria-live="polite"
+            data-testid="subject-hint"
+            className="pointer-events-none fixed bottom-28 left-1/2 z-50 max-w-[92vw] -translate-x-1/2 rounded-2xl bg-slate-900/85 px-4 py-3 text-center text-sm font-black text-white shadow-lg"
+          >
+            {hint}
+          </div>
+        )}
       </div>
 
       {/* Lesson Popup Modal */}

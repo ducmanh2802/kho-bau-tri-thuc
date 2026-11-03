@@ -123,7 +123,7 @@ export const MathSpeedRacingGame: React.FC<{ onExit: () => void }> = ({ onExit }
             </span>
             <button
               onClick={() => sound.speak(`${current.expr} bằng mấy?`)}
-              className="p-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 rounded-full font-bold"
+              className="p-2.5 min-w-[44px] min-h-[44px] bg-amber-400 hover:bg-amber-300 text-slate-900 rounded-full font-bold flex items-center justify-center"
               title="Nghe phép tính"
             >
               🔊

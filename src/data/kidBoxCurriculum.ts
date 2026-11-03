@@ -133,6 +133,18 @@ export function getKidBoxUnitLabel(unit: KidBoxUnit | undefined): string {
   return `Unit ${unit.index} — ${unit.title}`;
 }
 
+/**
+ * Nhãn tiếng Việt cho trạng thái nội dung (AGENTS §3). Enum giữ nguyên giá trị
+ * vì tài liệu và engine dẫn nó; chỉ màn hình của người dùng Việt thì dịch.
+ */
+export function kidBoxContentStatusLabel(
+  status: 'READY' | 'PARTIAL' | 'CONTENT_SOURCE_REQUIRED'
+): string {
+  if (status === 'READY') return 'Đủ nội dung';
+  if (status === 'PARTIAL') return 'Đủ một phần';
+  return 'Cần nguồn nội dung từ giáo viên';
+}
+
 /** Overall content readiness, surfaced in the parent panel and the docs. */
 export function getKidBoxContentReadiness(): {
   status: 'READY' | 'PARTIAL' | 'CONTENT_SOURCE_REQUIRED';

@@ -75,7 +75,7 @@ export const OceanFishingGame: React.FC<{ onExit: () => void }> = ({ onExit }) =
             </div>
             <button
               onClick={() => sound.speak(`${current.expr} bằng mấy?`)}
-              className="p-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-full"
+              className="p-2 min-w-[44px] min-h-[44px] bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-full flex items-center justify-center"
             >
               🔊
             </button>

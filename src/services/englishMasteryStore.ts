@@ -14,11 +14,11 @@ import type {
   EnglishMasteryState,
   EnglishSkillType,
 } from '../types/englishMastery';
-import { readJSONObject, writeJSON } from './storage';
+import { readJSONObject, writeJSON, STORAGE_KEYS } from './storage';
 import { EnglishMasteryEngine } from './englishMasteryEngine';
 import { CANONICAL_ENGLISH_SKILLS } from '../data/englishSkillTaxonomy';
 
-export const ENGLISH_MASTERY_STORE_KEY = 'kho_bau_english_mastery_store';
+export const ENGLISH_MASTERY_STORE_KEY = STORAGE_KEYS.ENGLISH_MASTERY_STORE;
 export const ENGLISH_MASTERY_STORE_VERSION = 'eng-mastery-v1';
 
 export interface EnglishMasteryStorePayload {

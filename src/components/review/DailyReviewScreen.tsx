@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Lesson, Question } from '../../types';
 import { AdaptiveService, SmartReviewSet } from '../../services/adaptive';
 import { StorageService } from '../../services/storage';
@@ -17,6 +17,9 @@ export const DailyReviewScreen: React.FC<DailyReviewScreenProps> = ({
 }) => {
   const [reviewSet, setReviewSet] = useState<SmartReviewSet>(AdaptiveService.generateDailyReview());
   const [isReviewing, setIsReviewing] = useState(false);
+  // "Đề khác" phải đổi đề, nhưng vẫn tái hiện được: lần bấm thứ N trong ngày luôn
+  // ra cùng một bộ câu (seed = N), không phụ thuộc Math.random.
+  const regenerateCount = useRef(0);
 
   const handleStartReview = () => {
     sound.playClick();
@@ -25,7 +28,7 @@ export const DailyReviewScreen: React.FC<DailyReviewScreenProps> = ({
 
   const handleRegenerate = () => {
     sound.playClick();
-    setReviewSet(AdaptiveService.generateDailyReview());
+    setReviewSet(AdaptiveService.generateDailyReview((regenerateCount.current += 1)));
     sound.speak('Đã tạo một bộ câu hỏi ôn tập mới cho bé!');
   };
 

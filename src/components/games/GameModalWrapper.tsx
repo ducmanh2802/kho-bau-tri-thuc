@@ -449,7 +449,7 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
                       setShowTierModal(true);
                     }}
                     title="Bấm để chọn màn hoặc tăng độ khó"
-                    className="inline-flex items-center gap-1 hover:underline text-left cursor-pointer"
+                    className="inline-flex min-h-[44px] items-center gap-1 px-1 hover:underline text-left cursor-pointer"
                   >
                     <span aria-hidden="true">{tierMeta?.emoji} </span>
                     <span className="font-extrabold text-amber-900 bg-amber-200/80 hover:bg-amber-300 px-1.5 py-0.2 rounded-md">
@@ -682,7 +682,7 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
                     onClick={() => setShowTierModal(false)}
                     aria-label="Đóng bảng chọn màn"
                     title="Đóng"
-                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm"
+                    className="w-11 h-11 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-sm"
                   >
                     ✕
                   </button>
