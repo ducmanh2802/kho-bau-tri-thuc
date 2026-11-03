@@ -839,3 +839,61 @@ làm hồ sơ lệch. Từ nay:
 
 Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ**: 22 lượt xanh kế tiếp vẫn chưa có một lần đỏ *thật* bị
 cổng chặn sau `3b0122c`.
+
+§24 — Đo CI cho T47: commit code **có** đủ ba run, nhưng cách né `RISK-16` vẫn còn một nửa — 2026-11-04
+
+Mục hiện trạng của tỷ lệ cổng QA **chuyển từ §23 sang §24 này** (theo đúng quy tắc chống đo-lại-vô-hạn
+ở §23: lần này có commit **code** mới nên số mới có ý nghĩa nghiệp vụ).
+
+Ba commit mới kể từ tip `a6c472b` của §23, tra bằng **SHA đủ 40 ký tự**:
+
+```bash
+SHA=$(git rev-parse <ref>)   # SHA ngắn trả total_count: 0 cho MỌI commit (§22)
+curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=$SHA"
+curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/<run-id>/jobs"
+```
+
+| commit | loại | run | kết quả |
+|---|---|---|---|
+| `f1764f7fa93b61ee56d76e43b4c5ac33e7734f91` | docs (§23) | 41698778007 · 41698777996 · 41698778061 | **cả ba success** |
+| `198a6d9a2ff787669394da4349d277c1990acb6f` | **code T47** | 41711756732 `1. Quality` job 126181318638 success **38 s** · 41711756652 `2. Build + artifact` job 126181318505 success **32 s** · 41711756710 `3. Browser QA` job 126181317728 **cancelled** sau 61 s | `total_count` = **3** |
+| `e0fcb6fea45c79f4e48d25a4095a51053a34b0ad` | docs (đồng bộ T47) | 41711874109 success · 41711874350 success · 41711874130 `golden path` job 126181882876 success **67 s** | cả ba success |
+
+**Điều mới thứ nhất — cách né `RISK-16` hoạt động, đúng như dự đoán của §23:** commit **code**
+`198a6d9…` push **một mình một lệnh** ⇒ `total_count: 3`, trong khi ba commit code liền trước
+(`6a07883e…` T44 · `c2a8626e…` T45 · `8083b106…` T46) đi chung lệnh push với commit docs đều
+`total_count: 0`. Đây là mẫu *code* đầu tiên trong lịch sử sổ này có run của chính nó.
+
+**Điều mới thứ hai — nửa còn lại của cách né, và chính phiên này là minh chứng:** "một commit một
+lệnh push" chỉ đảm bảo run được **tạo ra**, không đảm bảo run được **chạy xong**. Dòng thời gian
+(giờ UTC, lấy từ `jobs.started_at` / `completed_at`):
+
+```
+20:21:09  ba job của 198a6d9 khởi động
+20:21:47  1. Quality success · 20:21:41  2. Build success
+20:21:52  push lượt hai (e0fcb6f) ⇒ GitHub tạo ba run mới cùng ref
+20:22:10  3. Browser QA của 198a6d9 bị cancelled   ← cancel-in-progress: true (§ .github/workflows/03-qa-browser.yml:17-19)
+20:22:13  3. Browser QA của e0fcb6f khởi động → 20:23:20 success
+```
+
+Hai lệnh push cách nhau **47 giây** (`created_at` của ba run lượt một là `20:21:05Z`, của ba run
+lượt sau là `20:21:52Z`), còn `golden path` cần **61–87 giây** ⇒ lượt sau luôn chen vào
+lúc lượt trước chưa khép. Hệ quả thực tế **nhẹ** trong trường hợp này: xem từng bước của job bị hủy
+thì **bước 7 "QA probe" đã `success`**, chỉ mất bước 8 (đưa lỗi lên annotation, vốn `skipped` khi
+không có lỗi) và kết luận cấp job/run. Nhưng nếu probe *đỏ* thì bằng chứng đỏ đã bay cùng lệnh hủy.
+
+⇒ Cách né đầy đủ của `RISK-16` từ nay là **hai** điều kiện, không phải một:
+(1) mỗi commit **code** một lệnh push riêng, **và**
+(2) chờ lượt CI của commit đó khép (≈ 90 s cho cả ba workflow) rồi mới push lượt sau — hoặc đổi
+`cancel-in-progress: false` cho `ci-qa-*` (điều (b) đã ghi sẵn trong ô *đóng* của `RISK-16`).
+
+Vòng kiểm kê **chốt** (§23 + ba lượt vừa đo trực tiếp ở bảng trên; không chạy lại toàn sổ vì §23 đã
+đo tới `a6c472b` và ba lượt mới là toàn bộ phần chênh):
+
+  số lượt workflow `03` trên `main` : **35** (`#37` `66e0fea` → `#72` `e0fcb6f`)
+  cấp job toàn sổ                  : **24/35 lượt xanh · 9 đỏ · 2 cancelled**
+  chuỗi xanh tới tip               : **1 lượt** (`e0fcb6f`) — đứt ở `198a6d9` vì *bị hủy*, **không phải vì đỏ**
+  Ô 13                             : **vẫn MỞ** — chưa có lượt đỏ *thật* bị cổng chặn sau `3b0122c`
+
+Lưu ý khi đọc "chuỗi xanh = 1": lần này chuỗi ngắn **không** là tín hiệu chất lượng. commit code
+T47 xanh cả ba bước probe; nó chỉ mang nhãn `cancelled` vì lịch push của chính phiên làm việc.

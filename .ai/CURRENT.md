@@ -406,8 +406,16 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug 
   (bốn công tắc ba mẹ chỉ trang trí, `getChildProfile()` tiến streak khi đọc, `getAnalytics()` đóng dấu
   `lastPracticed`, `useSpeak` báo `'played'` ở `onerror`, chuỗi "mở khóa" lệch chính tả).
   `DEF-011` tiếp tục MỞ (chờ người giữ repo chốt "total" đếm theo lượt hay câu).
-- **CI:** chưa đo cho lượt này — theo §23, số hiện trạng CI sống ở `ci-gate-race.txt` §23 và **chỉ** đo lại
-  khi có commit **code** mới; commit code T47 sẽ push **riêng một lượt** để né `RISK-16`.
+- **CI (đo 2026-11-04, hồ sơ §24 — mục hiện trạng mới, thay cho §23):** commit code `198a6d9…` push
+  **một mình một lệnh** ⇒ `total_count: 3`, lần đầu một commit **code** của sổ săn bug có run của chính
+  nó (T44/T45/T46 đều `0`). `1. Quality` job 126181318638 success **38 s** · `2. Build` 126181318505
+  success **32 s** · `3. Browser QA` 126181317728 **cancelled** ở giây 61 — nhưng **bước 7 "QA probe" đã
+  `success`**, lệnh hủy rơi vào phần teardown. Nguyên nhân: lệnh push docs thứ hai đến sau **47 s** trong
+  khi `golden path` cần 61–87 s, và `03-qa-browser.yml:17-19` đặt `cancel-in-progress: true`. Commit docs
+  `e0fcb6f…` (cùng tree code) thì **3/3 success**, QA job 126181882876 **67 s**. Kiểm kê: **24/35 lượt
+  xanh · 9 đỏ · 2 cancelled**, chuỗi xanh tới tip **1** (đứt vì *bị hủy*, không vì đỏ). **Cách né
+  `RISK-16` rút gọn còn hai điều kiện:** một commit code một lệnh push **và chờ lượt CI khép (~90 s)**
+  trước khi push lượt sau.
 
 
 

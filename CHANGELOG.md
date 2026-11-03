@@ -17,6 +17,26 @@ asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện 
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
 ### Changed
+- **Cách né `RISK-16` có hiệu lực nhưng chỉ một nửa — điều kiện thứ hai vừa bị chính phiên T47 lộ ra.**
+  Commit code `198a6d9a2ff787669394da4349d277c1990acb6f` được push **một mình một lệnh** ⇒
+  `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=$(git rev-parse 198a6d9)`
+  trả `total_count: 3` (`1. Quality` job 126181318638 `success` **38 s** · `2. Build + artifact`
+  126181318505 `success` **32 s** · `3. Browser QA` 126181317728 **`cancelled`** ở giây **61**). Đây là
+  **mẫu code đầu tiên** trong lịch sử sổ này có run của chính nó (ba commit code liền trước
+  `6a07883e…`/`c2a8626e…`/`8083b106…` đều `total_count: 0`). Nhưng run bị hủy vì lượt docs `e0fcb6f…`
+  được đẩy **47 s** sau đó, cùng ref nên chen vào đúng nhóm `concurrency` của workflow (group
+  `ci-qa-…`, `cancel-in-progress: true` — `.github/workflows/03-qa-browser.yml:17-19`). Đọc từng bước của job bị hủy
+  (`actions/runs/41711756710/jobs`) thì **bước 7 "QA probe" đã `success`** — phần mất chỉ là bước 8
+  (annotation, vốn `skipped` khi không có lỗi) ⇒ hệ quả với bằng chứng *nhẹ*, nhưng nếu probe đỏ thì
+  bằng chứng đỏ đã bay cùng lệnh hủy. ⇒ Điều kiện đóng (a) của `RISK-16` nay đọc là **hai** vế: mỗi
+  commit code một lệnh push riêng **VÀ** chờ lượt CI khép (≈ 90 s cho cả ba workflow) rồi mới push tiếp;
+  hoặc dùng (b) `cancel-in-progress: false` cho `ci-qa-*`. Kiểm kê chốt (§23 + ba lượt mới đo trực tiếp):
+  workflow `03` trên `main` = **35 lượt** (`#37` `66e0fea` → `#72` `e0fcb6f`), **cấp job 24/35 xanh ·
+  9 đỏ · 2 cancelled**, chuỗi xanh tới tip **1** (`e0fcb6f`) và chuỗi ngắn lần này **không** phải tín
+  hiệu chất lượng. **§24 thành mục hiện trạng**, thay §23; các file khác dẫn đường dẫn tới
+  `evidence/2026-11-03-QA-RACE/ci-gate-race.txt` §24 và không đo lại cho commit docs-only. Đã trỏ
+  `docs/plan/RISK_REGISTER.md` `RISK-10` + `RISK-16`, `docs/plan/TEST_PLAN.md` §16 ô 13, `evidence/README.md`,
+  `.ai/CURRENT.md` về §24. Ô 13 **vẫn MỞ**: chưa có đỏ *thật* bị cổng chặn sau `3b0122c`.
 - **Vòng kiểm kê chốt §23, kèm quy tắc để hồ sơ hiện trạng không phải đổi theo từng commit docs.**
   `a6c472b` (chính commit hồ sơ §22, **không đổi `src/`**) được push **một mình** ⇒ tra bằng SHA đủ
   `40` ký tự `a6c472b4c69a774dd08aac1dfb5b321d909f562d` ⇒ `total_count: 3` (`1. Quality` 41696285737 ·
