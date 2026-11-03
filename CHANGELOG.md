@@ -128,6 +128,32 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T47F — "Chơi lại" cùng màn không dựng lại bảng chơi ở năm trò, và bảng chọn màn của trò tô màu vẫn không về được màn dễ (`DEF-018(a)`).**
+  Nút "Chơi lại" (cả ở biên lai phần thưởng) gọi `stage.restartGame()`, hàm này bump `nonce`
+  (`StorageService.bumpPlayNonce`) nhưng **không đổi** `tier` khi bé chơi lại đúng màn hiện tại ⇒
+  mọi hiệu ứng khởi tạo chỉ keyed `[stage.tier]` (hoặc `[stage.tier, stage.roundIdx]`) sẽ
+  **không chạy lại**, và năm trò rơi đúng vào đó: `NumberTowerGame.tsx` — tháp vẫn đầy
+  "Tầng 1 (+3), Tầng 2 (+5)…" trong khi điểm vừa về 0, bé tưởng mình đã xây lại xong;
+  `SentenceScrambleGame.tsx` — `setAssembledWords([])` cùng `setTrainDriving(false)` đều bị bỏ, mà
+  `handleWordTap` có `if (stage.locked || trainDriving) return;` ⇒ ván trước kết thúc ở round 1 thì
+  tàu chữ **đang chạy mãi mãi**, mọi cú chạm bị nuốt (soft-lock, nặng hơn lỗi mỹ thuật);
+  `ClockMoneyGame.tsx` — gợi ý của ván cũ treo sang ván mới; `EnglishAnimalSoundGame.tsx` +
+  `ListenPickPhonicsGame.tsx` — đề mới mà không có tiếng đọc, mất luôn gợi ý chính của trò
+  "Nghe và chọn". Năm chỗ sửa cùng khuôn: thêm `stage.nonce` vào deps.
+  **Một nghi oan đã đo lại**: `ColoringCanvasGame` **không** cần `nonce` — `onRestart` của nó là
+  wrapper riêng gọi `clearCanvas()` theo lệnh, và probe chạy trên `dist/` **trước khi sửa** cho thấy
+  tranh vốn đã bị xoá (`coverageAfterReplay: 0`, `canvasNodeReplaced: false`). Defect **thật** của
+  đúng wrapper đó là bỏ tham số `targetTier` ⇒ `stage.restartGame()` fallback `unlockedTier` (màn khó
+  nhất từng mở), tức đường sửa `DEF-017` lọt lại trên trò duy nhất có wrapper — giờ
+  `restartGame = (targetTier?: number) => { stage.restartGame(targetTier); clearCanvas(); }`.
+  Bằng chứng `evidence/2026-11-04-T47F/`: probe `probe-t47f-restart-clears-board.mjs` chạy **hai lần**
+  trên `dist/` (bản bỏ guard — QA FAIL 3 lỗi A2/B2/C3; bản có guard — QA PASS 5 bước / 0 lỗi / 7 ảnh;
+  C0 + C2 đứng nguyên giữa hai lần chạy, tức lời "nghi oan" là số đo chứ không phải lập luận),
+  `tests-RED-no-guard.txt` (`3 failed | 2 passed (5)`), hồi quy `qa/games.mjs` (vòng qua cả 31 tựa,
+  `errors: []`) + `qa/golden-path.mjs` (28 bước, 0 lỗi) trong `probe-regression.txt`, và
+  `verify-exit0.txt` (**119 file / 1502 test**, `Duration 24.79s`, entry `index-DbfbtGg4.js`
+  **211.1 kB** — `src/` đổi nên entry **đổi hash** còn **kB đứng nguyên**, boot graph vẫn
+  `435603 total` byte).
 - **T47 — năm defect: một phím vẫn xoá ván khi đang tạm dừng, "Không giới hạn" của ba mẹ bị tính ra 20 phút, quyền ba mẹ không lên cloud, dòng thưởng 0 XP, bảng chọn màn không về được màn dễ.**
   (a) **`DEF-013` phần còn lại — `Esc` lúc đang tạm dừng **thoát luôn ván****: tấm che
   "Đang tạm dừng" (`absolute inset-0 z-20`, dựng khi `isRealtime && isPaused`) là một lớp phủ thật mà

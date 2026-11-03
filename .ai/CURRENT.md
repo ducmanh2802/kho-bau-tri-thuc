@@ -416,6 +416,34 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug 
   xanh · 9 đỏ · 2 cancelled**, chuỗi xanh tới tip **1** (đứt vì *bị hủy*, không vì đỏ). **Cách né
   `RISK-16` rút gọn còn hai điều kiện:** một commit code một lệnh push **và chờ lượt CI khép (~90 s)**
   trước khi push lượt sau.
+- **T47F (2026-11-04, ngay sau mục trên) — lát cắt thứ 11, và là lát cắt đầu tiên mà *danh sách bug*
+  bị phép đo sửa.** Người dùng: "tự động chọn khi tôi không ở đây" + "xong thì push code". Mở bằng
+  `DEF-018(a)`: bấm "Chơi lại" **cùng màn** chỉ bump `stage.nonce` (không đổi `tier`/`roundIdx`) ⇒ mọi
+  hiệu ứng khởi tạo keyed `[stage.tier]` / `[stage.tier, stage.roundIdx]` **không chạy lại**. Sửa **5**
+  deps: `NumberTowerGame.tsx:25` (tháp vẫn "Tầng 1 (+3)"), `SentenceScrambleGame.tsx:31` (`trainDriving`
+  không reset ⇒ `handleWordTap` có `|| trainDriving` **nuốt mọi cú chạm** — soft-lock, nặng nhất),
+  `ClockMoneyGame.tsx:36` (gợi ý ván cũ treo sang ván mới), `EnglishAnimalSoundGame.tsx:30` +
+  `ListenPickPhonicsGame.tsx:139` (đề mới không có tiếng đọc). **Chỗ thứ sáu trong danh sách bị bác
+  bằng số**: `ColoringCanvasGame` có wrapper `onRestart` riêng gọi `clearCanvas()`, probe trên `dist/` ở
+  cây **không** guard trả `coverageAfterReplay: 0` + `canvasNodeReplaced: false` ⇒ "tranh giữ nguyên
+  màu" là lời **bịa theo suy luận**, đã phải viết lại trong test header / probe header / comment source.
+  Defect **thật** của wrapper đó: bỏ tham số `targetTier` ⇒ `stage.restartGame()` fallback
+  `unlockedTier` tức `DEF-017` **lọt lại** đúng trò duy nhất có wrapper — sửa ở
+  `ColoringCanvasGame.tsx:219`, probe thêm bước C3 để đo đúng điều đó.
+  Test: `tests/t47f-restart-resets-board.test.ts` (5) — scanner bất biến mọi deps dựng lại bảng trong
+  `src/components/games/*.tsx` + **hai test bắt điều kiện miễn còn đúng** (ngoại lệ không ghi chết) +
+  tiên đề "chơi lại cùng màn đổi nonce không đổi tier". **Hạn chế của scanner đã ghi rõ**: chỉ đọc deps
+  viết trên **một** dòng. RED: `3 failed | 2 passed (5)`; probe RED (bỏ guard) = QA FAIL 3 lỗi A2/B2/C3;
+  probe GREEN = QA PASS 5 bước / 0 lỗi / 7 ảnh; C0 + C2 đứng nguyên giữa hai lần chạy.
+  Cổng: `npm run verify` **EXIT=0** · `119 file / 1502 test` · `Duration 24.79s` ·
+  `index-DbfbtGg4.js` **211.1 kB** — `src/` đổi nên entry **đổi hash** còn **kB đứng nguyên**, boot graph
+  vẫn `435603 total` byte (đúng cặp lỗi mà quy ước "hash ≠ kB" cảnh báo). Hồi quy `qa/games.mjs`
+  (`errors: []`, vòng qua 31 tựa) + `qa/golden-path.mjs` (28 bước). Kiểm kê: 42 service, **30** probe
+  (probe mới đặt trong `evidence/2026-11-04-T47F/`), 31/31/31/31 trò.
+  Sổ: `DEF-018(a)` **ĐÓNG**, `DEF-018(b)` = **T47G vẫn MỞ** (5 trò `playWrong()` không phản hồi hình
+  ảnh), `DEF-019` vẫn MỞ. **Việc của lane sau**: docs sync đã xong trong phiên này (`measure.mjs` exit
+  0), commit tách **code** (6 file `src/` + test + `evidence/2026-11-04-T47F/`) rồi push **một mình**,
+  chờ ~90 s hãy push commit docs (`RISK-16`).
 
 
 

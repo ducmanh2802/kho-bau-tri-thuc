@@ -15,9 +15,20 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1497 test / 118 file,
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1502 test / 119 file,
    211.1 kB entry + 425.4 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
-   ngay sau **T47** (năm defect một đợt, đều là phần *còn hở* của sổ săn bug: `Esc` lúc đang tạm dừng
+   ngay sau **T47F** (đóng `DEF-018(a)`: **sáu** chỗ mà nút "Chơi lại" không xoá trạng thái bảng —
+   `NumberTowerGame.tsx:25`, `SentenceScrambleGame.tsx:31`, `ClockMoneyGame.tsx:36`,
+   `EnglishAnimalSoundGame.tsx:30`, `ListenPickPhonicsGame.tsx:139` đều thiếu `stage.nonce` trong deps
+   (chơi lại cùng màn chỉ bump `nonce`, không đổi `tier` ⇒ đề mới mà bảng cũ, nhẹ nhất là gợi ý cũ treo
+   lại, nặng nhất là soft-lock tàu chữ vì `trainDriving` không reset); chỗ thứ sáu là
+   `ColoringCanvasGame.tsx:219` — wrapper `onRestart` **duy nhất** trong repo bỏ tham số nên
+   `stage.restartGame()` lấy `unlockedTier`, tức `DEF-017` lọt lại đúng trò này; **1** file test mới
+   `tests/t47f-restart-resets-board.test.ts` (5) ⇒ +5 test; vẫn **42** service module, vẫn **30** probe QA
+   (probe bằng chứng đặt trong `evidence/2026-11-04-T47F/`, không tính vào `qa/`); `src/` đổi nên entry
+   **đổi hash** (đuôi `vqb0Kx4n` → `DbfbtGg4`) trong khi **kB đứng nguyên** 211.1 và boot graph vẫn
+   `435603 total` byte — bằng chứng `evidence/2026-11-04-T47F/`),
+   đợt **T47** liền trước (năm defect một đợt, đều là phần *còn hở* của sổ săn bug: `Esc` lúc đang tạm dừng
    **thoát luôn ván** vì tấm che "Đang tạm dừng" không được khai là lớp phủ — đóng `DEF-013`; ba mẹ chọn
    "Không giới hạn" (`dailyLimitMinutes: 0`) bị ép thành ngân sách 20 phút; `saveParentSettings()` ghi
    `setItem` thô nên không phát `kho_bau_storage_change` ⇒ quyền kiểm soát của ba mẹ không bao giờ rời
