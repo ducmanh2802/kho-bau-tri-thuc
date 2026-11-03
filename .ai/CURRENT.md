@@ -246,6 +246,16 @@ Người dùng: "push code và check bug tiếp" ⇒ chạy skill `kho-bau-chang
   chạy tay **năm** probe vì CI chỉ chạy golden-path (`RISK-18`): `games` (`catalogCount: 31`, 0 errors),
   `golden-path` (28 bước), `parent-controls` (7 bước), `focus`, `mobile` — tất cả exit 0,
   log ở `evidence/2026-11-03-T45/qa/`.
+- **CI phía server (đo 2026-11-04, §20)**: push `8d73ff1..e171e6e` xanh cả ba cổng trên tip `e171e6e`
+  (`1. Quality` 41683815885 · `2. Build + artifact` 41683815929 · **`3. Browser QA` 41683815872**, job
+  126084122217 `golden path trên Chromium` success `17:23:44Z→17:24:44Z` = **60 s**, bước 7 `success`,
+  bước 8 `skipped`). Commit code `c2a8626` **không có run nào** (`actions/runs?head_sha=c2a8626` ⇒
+  `total_count: 0`) — lần **thứ hai** gặp khuôn này (`6a07883` của T44 là lần đầu) ⇒ `RISK-16` có thêm
+  bằng chứng. Kiểm kê lại **toàn bộ** workflow `03` trên `main` bằng `jobs[].conclusion` ⇒ **28 lượt =
+  18 xanh · 9 đỏ · 1 `cancelled`**; chuỗi xanh tới tip = **4**; mười lăm lượt cuối không còn cờ = **14
+  xanh + 1 cancelled + 0 đỏ** (`evidence/2026-11-03-QA-RACE/ci-census-main-wf03-round2.txt` +
+  `-round2-raw.txt`; luận bàn §20 `ci-gate-race.txt`; 29 request, hạn mức 60/giờ). Ô 13 `TEST_PLAN.md`
+  §16 **vẫn MỞ**: chưa có đỏ *thật* nào sau khi bỏ cờ ⇒ cổng chưa *chứng minh* được nó cắt commit hỏng.
 - Số hiện trạng đã sync **lần chín trong ngày** (BRD §7/Phụ lục A, `ARCHITECTURE.md` §12, SRS §11 +
   NFR-M04, RTM §3/§7, `TEST_PLAN.md` header/§2/§9, `TASK_PLAN.md` `K-03` + một hàng §II,
   `CHANGELOG.md`, `evidence/README.md` + `evidence/2026-11-03-T45/`); `measure.mjs` **exit 0**.

@@ -631,3 +631,30 @@ Cập nhật kiểm kê §18 (vẫn đọc `jobs[].conclusion`, không dùng c�
 
 Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ** sau §19: chưa có lượt đỏ *thật* nào sau khi bỏ cờ
 (#52 trở đi chỉ toàn xanh hoặc một cancelled vì bị chen), nên cổng vẫn chưa *chứng minh* được nó chặn.
+
+---
+
+## 20. Bổ sung sau T45: hai lượt `main` mới, cả hai xanh — 18/28 cấp job
+
+Lệnh + output nguyên văn nằm ở `ci-census-main-wf03-round2.txt` (file này chỉ tóm tắt; vòng đo chạy
+2026-11-04 lúc `2026-11-03T17:23Z`, **29 request**, hạn mức unauthenticated 60/giờ nên mỗi giờ chỉ
+nâng cấp được một lần).
+
+Mẫu: **26 → 28** lượt `main` của workflow `03` kể từ `66e0fea` (run #37 → #65). Hai lượt mới:
+
+| # | run | job | commit | `jobs[].conclusion` | duration | bước 7 "QA probe" | bước 8 |
+|---|---|---|---|---|---|---|---|
+| 64 | 41666323856 | 126022497816 | `8d73ff1` | success | 57 s (`15:40:32Z→15:41:29Z`) | success | skipped |
+| 65 | 41683815872 | 126084122217 | `e171e6e` (tip push T45) | success | 60 s (`17:23:44Z→17:24:44Z`) | success | skipped |
+
+Tally trên `ci-census-main-wf03-round2-raw.txt` (28 dòng): `grep -c success` = **18** ·
+`grep -c failure` = **9** · `grep -c cancelled` = **1** ⇒ **18/28 lượt xanh cấp job**, đỏ vẫn **9**
+(không thêm đỏ mới), chuỗi xanh tính tới tip = **bốn lượt liên tiếp** #62→#65 và **bốn lượt cuối đều
+không còn cờ** `continue-on-error`.
+
+**Commit code `c2a8626` không có lượt CI nào** (`actions/runs?head_sha=c2a8626` ⇒ `total_count: 0`) —
+đúng khuôn `RISK-16` đã ghi sau T44: hai commit đi trong một lệnh push nên chỉ tip được probe. Đây là
+lần **thứ hai** gặp khuôn này, và là bằng chứng mạnh hơn cho `RISK-16` (lần đầu là `6a07883`).
+
+Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ** sau §20: 18 lượt xanh vẫn chưa chứng minh cổng *cắt* được
+commit hỏng, vì chưa từng có một probe đỏ *thật* xảy ra sau khi bỏ cờ ở `3b0122c`.

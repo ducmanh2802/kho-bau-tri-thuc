@@ -103,6 +103,29 @@ probe mà CI **không** chạy (một lượt CI chỉ chạy `qa/golden-path.mj
 | `qa/focus.mjs` | `qa/focus.txt` | `QA PASS — 0 step(s), 0 errors` (exit 0) |
 | `qa/mobile.mjs` | `qa/mobile.txt` | `QA PASS — 0 step(s), 0 errors` (exit 0) |
 
+## CI (đo sau push)
+
+Push `8d73ff1..e171e6e` (hai commit một lượt). Pre-push hook chạy `npm run verify` trên tip:
+`Test Files 110 passed (110)` · `Tests 1441 passed (1441)` · `Duration 26.51s` · `✔ Pre-push: passed`.
+
+| Workflow | run | job | commit được đo | kết quả | thời lượng | bước 7 "QA probe" | bước 8 |
+|---|---|---|---|---|---|---|---|
+| `1. Quality` | 41683815885 | — | `e171e6e` (tip) | success | — | — | — |
+| `2. Build + artifact` | 41683815929 | — | `e171e6e` | success | — | — | — |
+| **`3. Browser QA`** | **41683815872** | 126084122217 `golden path trên Chromium` | `e171e6e` | **success** | `17:23:44Z→17:24:44Z` = **60 s** | `success` | `skipped` |
+
+`c2a8626` (commit **code** của đợt này) **không có run nào**: `curl -s
+https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=c2a8626` ⇒
+`total_count: 0`. Đây là lần **thứ hai** gặp khuôn "hai commit một push ⇒ chỉ tip được probe" (lần đầu
+`6a07883` của T44) nên `RISK-16` vẫn MỞ; hệ quả thật: **không lượt CI nào chạy `qa/*` trên đúng bộ
+`src/` của T45**, phần hồi quy 31 trò ở mục trên chỉ có ở cấp máy.
+
+Kiểm kê lại toàn bộ workflow `03` trên `main` (vòng hai, `../2026-11-03-QA-RACE/ci-census-main-wf03-round2.txt`):
+**28 lượt = 18 xanh · 9 đỏ · 1 `cancelled`**, chuỗi xanh tới tip = **4**, mười lăm lượt cuối không còn
+cờ = **14 xanh + 1 cancelled + 0 đỏ**. Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ** — chưa có probe đỏ
+*thật* nào xảy ra sau khi bỏ `continue-on-error`, nên 18 lượt xanh mới chứng minh cổng *chạy*, chưa
+chứng minh cổng *cắt*.
+
 ## Ảnh
 
 `a2-lop-phu-che-bang.png`, `a4-sau-khi-dong-lop-phu.png`, `b1-man-nhac-nghi.png`,

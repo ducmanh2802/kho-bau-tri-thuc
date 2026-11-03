@@ -1,0 +1,135 @@
+Kiểm kê lượt CI của workflow `3. Browser QA` (id 401675040) trên `main` — vòng hai
+================================================================================================================================================
+
+Đo ngày 2026-11-04 (00:2x giờ máy, tương ứng `2026-11-03T17:23Z`), ngay sau push `8d73ff1..e171e6e`
+(hai commit T45: `c2a8626` code + `e171e6e` docs). **Không** sửa
+`ci-census-main-wf03.txt` (vòng một, đo 2026-11-03 sau T43) — file này là lát cắt kế tiếp, cùng
+phép đo, cùng định nghĩa.
+
+Vì sao đo lại: vòng một chốt **26 lượt = 16 xanh · 9 đỏ · 1 `cancelled`** tới tip `58020e5` (§19
+`ci-gate-race.txt`). Từ đó đã có thêm push, nên bất kỳ hồ sơ nào còn trích "16/26" làm *hiện trạng*
+đều lệch đúng số lượt mới. Cách đếm "số đã công bố + lượt mới" từng bỏ sót ba lượt đỏ và một lượt
+xanh nên ở đây vẫn đếm lại **toàn bộ** bằng `jobs[].conclusion`.
+
+Phạm vi: mọi run có `head_branch=main` của workflow `401675040` kể từ run `41488045102` (commit
+`66e0fea` — commit đầu mà probe thật sự chạy trên runner), tính cả `push` lẫn `workflow_dispatch`.
+
+```bash
+REPO=ducmanh2802/kho-bau-tri-thuc
+
+curl -s "https://api.github.com/rate_limit" \
+| node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const r=JSON.parse(s).resources.core;
+    console.log("core remaining:",r.remaining,"/",r.limit,"| reset:",new Date(r.reset*1000).toISOString());});'
+# core remaining: 53 / 60 | reset: 2026-11-03T18:23:50.000Z   ← trước khi chạy vòng đo (cần 1 + 28 = 29)
+
+# (1) đếm số run thoả điều kiện — 1 request
+curl -s "https://api.github.com/repos/$REPO/actions/workflows/401675040/runs?branch=main&per_page=100" \
+| node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const rs=JSON.parse(s).workflow_runs
+    .filter(x=>x.id>=41488045102).sort((a,b)=>a.id-b.id);
+    console.log("count="+rs.length);
+    console.log("first="+rs[0].id+" "+rs[0].head_sha.slice(0,7));
+    console.log("last="+rs[rs.length-1].id+" "+rs[rs.length-1].head_sha.slice(0,7));});'
+# count=28
+# first=41488045102 66e0fea
+# last=41683815872 e171e6e
+
+# (2) vòng đọc jobs[].conclusion — 28 request (mỗi run một request)
+for id in $(curl -s "https://api.github.com/repos/$REPO/actions/workflows/401675040/runs?branch=main&per_page=100" \
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{JSON.parse(s).workflow_runs
+      .filter(x=>x.id>=41488045102).sort((a,b)=>a.id-b.id).forEach(x=>console.log(x.id));})'); do
+  curl -s "https://api.github.com/repos/$REPO/actions/runs/$id/jobs" \
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const d=JSON.parse(s);
+      if(!Array.isArray(d.jobs)){console.log("RATE_LIMIT_OR_ERROR", JSON.stringify(d.message)); return;}
+      for(const j of d.jobs){const q=(j.steps||[]).find(x=>/QA probe/i.test(x.name));
+        console.log(j.run_id, j.conclusion,
+          Math.round((new Date(j.completed_at)-new Date(j.started_at))/1000)+"s",
+          "step7="+(q&&q.conclusion));}})';
+done
+```
+
+Output nguyên văn (cột: `run_id  job.conclusion  job_duration  bước7-QA-probe`) — chính là
+`ci-census-main-wf03-round2-raw.txt`; các `grep -c` dưới đếm **đúng trên file đó**:
+
+```
+41488045102 failure 61s step7=failure
+41490451074 failure 104s step7=failure
+41493791252 failure 62s step7=failure
+41494831619 failure 114s step7=failure
+41496530836 failure 100s step7=failure
+41498110362 failure 87s step7=failure
+41499645998 failure 100s step7=failure
+41501753363 success 59s step7=success
+41504913606 failure 81s step7=failure
+41508824890 failure 75s step7=failure
+41515106575 success 66s step7=success
+41516820864 success 127s step7=success
+41518983585 success 69s step7=success
+41523226603 success 69s step7=success
+41526285381 success 72s step7=success
+41527657645 success 57s step7=success
+41528603801 success 63s step7=success
+41537247288 success 62s step7=success
+41538711482 success 54s step7=success
+41632118172 success 76s step7=success
+41633585126 success 81s step7=success
+41642318907 success 61s step7=success
+41646599254 success 56s step7=success
+41647428035 cancelled 241s step7=skipped
+41648001797 success 56s step7=success
+41663622006 success 59s step7=success
+41666323856 success 57s step7=success
+41683815872 success 60s step7=success
+```
+
+```bash
+grep -c success   ci-census-main-wf03-round2-raw.txt   # 18
+grep -c failure   ci-census-main-wf03-round2-raw.txt   # 9
+grep -c cancelled ci-census-main-wf03-round2-raw.txt   # 1
+wc -l < ci-census-main-wf03-round2-raw.txt             # 28
+```
+
+**Kết quả: 28 lượt = 18 xanh · 9 đỏ · 1 `cancelled`** (cấp job). So vòng một: **thêm 2 lượt, cả hai
+xanh** (`8d73ff1` #64 · `e171e6e` #65) ⇒ mẫu số 26→28, tử số 16→18. Chuỗi xanh tính tới tip =
+**bốn lượt liên tiếp** `41648001797`(#62 `fc861f3`) → `41663622006`(#63 `58020e5`) →
+`41666323856`(#64 `8d73ff1`) → `41683815872`(#65 `e171e6e`), đứt ở `41647428035`(#61 `8e27cd5`
+**cancelled**, bước 7 `skipped` — không phải đỏ).
+
+Hai lượt mới, chi tiết cấp job:
+
+```
+#64  run 41666323856  job 126022497816  golden path trên Chromium  success  57s  step7=success  step8=skipped
+     (15:40:32Z→15:41:29Z)
+#65  run 41683815872  job 126084122217  golden path trên Chromium  success  60s  step7=success  step8=skipped
+     (17:23:44Z→17:24:44Z)
+```
+
+Lệnh đo `#65` (job id + bước, output nguyên văn một dòng):
+
+```bash
+curl -s "https://api.github.com/repos/$REPO/actions/runs/41683815872/jobs" \
+| node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{for(const j of JSON.parse(s).jobs){
+    console.log("run="+j.run_id+" job="+j.id+" "+j.name+" "+j.conclusion+" "+j.started_at+"->"+j.completed_at);
+    for(const st of j.steps||[]) if(/probe/i.test(st.name)) console.log("   step: "+st.name+" = "+st.conclusion);}});'
+# run=41683815872 job=126084122217 golden path trên Chromium success 2026-11-03T17:23:44Z->2026-11-03T17:24:44Z
+#    step: QA probe = success
+#    step: Đưa lỗi probe lên annotation (đọc public được) = skipped
+```
+
+Commit code của T45 **không có lượt CI nào** — đúng khuôn mà `RISK-16` đã ghi ở T44, và lần này còn
+dễ thấy hơn vì push mang theo cả `8d73ff1`:
+
+```bash
+curl -s "https://api.github.com/repos/$REPO/actions/runs?head_sha=c2a8626" \
+| node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{console.log("total_count="+JSON.parse(s).total_count);});'
+# total_count=0        ← API chấp nhận SHA ngắn ở `head_sha`, nhưng chỉ khớp khi run nào đó có đúng SHA này
+```
+
+(Cũng kiểm `head_sha` đầy đủ của `8d73ff1` và `e171e6e`: mỗi SHA một bộ ba run `1.`/`2.`/`3.`, tất cả
+`completed success`. Không có run nào gắn `c2a8626` ⇒ lượt probe của phần code T45 đi nhờ commit docs.)
+
+Điều **chưa** đổi: ô 13 `docs/plan/TEST_PLAN.md` §16 vẫn MỞ — 18 lượt xanh chưa có nghĩa là cổng đã
+cắt; đến giờ vẫn chưa từng thấy một probe đỏ *thật* làm đỏ cả run sau khi `continue-on-error` bị bỏ
+ở `3b0122c`, và cũng chưa có đỏ *giả* nào bị chặn oan. `RISK-10`/`RISK-16` vì thế vẫn MỞ.
+
+Hạn mức sau vòng đo: 29 request cho vòng chính + vài request xác suất ⇒ unauthenticated 60/giờ, mỗi
+giờ chạy lại được **một** lần. Muốn lặp lại thì đọc `rate_limit` trước, `remaining` phải ≥ 30.
