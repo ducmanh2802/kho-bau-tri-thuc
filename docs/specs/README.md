@@ -15,9 +15,17 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1377 test / 100 file,
-   210.9 kB entry + 425.2 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
-   ngay sau **T43** (một defect: `resetProgress()` chỉ quét 13/17 khoá nên "Đặt lại tiến độ" để sót
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1410 test / 105 file,
+   211.0 kB entry + 425.3 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
+   ngay sau **T44** (năm lát cắt: `kho_bau_ioe_store` được đưa vào `STORAGE_KEYS` ⇒ **18** key trong registry
+   (tổng vẫn **19** vì `kho_bau_cloud_session_hint` nằm ngoài), đường sinh đề hết `Math.random`, chuỗi máy/Anh
+   còn lộ trên UI, **44** hộp chạm < 44px mà probe render đo được ở 375×812 dù quét class trong source không thấy,
+   và lượt sai phải có **lý do** bằng chữ + tiếng chứ không chỉ một tiếng bíp; **5** file test mới
+   `tests/t44a-storage-key-coverage` (6) · `t44b-exercise-selection-seeded` (10) · `t44c-ui-label-language` (7) ·
+   `t44d-tap-targets` (4) · `t44e-wrong-answer-feedback` (6) ⇒ 33 test; thêm **1** file dữ liệu
+   `src/data/englishIoe/selection.ts` ⇒ **105** file `src/data/*.ts`, vẫn **42** service module;
+   `src/` đổi nên entry **đổi cả hash lẫn kB** — bằng chứng `evidence/2026-11-03-T44/`),
+   đợt **T43** liền trước (một defect: `resetProgress()` chỉ quét 13/17 khoá nên "Đặt lại tiến độ" để sót
    `review_days` + `game_first_seen` + `tree_water` — `DEF-001` trong `docs/plan/RISK_REGISTER.md`;
    1 file test mới `tests/t43a-reset-progress-sweeps-child-data.test.ts` (5 test; RED 4 failed → GREEN);
    không thêm key, không thêm service module (vẫn **42**); `src/services/storage.ts` đổi nên entry

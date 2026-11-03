@@ -199,7 +199,7 @@ Cột **Gate** chỉ cổng nào chặn nếu vi phạm: `V` = `npm run verify` 
 | FR-P03 | Cài đặt cha mẹ lưu ở `kho_bau_parent_settings` (gồm night mode, bg music) | DC-10 | `src/services/storage.ts`, `tests/t14c-storage.test.ts` | V |
 | FR-P04 | Xuất báo cáo JSON ra file, tên `kho_bau_tri_thuc_report_*`, dữ liệu của chính máy đó | tải file thành công, JSON parse được | `src/services/storage.ts`, `qa/golden-path.mjs` | Q |
 | FR-P05 | Nạp file báo cáo: chỉ nhận đúng schema, từ chối dữ liệu lạ mà không làm hỏng store hiện có | import file rác → store giữ nguyên + thông báo lỗi | `tests/parent-and-demo.test.ts` | V |
-| FR-P06 | Đặt lại dữ liệu: cần xác nhận 2 bước trong Parent Gate; danh sách khoá xoá lấy **từ** `STORAGE_KEYS` trừ allowlist `RESET_KEEP_KEYS` ⇒ quét 16/17 khoá `kho_bau_*` (sao, XP, tiến độ, ôn tập, dấu "đã chơi", cờ tưới cây), **giữ** đúng một khoá `kho_bau_parent_settings` vì đó là lựa chọn của người lớn | không reset từ màn bé; sau reset `getReviewCompletedDays()` rỗng, `getTreeWateredDate()` = `null`, dấu "đã chơi" biến mất, cấu hình ba mẹ còn nguyên | `tests/t43a-reset-progress-sweeps-child-data.test.ts`, `evidence/2026-11-03-T43/probe-t43-reset.mjs` (kèm output `probe-t43-reset.txt`) | V,Q |
+| FR-P06 | Đặt lại dữ liệu: cần xác nhận 2 bước trong Parent Gate; danh sách khoá xoá lấy **từ** `STORAGE_KEYS` trừ allowlist `RESET_KEEP_KEYS` ⇒ quét **17/18** khoá `kho_bau_*` (sao, XP, tiến độ, ôn tập, dấu "đã chơi", cờ tưới cây, tiến độ IOE), **giữ** đúng một khoá `kho_bau_parent_settings` vì đó là lựa chọn của người lớn | không reset từ màn bé; sau reset `getReviewCompletedDays()` rỗng, `getTreeWateredDate()` = `null`, dấu "đã chơi" biến mất, cấu hình ba mẹ còn nguyên | `tests/t43a-reset-progress-sweeps-child-data.test.ts`, `evidence/2026-11-03-T43/probe-t43-reset.mjs` (kèm output `probe-t43-reset.txt`) | V,Q |
 | FR-P07 | Báo cáo chẩn đoán per skill + gợi ý kèm theo, có "chuẩn" để so sánh | mỗi row hiển thị `accuracy` / `gate` | `parent/ParentDashboardModal.tsx:850`, [src/services/competitionQuality.ts](file:///D:/trithuc/kho-bau-tri-thuc/src/services/competitionQuality.ts) | V |
 | FR-P08 | Gói "Ôn ở nhà" Kid's Box: phụ huynh chọn Unit/Tuần → app dựng gói, không cần nhập điểm | panel tồn tại và hoạt động với units = 0 (hiện yêu cầu nguồn) | [src/components/parent/KidBoxParentPanel.tsx](file:///D:/trithuc/kho-bau-tri-thuc/src/components/parent/KidBoxParentPanel.tsx) | Q |
 
@@ -234,7 +234,7 @@ Cột **Gate** chỉ cổng nào chặn nếu vi phạm: `V` = `npm run verify` 
 
 | ID | Nhóm | Yêu cầu | Ngưỡng chấp nhận | Đo bằng | Gate |
 |---|---|---|---|---|---|
-| NFR-P01 | Hiệu năng | Main chunk ≤ 600 kB | hiện 199.2 kB (**đạt mục tiêu ≤ 450 kB** từ T39); đồ thị chặn lần vẽ đầu 413.6 kB; vendor lớn `three-vendor` 572.6 / `firebase-vendor` 723 nằm ngoài entry, chỉ tải khi cần | `npm run check:budget`, `tests/bundle-budget.test.ts`, `tests/t39-first-load-graph.test.ts` | V, C |
+| NFR-P01 | Hiệu năng | Main chunk ≤ 600 kB | hiện 211.0 kB (**đạt mục tiêu ≤ 450 kB** từ T39); đồ thị chặn lần vẽ đầu 425.3 kB; vendor lớn `three-vendor` 572.6 / `firebase-vendor` 723 nằm ngoài entry, chỉ tải khi cần | `npm run check:budget`, `tests/bundle-budget.test.ts`, `tests/t39-first-load-graph.test.ts` | V, C |
 | NFR-P02 | Hiệu năng | Game component là `lazy` — mở game không nạp toàn bộ app | mỗi id trong `GAME_REGISTRY` là `lazy(...)` | `tests/t23-mcp-servers.test.ts`, `tests/t02c-startup-split.test.ts` | V |
 | NFR-P03 | Hiệu năng | Nước cờ không khoá UI | node budget có giới hạn, test timing | `tests/cotuong-engine.test.ts` | V |
 | NFR-P04 | Hiệu năng | Không bộ đếm thời gian/chu kỳ nào gọi `Math.random` trong dữ liệu đề | grep 0 kết quả ở `src/data/games/*.ts` | `AGENTS.md` §2, `tests/games-content.test.ts` | V |
@@ -256,7 +256,7 @@ Cột **Gate** chỉ cổng nào chặn nếu vi phạm: `V` = `npm run verify` 
 | NFR-M01 | Bảo trì | Một cổng duy nhất: `npm run verify` = typecheck + test + build + budget | exit 0 | [package.json](file:///D:/trithuc/kho-bau-tri-thuc/package.json) scripts | V, C |
 | NFR-M02 | Bảo trì | Mọi ngưỡng nghiệp vụ nằm trong `src/config/policy.ts`, có rationale + test | 17 export policy, 693 dòng | `src/config/policy.ts` | V |
 | NFR-M03 | Bảo trì | UI không quyết định correctness/score/mastery/readiness | engine là chỗ chấm duy nhất | FR-L03, FR-E05, `AGENTS.md` §0 principle 1 | V |
-| NFR-M04 | Bảo trì | Tên test `tests/t<NN>-<chủ đề>.test.ts`; hành vi mới ⇒ test mới | 100 file / 1377 test | `AGENTS.md` §2 | V, H |
+| NFR-M04 | Bảo trì | Tên test `tests/t<NN>-<chủ đề>.test.ts`; hành vi mới ⇒ test mới | 105 file / 1410 test | `AGENTS.md` §2 | V, H |
 | NFR-M05 | Bảo trì | Không thêm dependency nếu chưa hỏi; runtime deps = 8 | `package.json` không đổi ngoài kế hoạch (`firebase`, `three`, `@types/three` vào repo cùng merge từ lane khác — đã ghi nợ vì `@types/three` lẽ ra thuộc `devDependencies`) | `AGENTS.md` §1.4 | H, C |
 | NFR-M06 | Bảo trì | MCP layer zero-dependency, stdio tự viết | 0 import ngoài `node:*` trong `mcp/**` | `tests/t23-mcp-servers.test.ts` | V |
 
@@ -269,12 +269,11 @@ Cột **Gate** chỉ cổng nào chặn nếu vi phạm: `V` = `npm run verify` 
 **Lịch sử:** `P28-v1 → P29-v2 → P30-v1 → P41-v1 → P42-v1 → P42-v2 → P42-v3 → P43-v1`
 (`SCHEMA_HISTORY` [src/services/storage.ts:191](file:///D:/trithuc/kho-bau-tri-thuc/src/services/storage.ts#L191)).
 
-**Kiểm kê key (đo lại 2026-11-03 lần bảy — T43 không thêm/bớt key; `stateTouchedAt` là một TRƯỜNG trong JSON của `kho_bau_child_profile`, không phải key mới — giữ nguyên kết quả đo 2026-11-02 sau T40):** grep `kho_bau_` trong `src/` trả **21 chuỗi**, chia thành:
-- **19 key `localStorage`** — **17 khai báo tập trung** trong `STORAGE_KEYS`
-  ([src/services/storage.ts:60](file:///D:/trithuc/kho-bau-tri-thuc/src/services/storage.ts#L60)) và **2 key khai báo cục bộ**:
-  `kho_bau_ioe_store` ở [src/components/learning/englishIoe/EnglishIoeScreen.tsx:6](file:///D:/trithuc/kho-bau-tri-thuc/src/components/learning/englishIoe/EnglishIoeScreen.tsx#L6)
-  và `kho_bau_cloud_session_hint` ở [src/services/cloudSync.ts:10](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L10)
-  (nợ kỹ thuật: key nằm ngoài registry — ghi ở `ARCHITECTURE.md` §7). Chuỗi thứ hai **chỉ là
+**Kiểm kê key (đo lại 2026-11-03 **lần tám** — T44A đưa `kho_bau_ioe_store` về registry nên **18** key khai báo tập trung; `stateTouchedAt` là một TRƯỜNG trong JSON của `kho_bau_child_profile`, không phải key mới):** grep `kho_bau_` trong `src/` trả **21 chuỗi**, chia thành:
+- **19 key `localStorage`** — **18 khai báo tập trung** trong `STORAGE_KEYS`
+  ([src/services/storage.ts:60](file:///D:/trithuc/kho-bau-tri-thuc/src/services/storage.ts#L60)) và **1 key khai báo cục bộ**:
+  `kho_bau_cloud_session_hint` ở [src/services/cloudSync.ts:10](file:///D:/trithuc/kho-bau-tri-thuc/src/services/cloudSync.ts#L10)
+  (nợ kỹ thuật: key nằm ngoài registry — ghi ở `ARCHITECTURE.md` §7). Chuỗi này **chỉ là
   cờ boolean `'1'` báo thiết bị này từng đăng nhập, không chứa dữ liệu hay bài làm của bé** (ADR-16).
 - 2 chuỗi **không phải** key: `kho_bau_storage_change` (tên CustomEvent) và
   `kho_bau_tri_thuc_report_` (tiền tố tên file báo cáo). Đếm gộp hai chuỗi này vào kiểm kê là sai số.
@@ -377,7 +376,7 @@ Chi tiết từng dòng: xem [`RTM.md`](RTM.md).
 
 | Hạng | Kết quả 2026-11-03 lần bảy (sau T40 sửa mã máy trên báo cáo Ba Mẹ + migration `P43-v1`, sau T41D hợp nhất hồ sơ cloud, sau T42 tám sửa lỗi chọn màn/nghe-chọn/focus/dữ liệu hỏng/đồng hồ merge/phép có nhớ/lưới đề/hẹn giờ, sau T43 "Đặt lại tiến độ" quét đủ khoá dữ liệu bé) |
 |---|---|
-| `npm run verify` | **EXIT=0** — typecheck sạch · 100 file / 1377 test pass · build OK · main chunk 210.9 kB → PASS, đạt mục tiêu 450 kB (đo 2026-11-03 **lần bảy** trên nội dung = HEAD `main` `195a4be` cộng T43 — một sửa lỗi chạm `src/services/storage.ts` (`resetProgress` + allowlist `RESET_KEEP_KEYS`), không thêm module nào; `src/` đổi nên entry **đổi cả hash lẫn kB** so với đợt đo trước: `index-BYLrQykB.js` **210.9 kB**, boot graph **425.2 kB**; 1 file test mới `tests/t43a-reset-progress-sweeps-child-data.test.ts` (5 test), bằng chứng `evidence/2026-11-03-T43/`; lượt T42 liền trước: số đo của lượt đó chỉ ghi ở `evidence/2026-11-03-T42/verify.txt` — một vùng hiện trạng giữ **một** bộ số) |
+| `npm run verify` | **EXIT=0** — typecheck sạch · 105 file / 1410 test pass · build OK · main chunk 211.0 kB → PASS, đạt mục tiêu 450 kB (đo 2026-11-03 **lần tám** trên nội dung = HEAD `main` `fc861f3` cộng T44 — năm lát cắt chạm `src/services/storage.ts` (registry `STORAGE_KEYS` đủ 18 key), `src/services/adaptive.ts` + `src/data/englishIoe/selection.ts` (sinh đề tất định, **1** file dữ liệu mới), bảy component chuỗi UI + cỡ nút chạm, và `src/components/subject/SubjectScreen.tsx` (lượt sai có lý do bằng chữ + tiếng); `src/` đổi nên entry **đổi cả hash lẫn kB** so với đợt đo trước: `index-tB3FJlbX.js` **211.0 kB**, boot graph **425.3 kB**; **5** file test mới `tests/t44a…t44e` (33 test), bằng chứng `evidence/2026-11-03-T44/`; lượt T43 liền trước: số đo của lượt đó chỉ ghi ở `evidence/2026-11-03-T43/verify.txt` — một vùng hiện trạng giữ **một** bộ số) |
 | Probe QA | T40 trên `dist/`: `QA PASS — 6 step(s), 0 errors`; `qa/decision-engine.mjs`: `QA PASS — 12 step(s), 0 errors`; các probe khác cần chạy lại sau thay đổi UI tương ứng (xem `docs/SDLC.md` §5) |
 | FR chưa đạt / cần nguồn | FR-N04 (Kid's Box units = 0), BG-01 (vẫn chưa đo được: sync là tuỳ chọn nên không có số liệu server), FR-Y09 mới chỉ đạt một phần (chưa test với project Firebase thật) |
 | Nợ ghi nhận | mục tiêu chunk 450 kB **đã đạt** (209.9 kB sau T41D) nhưng bốn ngân hàng đề vẫn được nạp hết sau khi mount thay vì theo từng môn bé mở; audit riêng cho track Kid's Box trước khi dùng với trẻ; `@types/three` sai chỗ; `npm install` báo 4 lỗ hổng severity cao |

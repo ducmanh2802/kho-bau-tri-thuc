@@ -65,6 +65,24 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T44 — bốn lỗi người dùng chạm tới, trong đó một lỗi chỉ probe render mới thấy.**
+  (a) **`disabled` làm lời giải thích không bao giờ tới bé**: ô bài bị khoá và rương chủ đề trên
+  `src/components/subject/SubjectScreen.tsx` dùng `disabled`, nên cú chạm bị trình duyệt chặn ngay
+  tại đó — hai thông điệp đã viết sẵn ("đã mở rồi" / "chưa học hết bài") là code chết. Đổi sang
+  `aria-disabled` + một lối `rejectTurn()` duy nhất phát **ba kênh** (bíp sai + `sound.speak()` +
+  banner `role="status" aria-live="polite"`, tự ẩn sau 5 s) và tách rõ **bốn** lý do rương không mở
+  (phần thưởng bị tắt · đã mở rồi · chưa hết bài · kho dữ liệu chưa nạp). Probe `page.mouse.click`
+  thật ở 375×812 xác nhận cả chữ lẫn tiếng tới bé: `evidence/2026-11-03-T44/probe-t44-tap.txt`
+  mục `blocked[]`. (b) **44 hộp chạm dưới 44px** (`AGENTS.md` §3) trong **31/31** trò — nặng nhất là
+  dải "Màn {tier} ▾" dùng chung **152×14** ở `GameModalWrapper.tsx` và hai nút loa icon-only
+  36×36 / 28×28 (`SyllableBuilderGame.tsx`, `EnglishColorBalloonGame.tsx`); `tests/t44d` quét class
+  trong source báo **0** vì cỡ sinh từ nội dung/padding chứ không từ `w-*`/`h-*`. Danh sách RED:
+  `evidence/2026-11-03-T44/probe-t44-tap-RED-first-sweep.txt`, trạng thái hiện tại: **0** offender.
+  (c) `kho_bau_ioe_store` vẫn là literal riêng ngoài `STORAGE_KEYS` ⇒ `resetProgress` (đợt T43)
+  không quét được tiến độ IOE; nay về registry — **18** key tập trung, tổng **19**.
+  (d) `Math.random`/`Date.now` còn lọt trong đường sinh đề của `src/services/adaptive.ts` và màn
+  IOE, trái bất biến tất định `AGENTS.md` §2 ⇒ `seedForLocalDay` (hash FNV) + `shuffleSeeded`, phần
+  lựa câu rơi xuống module dữ liệu mới `src/data/englishIoe/selection.ts`.
 - **T43 — "Đặt lại tiến độ" nay quét đủ khoá dữ liệu của bé (`DEF-001`).** Hồ sơ pha 11
   (`docs/11-decommissioning/decommission.md`) bắt đầu liệt kê từng khoá bằng lệnh
   `sed -n '/^const STORAGE_KEYS = {/,/^};/p' src/services/storage.ts | grep -cE "^[[:space:]]+[A-Z_]+: 'kho_bau"`

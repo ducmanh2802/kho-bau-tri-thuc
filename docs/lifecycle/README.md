@@ -12,7 +12,7 @@ chứng thì để trống và ghi lý do ngay dưới bảng — không tô h�
 | # | Artifact | Pha | Trạng thái | Bằng chứng / số đo |
 |---|---|---|---|---|
 | 01 | [Lifecycle Board](01_LIFECYCLE_BOARD.md) | cả 6 | Đủ, 1 pha **Pass một phần** | 6 pha × 5 lớp; ô Release đã có số đo (`git tag` = 1) nhưng còn 3 điều kiện mở, xem `01` §Pha 5 |
-| 02 | [AI Usage Charter](02_AI_USAGE_CHARTER.md) | governance | Đạt | Rule of Two 4 lớp; 3 hook + 4 workflow + 1377 test |
+| 02 | [AI Usage Charter](02_AI_USAGE_CHARTER.md) | governance | Đạt | Rule of Two 4 lớp; 3 hook + 4 workflow + 1410 test |
 | 03 | [Requirements Chain](03_REQUIREMENTS_CHAIN.md) | Requirements | Đạt cho lát cắt | 88 FR · 6 US · 42 TC · 0 test mồ côi (`RTM.md` §7) |
 | 04 | [Design Blueprint](04_DESIGN_BLUEPRINT.md) | Design | Đạt, 1 lỗ hổng | 18 ADR · 6 driver có số đo · STRIDE 6 mục · lethal trifecta đã cắt 2/3 điều kiện |
 | 05 | [Implementation Loop](05_IMPLEMENTATION_LOOP.md) | Implementation | Đạt | Guarded loop 6 bước có ví dụ thật T41C; merge gate 5 điều kiện, G-5 đang hở |
@@ -29,15 +29,15 @@ hồ sơ pha mới: [`../01-intake/`](../01-intake/) (4 file) ·
 [`../10-operations/`](../10-operations/) (2 file) ·
 [`../11-decommissioning/`](../11-decommissioning/) (1 file)
 
-## 2. Số đo hiện trạng (đo 2026-11-03 **lần bảy**, nội dung = HEAD `main` `195a4be` cộng **T43** — một sửa lỗi `resetProgress` trong `src/services/storage.ts` + 1 file test `tests/t43a-reset-progress-sweeps-child-data.test.ts`; `npm run verify` trên working tree: EXIT=0 · **1377 test** · `Duration 28.57s`, đo lại trên **đúng nội dung commit**: `Duration 25.82s` vẫn 100 file / `index-BYLrQykB.js` 210.9 kB (`evidence/2026-11-03-T43/verify-precommit.txt`); đợt sáu cùng ngày là **T42** (tám sửa lỗi, 7 file test; số của lượt đó ở `evidence/2026-11-03-T42/verify.txt`); đợt năm là `1cac775` + **T41D** (1327 test · 22.32 s); đợt bốn là commit `3b0122c` (1287 test · 22.15 s); trước đó là đợt 2026-11-02 trên HEAD sau merge release `7365830` + bản sửa flake theo giờ)
+## 2. Số đo hiện trạng (đo 2026-11-03 **lần tám**, nội dung = HEAD `main` `fc861f3` cộng **T44** — năm lát cắt (registry key, sinh đề tất định, chuỗi UI, cỡ nút chạm, lượt sai có lý do) + 5 file test `tests/t44a…t44e`; `npm run verify` trên working tree: EXIT=0 · **1410 test** · `Duration 25.78s` · 105 file · `index-tB3FJlbX.js` 211.0 kB (`evidence/2026-11-03-T44/verify.txt`); đợt bảy cùng ngày là **T43** (một sửa lỗi `resetProgress`, 1 file test; số của lượt đó ở `evidence/2026-11-03-T43/verify.txt`); đợt sáu là **T42** (tám sửa lỗi, 7 file test; số của lượt đó ở `evidence/2026-11-03-T42/verify.txt`); đợt năm là `1cac775` + **T41D** (1327 test · 22.32 s); đợt bốn là commit `3b0122c` (1287 test · 22.15 s); trước đó là đợt 2026-11-02 trên HEAD sau merge release `7365830` + bản sửa flake theo giờ)
 
 | Hạng | Số | Lệnh |
 |---|---|---|
-| Cổng chất lượng | `npm run verify` EXIT=0 | `evidence/2026-11-03-T43/verify.txt` (lần đo gần nhất, 2026-11-03 lần bảy) · `evidence/2026-11-03-T42/verify.txt` · `evidence/2026-11-03-T41D/verify-t41d.txt` · `evidence/2026-11-03-QA-RACE/verify-1287.txt` · `verify-1286.txt` · `verify-1281.txt` · `verify-1280.txt` · `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` · `verify-rc.txt` · `verify.txt` · `evidence/2026-11-02-T41C/verify.txt` |
-| Test file / test | 100 / 1377 · suite 28.57 s (đo 2026-11-03 lần bảy; các lần đo trước cùng ngày: 1372 / 24.14 s ở T42, 1327 / 22.32 s ở T41D, 1287 / 22.15 s trên commit `3b0122c`, 1286 / 22.18 s, 1281 / 22.58 s và 1280 / 21.88 s, ngày 2026-11-02 là 1278 / 23.64 s) | `npx vitest run` |
+| Cổng chất lượng | `npm run verify` EXIT=0 | `evidence/2026-11-03-T44/verify.txt` (lần đo gần nhất, 2026-11-03 **lần tám**) · `evidence/2026-11-03-T43/verify.txt` · `evidence/2026-11-03-T42/verify.txt` · `evidence/2026-11-03-T41D/verify-t41d.txt` · `evidence/2026-11-03-QA-RACE/verify-1287.txt` · `verify-1286.txt` · `verify-1281.txt` · `verify-1280.txt` · `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` · `verify-rc.txt` · `verify.txt` · `evidence/2026-11-02-T41C/verify.txt` |
+| Test file / test | 105 / 1410 · suite 25.78 s (đo 2026-11-03 lần tám; các lần đo trước cùng ngày: 1377 / 28.57 s ở T43, 1372 / 24.14 s ở T42, 1327 / 22.32 s ở T41D, 1287 / 22.15 s trên commit `3b0122c`, 1286 / 22.18 s, 1281 / 22.58 s và 1280 / 21.88 s, ngày 2026-11-02 là 1278 / 23.64 s) | `npx vitest run` |
 | Probe QA | 30 (29 `.mjs` + 1 `.cjs`) | `ls qa/*.mjs qa/*.cjs` trừ `lib.mjs`, `run-one.mjs` |
-| Entry chunk | **210.9 kB** `index-BYLrQykB.js` | `npm run check:budget` |
-| Boot graph | **425.2 kB** | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `435446 total` (÷ 1024 = 425.2 KiB) |
+| Entry chunk | **211.0 kB** `index-tB3FJlbX.js` | `npm run check:budget` |
+| Boot graph | **425.3 kB** | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `435536 total` (÷ 1024 = 425.3 KiB) |
 | Trần | entry 600 kB cứng / 450 kB mục tiêu | `src/config/policy.ts` + `scripts/check-bundle-budget.mjs` |
 | Trò chơi đăng ký đủ 4 nơi | 31 = 31 = 31 = 31 | `tests/t23-mcp-servers.test.ts` |
 | Dependency runtime | 8 | `package.json → dependencies` |
