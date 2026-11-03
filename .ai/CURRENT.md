@@ -195,6 +195,17 @@ Nên "triển khai theo guide" = **lớp ánh xạ + artifact thật**, không p
   (AGENTS §1.3): `evidence/2026-11-03-T43/probe-t43-reset.mjs` chạy trên `dist/` ⇒ `ok: true`
   (3 khoá con `null`, `kho_bau_parent_settings` còn nguyên), `qa/golden-path.mjs` vẫn
   `QA PASS — 28 step(s), 0 errors`.
+- **Tỷ lệ cổng QA chuyển sang kiểm kê, không đếm cộng dần.** Đo mọi run `head_branch=main` của
+  workflow `03` từ `66e0fea` bằng `jobs[].conclusion` ⇒ **13/22 lượt xanh, 9 đỏ**; **mười hai lượt xanh
+  liên tiếp** (`2d2ca27`→`3eb7d12`), **chín lượt cuối không còn lưới**, ba lượt trong số đó đổi `src/`.
+  Kiểm kê bắt ba lỗi hồ sơ: chuỗi đỏ đầu là **bảy** lượt chứ không phải bốn (sót `bd3f2a7`, `08eacc7`,
+  `37fd35e`), một lượt xanh chưa từng ghi (`1cac775`), và `af19a22` (41523541700) bị tính nhầm là lượt
+  `main` trong khi `event` là `pull_request` trên nhánh dependabot. Các con số "7/13", "8/14", "10/16"
+  ở những dòng dated phía trên **giữ nguyên** (nhật sử từng lát cắt) — vùng hiện trạng trong
+  `docs/SDLC.md` §4, `docs/lifecycle/{README,HARNESS,CHECKLIST,01_LIFECYCLE_BOARD,07_RELEASE_OPERATIONS}`,
+  `docs/specs/BRD.md` R-04, `docs/plan/TEST_PLAN.md` ô 13 nay dẫn `evidence/2026-11-03-QA-RACE/ci-census-main-wf03.txt`
+  (§17–§18 `ci-gate-race.txt`). Lưu ý đơn vị: `afb9eeb` từng ghi 63 s là **cấp run**, cấp **job** 59 s.
+  Unauthenticated API chỉ 60 request/giờ ⇒ vòng kiểm kê tốn 23 request, mỗi giờ chạy được ~2 lần.
 - **Cố ý để mở, cần người duyệt — agent không tự đóng**: `RISK-01` (không có đường xoá dữ liệu
   cloud; `resetProgress` chỉ dọn `localStorage`), `RISK-11` + `OQ-07` (`docs/SAFETY_PRIVACY.md` nói
   "sao lưu" nhưng export một chiều), và quyết định sư phạm "tên bé có được giữ khi reset không"

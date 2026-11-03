@@ -496,3 +496,91 @@ tiếp**, **sáu lượt cuối chạy khi không còn cờ** — `3b0122c` `6e3
 Điều **chưa** đổi: chưa lần nào thấy một probe đỏ *thật* bị cổng chặn ⇒ ô 13 `docs/plan/TEST_PLAN.md`
 §16 vẫn MỞ. T42 sửa 8 defect nhưng không có defect nào biểu hiện thành probe đỏ, nên lượt xanh này cũng
 không điền được ô đó.
+
+## 17. Lượt CI của T43 `3eb7d12` — và hai lượt trước đó chưa ghi hết
+
+Lệnh đo (API công khai, không token):
+
+```bash
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/3eb7d122853b0bbd3aaaf627a42b88708ece8be1/check-runs
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/41642318907/jobs
+curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/workflows/401675040/runs?per_page=60
+```
+
+Cả ba workflow xanh **trên chính commit chứa T43** (`3eb7d12`, 39 file, +2242/−105):
+
+| Workflow | Run | Job | Kết luận | `started_at` → `completed_at` |
+|---|---|---|---|---|
+| `1. Quality` | 41642318963 | 125938668988 `typecheck + tests` | `success` | 13:12:49Z → 13:13:09Z (**20 s**) |
+| `2. Build + artifact` | 41642318933 | 125938669266 `build + bundle budget` | `success` | 13:12:49Z → 13:13:03Z (**14 s**) |
+| `3. Browser QA` | 41642318907 | 125938668299 `golden path trên Chromium` | `success` | 13:12:49Z → 13:13:50Z (**61 s**) |
+
+Bước 7 "QA probe" `success`, bước 8 "Đưa lỗi probe lên annotation" `skipped` — đúng hợp đồng đã khoá
+bằng test trong `3b0122c` (không còn `continue-on-error`).
+
+`3. Browser QA` **tính từ commit bỏ cờ `3b0122c`** — đợt này đo lại **toàn bộ** bằng `?branch=main`
+(§18) nên con số công bố ở đây đã được sửa cho khớp: trên `main` có **9 run, 9 job `success`** —
+`3b0122c` 41523226603 · `6e30794` 41526285381 · `e961815` 41527657645 · `1cac775` 41528603801
+(job 125562681976) · `06b8962` 41537247288 · `1deb859` 41538711482 · `caff32a` 41632118172 ·
+`195a4be` 41633585126 (job 125909016989) · `3eb7d12` 41642318907. Bản viết tay của §17 ban đầu ghi
+"**10 run, 10 job**" vì nó đếm lẫn run 41523541700 của `af19a22`; đo `runs/41523541700` thì run đó là
+`event: pull_request` trên `head_branch: dependabot/github_actions/actions/checkout-7` — **không phải
+`main`**. Run `1cac775` **không nằm trong** danh sách §16 đếm "sáu lượt cuối không còn cờ" — §16 liệt kê
+theo từng lượt *được ghi* chứ không theo mọi lượt *tồn tại*; đo lại từ API thì số lượt xanh lớn hơn con
+số đã công bố. Đây chính là lý do §13 đặt **quy tắc dừng**: tỷ lệ là bằng chứng "cổng không chặn oan",
+không phải điểm số phải tối ưu.
+
+Theo đúng cách đếm của §16 (lấy tổng đã công bố + các lượt mới), T43 là lượt **thứ 12/18 xanh**,
+**mười một lượt cuối liên tiếp**, **tám lượt cuối không còn cờ** *(tính tới `3eb7d12`)*; trong đó
+`3eb7d12` là lượt **thứ ba không lưới trên commit đổi `src/`** (hai lượt trước: `06b8962` T41D,
+`caff32a` T42). Cách đếm cộng-dần đó **nay đã bị thay** bằng kiểm kê trực tiếp ở §18 (13/22) vì nó
+không tái tạo được bằng một lệnh.
+
+Cổng máy trước push: `npm run verify` **EXIT=0** · `100 passed (100)` / `1377 passed (1377)` ·
+`Duration 25.71s` do pre-push hook chạy lại (`25.82s` trên working tree trước đó, `28.57s` lần đo đầu —
+`evidence/2026-11-03-T43/verify-precommit.txt`), vẫn `index-BYLrQykB.js` **210.9 kB**.
+
+Điều **không** đổi vì lượt xanh này: chưa lần nào thấy một probe đỏ *thật* bị cổng chặn ⇒ ô 13
+`docs/plan/TEST_PLAN.md` §16 vẫn MỞ (T43 sửa `resetProgress`, không biểu hiện thành probe đỏ);
+chữ ký Go/No-Go và restore drill R-1 vẫn là việc của người giữ repo.
+
+## 18. Kiểm kê TOÀN BỘ lượt `main` của workflow `03` — thay cho cách đếm cộng dần của §16/§17
+
+Vì sao phải kiểm kê: tỷ lệ từ §16 tới §17 xây theo kiểu "số đã công bố + lượt mới", nên mỗi lần một
+lượt bị bỏ quên là con số lệch vĩnh viễn, và **không có lệnh nào tái tạo ra nó**. Lần này lấy mọi run
+có `head_branch=main` rồi đọc `jobs[].conclusion` (không đọc `workflow_runs[].conclusion` — trước
+`3b0122c` cờ `continue-on-error` khiến **run** luôn `success` dù **job** đỏ; kiểm chứng: cùng danh sách
+22 run `main` thì API cho 50/50 run `success` toàn lịch sử).
+
+Lệnh đo + output nguyên văn + bảng đối chiếu run_id→commit nằm ở **`ci-census-main-wf03.txt`** (và bản
+chỉ-số 22 dòng `ci-census-main-wf03-raw.txt`). Ghi vào đây **kết luận** để §17–§18 đọc liền mạch; dẫn
+trích lại con số thì lấy từ lệnh trong file kiểm kê đó, vì một lượt CI không tự tái tạo được tại đây.
+
+Kết quả — **22 lượt `main` kể từ `66e0fea`** (commit đầu mà probe thật sự chạy trên runner):
+`66e0fea` đỏ 61 s · `77d90ce` đỏ 104 s · `2db8715` đỏ 62 s · `bd3f2a7` đỏ 114 s · `e777457` đỏ 100 s ·
+`08eacc7` đỏ 87 s · `37fd35e` đỏ 100 s · `afb9eeb` **xanh 59 s (job)** · `8e6f9f5` đỏ 81 s · `80c7e39`
+đỏ 75 s · `2d2ca27` xanh 66 s · `c9fd2b4` xanh 127 s · `eb4b7b2` xanh 69 s · `3b0122c` xanh 69 s ·
+`6e30794` xanh 72 s · `e961815` xanh 57 s · `1cac775` xanh 63 s · `06b8962` xanh 62 s · `1deb859`
+xanh 54 s · `caff32a` xanh 76 s · `195a4be` xanh 81 s · `3eb7d12` xanh 61 s. Mọi lượt đỏ đều đỏ ở đúng
+bước 7 "QA probe".
+
+**Tổng kiểm kê: 13/22 lượt xanh, 9 đỏ** (`grep -c failure` = 9 / `grep -c success` = 13 / `wc -l` = 22
+trên `ci-census-main-wf03-raw.txt`). Chuỗi: **bảy lượt đỏ liên tiếp** đầu (`66e0fea`→`37fd35e`) ⇒ xanh
+đầu `afb9eeb` ⇒ **hai lượt đỏ cuối** (`8e6f9f5`, `80c7e39`) ⇒ **mười hai lượt xanh liên tiếp**
+(`2d2ca27`→`3eb7d12`, không đứt từ `80c7e39` tới nay). Trong đó **chín lượt cuối không còn cờ**
+(`3b0122c`→`3eb7d12`) và **ba lượt** trong số đó trên commit đổi `src/` (`06b8962` T41D 4 file,
+`caff32a` T42 10 file, `3eb7d12` T43 1 file; `git show --name-only --format='' <c> | grep -c '^src/'`).
+
+Ba chỗ hồ sơ cũ **sai so với kiểm kê này** và đã được sửa ở vùng hiện trạng (`docs/SDLC.md` §4,
+`docs/lifecycle/HARNESS.md` §"Harness thật của từng cổng", `docs/lifecycle/README.md` §3, `BRD.md`
+R-04, `.ai/CURRENT.md`):
+1. "đỏ ở bước QA probe **bốn lần liên tiếp**" ⇒ thật ra **bảy** — §9/§16 bỏ sót `bd3f2a7`
+   (41494831619), `08eacc7` (41498110362), `37fd35e` (41499645998); chính `bd3f2a7` nằm giữa `2db8715`
+   và `e777457` nên cụm "bốn lần liên tiếp" chưa bao giờ liền mạch.
+2. "6 đỏ / 12 xanh trên 18 lượt" (cách đếm cộng dần) ⇒ **9 đỏ / 13 xanh trên 22 lượt**.
+3. §17 ban đầu tính `af19a22` (41523541700) vào lượt `main` ⇒ run đó là `pull_request` trên
+   `dependabot/github_actions/actions/checkout-7`; số không-lưới trên `main` là **9**, không phải 10.
+
+Không đổi vì kiểm kê này: **ô 13 `docs/plan/TEST_PLAN.md` §16 vẫn MỞ** — 9 lượt đỏ kia là đỏ *thật của
+một lỗi chưa sửa* (race đề cổng phụ huynh) chứ chưa từng có một probe đỏ *giả* bị cổng chặn oan; và
+quy tắc dừng §13 vẫn áp dụng — con số 13/22 là **bằng chứng cổng chạy đúng**, không phải điểm số.

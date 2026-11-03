@@ -1,0 +1,125 @@
+Kiểm kê lượt CI của workflow `3. Browser QA` (id 401675040) trên `main`
+================================================================================
+
+Đo ngày 2026-11-03, ngay sau push `3eb7d12` (T43). Nguồn: API công khai GitHub, **không token**.
+
+Vì sao phải kiểm kê lại từ đầu (thay cho cách đếm "số đã công bố + lượt mới" của §16/§17 trong
+`ci-gate-race.txt`): cách cộng dần không có lệnh nào tái tạo ra nó, và nó đã bỏ sót ba lượt đỏ
+(`bd3f2a7`, `08eacc7`, `37fd35e`) cùng một lượt xanh (`1cac775`).
+
+Đọc `jobs[].conclusion`, **không** đọc `workflow_runs[].conclusion`: trước commit `3b0122c` job
+`qa-smoke` mang `continue-on-error: true`, nên *run* luôn `success` dù *job* đỏ. Kiểm chứng: cùng
+danh sách 50 run `main` của workflow này, API cho **50/50 run `success`** — tức con số cấp run hoàn
+toàn mù với 9 lượt đỏ.
+
+Lệnh (preflight + vòng đo). Unauthenticated rate limit = 60 request/giờ, lệnh này tốn 1 + 22 = 23
+request ⇒ mỗi giờ chỉ chạy được ~2 lần; `remaining` phải ≥ 24.
+
+```bash
+REPO=ducmanh2802/kho-bau-tri-thuc
+
+curl -s "https://api.github.com/rate_limit" \
+| node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const r=JSON.parse(s).resources.core;
+    console.log("core remaining:",r.remaining,"/",r.limit,"| reset:",new Date(r.reset*1000).toISOString());});'
+# core remaining: 45 / 60 | reset: 2026-11-03T14:12:48.000Z   ← trước khi chạy vòng đo
+
+for id in $(curl -s "https://api.github.com/repos/$REPO/actions/workflows/401675040/runs?branch=main&per_page=100" \
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{JSON.parse(s).workflow_runs
+      .filter(x=>x.id>=41488045102).sort((a,b)=>a.id-b.id).forEach(x=>console.log(x.id));})'); do
+  curl -s "https://api.github.com/repos/$REPO/actions/runs/$id/jobs" \
+  | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const d=JSON.parse(s);
+      if(!Array.isArray(d.jobs)){console.log("RATE_LIMIT_OR_ERROR", JSON.stringify(d.message)); return;}
+      for(const j of d.jobs){const q=(j.steps||[]).find(x=>/QA probe/i.test(x.name));
+        console.log(j.run_id, j.conclusion,
+          Math.round((new Date(j.completed_at)-new Date(j.started_at))/1000)+"s",
+          "step7="+(q&&q.conclusion));}})';
+done
+```
+
+Output nguyên văn — cột: `run_id  job.conclusion  job_duration  bước7-QA-probe`. Bản chỉ-số lưu ở
+`ci-census-main-wf03-raw.txt` (22 dòng, không có prose) để các `grep -c` dưới đếm **đúng trên file đó**:
+
+```
+41488045102 failure 61s step7=failure
+41490451074 failure 104s step7=failure
+41493791252 failure 62s step7=failure
+41494831619 failure 114s step7=failure
+41496530836 failure 100s step7=failure
+41498110362 failure 87s step7=failure
+41499645998 failure 100s step7=failure
+41501753363 success 59s step7=success
+41504913606 failure 81s step7=failure
+41508824890 failure 75s step7=failure
+41515106575 success 66s step7=success
+41516820864 success 127s step7=success
+41518983585 success 69s step7=success
+41523226603 success 69s step7=success
+41526285381 success 72s step7=success
+41527657645 success 57s step7=success
+41528603801 success 63s step7=success
+41537247288 success 62s step7=success
+41538711482 success 54s step7=success
+41632118172 success 76s step7=success
+41633585126 success 81s step7=success
+41642318907 success 61s step7=success
+```
+
+Đối chiếu run_id → commit (`head_commit.id` 7 ký tự, `head_branch` + `event`):
+
+```
+41488045102 66e0fea  main push     41518983585 eb4b7b2  main push
+41490451074 77d90ce  main push     41523226603 3b0122c  main push   ← bỏ continue-on-error
+41493791252 2db8715  main push     41526285381 6e30794  main push
+41494831619 bd3f2a7  main push     41527657645 e961815  main push
+41496530836 e777457  main push     41528603801 1cac775  main push   ← §16/§17 chưa từng ghi
+41498110362 08eacc7  main push     41537247288 06b8962  main push   ← đổi src/, lần đầu không lưới
+41499645998 37fd35e  main push     41538711482 1deb859  main push
+41501753363 afb9eeb  main push     41632118172 caff32a  main push   ← T42, đổi src/
+41504913606 8e6f9f5  main push     41633585126 195a4be  main push
+41508824890 80c7e39  main push     41642318907 3eb7d12  main push   ← T43, đổi src/
+```
+
+Tổng (đếm trên file chỉ-số `ci-census-main-wf03-raw.txt`, 22 dòng):
+
+```bash
+grep -c failure evidence/2026-11-03-QA-RACE/ci-census-main-wf03-raw.txt   # → 9
+grep -c success evidence/2026-11-03-QA-RACE/ci-census-main-wf03-raw.txt   # → 13
+wc -l < evidence/2026-11-03-QA-RACE/ci-census-main-wf03-raw.txt           # → 22
+```
+
+⇒ **13/22 lượt xanh, 9 đỏ.** Chuỗi: bảy lượt đỏ liên tiếp đầu (`66e0fea`→`37fd35e`) ⇒ xanh đầu
+`afb9eeb` ⇒ hai lượt đỏ cuối (`8e6f9f5` docs-only, `80c7e39`) ⇒ **mười hai lượt xanh liên tiếp**
+(`2d2ca27`→`3eb7d12`). **Chín lượt cuối không còn cờ** (`3b0122c`→`3eb7d12`), trong đó **ba lượt trên
+commit đổi `src/`** (`06b8962` T41D, `caff32a` T42, `3eb7d12` T43):
+
+```bash
+for c in 3b0122c 6e30794 e961815 1cac775 06b8962 1deb859 caff32a 195a4be 3eb7d12; do
+  printf "%s %s\n" $c "$(git show --name-only --format='' $c | grep -c '^src/')"
+done
+# 3b0122c 0 · 6e30794 0 · e961815 0 · 1cac775 0 · 06b8962 4 · 1deb859 0 · caff32a 10 · 195a4be 0 · 3eb7d12 1
+```
+
+(`--name-only` in đường dẫn **không thụt lề** ⇒ mẫu `^src/`; dùng `^ src/` với `--stat` cũng ra số
+như nhau cho `3eb7d12` nhưng phải chú ý kẻo đếm ra 0.)
+
+Hai cách đo thời lượng khác nhau — docs trước đây ghi `63 s` cho lượt `afb9eeb` vì lấy `created_at →
+updated_at` của **run**; bảng kiểm kê này lấy `started_at → completed_at` của **job** ⇒ **59 s**. Mười
+một lượt mà §10–§17 đã ghi **cấp job** (`2d2ca27` 66 · `c9fd2b4` 127 · `eb4b7b2` 69 · `3b0122c` 69 ·
+`6e30794` 72 · `e961815` 57 · `06b8962` 62 · `1deb859` 54 · `caff32a` 76 · `195a4be` 81 · `3eb7d12` 61)
+khớp từng số với bảng này; `afb9eeb` là nơi hai cấp khác nhau (run 63 s / job 59 s). Khi trích số cho
+docs, nêu rõ là cấp run hay cấp job — và chưa kiểm tra cấp run cho `66e0fea`…`80c7e39` (bị giới hạn
+60 request/giờ chặn lại trước khi đo `runs/<id>` từng cái).
+
+Run bị loại khỏi kiểm kê (đính chính cho §17):
+
+```
+41523541700 af19a22  head_branch: dependabot/github_actions/actions/checkout-7  event: pull_request
+```
+
+Run đó từng được §17 tính là một lượt `main`; đo `runs/41523541700` thì `event` là `pull_request` trên
+nhánh dependabot ⇒ không thuộc kiểm kê `main`. Vì nó mà §17 ghi "10 run, 10 job `success`" — số đúng
+trên `main` kể từ `3b0122c` là **9/9**.
+
+Điều kiểm kê này **không** chứng minh: 9 lượt đỏ là đỏ *thật* của một lỗi app chưa sửa (race "đề cổng
+phụ huynh" vẽ sau khung hình đầu), chưa từng có probe đỏ *giả* bị cổng chặn oan ⇒ ô 13
+`docs/plan/TEST_PLAN.md` §16 vẫn MỞ. Tỷ lệ cũng không phải điểm số phải tối ưu (quy tắc dừng §13).

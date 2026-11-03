@@ -17,6 +17,30 @@ asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện 
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
 ### Changed
+- **Tỷ lệ cổng QA chuyển từ "đếm cộng dần" sang kiểm kê — và kiểm kê bắt ba chỗ hồ sơ sai.**
+  Cách đếm cũ ("4/10", "8/14", "10/16") là *số đã công bố + lượt mới*, nên không có lệnh nào tái tạo
+  ra nó và mỗi lượt bị bỏ quên làm lệch vĩnh viễn. Đo lại một lượt, lấy **mọi** run
+  `head_branch=main` của workflow `03` kể từ `66e0fea` rồi đọc `jobs[].conclusion` (không đọc
+  `workflow_runs[].conclusion`: trước `3b0122c` cờ `continue-on-error` khiến run luôn `success` dù job
+  đỏ — 50/50 run cấp run đều `success`) ⇒ **13/22 lượt xanh, 9 đỏ**: bảy lượt đỏ liên tiếp đầu
+  (`66e0fea`→`37fd35e`) ⇒ xanh đầu `afb9eeb` ⇒ hai lượt đỏ cuối (`8e6f9f5`, `80c7e39`) ⇒ **mười hai
+  lượt xanh liên tiếp** (`2d2ca27`→`3eb7d12`, T43). **Chín lượt cuối không còn lưới**, ba lượt trong số
+  đó trên commit đổi `src/` (`06b8962` 4 file · `caff32a` 10 · `3eb7d12` 1 — đếm file bắt đầu `src/`
+  trong `git show --name-only` của từng commit). Ba chỗ sai bị bắt: (a) cụm "đỏ ở bước QA probe
+  **bốn lần liên tiếp**" thật ra là **bảy** — `bd3f2a7` (41494831619), `08eacc7` (41498110362),
+  `37fd35e` (41499645998) chưa từng được ghi, và `bd3f2a7` nằm *giữa* `2db8715` với `e777457` nên chuỗi
+  bốn chưa bao giờ liền mạch; (b) lượt `1cac775` (41528603801, job 125562681976 `success` 63 s) xanh mà
+  chưa từng được ghi; (c) run 41523541700 `af19a22` bị tính là lượt `main` trong khi nó là
+  `pull_request` trên `dependabot/github_actions/actions/checkout-7`. Một số đổi ý nghĩa: `afb9eeb`
+  "63 s" là **cấp run**, **cấp job 59 s**. Vòng đo tốn 23 request trên hạn mức chưa-token 60/giờ ⇒ mỗi
+  giờ chạy được ~2 lần. Refresh **vùng hiện trạng** (`docs/SDLC.md` §4, năm file trong
+  `docs/lifecycle/` gồm `README`, `HARNESS`, `CHECKLIST`, `01_LIFECYCLE_BOARD`,
+  `07_RELEASE_OPERATIONS`, `docs/specs/BRD.md` R-04,
+  `docs/plan/TEST_PLAN.md` ô 13); **dòng lịch sử giữ nguyên số** theo quy ước `docs/specs/README.md`
+  §"Quy ước chung" 1. Bằng chứng: `evidence/2026-11-03-QA-RACE/ci-census-main-wf03.txt` (lệnh + output
+  + bảng run→commit), chỉ-số 22 dòng `…-raw.txt` (`grep -c failure` ⇒ 9, `grep -c success` ⇒ 13),
+  luận bàn §17–§18 `ci-gate-race.txt`. **Ô 13 vẫn MỞ** — chưa có probe đỏ *giả* nào bị chặn oan, và sau
+  khi bỏ cờ cũng chưa có đỏ *thật* nào xảy ra. Không đổi `src/`, `qa/`, `tests/`, không thêm dependency.
 - **Đã xoá cờ `continue-on-error` của job `qa-smoke` — `3. Browser QA` từ đây là cổng chặn thật.**
   Điều kiện bỏ cờ ghi ngay trong comment của `.github/workflows/03-qa-browser.yml` ("xanh liên tiếp
   vài lần trên main") và trong `docs/lifecycle/07_RELEASE_OPERATIONS.md` §2; cổng đạt **ba lượt xanh

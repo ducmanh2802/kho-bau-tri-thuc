@@ -36,6 +36,11 @@ grep -o "assets/[A-Za-z0-9_.-]*\.js" dist/index.html | sed "s#^#dist/#" | sort -
   nhau mỗi `Duration`. Lý do phải đo lại: sau `verify.txt` còn một sửa **comment** trong
   `storage.ts` (lưu dẫn `cloudSync.ts:9` → `:10` cho đúng dòng thật); comment bị minifier bỏ nên
   chunk không đổi — đo lại để chứng minh bằng số, không đoán.
+- **Lần đo thứ ba, sau đợt bổ sung bằng chứng + kiểm kê tỷ lệ CI** (chỉ sửa docs/evidence, `src/`
+  không đổi): `npm run verify` ⇒ EXIT **0** · `Test Files 100 passed (100)` ·
+  `Tests 1377 passed (1377)` · `Duration 25.51s` · `Main chunk: index-BYLrQykB.js = 210.9 kB → PASS`
+  — vẫn cùng hash. Quét lệch số liệu `measure.mjs --vitest-out -` trên log này ⇒
+  `LỆCH CẦN SỬA (vùng hiện trạng): 0`, exit 0.
 
 ## Kiểm kê khoá (nguồn của con số 13 → 16)
 
@@ -95,9 +100,18 @@ Parent Gate → tab "Cài Đặt & Thời Gian" → gieo 4 khoá → bấm "Đ�
 
 ## Verdict
 
-`Pass` (cấp máy). **Chưa** có lượt CI trên commit chứa T43 tại thời điểm viết các file này;
-SHA commit + các check-run ghi bổ sung ở dòng `2026-11-03-T43` của [`../README.md`](../README.md)
-(tiền lệ: `195a4be` bổ sung SHA và lượt CI cho `2026-11-03-T42`).
+`Pass` (cấp máy **và** cấp CI). Commit = `3eb7d12` (39 file, `+2242/−105` —
+`git show --shortstat 3eb7d12`), push `195a4be..3eb7d12`, `HEAD == origin/main`.
+Lệnh: `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/3eb7d122853b0bbd3aaaf627a42b88708ece8be1/check-runs`
+⇒ ba check-run `completed` / `success`; `curl -s …/actions/runs/41642318907/jobs` ⇒ job
+125938668299 `golden path trên Chromium` `success` `13:12:49Z → 13:13:50Z` = **61 s**, bước 7
+"QA probe" `success`, bước 8 `skipped`. Hai run còn lại: `1. Quality` 41642318963 (20 s) và
+`2. Build + artifact` 41642318933 (14 s). Tỷ lệ cổng QA **không** còn lấy từ cách đếm cộng dần nữa:
+kiểm kê toàn bộ mọi run `main` của workflow `03` kể từ `66e0fea` (đọc `jobs[].conclusion`) ⇒
+**13/22 lượt xanh, 9 đỏ**, **mười hai lượt xanh liên tiếp** tới `3eb7d12`, **chín lượt cuối không còn
+lưới** — lệnh + output ở [`../2026-11-03-QA-RACE/ci-census-main-wf03.txt`](../2026-11-03-QA-RACE/ci-census-main-wf03.txt),
+luận bàn §17–§18 của [`../2026-11-03-QA-RACE/ci-gate-race.txt`](../2026-11-03-QA-RACE/ci-gate-race.txt).
+Chữ ký Go/No-Go vẫn trống — việc của người giữ repo, không phải của đợt đo này.
 
 ## Khuyết liên quan, cố ý **để mở** (không sửa trong đợt này)
 
