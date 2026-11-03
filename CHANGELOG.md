@@ -17,7 +17,24 @@ asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện 
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
 ### Changed
-- **Lệnh đo CI trong hồ sơ sai cú pháp, và sửa nó làm `RISK-16` *chắc chắn hơn* chứ không mất đi.**
+- **Vòng kiểm kê chốt §23, kèm quy tắc để hồ sơ hiện trạng không phải đổi theo từng commit docs.**
+  `a6c472b` (chính commit hồ sơ §22, **không đổi `src/`**) được push **một mình** ⇒ tra bằng SHA đủ
+  `40` ký tự `a6c472b4c69a774dd08aac1dfb5b321d909f562d` ⇒ `total_count: 3` (`1. Quality` 41696285737 ·
+  `2. Build + artifact` 41696285812 · **`3. Browser QA` 41696285755**, job 126127579573 `success`
+  `18:42:03Z→18:43:30Z` = **87 s**, bước 7 `success`, bước 8 `skipped`). Đây là **phép đối chứng một
+  biến** đầu tiên của `RISK-16`: đặt cạnh `8083b106…` (commit code T46, đi chung lệnh push với docs
+  ⇒ `total_count: 0`), biến số duy nhất là **số commit trong một lệnh push**. Kiểm kê chốt: workflow
+  `03` trên `main` = **32 lượt**, cấp run `{"success":31,"cancelled":1}` (không dùng làm tỷ lệ),
+  khoảng không còn cờ = **19 lượt = 18 xanh + 1 `cancelled` + 0 đỏ**, **cấp job suy ra 22/32 xanh ·
+  9 đỏ · 1 cancelled**, chuỗi xanh tới tip = **8**. Vì **mỗi commit docs lại thêm đúng một lượt CI**,
+  dán số tuyệt đối ở nhiều file làm hồ sơ lệch vĩnh viễn sau mỗi commit ⇒ ba quy tắc ghi trong §23:
+  (1) mục hiện trạng là §23, các file khác **dẫn đường dẫn**, nếu chép số thì **kèm "tính tới tip
+  `<sha>`"**; (2) **chỉ đo lại khi có commit code mới**; (3) không kết luận "không có lượt CI" từ SHA
+  ngắn. Đã trỏ `docs/SDLC.md` §4, `docs/specs/BRD.md` R-04, `docs/lifecycle/README.md`,
+  `docs/lifecycle/HARNESS.md`, `docs/lifecycle/07_RELEASE_OPERATIONS.md`, `docs/plan/TEST_PLAN.md`
+  ô 13, `docs/plan/RISK_REGISTER.md` `RISK-10` + `RISK-16`, `.ai/CURRENT.md` về §23
+  (`evidence/2026-11-03-QA-RACE/ci-gate-race.txt`). Ô 13 **vẫn MỞ**: 22 lượt xanh vẫn chưa có một lần
+  đỏ *thật* bị cổng chặn sau `3b0122c`.
   Tra `https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=<7 ký tự>` trả
   `total_count: 0` cho **mọi** commit — GitHub so khớp nguyên SHA 40 ký tự. Bằng chứng ngay trên commit
   vừa push `4659d99`: dạng ngắn ⇒ `0`, dạng đủ ⇒ **3 lượt** `run_number` 68 tất cả `completed success`

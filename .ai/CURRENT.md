@@ -322,13 +322,21 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 9 của bug h
   code bằng SHA đủ (`6a07883e…b27` · `c2a8626e…cb2` · `8083b106…e54`) ⇒ cả ba vẫn `0`, **`RISK-16` đứng**;
   đã sửa lệnh dẫn chứng ở `ci-gate-race.txt` §20, `ci-census-main-wf03-round2.txt`,
   `evidence/2026-11-03-T45/README.md`, `evidence/README.md`, `TASK_PLAN.md` §II, file này.
-  **Số hiện trạng mới (vòng ba-b)**: workflow `03` trên `main` = **31 lượt** (`#37` `66e0fea` → `#68`
+  **Số hiện trạng *tính riêng cho vòng ba-b* (tip `4659d99`)**: workflow `03` trên `main` = **31 lượt** (`#37` `66e0fea` → `#68`
   `4659d99`); khoảng không còn cờ = **18 lượt = 17 xanh + 1 cancelled + 0 đỏ**; **cấp job toàn sổ suy ra
   21/31 xanh · 9 đỏ · 1 cancelled**; chuỗi xanh tới tip = **7**; đóng nợ cũ của vòng một: `c7e9a00` có
   đủ **3** lượt success (#60) ⇒ không còn "chưa tra được". Hệ quả nghiệp vụ: vì commit docs-only vẫn
   chạy đủ ba cổng, cách né `RISK-16` là **push commit code riêng một lượt** — đã ghi vào `RISK-16`.
   **Hai chỗ lệch bị phát hiện khi quét**: `docs/lifecycle/HARNESS.md` và
   `docs/lifecycle/07_RELEASE_OPERATIONS.md` vẫn ghi **13/22** (đợt §20 quên quét `docs/lifecycle/`).
+- **§23 — vòng chốt, và mục hiện trạng không còn nằm ở file nào khác**: `a6c472b` (hồ sơ §22, push
+  **một mình**) có đủ ba run lượt #69, `3. Browser QA` run 41696285755 job 126127579573 `success`
+  **87 s** ⇒ phép đối chứng một biến của `RISK-16`. Kiểm kê chốt: **32 lượt**, cấp job suy ra
+  **22/32 xanh · 9 đỏ · 1 cancelled** *tính tới tip `a6c472b`*, chuỗi xanh tới tip **8**, khoảng không
+  còn cờ **19 lượt = 18 xanh + 1 cancelled + 0 đỏ**. Từ đây **số này sống ở §23**
+  (`evidence/2026-11-03-QA-RACE/ci-gate-race.txt`); `SDLC.md` / `BRD.md` R-04 / `lifecycle/README.md`
+  / `HARNESS.md` / `07_RELEASE_OPERATIONS.md` / `TEST_PLAN.md` ô 13 / `RISK-10` đã trỏ §23.
+  **Không đo lại cho một commit docs** — chỉ khi có commit **code** mới hoặc khi ô 13 cần đỏ *thật*.
 - **Bài học quy trình (lần đầu trả giá thật):** `git checkout -- <file>` trong pha ablation đã **xoá mất
   bản sửa chưa commit** của `useModalHistory.ts` ⇒ phải viết lại tay. Từ đó: ablation restore từ
   `/tmp/*.GREEN.*`, và `tests-RED.txt` (RED **tái lập** bằng `git checkout HEAD --` đúng 4 file) có bảng

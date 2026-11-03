@@ -795,3 +795,47 @@ ra **có** lượt và xanh, đúng như dự đoán ở `#68`.
 Bài học quy trình: một **cảm biến giả** không cần cờ `continue-on-error` — chỉ cần cú pháp lệnh sai là
 đủ. `RISK-16` trước đó được ghi bằng lệnh SHA ngắn, tức hoàn toàn có thể là sản phẩm của cú pháp chứ
 không phải của GitHub; phải đo lại bằng SHA đủ mới kết luận được.
+
+
+================================================================================
+§23 — Vòng chốt: `a6c472b` (docs) cũng có lượt CI, và quy tắc để KHÔNG đo lại vô hạn
+================================================================================
+
+Commit hồ sơ §22 (`a6c472b4c69a774dd08aac1dfb5b321d909f562d`, 21 file, chỉ `docs/` + `.ai/` +
+`evidence/`, **không đổi `src/`**) được push một mình ⇒ tra bằng **SHA đủ** (đúng bài học §22):
+
+  curl -s ".../actions/runs?head_sha=a6c472b4c69a774dd08aac1dfb5b321d909f562d"  ->  "total_count": 3
+    41696285737 | `1. Quality`        | run 69 | completed success
+    41696285812 | `2. Build + artifact`| run 69 | completed success
+    41696285755 | `3. Browser QA`      | run 69 | completed success
+  curl -s ".../actions/runs/41696285755/jobs"
+    job 126127579573 `golden path trên Chromium` **success** `18:42:03Z→18:43:30Z` = **87 s**
+    bước: 1..7 `success`, 8 `skipped` (chẩn đoán), 15..17 `success`
+  pre-push hook (nguyên suite, chạy trước khi đẩy): `Test Files 113 passed (113)` ·
+    `Tests 1460 passed (1460)` · `Duration 24.06s` · `✔ Pre-push: passed`
+
+Cùng commit này, push **một mình** ⇒ có đủ **ba** lượt CI. Đặt cạnh `8083b10` (commit code của T46, đẩy
+chung một lệnh với `cb56720` ⇒ `total_count: 0`), đây là phép đối chứng sạch đầu tiên của `RISK-16`:
+biến số duy nhất là **số commit trong một lệnh push**, không phải loại file, không phải nội dung.
+⇒ Cách né `RISK-16` đã kiểm chứng bằng dữ liệu, không phải suy đoán: **mỗi commit một lệnh push**
+(hoặc ít nhất: commit code không đi chung với commit docs).
+
+Vòng kiểm kê **chốt** (một request):
+
+  số lượt workflow `03` trên `main` : **32** (`#37` `66e0fea` → `#69` `a6c472b`)
+  cấp run                          : {"success":31,"cancelled":1}  ← vẫn không dùng làm tỷ lệ
+  index `3b0122c`                  : 13/32 ⇒ khoảng không còn cờ = **19 lượt = 18 xanh + 1 cancelled + 0 đỏ**
+  cấp job toàn sổ (suy ra)         : **22/32 lượt xanh · 9 đỏ · 1 cancelled**
+  chuỗi xanh tới tip               : **8 lượt liên tiếp** (`#62` `fc861f3` → `#69` `a6c472b`)
+
+**Quy tắc chống đo-lại-vô-hạn** (ghi ở đây vì chính các vòng §19→§23 là minh chứng): mỗi commit docs
+lại thêm đúng một lượt CI, nên nếu hồ sơ hiện trạng *dán* con số tuyệt đối thì mọi commit docs sau đó
+làm hồ sơ lệch. Từ nay:
+  (1) **mục hiện trạng** của tỷ lệ cổng QA là §23 này; các file khác dẫn đường dẫn tới đây thay vì
+      chép số, và nếu chép số thì **phải kèm "tính tới tip `<sha>`"**;
+  (2) **chỉ đo lại** khi có commit **code** mới (lúc đó con số mới có ý nghĩa nghiệp vụ), hoặc khi ô 13
+      cần bằng chứng đỏ *thật*;
+  (3) không bao giờ kết luận "commit không có lượt CI" nếu lệnh tra dùng SHA ngắn (§22).
+
+Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ**: 22 lượt xanh kế tiếp vẫn chưa có một lần đỏ *thật* bị
+cổng chặn sau `3b0122c`.
