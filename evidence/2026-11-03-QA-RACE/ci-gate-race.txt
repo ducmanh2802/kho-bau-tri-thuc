@@ -658,3 +658,67 @@ lần **thứ hai** gặp khuôn này, và là bằng chứng mạnh hơn cho `R
 
 Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ** sau §20: 18 lượt xanh vẫn chưa chứng minh cổng *cắt* được
 commit hỏng, vì chưa từng có một probe đỏ *thật* xảy ra sau khi bỏ cờ ở `3b0122c`.
+
+
+================================================================================
+§21 — Đo CI cho T46 (push `0c92915..cb56720`, hai commit một lệnh push) — 2026-11-04
+================================================================================
+
+Bối cảnh: T46 = `8083b10` (code + tests + evidence) và `cb56720` (docs sync), đẩy cùng một lượt.
+Pre-push hook chạy `npm run verify` nguyên suite trên tip, log do git in ra:
+
+  Test Files  113 passed (113)
+       Tests  1460 passed (1460)
+    Duration  24.17s
+  ✔ Pre-push: passed
+  To https://github.com/ducmanh2802/kho-bau-tri-thuc.git
+     0c92915..cb56720  main -> main
+
+Lệnh đo (mỗi mục một request, hạn mức 60/giờ):
+
+  SHA=$(git rev-parse HEAD)                      # cb567201dd6db9d07e38965244fb7a40fcd18f93
+  curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=$SHA"
+  curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/41692600066/jobs"
+  curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=$(git rev-parse 0c92915)"
+  curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=8083b1062b9241de1a1d69773d42cd6cb67cbe54"
+  node -e "... GET /actions/workflows/401675040/runs?branch=main&per_page=100, lọc id>=41488045102 ..."
+
+Ba workflow trên tip `cb56720` (run #67) — **tất cả completed success**:
+
+| run | workflow | commit | kết quả |
+|---|---|---|---|
+| 41692600202 | `1. Quality` | `cb56720` | success |
+| 41692599879 | `2. Build + artifact` | `cb56720` | success |
+| 41692600066 | **`3. Browser QA`** | `cb56720` | success |
+
+Cấp job của `3. Browser QA` (đọc `jobs[]`, không tin cấp run):
+
+  job 126114749872 "golden path trên Chromium"  completed success
+      started_at 2026-11-03T18:18:56Z → completed_at 2026-11-03T18:20:00Z  = 64 s
+      bước 6 "Install Chromium" success · bước 7 "QA probe" **success** ·
+      bước 8 "Đưa lỗi probe lên annotation" **skipped**  (bước 8 chỉ chạy khi probe đỏ)
+
+Lượt #66 (`0c92915`, docs-only của T45) cũng ba workflow success: runs 41686215529 / 41686215385 /
+41686215360. **Cấp run của hai lượt mới này = cấp job** vì từ `3b0122c` cờ `continue-on-error` đã bị
+xoá — đó chính là điều kiện để lần đo này được phép dùng một request thay cho hai mươi.
+
+**Commit code `8083b10` không có lượt CI nào**: `actions/runs?head_sha=8083b1062…` ⇒ `total_count: 0`.
+Lần **thứ ba** gặp khuôn "hai commit một push ⇒ chỉ tip được probe" (`6a07883` T44, `c2a8626` T45,
+`8083b10` T46) ⇒ `RISK-16` vẫn MỞ và hệ quả lặp lại: không lượt CI nào chạy `qa/golden-path.mjs` trên
+đúng bộ `src/` của T46 — bằng chứng probe của đợt này chỉ có ở cấp máy (mục "Hồi quy" trong
+`evidence/2026-11-04-T46/README.md`).
+
+Kiểm kê tỷ lệ cổng QA (vòng ba, chỉ **một** request vì dùng cấp run ở khoảng không còn cờ):
+
+  census size (id>=41488045102, tức từ `66e0fea`): **30 lượt** (`total_count` của workflow = 58 tính cả nhánh khác)
+  cấp run trên 30 lượt: {"success":29,"cancelled":1}   ← **KHÔNG dùng làm tỷ lệ**: #37–#51 còn cờ
+  tính từ run của commit `3b0122c` (phát cờ bị xoá; index 13/30) tới tip: **17 lượt không còn cờ**
+    ⇒ cấp run == cấp job ⇒ **16 success + 1 cancelled + 0 failure**
+  suy ra cấp job toàn sổ: **20/30 lượt xanh · 9 đỏ · 1 cancelled**
+    (= 18/28 đo ở §20, cộng hai lượt mới #66 + #67 đều xanh — cả hai đều ở khoảng không còn cờ)
+  chuỗi xanh tính tới tip: **6 lượt liên tiếp** (#62 `fc861f3` → #67 `cb56720`)
+
+Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ** sau §21: 20 lượt xanh vẫn chưa chứng minh cổng *cắt* được
+một commit hỏng, vì chưa từng có probe đỏ *thật* nào xảy ra sau khi bỏ cờ ở `3b0122c` (và cũng chưa có
+lượt đỏ *giả* nào bị chặn oan). Muốn đóng ô này cần một commit cố tình làm probe đỏ trên nhánh thử
+nghiệm — quyết định của người giữ repo, không tự làm.

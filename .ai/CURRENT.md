@@ -301,6 +301,19 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 9 của bug h
   C `2 failed | 4 passed (6)`. Probe đặt **ngoài** `qa/` ⇒ số probe vẫn **30**.
 - Hồi quy chạy tay (CI chỉ chạy một probe — `RISK-18`): `qa/games.mjs` `catalogCount: 31` 0 errors ·
   `golden-path` 28 bước 0 errors · `focus` 0 errors · `parent-controls` 7 bước 0 errors (`qa/` trong evidence).
+- **CI đo sau push** (`0c92915..cb56720`, hai commit `8083b10` code + `cb56720` docs đi trong **một**
+  lệnh push; pre-push hook chạy `npm run verify` trên tip ⇒ `113 file / 1460 test`, `Duration 24.17s`):
+  tip `cb56720` có đủ ba lượt xanh — `1. Quality` 41692600202 · `2. Build + artifact` 41692599879 ·
+  **`3. Browser QA` 41692600066** (job 126114749872 `golden path trên Chromium` success
+  `18:18:56Z→18:20:00Z` = **64 s**, bước 7 `success`, bước 8 `skipped`). **Commit code `8083b10`
+  không có run nào** (`actions/runs?head_sha=8083b10…` ⇒ `total_count: 0`) ⇒ khuôn "push hai commit
+  thì commit code không được probe lượt nào" tái diễn **lần thứ ba** (`6a07883` T44 · `c2a8626` T45 ·
+  `8083b10` T46) ⇒ `RISK-16` vẫn MỞ, và vì CI chỉ chạy `qa/golden-path.mjs` (`RISK-18`) nên **không**
+  lượt CI nào chạm chốt T46C. Vòng kiểm kê §21 (`evidence/2026-11-03-QA-RACE/ci-gate-race.txt`): toàn
+  sổ workflow `03` = **30 lượt**; khoảng không còn cờ từ `3b0122c` = **17 lượt = 16 xanh + 1 cancelled
+  + 0 đỏ**; chuỗi xanh tới tip = **6**; cấp job toàn sổ suy ra **20/30 xanh · 9 đỏ · 1 cancelled**.
+  Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ** — chưa có đỏ *thật* nào sau khi bỏ cờ ⇒ cổng chưa
+  *chứng minh* được nó cắt commit hỏng.
 - **Bài học quy trình (lần đầu trả giá thật):** `git checkout -- <file>` trong pha ablation đã **xoá mất
   bản sửa chưa commit** của `useModalHistory.ts` ⇒ phải viết lại tay. Từ đó: ablation restore từ
   `/tmp/*.GREEN.*`, và `tests-RED.txt` (RED **tái lập** bằng `git checkout HEAD --` đúng 4 file) có bảng

@@ -148,6 +148,31 @@ nên chạy tay bốn probe mà CI **không** chạy (một lượt CI chỉ ch�
 | `qa/focus.mjs` | `qa/focus.txt` | `QA PASS — 0 step(s), 0 errors` (exit 0) |
 | `qa/parent-controls.mjs` | `qa/parent-controls.txt` | `QA PASS — 7 step(s), 0 errors` (exit 0) |
 
+## CI (đo sau push)
+
+Push `0c92915..cb56720` (hai commit trong **một** lệnh push: `8083b10` code + `cb56720` docs).
+Pre-push hook chạy `npm run verify` nguyên suite trên tip ⇒ `Test Files 113 passed (113)` ·
+`Tests 1460 passed (1460)` · `Duration 24.17s` · `✔ Pre-push: passed`.
+
+| Workflow | run | job | commit được đo | kết quả | thời lượng | bước 7 "QA probe" | bước 8 |
+|---|---|---|---|---|---|---|---|
+| `1. Quality` | 41692600202 | — | `cb56720` (tip) | success | — | — | — |
+| `2. Build + artifact` | 41692599879 | — | `cb56720` | success | — | — | — |
+| **`3. Browser QA`** | **41692600066** | 126114749872 `golden path trên Chromium` | `cb56720` | **success** | `18:18:56Z→18:20:00Z` = **64 s** | `success` | `skipped` |
+
+Commit docs `0c92915` (đẩy ở push trước, T45) có lượt #66 riêng: runs 41686215529 / 41686215385 /
+41686215360 đều success.
+
+**Commit code `8083b10` không có run nào**: `curl -s
+https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=8083b1062b9241de1a1d69773d42cd6cb67cbe54`
+⇒ `total_count: 0`. Đây là lần **thứ ba** liên tiếp gặp khuôn này (`6a07883` T44, `c2a8626` T45,
+`8083b10` T46) ⇒ `RISK-16` không những MỞ mà còn **tái diễn 100 %** với các push hai commit; hệ quả
+đúng như lần trước: **không lượt CI nào chạy `qa/*` trên đúng bộ `src/` của T46** — mục "Hồi quy" ở
+trên chỉ là bằng chứng cấp máy. Vòng kiểm kê §21 (`../2026-11-03-QA-RACE/ci-gate-race.txt`): toàn sổ
+workflow `03` nay **30 lượt**, khoảng **không còn cờ** từ `3b0122c` = **17 lượt = 16 xanh + 1 cancelled
++ 0 đỏ**, chuỗi xanh tới tip = **6**; cấp job toàn sổ suy ra **20/30 xanh · 9 đỏ · 1 cancelled**. Ô 13
+`docs/plan/TEST_PLAN.md` §16 **vẫn MỞ**.
+
 ## Ảnh
 
 `a1-lop-phu-dang-mo.png`, `a2-sau-esc-lan-mot.png`, `a3-sau-mo-lai-dong-bang-esc.png`,
