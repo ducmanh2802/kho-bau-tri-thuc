@@ -584,3 +584,50 @@ R-04, `.ai/CURRENT.md`):
 Không đổi vì kiểm kê này: **ô 13 `docs/plan/TEST_PLAN.md` §16 vẫn MỞ** — 9 lượt đỏ kia là đỏ *thật của
 một lỗi chưa sửa* (race đề cổng phụ huynh) chứ chưa từng có một probe đỏ *giả* bị cổng chặn oan; và
 quy tắc dừng §13 vẫn áp dụng — con số 13/22 là **bằng chứng cổng chạy đúng**, không phải điểm số.
+
+---
+
+## 19. Bổ sung sau T44: bốn lượt `main` mới (một `cancelled`) — 16/26 xanh cấp job
+
+Lệnh (cùng nguồn với §18, chạy 2026-11-03 sau push `58020e5`):
+
+```bash
+curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/workflows/401675040/runs?branch=main&per_page=100" > wf03.json
+node -e "const j=JSON.parse(require('fs').readFileSync('wf03.json','utf8'));
+ const rs=(j.workflow_runs||[]).filter(r=>r.run_number>=37);const by={};
+ for(const r of rs)by[r.conclusion||r.status]=(by[r.conclusion||r.status]||0)+1;
+ console.log(rs.length,JSON.stringify(by));"
+# → 26 {"success":25,"cancelled":1}          (CẤP RUN — xem cảnh báo bên dưới)
+
+for id in 41646599254 41647428035 41648001797 41663622006; do
+  curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs/$id/jobs" \
+    | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{const j=JSON.parse(d);
+        for(const job of j.jobs||[]){const s7=(job.steps||[]).find(x=>x.number===7);
+        console.log(job.name,'|',job.conclusion,'| step7',s7&&s7.conclusion);}});"
+done
+```
+
+| run | workflow `run_number` | commit | job `golden path trên Chromium` | step 7 "QA probe" |
+|---|---|---|---|---|
+| 41646599254 | 60 | `c7e9a00` | `success` (13:41:36 → 13:42:32, 56 s) | `success` |
+| 41647428035 | 61 | `8e27cd5` | **`cancelled`** (13:47:03 → 13:51:04) | `skipped` — probe **không chạy** |
+| 41648001797 | 62 | `fc861f3` | `success` (13:51:07 → 13:52:03, 56 s) | `success` |
+| 41663622006 | 63 | `58020e5` (T44) | `success` (15:24:47 → 15:25:50, 63 s) | `success` |
+
+`6a07883` (commit code T44) **không có run riêng**: `curl …/actions/runs?head_sha=6a07883e093d3a0f9013dde4650a029b8b6a5b27` ⇒
+`total_count: 0`, vì hai commit `6a07883` + `58020e5` đi trong **một** lệnh push nên GitHub chỉ tạo
+run trên tip `58020e5`. Đây là lý do hồ sơ T44 ghi CI theo `58020e5`, không phải theo commit code.
+
+Cập nhật kiểm kê §18 (vẫn đọc `jobs[].conclusion`, không dùng cấp run):
+
+- mẫu: **22 → 26** lượt `main` của workflow `03` kể từ `66e0fea` (run #37 → #63).
+- xanh cấp job: **13 → 16** · đỏ: **9** (không thêm đỏ) · **1 `cancelled`** (#61 `8e27cd5`, bước 7
+  `skipped`: lượt này bị chính push kế tiếp `fc861f3` chen lúc đang chạy — không phải probe đỏ).
+- chuỗi: **#48 → #60 = 13 lượt xanh liên tiếp**,dừng ở #61 vì `cancelled` chứ không vì đỏ, rồi
+  #62–#63 xanh tiếp. "Không còn lưới" tính từ #52 (`6e30794`): **12 lượt**, trong đó 11 xanh + 1 cancelled.
+- Cảnh báo cấp run: lọc theo cách này cho **25/26 `success`** — khác 16 vì các run từ #37 đến #51
+  chạy khi workflow `03` còn `continue-on-error: true`, nên run `success` dù job đỏ. Muốn số thật
+  phải đọc `jobs[].conclusion` như §18/§19, không đọc `workflow_runs[].conclusion`.
+
+Ô 13 `docs/plan/TEST_PLAN.md` §16 **vẫn MỞ** sau §19: chưa có lượt đỏ *thật* nào sau khi bỏ cờ
+(#52 trở đi chỉ toàn xanh hoặc một cancelled vì bị chen), nên cổng vẫn chưa *chứng minh* được nó chặn.

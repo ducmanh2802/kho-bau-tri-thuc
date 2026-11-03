@@ -114,6 +114,26 @@ node "C:/Users/Windows/.qoder/skills/kho-bau-measure-sync/scripts/measure.mjs" -
 `CHANGELOG.md` / `TASK_PLAN §II`) không bị chạm tới. Lưu ý log phải **đã bỏ mã ANSI** —
 `verify.txt` ở đây là bản `sed` bỏ escape màu, nếu đưa log có ANSI vào thì `test_total` không đọc được.
 
+## CI (đo sau push)
+
+Hai commit `6a07883` (code+test+evidence) và `58020e5` (docs) đi trong **một** lệnh push
+(`fc861f3..58020e5`), nên GitHub chỉ tạo run trên tip:
+
+| workflow | run | commit | kết luận |
+|---|---|---|---|
+| `1. Quality` | 41663622227 | `58020e5` | `completed success` |
+| `2. Build + artifact` | 41663622071 | `58020e5` | `completed success` |
+| `3. Browser QA` | 41663622006 | `58020e5` | job `golden path trên Chromium` `success` (15:24:47 → 15:25:50, 63 s), bước 7 **"QA probe" `success`**, bước 8 `skipped` |
+
+`6a07883` **không có run riêng**: `curl -s "https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/actions/runs?head_sha=6a07883e093d3a0f9013dde4650a029b8b6a5b27"` ⇒
+`total_count: 0`. Đây là lỗ hổng định nghĩa "commit nào cũng qua cổng", ghi là `RISK-16` trong
+`docs/plan/RISK_REGISTER.md`. Kiểm kê tỷ lệ cả ngày cập nhật ở §19
+[`../2026-11-03-QA-RACE/ci-gate-race.txt`](../2026-11-03-QA-RACE/ci-gate-race.txt): **26 lượt = 16 xanh ·
+9 đỏ · 1 cancelled** (cấp job).
+
+Pre-push hook trên lượt push này: `verify:quick` ⇒ `Test Files 105 passed (105)` ·
+`Tests 1410 passed (1410)` · `Duration 23.78s` · `✔ Pre-push: passed`.
+
 ## Ảnh
 
 `img/*.png` chụp ở viewport 375×812 bằng `page.screenshot` trong phiên probe; ba file, không có ảnh
