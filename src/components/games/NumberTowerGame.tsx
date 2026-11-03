@@ -20,7 +20,9 @@ export const NumberTowerGame: React.FC<{ onExit: () => void }> = ({ onExit }) =>
 
   useEffect(() => {
     setTowerBlocks([]);
-  }, [stage.tier]);
+    // T47F: "Chơi lại" giữ nguyên `tier`, chỉ bump `nonce` — thiếu nonce thì tháp vẫn đầy gạch
+    // của ván cũ trong khi điểm vừa về 0.
+  }, [stage.tier, stage.nonce]);
 
   const handlePickBrick = (num: number) => {
     if (stage.locked) return;

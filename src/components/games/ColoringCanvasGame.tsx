@@ -212,8 +212,12 @@ export const ColoringCanvasGame: React.FC<{ onExit: () => void }> = ({ onExit })
     stage.submitCorrect(stars);
   };
 
-  const restartGame = () => {
-    stage.restartGame();
+  // T47F: wrapper này là `onRestart` của trò — `handleSelectTier` trong `GameModalWrapper` gọi
+  // `onRestart(t)` với chính màn bé bấm. Bỏ tham số thì `stage.restartGame()` fallback `unlockedTier`
+  // (màn khó nhất từng mở) ⇒ bé bí ở Màn 3 mà chọn Màn 1 vẫn ở Màn 3: đường sửa của `DEF-017` lọt
+  // đúng trò này vì chỉ nó có wrapper riêng. Khoá bằng `tests/t47f-restart-resets-board.test.ts`.
+  const restartGame = (targetTier?: number) => {
+    stage.restartGame(targetTier);
     clearCanvas();
   };
 

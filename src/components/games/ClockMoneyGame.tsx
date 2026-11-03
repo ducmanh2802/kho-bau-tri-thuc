@@ -32,7 +32,8 @@ export const ClockMoneyGame: React.FC<{ onExit: () => void }> = ({ onExit }) => 
 
   React.useEffect(() => {
     setShowHint(false);
-  }, [stage.tier, stage.roundIdx]);
+    // T47F: ván mới (nonce mới) phải bắt đầu mà không còn gợi ý của ván cũ.
+  }, [stage.tier, stage.roundIdx, stage.nonce]);
 
   const choose = (opt: string) => {
     if (stage.locked || stage.phase !== 'playing') return;

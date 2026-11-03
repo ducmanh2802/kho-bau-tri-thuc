@@ -134,7 +134,9 @@ const ListenPickStage: React.FC<{
   useEffect(() => {
     const timer = setTimeout(() => playVoice(), 400);
     return () => clearTimeout(timer);
-  }, [stage.tier, stage.roundIdx, currentRound]);
+    // T47F: `currentRound` đã đổi theo nonce ở effect trên, nhưng khoá của ván phải ghi thẳng
+    // vào deps để bất biến "mọi hiệu ứng theo tier/roundIdx phải theo nonce" không có ngoại lệ.
+  }, [stage.tier, stage.roundIdx, currentRound, stage.nonce]);
 
   const handlePick = (card: PhonicsCard) => {
     if (stage.locked) return;

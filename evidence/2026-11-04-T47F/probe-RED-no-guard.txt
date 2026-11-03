@@ -1,0 +1,41 @@
+{
+  "steps": [
+    "C0: tiến độ Màn 3 ⇒ bảng mở đúng Màn 3, mẫu tranh đúng \"Bông Hoa Rực Rỡ\"",
+    "C2: chơi lại cùng màn ⇒ coverage về 0% (ink 15143→12551, node canvas thay thế=false) — tranh sạch theo LỆNH, không cần stage.nonce"
+  ],
+  "errors": [
+    "A2: chơi lại cùng màn mà tháp vẫn còn 3 tầng (điểm đã về 0) — hành vi cũ của DEF-018: reset chỉ keyed theo `stage.tier`",
+    "B2: chơi lại cùng màn mà toa tàu vẫn giữ 1 từ của ván trước — cùng nút nguồn với lỗi soft-lock (`trainDriving` cũng không đổi)",
+    "C3: bé đã mở Màn 3 rồi bấm Màn 1 mà tranh vẫn là \"Bông Hoa Rực Rỡ\" — wrapper `onRestart` bỏ tham số `targetTier` (DEF-017 lọt lại trên trò này)"
+  ],
+  "facts": {
+    "towerAnswered": 3,
+    "blocksBeforeRestart": 3,
+    "blocksAfterRestart": 3,
+    "carsBeforeRestart": 1,
+    "carsAfterRestart": 1,
+    "headerAtOpen": "🦊 Màn 3/6 ▾ · 🚀 Câu 1/1",
+    "templateAtOpen": "Bông Hoa Rực Rỡ",
+    "coverageBeforeReplay": 2,
+    "canvasInkBeforeReplay": 15143,
+    "canvasNodeReplaced": false,
+    "coverageAfterReplay": 0,
+    "canvasInkAfterReplay": 12551,
+    "templateAfterReplay": "Bông Hoa Rực Rỡ",
+    "coverageBeforePickEasier": 2,
+    "templateAfterPickEasier": "Bông Hoa Rực Rỡ",
+    "coverageAfterPickEasier": 0
+  },
+  "failedAt": "A2",
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\a1-thap-da-xay.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\a2-sau-choi-lai.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\b1-tu-da-ghep.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\b2-sau-choi-lai.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\c1-da-to-mau.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\c2-sau-choi-lai-cung-man.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\c3-sau-khi-chon-man-1.png"
+  ],
+  "ok": false
+}
+QA FAIL — 3 error(s) at A2

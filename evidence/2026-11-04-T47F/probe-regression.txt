@@ -1,0 +1,11 @@
+=== node qa/run-one.mjs qa/games.mjs
+  "errors": [],
+QA PASS — 0 step(s), 0 errors
+=== node qa/run-one.mjs qa/golden-path.mjs
+  "steps": [
+      "ok": true
+      "ok": true,
+      "ok": true
+      "ok": true,
+  "errors": [],
+QA PASS — 28 step(s), 0 errors

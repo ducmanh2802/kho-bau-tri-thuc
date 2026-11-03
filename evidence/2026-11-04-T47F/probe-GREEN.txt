@@ -1,0 +1,40 @@
+{
+  "steps": [
+    "A2: chơi lại cùng màn ⇒ tháp về 0 tầng",
+    "B2: chơi lại cùng màn ⇒ mọi toa trống, bé chạm lại được từ đầu",
+    "C0: tiến độ Màn 3 ⇒ bảng mở đúng Màn 3, mẫu tranh đúng \"Bông Hoa Rực Rỡ\"",
+    "C2: chơi lại cùng màn ⇒ coverage về 0% (ink 15143→12551, node canvas thay thế=false) — tranh sạch theo LỆNH, không cần stage.nonce",
+    "C3: bấm Màn 1 từ Màn 3 ⇒ mẫu tranh đúng về \"Ngôi Nhà Thân Thương\" của Màn 1"
+  ],
+  "errors": [],
+  "facts": {
+    "towerAnswered": 3,
+    "blocksBeforeRestart": 3,
+    "blocksAfterRestart": 0,
+    "carsBeforeRestart": 1,
+    "carsAfterRestart": 0,
+    "headerAtOpen": "🦊 Màn 3/6 ▾ · 🚀 Câu 1/1",
+    "templateAtOpen": "Bông Hoa Rực Rỡ",
+    "coverageBeforeReplay": 2,
+    "canvasInkBeforeReplay": 15143,
+    "canvasNodeReplaced": false,
+    "coverageAfterReplay": 0,
+    "canvasInkAfterReplay": 12551,
+    "templateAfterReplay": "Bông Hoa Rực Rỡ",
+    "coverageBeforePickEasier": 2,
+    "templateAfterPickEasier": "Ngôi Nhà Thân Thương",
+    "coverageAfterPickEasier": 0
+  },
+  "failedAt": null,
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\a1-thap-da-xay.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\a2-sau-choi-lai.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\b1-tu-da-ghep.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\b2-sau-choi-lai.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\c1-da-to-mau.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\c2-sau-choi-lai-cung-man.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47F\\c3-sau-khi-chon-man-1.png"
+  ],
+  "ok": true
+}
+QA PASS — 5 step(s), 0 errors

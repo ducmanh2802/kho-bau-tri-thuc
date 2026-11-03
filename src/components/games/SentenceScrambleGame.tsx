@@ -25,7 +25,10 @@ export const SentenceScrambleGame: React.FC<{ onExit: () => void }> = ({ onExit 
   useEffect(() => {
     setAssembledWords([]);
     setTrainDriving(false);
-  }, [stage.tier, stage.roundIdx]);
+    // T47F: chơi lại cùng màn không đổi `tier` và không đổi `roundIdx` (đang ở round 1).
+    // `trainDriving` mà còn `true` thì `handleWordTap` return sớm ⇒ mọi cú chạm bị nuốt,
+    // tàu chữ kẹt vĩnh viễn trên ván mới.
+  }, [stage.tier, stage.roundIdx, stage.nonce]);
 
   // T02B/B2 — seeded scramble (mixes play nonce): never the correct order
   // and never the plain reverse that children could game right-to-left.

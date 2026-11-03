@@ -25,8 +25,9 @@ export const EnglishAnimalSoundGame: React.FC<{ onExit: () => void }> = ({ onExi
       sound.speak(`Find the ${current.target.englishName}!`, 'en-GB');
     }, 400);
     return () => clearTimeout(timer);
+    // T47F: chơi lại cùng màn chỉ đổi `nonce` ⇒ phải đọc lại lời gợi ý của đề mới.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage.tier, stage.roundIdx]);
+  }, [stage.tier, stage.roundIdx, stage.nonce]);
 
   const handlePickAnimal = (item: AnimalSafariItem) => {
     if (stage.locked) return;
