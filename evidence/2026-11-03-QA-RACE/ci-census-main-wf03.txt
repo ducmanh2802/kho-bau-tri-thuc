@@ -139,4 +139,8 @@ sau khi đo xong ⇒ **chưa** đo được lượt CI của commit docs `c7e9a0
 đóng bằng chứng nhìn thấy được cho T43") trong phiên này. Quy tắc ghi lại để lần sau không nói liều:
 **không** viết "CI xanh" cho `c7e9a00` ở bất kỳ tài liệu nào cho tới khi
 `runs?head_sha=c7e9a00…` trả kết quả thật. Nếu một lượt docs-only đỏ thì kiểm kê này thành **13/23**,
-không còn là 13/22 — nên con số 22 ở trên chỉ đúng cho các run **đã** đo, tính tới `3eb7d12`.
+không còn là 13/22 — nên con số 22 ở trên chỉ đúng cho các run **đã** đo, tính tới `3eb7d12`. Rule này
+áp dụng cho **mọi** commit docs-only push sau đó trong phiên (kể cả commit ghi chính đoạn này), cho tới
+khi đo lại. Cách đo rẻ: một lệnh `runs?head_sha=<sha>` cho **một** lượt (khác với vòng kiểm kê 22 run
+tốn 23 request) — nhưng chưa chạy thành công lần nào trong phiên này vì hạn mức đã hết, nên số request
+tiết kiệm được là **phép tính**, chưa phải số đo.
