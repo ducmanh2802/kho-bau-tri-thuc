@@ -108,7 +108,40 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
-- **T46 — ba defect còn lại của lượt đo T45: một lời chào bị lời khen chặn, một nút không tên, một phím làm mất ván.**
+- **T47 — năm defect: một phím vẫn xoá ván khi đang tạm dừng, "Không giới hạn" của ba mẹ bị tính ra 20 phút, quyền ba mẹ không lên cloud, dòng thưởng 0 XP, bảng chọn màn không về được màn dễ.**
+  (a) **`DEF-013` phần còn lại — `Esc` lúc đang tạm dừng **thoát luôn ván****: tấm che
+  "Đang tạm dừng" (`absolute inset-0 z-20`, dựng khi `isRealtime && isPaused`) là một lớp phủ thật mà
+  `useModalHistory` chỉ khai `overlayOpen: showTierModal`, nên `Esc` rơi thẳng xuống `history.back()`.
+  `GameOverlayState` + `escapeOverlayKind()` xếp lớp theo **z-order** (bảng "Chọn Màn & Độ Khó" `z-50`
+  trước, tấm che `z-20` sau) và `pauseVeilOpen` đòi `Boolean(onTogglePause)` — trò không có đồng hồ thì
+  không có tấm che, nên `Esc` không bị nuốt. Probe trên `dist/` (`evidence/2026-11-04-T47/probe-t47-escape-pause.mjs`,
+  4 bước / 5 ảnh, exit 0) chứng minh cả bốn chiều: tạm dừng → `Esc` **mở khoá, ván còn**; `Esc` lần hai
+  vẫn thoát; trò không đồng hồ một lần `Esc` thoát ngay; và hồi quy T46C (bảng chọn màn vẫn là ưu tiên
+  số một). (b) **ba mẹ chọn "Không giới hạn" (`dailyLimitMinutes: 0`) bị ngân sách hoá thành 20 phút**:
+  `decisionEngine` tính `input.budgetMinutes ?? (dailyLimitMinutes || DEFAULT_BUDGET_MINUTES)` nên `0` —
+  giá trị *có nghĩa* — bị `||` nuốt. Sửa bằng `resolveDailyBudgetMinutes()` thuần (test được) +
+  `P39_DECISION_POLICY.UNLIMITED_BUDGET_MINUTES: 240`; dùng **số hữu hạn** vì `JSON.stringify(Infinity)`
+  ra `null` nên một lần persist là hỏng vĩnh viễn. **Bài học đỏ giả:** test đầu tiên so `dailyPlan` qua
+  `decide()` xanh *cả trước lẫn sau* khi sửa — kế hoạch tự sinh ngắn hơn cả trần 20 phút nên hiệu số
+  20/240 không hiện ra ở tầng đó; phép thử phải đặt ở `buildDailyPlan` với `fiveRecs` 5 × 12 = 60 phút. (c) **`saveParentSettings()` ghi
+  `localStorage.setItem` thô**: `writeJSON` là chỗ **duy nhất** phát `kho_bau_storage_change` mà
+  `cloudSync.ts` nghe để hẹn giờ auto-sync ⇒ giờ học / phần thưởng / độ khó bé vừa cài không bao giờ rời
+  khỏi máy đang gõ, kể cả khi người lớn đã bật đồng bộ. Đổi sang `writeJSON`. (d) **Thử Thách Tuần ghi
+  thêm dòng thưởng `xp=0`**: `recordWeeklyChallengeCompleted` vừa gọi `recordQuestEvent` (đường thưởng
+  thật) vừa `addRewardHistory({ amount: 0, … })`, nên mỗi tuần lại thêm một dòng vô nghĩa vào lịch sử
+  **50** phần thưởng — bé xem dashboard thấy "Hoàn thành Thử Thách Tuần +0" lặp lại và các phần thưởng
+  thật bị đẩy ra khỏi cửa sổ. Bỏ `addRewardHistory`. (e) **bảng "Chọn Màn & Độ Khó" không về được màn
+  *dễ* hơn**: `selectGameTier` **chỉ mở khoá** (`Math.max`), còn `restartGame()` đọc `unlockedTier` một
+  cách mù ⇒ bé đang bí ở Màn 5 mà bấm Màn 1 thì bảng nạp lại Màn 5, chỉ tổ mất điểm. `restartGame(targetTier?)`
+  nhận đúng màn bé bấm; `jumpToTier` (không nơi nào gọi) bị **xoá** để chỉ còn **một** đường đổi màn.
+  Ablation: `mutation-1-veil-declared.txt` (đặt `pauseVeilOpen = false`) chỉ làm đỏ **1** test vì hợp
+  đồng nguồn vẫn nhìn thấy tên identifier ⇒ **probe mới là bằng chứng hành vi**, không phải regex;
+  `mutation-2-hook-guard.txt` đỏ đúng test chốt `Boolean(onTogglePause)`; cả hai probe chạy trên build
+  bỏ chốt đều `QA FAIL` (`probe-t47-RED-no-guard.txt`, `probe-t47e-RED-no-guard.txt`), và file sửa được
+  hoàn tác có **md5 đối chiếu**. `tests/t47a…t47e` = **37** test; cổng `npm run verify` **EXIT=0** ·
+  `118 file / 1497 test` · `Duration 27.64s` · entry `index-vqb0Kx4n.js` **211.1 kB**.
+  **Còn mở:** `T47F` ("Chơi lại" không xoá trạng thái bảng ở trò tháp/tàu chữ) và `T47G` (lượt sai của
+  năm trò chưa có phản hồi hình ảnh). Bằng chứng: `evidence/2026-11-04-T47/`.
   (a) **`DEF-010` câu chào theo giờ biến mất với bé đã có streak**: `getEncouragementPhrase()`
   `return` chuỗi **khen** khi `hasStreak`, tức câu chào `Chào buổi sáng/chiều/Tối rồi…` chỉ vang lên
   ở lần chơi đầu tiên — mà lần chơi đầu chỉ có một. Sửa: câu chào luôn đứng trước, lời khen nối làm

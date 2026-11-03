@@ -15,9 +15,22 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1460 test / 113 file,
-   211.2 kB entry + 425.5 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
-   ngay sau **T46** (ba defect còn lại của đợt săn bug mà code tự sửa được, không phải quyết nội dung: câu
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1497 test / 118 file,
+   211.1 kB entry + 425.4 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
+   ngay sau **T47** (năm defect một đợt, đều là phần *còn hở* của sổ săn bug: `Esc` lúc đang tạm dừng
+   **thoát luôn ván** vì tấm che "Đang tạm dừng" không được khai là lớp phủ — đóng `DEF-013`; ba mẹ chọn
+   "Không giới hạn" (`dailyLimitMinutes: 0`) bị ép thành ngân sách 20 phút; `saveParentSettings()` ghi
+   `setItem` thô nên không phát `kho_bau_storage_change` ⇒ quyền kiểm soát của ba mẹ không bao giờ rời
+   khỏi máy đang gõ, kể cả khi đã bật đồng bộ; Thử Thách Tuần ghi thêm dòng thưởng `xp=0` trùng lặp làm
+   đầy lịch sử 50 phần thưởng; và bảng "Chọn Màn & Độ Khó" không về được màn **dễ** hơn vì `selectGameTier`
+   chỉ mở khoá (`Math.max`) ⇒ `restartGame(targetTier)`; **5** file test mới
+   `tests/t47a-escape-resumes-pause-veil` (7) · `t47b-unlimited-daily-budget` (10) ·
+   `t47c-parent-settings-broadcast` (7) · `t47d-weekly-challenge-zero-reward-row` (6) ·
+   `t47e-tier-picker-easier` (7) ⇒ 37 test; vẫn **42** service module, vẫn **30** probe QA
+   (probe bằng chứng đặt trong `evidence/2026-11-04-T47/`, không tính vào `qa/`); `src/` đổi nên entry
+   **đổi cả hash lẫn kB** (đuôi `CprqGUdJ` → `vqb0Kx4n`, 211.2 → 211.1 kB) — bằng chứng
+   `evidence/2026-11-04-T47/`),
+   đợt **T46** liền trước (ba defect còn lại của đợt săn bug mà code tự sửa được, không phải quyết nội dung: câu
    chào theo giờ bị lời khen streak **thay thế** nên bé đã có streak không bao giờ được chào, nút loa của
    "Đôi Tai Thính — Nghe & Chọn" là icon-only **không tên truy cập** (không `aria-label` lẫn `title`), và
    **Esc thoát luôn trò chơi** khi lớp phủ "Chọn Màn & Độ Khó" còn đang che bảng; **3** file test mới

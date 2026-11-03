@@ -349,6 +349,66 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 9 của bug h
 - **Hygiene:** vẫn **không** stage 6 file `docs/opencode/reports/img/*.png` và
   `docs/step-by-step-guidance.md` (untracked, của lane khác); `package-lock.json` còn nguyên.
 
+## T47 — năm lát cắt, `DEF-013` đóng, và một lần "xanh giả" (2026-11-04, lane này)
+
+Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug hunt, HEAD `f1764f7`).
+**`src/` đổi 6 file** (`GameModalWrapper.tsx` · `useModalHistory.ts` · `useGameStage.ts` ·
+`policy.ts` · `decisionEngine.ts` · `storage.ts`), **5 file test mới / 37 test**.
+
+- **T47A `DEF-013` ĐÓNG** — T46 mới route lớp phủ "Chọn Màn & Độ Khó"; **tấm che tạm dừng** vẫn để
+  `Esc` đi thẳng `onExit` ⇒ bé bấm Esc để xem lại tấm che thì bị đá khỏi ván. `useModalHistory` nhận
+  `escapeOverlayKind({ tierPickerOpen, pauseVeilOpen })` route theo **z-order thật** (`z-50` bảng chọn
+  trước `z-20` tấm che); `pauseVeilOpen = isRealtime && isPaused && Boolean(onTogglePause)` để trò
+  **không có đồng hồ** không nuốt Esc. `tests/t47a-escape-resumes-pause-veil.test.ts` (7).
+- **T47B `DEF-014`** — ba mẹ chọn "Không giới hạn" (`dailyLimitMinutes: 0`) bị ngân sách hoá thành
+  **20 phút** vì `?? (dailyLimitMinutes || DEFAULT_BUDGET_MINUTES)` nuốt `0`; tách
+  `resolveDailyBudgetMinutes()` thuần + `P39_DECISION_POLICY.UNLIMITED_BUDGET_MINUTES: 240`
+  (**hữu hạn**, vì `JSON.stringify(Infinity)` ⇒ `null`, một lần persist là hỏng vĩnh viễn).
+  `tests/t47b-unlimited-daily-budget.test.ts` (10).
+  **Bài học đỏ giả:** test đầu tiên so `dailyPlan` qua `decide()` **xanh cả trước lẫn sau** khi sửa —
+  kế hoạch tự sinh ngắn hơn cả trần 20 phút nên hiệu số 20/240 không hiện ra ⇒ phép thử phải đặt ở
+  **cấp hàm thuần** và ở `buildDailyPlan` với `fiveRecs` 5 × `estimatedMinutes: 12` = 60 phút. Đây là
+  lần đầu một test tự viết **không đỏ** khi phá code cũ.
+- **T47C `DEF-015`** — `saveParentSettings()` ghi `localStorage.setItem` trần, bỏ qua `writeJSON` là
+  ngã rẽ **duy nhất** phát `CustomEvent('kho_bau_storage_change')` mà `cloudSync.ts:106` nghe để hẹn
+  đồng bộ ⇒ cài đặt ba mẹ đổi trên máy này không bao giờ sang máy khác, im lặng.
+  `tests/t47c-parent-settings-broadcast.test.ts` (7).
+- **T47D `DEF-016`** — `recordWeeklyChallengeCompleted()` vừa gọi `recordQuestEvent` (thưởng thật) vừa
+  tự đẩy `addRewardHistory({ type: 'xp', amount: 0 })` ⇒ lịch sử phần thưởng đầy dòng "0 XP" mỗi tuần.
+  `tests/t47d-weekly-challenge-zero-reward-row.test.ts` (6).
+- **T47E `DEF-017`** — `handleSelectTier` gọi `selectGameTier` (chỉ **tăng**, `Math.max`) rồi
+  `onRestart()` **không truyền** số màn, còn `restartGame()` đọc `unlockedTier` = màn cao nhất từng mở
+  ⇒ Màn 5 chọn Màn 1 thì bảng **nạp lại đúng Màn 5**, điểm vừa tích **mất**; `stage.jumpToTier` viết
+  sẵn nhưng **không nơi nào gọi**. Sửa: `restartGame(targetTier?)` + wrapper gọi `onRestart(t)` — một
+  thay đổi ở framework phủ **31** trò. `tests/t47e-tier-picker-easier.test.ts` (7); xoá luôn `jumpToTier`
+  chết. **Tham chiếu dòng trong comment/test đổi sang tên symbol** (`Math.max` trong
+  `StorageService.selectGameTier`) vì `storage.ts` dài ra làm số dòng trôi.
+- Cổng: `npm run verify` **EXIT=0** · `118 file / 1497 test` · `Duration 27.64s` ·
+  `index-vqb0Kx4n.js` **211.1 kB** · boot graph `435603 total` byte = **425.4 kB** (−115 byte so với
+  `435718` của T46). Kiểm kê không đổi: 42 service, **30** probe QA, 31/31/31/31 trò, 105 file
+  `src/data/**/*.ts`, 16 file `src/data/math/*.ts`, 18 key `STORAGE_KEYS`. Log
+  `evidence/2026-11-04-T47/verify.txt`.
+- Bằng chứng UI thật: **hai** probe đặt ngoài `qa/` (số probe vẫn **30**) —
+  `probe-t47-escape-pause.mjs` ⇒ `QA PASS — 4 step(s), 0 errors`, 5 ảnh; `probe-t47e-tier-picker.mjs`
+  ⇒ `QA PASS — 4 step(s), 0 errors`, 2 ảnh, `headerBefore "🌟 Màn 5/6 ▾"` → `headerAfterPick "🐥 Màn 2/6 ▾"`
+  mà `unlockedTier` vẫn **5**. **Mỗi chốt có bước đối chứng** (A1 Esc mở tấm che + A3 Esc kế vẫn thoát
+  thật + B1 trò không tấm che thoát ngay) — thiếu chúng thì mục A chỉ chứng minh "phím bị chết".
+- Ablation: `mutation-1-veil-declared.txt` (đặt `pauseVeilOpen = false`) chỉ đỏ **1** test trong t47a ·
+  `mutation-2-hook-guard.txt` (bỏ chốt trong hook) đỏ **2** file (t46c + t47a) ⇒ **ablation cấp unit
+  không đủ cho hành vi bàn phím**; bằng chứng thật là `probe-t47-RED-no-guard.txt` = cùng probe trên
+  build bỏ chốt ⇒ `QA FAIL — 3 error(s) at A`, exit 1. RED ban đầu của 5 file test: `tests-RED-initial.txt`
+  + `tests-RED-t47{b,c,d,e}.txt`.
+- **Sổ:** `DEF-013` **đóng hoàn toàn**; `DEF-014`…`DEF-017` mới; `DEF-018` (**MỞ** — T47F "Chơi lại"
+  không xoá trạng thái bảng ở trò tháp/tàu chữ, T47G lượt sai của 5 trò không có phản hồi **hình ảnh**;
+  trong cùng ô ghi rõ **một ứng viên đã bị bác** — "tắt phần thưởng làm mất thưởng theo cấp" — vì
+  `tests/t41a-parent-controls.test.ts:178-192` đã khoá đúng hành vi đó, và danh sách chỉ nhận sau khi
+  đối chiếu **từng chỗ** với source); `DEF-019` ghi năm chỗ lệch chính sách chưa thành defect có test
+  (bốn công tắc ba mẹ chỉ trang trí, `getChildProfile()` tiến streak khi đọc, `getAnalytics()` đóng dấu
+  `lastPracticed`, `useSpeak` báo `'played'` ở `onerror`, chuỗi "mở khóa" lệch chính tả).
+  `DEF-011` tiếp tục MỞ (chờ người giữ repo chốt "total" đếm theo lượt hay câu).
+- **CI:** chưa đo cho lượt này — theo §23, số hiện trạng CI sống ở `ci-gate-race.txt` §23 và **chỉ** đo lại
+  khi có commit **code** mới; commit code T47 sẽ push **riêng một lượt** để né `RISK-16`.
+
 
 
 P36, P38, P39 sessions share this working tree concurrently. Each lane left its
