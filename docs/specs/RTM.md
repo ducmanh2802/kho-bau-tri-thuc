@@ -60,8 +60,8 @@
 | FR-L07 | `src/components/learning/NextBestActionCard.tsx` | `tests/personas-and-learning-os.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 | FR-L08 | `src/services/adaptive.ts`, `src/components/review/DailyReviewScreen.tsx` | `tests/learning-engine.test.ts`, `tests/date-utils.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 | FR-L09 | `src/services/adaptiveDifficulty.ts`, `src/config/policy.ts:464` | `tests/adaptive-difficulty.test.ts` | — | V,1 | ĐẠT |
-| FR-L10 | `src/types/learningOS.ts:179`, `src/services/storage.ts:149` | `tests/fatigue-reset.test.ts` | — | V,1 | ĐẠT |
-| FR-L11 | `src/services/sessionComposer.ts`, `src/services/storage.ts:145` | `tests/session-composer.test.ts` | `qa/lesson-types.mjs` | V,1 | ĐẠT |
+| FR-L10 | `src/types/learningOS.ts:179`, `src/services/storage.ts:206` | `tests/fatigue-reset.test.ts` | — | V,1 | ĐẠT |
+| FR-L11 | `src/services/sessionComposer.ts`, `src/services/storage.ts:202` | `tests/session-composer.test.ts` | `qa/lesson-types.mjs` | V,1 | ĐẠT |
 | FR-L12 | `src/services/learningOS.ts` | `tests/lesson-completion.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 
 ### 2.3 FR-G — Trò chơi
@@ -142,7 +142,7 @@
 | FR-P03 | DC-10, `src/services/storage.ts` | `tests/t14c-storage.test.ts` | — | V,1 | ĐẠT |
 | FR-P04 | `src/services/storage.ts` (export JSON) | `tests/parent-and-demo.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 | FR-P05 | `src/services/storage.ts` (import) | `tests/parent-and-demo.test.ts` | — | V,1 | ĐẠT |
-| FR-P06 | `src/components/parent/ParentDashboardModal.tsx` | `tests/parent-and-demo.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
+| FR-P06 | `src/components/parent/ParentDashboardModal.tsx`, `src/services/storage.ts` (`resetProgress` + allowlist `RESET_KEEP_KEYS`) | `tests/parent-and-demo.test.ts`, `tests/t43a-reset-progress-sweeps-child-data.test.ts` | `evidence/2026-11-03-T43/probe-t43-reset.mjs` (probe bằng chứng, không đặt trong `qa/` ⇒ không lọt vào số probe 30) | V,3 | ĐẠT |
 | FR-P07 | `src/components/parent/ParentDashboardModal.tsx:850` (`{row.accuracy}% / chuẩn {row.gate}%`), `src/services/competitionQuality.ts` | `tests/competition-readiness.test.ts` | `qa/golden-path.mjs` | V,3 | ĐẠT |
 | FR-P08 | `src/components/parent/KidBoxParentPanel.tsx` | `tests/kidbox-bridge-practice.test.ts` | `qa/kidbox-focus.mjs` | V,3 | **CHƯA ĐẠT** (phụ thuộc FR-N04) |
 
@@ -158,7 +158,7 @@
 | FR-Y06 | `src/index.css`, `public/fonts` | `tests/p41-font-encoding.test.ts` | `qa/p41-font-visual.mjs` | V,3 | ĐẠT |
 | FR-Y07 | `src/App.tsx` (@vercel/analytics mặc định) | `tests/firebase-auth-sync.test.ts` | `qa/t02-smoke.mjs` (network) | V,1 | ĐẠT |
 | FR-Y08 | `src/services/firebase.ts:82`, `src/components/auth/AccountModal.tsx` | `tests/firebase-auth-sync.test.ts:86` (offline khi chưa đăng nhập) | `qa/golden-path.mjs` | V,1 | ĐẠT |
-| FR-Y09 | `src/services/cloudMerge.ts:171` (luật hợp nhất thuần), `src/services/cloudSync.ts:228` (kéo + gộp + đẩy), `:117` (chỉ theo dõi auth khi máy từng đăng nhập), `firestore.rules` | `tests/firebase-auth-sync.test.ts`, `tests/t41d-cloud-merge.test.ts` (28), `tests/t41d-cloud-sync-race.test.ts` (12) — đều mock | — | V,1 | ĐẠT MỘT PHẦN — chưa test với project Firebase thật, chưa có UI xoá dữ liệu cloud |
+| FR-Y09 | `src/services/cloudMerge.ts:171` (luật hợp nhất thuần), `src/services/cloudSync.ts:228` (kéo + gộp + đẩy), `:20` (chỉ theo dõi auth khi máy từng đăng nhập), `firestore.rules` | `tests/firebase-auth-sync.test.ts`, `tests/t41d-cloud-merge.test.ts` (28), `tests/t41d-cloud-sync-race.test.ts` (12) — đều mock | — | V,1 | ĐẠT MỘT PHẦN — chưa test với project Firebase thật, chưa có UI xoá dữ liệu cloud |
 
 ### 2.10 FR-C — Cờ tướng
 
@@ -187,10 +187,10 @@
 | NFR-A04 | `src/index.css:414` (`@media (prefers-reduced-motion: reduce)`) | — | `qa/responsive-a11y.mjs` | V,3 | ĐẠT (probe-only) |
 | NFR-A05 | `docs/P31_PERFORMANCE_ACCESSIBILITY.md` | — | `qa/responsive-a11y.mjs` | V,3 | ĐẠT (probe-only) |
 | NFR-R01 | `public/sw.js`, `src/services/pwa.ts` | `tests/pwa.test.ts` | `qa/offline-pwa.mjs` | V,2,3 | ĐẠT |
-| NFR-R02 | `src/services/storage.ts:114`, `:177` | `tests/exam-fidelity.test.ts`, `tests/t18a-motivation.test.ts`, `tests/reading-fluency.test.ts`, `tests/t40-parent-facing-ids.test.ts` | — | V,1 | ĐẠT |
-| NFR-R03 | `src/services/storage.ts:262` (`readJSONObject`) | `tests/decision-engine-storage.test.ts`, `tests/kidbox-learning-os.test.ts` | — | V,1 | ĐẠT |
+| NFR-R02 | `src/services/storage.ts:128`, `:191` | `tests/exam-fidelity.test.ts`, `tests/t18a-motivation.test.ts`, `tests/reading-fluency.test.ts`, `tests/t40-parent-facing-ids.test.ts` | — | V,1 | ĐẠT |
+| NFR-R03 | `src/services/storage.ts:276` (`readJSONObject`) | `tests/decision-engine-storage.test.ts`, `tests/kidbox-learning-os.test.ts` | — | V,1 | ĐẠT |
 | NFR-R04 | `src/services/storage.ts`, `src/services/learningOS.ts` | `tests/lesson-completion.test.ts`, `tests/game-rewards.test.ts`, `tests/personas-and-learning-os.test.ts` | `qa/games.mjs` | V,1,3 | ĐẠT |
-| NFR-C01 | `src/services/storage.ts` (nguồn thật), `src/services/cloudSync.ts:117` (chỉ sync khi đã đăng nhập), `firestore.rules` | `tests/firebase-auth-sync.test.ts`, `tests/t41d-cloud-sync-race.test.ts` | `qa/offline-pwa.mjs` | V,1 | ĐẠT (mặc định) — phần cloud mirror mới đạt một phần, xem FR-Y09 |
+| NFR-C01 | `src/services/storage.ts` (nguồn thật), `src/services/cloudSync.ts:20` (chỉ sync khi đã đăng nhập), `firestore.rules` | `tests/firebase-auth-sync.test.ts`, `tests/t41d-cloud-sync-race.test.ts` | `qa/offline-pwa.mjs` | V,1 | ĐẠT (mặc định) — phần cloud mirror mới đạt một phần, xem FR-Y09 |
 | NFR-C02 | `.gitignore` (`progress/`) | `tests/t23-mcp-servers.test.ts` | — | V,1,H | ĐẠT |
 | NFR-C03 | `mcp/sample-export.json` (`isDemoData`), `src/services/demoSeed.ts` | `tests/t23-mcp-servers.test.ts`, `tests/parent-and-demo.test.ts` | `qa/golden-path.mjs` | V,1 | ĐẠT |
 | NFR-C04 | `src/data/contentSafety.ts` | `tests/content-quality.test.ts`, `tests/praise-engine.test.ts` | `qa/p41-curriculum-quality.mjs` | V,1,3 | ĐẠT |
@@ -199,7 +199,7 @@
 | NFR-M01 | `package.json` (`verify`, `verify:quick`) | — | — | V,H,1,2 | ĐẠT |
 | NFR-M02 | `src/config/policy.ts` (17 export, có rationale) | test theo từng policy block | — | V,1 | ĐẠT |
 | NFR-M03 | ADR-03; `src/services/answerCheck.ts` | `tests/answerCheck.test.ts`, `tests/competition-engine.test.ts` | `qa/question-types.mjs` | V,1 | ĐẠT |
-| NFR-M04 | `tests/` naming | 99 file / 1372 test | — | V,H,1 | ĐẠT |
+| NFR-M04 | `tests/` naming | 100 file / 1377 test | — | V,H,1 | ĐẠT |
 | NFR-M05 | `package.json` (8 runtime deps; `@types/three` sai chỗ — nợ #8 ARCHITECTURE §13) | `tests/t23-mcp-servers.test.ts` | — | V,H,1 | ĐẠT |
 | NFR-M06 | `mcp/lib/server.mjs` | `tests/t23-mcp-servers.test.ts` | — | V,1 | ĐẠT |
 
@@ -209,7 +209,7 @@
 
 | ID | Key / đối tượng | Nơi khai báo | Pipeline đọc/ghi | Test |
 |---|---|---|---|---|
-| DC-01 | nguyên tắc mọi store | `src/services/storage.ts:262`, `:281` | `readJSONObject` → migrate → sanitize → default | `tests/decision-engine-storage.test.ts` |
+| DC-01 | nguyên tắc mọi store | `src/services/storage.ts:276`, `:295` | `readJSONObject` → migrate → sanitize → default | `tests/decision-engine-storage.test.ts` |
 | DC-02 | `kho_bau_child_profile` | `src/services/storage.ts:61` | StorageService | `tests/t07-subject-path.test.ts` |
 | DC-03 | `kho_bau_game_progress` | `:71`, `GAME_PROGRESS_SCHEMA_VERSION:102` | StorageService | `tests/game-rewards.test.ts`, `tests/t08-games-hub.test.ts` |
 | DC-04 | `kho_bau_learning_os_store` | `:67` | `createEmptyLearningOSStore:157` | `tests/t18a-motivation.test.ts`, `tests/fatigue-reset.test.ts` |
@@ -278,7 +278,7 @@
 
 ## 7. Ma trận ngược: test không phục vụ yêu cầu nào?
 
-99 file test đều nằm trong ít nhất một dòng §2 hoặc §3 ở trên (mới nhất: bảy file T42 — `tests/t42a-tier-picker-honest.test.ts` → FR-G04 (6 bậc) + FR-M01 (XP/sao không tự tăng) + NFR-R04; `tests/t42b-listen-pick-answer.test.ts` → FR-G04 (đáp án phải nằm trong tập phương án); `tests/t42c-focus-trap-typing.test.ts` → NFR-A01 + FR-G08 (bẫy focus không cướp con trỏ khi bé đang gõ); `tests/t42d-corrupt-storage-guard.test.ts` → NFR-R04 (một phần tử hỏng không xoá cả danh sách ôn); `tests/t42e-resource-touch-clock.test.ts` → FR-Y09 + NFR-C01 (luật đồng hồ `stateTouchedAt` khi hợp nhất cloud); `tests/t42f-digit-lesson-no-carry.test.ts` → FR-L02 — **chưa có FR nào** phát biểu "cộng/trừ lớp 1 không nhớ/không mượn" nên đây là ánh xạ gần nhất; nợ ghi ở `docs/plan/TASK_PLAN.md` §"Hệ quả chưa đóng"; `tests/t42g-late-state-timers.test.ts` → FR-G06 + NFR-R04 (đề và hẹn giờ dựng lại ở thì render, không kẹt state cũ); trước đó: `tests/t41d-cloud-merge.test.ts` + `tests/t41d-cloud-sync-race.test.ts` → FR-Y09/NFR-C01/A-03 (phép hợp nhất hồ sơ cloud không in tài nguyên, không bỏ hồ sơ demo vào tài khoản thật, và kết quả của phiên đăng nhập cũ không được ghi lên phiên mới); `tests/t41f-parent-gate.test.ts` → FR-P01/NFR-M04 (cổng phụ huynh phải có đề ngay khung hình đầu) + NFR-U01 (probe không tin một lần đọc); `tests/chess-engine-performance.test.ts` (merge `09511d3`) → FR-C06 + NFR-P01 — tên file không theo quy ước `t<NN>-…`, nợ ghi ở §10; `tests/t43-game-pause.test.ts` → FR-G08 + KBT-ISSUE-43 (`docs/issues/43-game-pause.md`), đã ghi ở §6 và §10; `tests/t41c-idempotency.test.ts` → NFR-R04/FR-G04/FR-R05; `tests/t41b-decision-clock.test.ts` → FR-L04/FR-L06; `tests/t41a-parent-controls.test.ts` → FR-P01/FR-S06/NFR-M04; `tests/t40-parent-facing-ids.test.ts` → FR-P01/FR-L06/FR-R04/NFR-R02/NFR-M04; `tests/t39-first-load-graph.test.ts` → NFR-P01/NFR-C01/NFR-M04 + ADR-18; `tests/t38-webgl-fallback.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/t34-chess-real-set.test.ts` → FR-C06; `tests/t33-feedback-timers.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/t32-game-stage-reset.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/chess-3d.test.ts` → FR-C06; `tests/t31-bug-hunt-fixes.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/firebase-cloud-sync.test.ts` đổi tên thành `tests/firebase-auth-sync.test.ts` → FR-Y08/Y09/NFR-C01; `tests/t24-speech-math-operators.test.ts` → FR-Y02; `tests/t25-difficulty-ladder.test.ts` → FR-G04/G05; `tests/t26-cotuong-puzzles.test.ts` → FR-C06; `tests/t27-lesson-engagement.test.ts` → FR-M01/FR-S08; `tests/t28-ui-polish.test.ts` → NFR-U01/NFR-M04; `tests/t29-lesson-smooth.test.ts` → FR-L02/NFR-M04; `tests/t30-cotuong-piece-depth.test.ts` → FR-C02), **ngoại trừ** các file sau —
+100 file test đều nằm trong ít nhất một dòng §2 hoặc §3 ở trên (mới nhất: bảy file T42 — `tests/t42a-tier-picker-honest.test.ts` → FR-G04 (6 bậc) + FR-M01 (XP/sao không tự tăng) + NFR-R04; `tests/t42b-listen-pick-answer.test.ts` → FR-G04 (đáp án phải nằm trong tập phương án); `tests/t42c-focus-trap-typing.test.ts` → NFR-A01 + FR-G08 (bẫy focus không cướp con trỏ khi bé đang gõ); `tests/t42d-corrupt-storage-guard.test.ts` → NFR-R04 (một phần tử hỏng không xoá cả danh sách ôn); `tests/t42e-resource-touch-clock.test.ts` → FR-Y09 + NFR-C01 (luật đồng hồ `stateTouchedAt` khi hợp nhất cloud); `tests/t42f-digit-lesson-no-carry.test.ts` → FR-L02 — **chưa có FR nào** phát biểu "cộng/trừ lớp 1 không nhớ/không mượn" nên đây là ánh xạ gần nhất; nợ ghi ở `docs/plan/TASK_PLAN.md` §"Hệ quả chưa đóng"; `tests/t42g-late-state-timers.test.ts` → FR-G06 + NFR-R04 (đề và hẹn giờ dựng lại ở thì render, không kẹt state cũ); trước đó: `tests/t41d-cloud-merge.test.ts` + `tests/t41d-cloud-sync-race.test.ts` → FR-Y09/NFR-C01/A-03 (phép hợp nhất hồ sơ cloud không in tài nguyên, không bỏ hồ sơ demo vào tài khoản thật, và kết quả của phiên đăng nhập cũ không được ghi lên phiên mới); `tests/t41f-parent-gate.test.ts` → FR-P01/NFR-M04 (cổng phụ huynh phải có đề ngay khung hình đầu) + NFR-U01 (probe không tin một lần đọc); `tests/chess-engine-performance.test.ts` (merge `09511d3`) → FR-C06 + NFR-P01 — tên file không theo quy ước `t<NN>-…`, nợ ghi ở §10; `tests/t43-game-pause.test.ts` → FR-G08 + KBT-ISSUE-43 (`docs/issues/43-game-pause.md`), đã ghi ở §6 và §10; `tests/t41c-idempotency.test.ts` → NFR-R04/FR-G04/FR-R05; `tests/t41b-decision-clock.test.ts` → FR-L04/FR-L06; `tests/t41a-parent-controls.test.ts` → FR-P01/FR-S06/NFR-M04; `tests/t40-parent-facing-ids.test.ts` → FR-P01/FR-L06/FR-R04/NFR-R02/NFR-M04; `tests/t39-first-load-graph.test.ts` → NFR-P01/NFR-C01/NFR-M04 + ADR-18; `tests/t38-webgl-fallback.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/t34-chess-real-set.test.ts` → FR-C06; `tests/t33-feedback-timers.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/t32-game-stage-reset.test.ts` → FR-G04/NFR-U01/NFR-M04; `tests/chess-3d.test.ts` → FR-C06; `tests/t31-bug-hunt-fixes.test.ts` → FR-C06/NFR-U01/NFR-M04; `tests/firebase-cloud-sync.test.ts` đổi tên thành `tests/firebase-auth-sync.test.ts` → FR-Y08/Y09/NFR-C01; `tests/t24-speech-math-operators.test.ts` → FR-Y02; `tests/t25-difficulty-ladder.test.ts` → FR-G04/G05; `tests/t26-cotuong-puzzles.test.ts` → FR-C06; `tests/t27-lesson-engagement.test.ts` → FR-M01/FR-S08; `tests/t28-ui-polish.test.ts` → NFR-U01/NFR-M04; `tests/t29-lesson-smooth.test.ts` → FR-L02/NFR-M04; `tests/t30-cotuong-piece-depth.test.ts` → FR-C02), **ngoại trừ** các file sau —
 chúng bảo vệ *chất lượng nền* chứ không bảo vệ một FR riêng lẻ:
 
 | File | Vai trò thật |

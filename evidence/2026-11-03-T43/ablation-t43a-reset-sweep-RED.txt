@@ -1,0 +1,98 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t43a-reset-progress-sweeps-child-data.test.ts (5 tests | 4 failed) 21ms
+   ❯ T43/A — resetProgress quét sạch dữ liệu của bé (5)
+     × xoá mọi khoá dữ liệu bé, kể cả ba khoá vốn bị sót 9ms
+     ✓ giữ thiết lập và phiên đăng nhập của người lớn 1ms
+     × lịch sử ngày ôn tập về trắng sau reset 4ms
+     × cây trở lại trạng thái chưa tưới để bé nhận confetti của ngày mới 4ms
+     × nhãn "MỚI" và ngày thấy lần đầu của trò chơi bị xoá theo hồ sơ 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t43a-reset-progress-sweeps-child-data.test.ts > T43/A — resetProgress quét sạch dữ liệu của bé > xoá mọi khoá dữ liệu bé, kể cả ba khoá vốn bị sót
+AssertionError: kho "kho_bau_review_days" phải bị xoá bởi resetProgress: expected '{"seeded":"kho_bau_review_days"}' to be null
+
+- Expected:
+null
+
++ Received:
+"{\"seeded\":\"kho_bau_review_days\"}"
+
+ ❯ tests/t43a-reset-progress-sweeps-child-data.test.ts:87:87
+     85|
+     86|     for (const key of CHILD_DATA_KEYS) {
+     87|       expect(localStorage.getItem(key), `kho "${key}" phải bị xoá bởi …
+       |                                                                                       ^
+     88|     }
+     89|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/t43a-reset-progress-sweeps-child-data.test.ts > T43/A — resetProgress quét sạch dữ liệu của bé > lịch sử ngày ôn tập về trắng sau reset
+AssertionError: expected [ '2026-11-01', '2026-11-02' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "2026-11-01",
++   "2026-11-02",
++ ]
+
+ ❯ tests/t43a-reset-progress-sweeps-child-data.test.ts:107:53
+    105|     StorageService.resetProgress();
+    106|
+    107|     expect(StorageService.getReviewCompletedDays()).toEqual([]);
+       |                                                     ^
+    108|   });
+    109|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/t43a-reset-progress-sweeps-child-data.test.ts > T43/A — resetProgress quét sạch dữ liệu của bé > cây trở lại trạng thái chưa tưới để bé nhận confetti của ngày mới
+AssertionError: expected '2026-11-03' to be null
+
+- Expected:
+null
+
++ Received:
+"2026-11-03"
+
+ ❯ tests/t43a-reset-progress-sweeps-child-data.test.ts:116:49
+    114|     StorageService.resetProgress();
+    115|
+    116|     expect(StorageService.getTreeWateredDate()).toBeNull();
+       |                                                 ^
+    117|   });
+    118|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/t43a-reset-progress-sweeps-child-data.test.ts > T43/A — resetProgress quét sạch dữ liệu của bé > nhãn "MỚI" và ngày thấy lần đầu của trò chơi bị xoá theo hồ sơ
+AssertionError: expected '{"catch_letters":"2026-10-26","syllab…' to be null
+
+- Expected:
+null
+
++ Received:
+"{\"catch_letters\":\"2026-10-26\",\"syllable_builder\":\"2026-10-26\",\"rhyme_hunter\":\"2026-10-26\",\"sentence_scramble\":\"2026-10-26\",\"listen_pick\":\"2026-10-26\",\"spelling_duel\":\"2026-10-26\",\"tone_paint\":\"2026-10-26\",\"rhyme_train\":\"2026-10-26\",\"read_and_do\":\"2026-10-26\",\"falling_numbers\":\"2026-10-26\",\"speed_racing\":\"2026-10-26\",\"number_tower\":\"2026-10-26\",\"ocean_fishing\":\"2026-10-26\",\"shape_sorting\":\"2026-10-26\",\"clock_money\":\"2026-10-26\",\"word_story\":\"2026-10-26\",\"ten_frame_market\":\"2026-10-26\",\"number_line_hop\":\"2026-10-26\",\"clock_builder\":\"2026-10-26\",\"animal_safari\":\"2026-10-26\",\"color_balloon\":\"2026-10-26\",\"phonics_pop\":\"2026-10-26\",\"simon_says\":\"2026-10-26\",\"word_builder_train\":\"2026-10-26\",\"treasure_coding\":\"2026-10-26\",\"little_scientist\":\"2026-10-26\",\"memory_cards\":\"2026-10-26\",\"coloring_canvas\":\"2026-10-26\",\"connect_dots\":\"2026-10-26\",\"shadow_match\":\"2026-10-26\",\"pixel_mosaic\":\"2026-10-26\",\"ocean-count\":\"2026-09-01\"}"
+
+ ❯ tests/t43a-reset-progress-sweeps-child-data.test.ts:126:61
+    124|
+    125|     // Sau reset, app xử lý như cài mới: chưa có ngày thấy nào được gh…
+    126|     expect(localStorage.getItem('kho_bau_game_first_seen')).toBeNull();
+       |                                                             ^
+    127|   });
+    128| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed (5)
+   Start at  19:18:59
+   Duration  678ms (transform 63%, import 25%, tests 8%, worker 4%, environment 1%)
+

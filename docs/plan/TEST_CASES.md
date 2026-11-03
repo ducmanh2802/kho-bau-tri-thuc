@@ -65,14 +65,14 @@ Cột "Bằng chứng" trỏ tới file chạy được. Cột "Giết bởi" tr
 | TC-04 | US-02 / biên | unit | hai id khác nhau vẫn tính 2 lượt | `tests/t41c-idempotency.test.ts:146` | chặn theo nội dung thay vì theo id | Pass |
 | TC-05 | US-03 / lỗi | unit | `finishSession` trùng `sessionId` không nhân đôi attempts | [`tests/t41c-idempotency.test.ts:164`](../../tests/t41c-idempotency.test.ts#L164) | bỏ guard `src/services/readingEngine.ts:320` → **đã chứng minh §4 M1** | Pass |
 | TC-06 | US-03 / chính | unit | buổi đọc mới vẫn cộng dồn bình thường | `tests/t41c-idempotency.test.ts:180` | guard chặn mọi session (kể cả id mới) | Pass |
-| TC-07 | US-03 / biên | unit | danh sách id đã gập sống qua một lần đọc lại | `tests/t41c-idempotency.test.ts:187` | xoá `appliedSessionIds` khỏi whitelist sanitizer `src/services/storage.ts:782` | Pass |
+| TC-07 | US-03 / biên | unit | danh sách id đã gập sống qua một lần đọc lại | `tests/t41c-idempotency.test.ts:187` | xoá `appliedSessionIds` khỏi whitelist sanitizer `src/services/storage.ts:796` | Pass |
 | TC-08 | US-04 / lỗi | unit | ghi thất bại ⇒ streak + `lastActiveDate` giữ nguyên sau nhiều lần đọc | `tests/t41c-idempotency.test.ts:198` | bỏ hoàn tác khi `saveChildProfile` trả `false` | Pass |
 | TC-09 | US-04 / chính | unit | lưu được ⇒ cộng đúng 1 lần, đọc lại không cộng thêm | `tests/t41c-idempotency.test.ts:213` | so ngày bằng chuỗi UTC thay vì lịch địa phương | Pass |
 | TC-10 | US-04 / lỗi | unit | khiên chỉ bị tiêu sau khi bước ngày đã lưu chắc | `tests/t41c-idempotency.test.ts:224` | tiêu khiên trước khi ghi | Pass |
-| TC-11 | US-01 / lỗi | unit | hai cú gửi của cùng một lượt chỉ trả một lần | [`tests/t41c-idempotency.test.ts:261`](../../tests/t41c-idempotency.test.ts#L261) | bỏ guard `src/services/storage.ts:2140` → **đã chứng minh §4 M2** | Pass |
+| TC-11 | US-01 / lỗi | unit | hai cú gửi của cùng một lượt chỉ trả một lần | [`tests/t41c-idempotency.test.ts:261`](../../tests/t41c-idempotency.test.ts#L261) | bỏ guard `src/services/storage.ts:2265` → **đã chứng minh §4 M2** | Pass |
 | TC-12 | US-01 / lỗi | unit | quest không nhận lượt chơi thứ hai từ một cú gửi trùng | `tests/t41c-idempotency.test.ts:277` | như TC-11 | Pass |
 | TC-13 | US-01 / biên | unit | nonce mới = lượt chơi thật ⇒ vẫn trả thưởng | `tests/t41c-idempotency.test.ts:291` | khoá biên lai bỏ hẳn `nonce` | Pass |
-| TC-14 | US-01 / biên | unit | biên lai sống qua một lần đọc lại (whitelist của sanitizer) | `tests/t41c-idempotency.test.ts:299` | xoá `rewardClaims` khỏi whitelist `src/services/storage.ts:1460` | Pass |
+| TC-14 | US-01 / biên | unit | biên lai sống qua một lần đọc lại (whitelist của sanitizer) | `tests/t41c-idempotency.test.ts:299` | xoá `rewardClaims` khỏi whitelist `src/services/storage.ts:1474` | Pass |
 | TC-15 | US-01 / lỗi | unit | lưu thất bại thì không ghi biên lai non | `tests/t41c-idempotency.test.ts:306` | ghi `rewardClaims` trước khi biết `writeJSON` thành công | Pass |
 | TC-16 | US-02 / hợp đồng | source-contract | phần trailing của `recordQuestionAnswer` đứng sau phép thử đã ghi được | `tests/t41c-idempotency.test.ts:319` | đảo thứ tự `if (!recorded) return;` (`src/services/storage.ts:1686`) | Pass |
 | TC-17 | US-04 / hợp đồng | source-contract | bước ngày chỉ hoàn tác khi `saveChildProfile` báo ghi hỏng | `tests/t41c-idempotency.test.ts:327` | đổi `writeJSON` thành `void` | Pass |
@@ -118,7 +118,7 @@ test phải đỏ vì **đúng nguyên nhân**, rồi hoàn tác.
 | # | Dòng bị bỏ | Test phải đỏ | Kết quả thật | Log |
 |---|---|---|---|---|
 | M1 | `src/services/readingEngine.ts:320` — guard `appliedSessionIds` | TC-05 `finishSession trùng sessionId không nhân đôi attempts của bậc` | `Tests 1 failed \| 24 skipped (25)` · EXIT=1 | [`mutation-M1-session-guard.txt`](../../evidence/2026-11-02-T41C/mutation-M1-session-guard.txt) |
-| M2 | `src/services/storage.ts:2140` — guard `rewardClaims` | TC-11 + TC-12 | `Tests 2 failed \| 23 passed (25)` · EXIT=1 | [`mutation-M2-reward-claim-guard.txt`](../../evidence/2026-11-02-T41C/mutation-M2-reward-claim-guard.txt) |
+| M2 | `src/services/storage.ts:2265` — guard `rewardClaims` | TC-11 + TC-12 | `Tests 2 failed \| 23 passed (25)` · EXIT=1 | [`mutation-M2-reward-claim-guard.txt`](../../evidence/2026-11-02-T41C/mutation-M2-reward-claim-guard.txt) |
 | — | hoàn tác M1+M2 | toàn bộ lát cắt 1 | `Tests 25 passed (25)` · EXIT=0 | [`mutation-baseline-t41c.txt`](../../evidence/2026-11-02-T41C/mutation-baseline-t41c.txt) |
 | M3 | `src/hooks/useGameStage.ts:24` — bỏ `!s.pausedByUser` khỏi `isGameClockRunning` | TC-30 và TC-32 (đỏ **hai** dòng: bảng sự thật *và* nhánh "tạm đang lúc mở lớp phủ") | `Tests 2 failed \| 28 passed (30)` · EXIT=1 | [`mutation-M3-clock-decision.txt`](../../evidence/2026-11-02-KBT-ISSUE-43/mutation-M3-clock-decision.txt) |
 | M4 | `src/hooks/useGameStage.ts:139` — bỏ **một** guard `if (!isRunning) return;` trong `submitCorrect` | TC-36 | `Tests 1 failed \| 29 passed (30)` · EXIT=1 | [`mutation-M4-score-guard.txt`](../../evidence/2026-11-02-KBT-ISSUE-43/mutation-M4-score-guard.txt) |
@@ -133,7 +133,7 @@ Lệnh tái lập (chạy trên máy sạch, `git checkout -- <file>` ngay sau �
 ```bash
 # M1 — bỏ dòng guard trong readingEngine.applySession
 npx vitest run tests/t41c-idempotency.test.ts -t "finishSession trùng"   # phải EXIT=1
-# M2 — đổi điều kiện ở storage.ts:2140 thành `if (false && …)`
+# M2 — đổi điều kiện ở storage.ts:2265 thành `if (false && …)`
 npx vitest run tests/t41c-idempotency.test.ts                            # phải đỏ đúng TC-11 + TC-12
 git checkout -- src/services/readingEngine.ts src/services/storage.ts
 npx vitest run tests/t41c-idempotency.test.ts                            # phải EXIT=0, 25 passed

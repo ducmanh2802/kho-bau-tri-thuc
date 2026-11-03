@@ -41,6 +41,37 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T43 — "Đặt lại tiến độ" nay quét đủ khoá dữ liệu của bé (`DEF-001`).** Hồ sơ pha 11
+  (`docs/11-decommissioning/decommission.md`) bắt đầu liệt kê từng khoá bằng lệnh
+  `sed -n '/^const STORAGE_KEYS = {/,/^};/p' src/services/storage.ts | grep -cE "^[[:space:]]+[A-Z_]+: 'kho_bau"`
+  ⇒ **17** khoá, trong khi `StorageService.resetProgress()` liệt kê tay **13** — ba khoá
+  `kho_bau_review_days` (danh sách ôn), `kho_bau_game_first_seen` (dấu "đã chơi" trên bảng chọn màn)
+  và `kho_bau_tree_water` (cờ tưới cây hôm nay) **sống sót** sau khi bấm reset, trái đúng lời hứa UI
+  "Đã đặt lại tiến độ về dữ liệu mới tinh ban đầu!" (`ParentDashboardModal`). Cách sửa không phải
+  thêm ba dòng `removeItem` cho đủ, mà đổi **cơ chế**: `childDataResetKeys()` sinh danh sách **từ**
+  `STORAGE_KEYS` trừ allowlist `RESET_KEEP_KEYS`, nên lần sau thêm một khoá dữ liệu mới buộc người
+  viết phải quyết định quét-hay-giữ ngay tại allowlist — không âm thầm sót nữa. Allowlist chỉ có
+  `PARENT_SETTINGS`: đó là lựa chọn của người lớn trên thiết bị (chế độ đêm, âm thanh, phần thưởng),
+  xoá nó khiến ba mẹ phải cấu hình lại chỉ vì bé muốn chơi lại từ đầu; cờ phiên đăng nhập cloud
+  `kho_bau_cloud_session_hint` nằm ngoài `STORAGE_KEYS` nên đương nhiên không bị quét. Mỗi vòng
+  `removeItem` bọc `try/catch` vì `localStorage` có thể bị chặn (private mode) — khi đó coi như đã trắng.
+  **Test viết trước:** `tests/t43a-reset-progress-sweeps-child-data.test.ts` (5) ⇒ RED
+  `Tests 4 failed | 1 passed (5)` (`evidence/2026-11-03-T43/ablation-t43a-reset-sweep-RED.txt`), restore
+  nguồn ⇒ `5 passed (5)`. Cổng: `npm run verify` **EXIT=0** · `100 passed (100)` / `1377 passed (1377)` ·
+  `Duration 28.57s` · `index-BYLrQykB.js` **210.9 kB → PASS (meets 450 kB goal)** · boot graph
+  **425.2 kB** (`435446 total` byte, `evidence/2026-11-03-T43/boot-graph.txt`) · **bằng chứng nhìn thấy
+  được** (`AGENTS.md` §1.3): `npm run build` rồi `node qa/run-one.mjs evidence/2026-11-03-T43/probe-t43-reset.mjs`
+  trên `dist/` ⇒ exit 0, `ok: true` — đi thật qua Parent Gate → tab "Cài Đặt & Thời Gian" → gieo 4 khoá
+  → bấm "Đặt lại tiến độ" → "Xác nhận đặt lại", sau reset ba khoá con `null`,
+  `kho_bau_parent_settings` còn `{"nightMode":true,"rewardsEnabled":true}`, `toastSeen: true`
+  (`probe-t43-reset.txt`); `qa/golden-path.mjs` vẫn `QA PASS — 28 step(s), 0 errors`
+  (`probe-golden-path.txt`). Probe giữ trong `evidence/`, **không** trong `qa/` vì `qa/*.mjs` bị đếm
+  là probe (giữ số probe 30 đúng). Không có ảnh PNG: sửa không đổi layout, thứ đổi là dữ liệu bị xoá.
+  · không thêm dependency,
+  không thêm service module (vẫn 42). **Hai việc hồ sơ bắt ra nhưng cố ý KHÔNG tự sửa** (cần người
+  duyệt, chủ đích để mở): `RISK-01` — không có đường xoá bản ghi cloud cho dù phụ huynh muốn rút dữ
+  liệu; `RISK-11` — `docs/SAFETY_PRIVACY.md` §2 nói "sao lưu" trong khi export là **một chiều**
+  (`grep -rn 'type="file"\|importData' src/components/parent/*.tsx` ⇒ exit 1).
 - **T42 — tám defect: chọn màn không còn in sao, thẻ *Đôi Tai Thính* luôn có đáp án, bẫy focus
   không cướp con trỏ khi bé gõ, một mục hỏng không xoá cả danh sách ôn, đồng hồ hợp nhất cloud
   thật sự chạy, bài Toán lớp 1 bỏ phép có nhớ/có mượn, lưới đề sạch dấu ngay khung hình đầu, hẹn
@@ -182,6 +213,17 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   `continue-on-error: true` **giữ nguyên** vì mới có một lần xanh.
 
 ### Tests
+- **T43 — 1 file / 5 test mới, ablation đúng một hàm.** `tests/t43a-reset-progress-sweeps-child-data.test.ts`:
+  hai test **cấu trúc** ("xoá mọi khoá dữ liệu bé, kể cả ba khoá vốn bị sót" — danh sách xoá phải lấy
+  từ `STORAGE_KEYS` trừ allowlist; "giữ thiết lập và phiên đăng nhập của người lớn" —
+  `kho_bau_parent_settings` và cờ phiên cloud phải còn nguyên) và ba test **hành vi người dùng thấy**
+  (`saveReviewCompletedDays` → sau reset `getReviewCompletedDays()` = `[]`;
+  `setTreeWateredDate('2026-11-03')` → `getTreeWateredDate()` = `null`; `markGameSeen('ocean-count', …)`
+  → raw key `null`), môi trường `node` + polyfill `localStorage` in-memory theo tiền lệ
+  `decision-engine-storage.test.ts`. Ablation: `git diff src/services/storage.ts > /tmp/t43a-fix.patch`
+  → `git checkout -- src/services/storage.ts` → `npx vitest run tests/t43a-…` ⇒ đỏ **4** test, đúng một
+  test "giữ thiết lập… của người lớn" xanh (vì bản cũ cũng không đụng hai khoá đó) → `git apply` →
+  `5 passed (5)`; không để lại file tạm trong `qa/` hay `scripts/` (thư mục `qa/*.mjs` được đếm là probe).
 - **T42 — 7 file / 45 test mới, ablation từng defect, và bằng chứng nhìn thấy được cho hai lỗi UI.**
   `t42a-tier-picker-honest` (5): `selectGameTier` chỉ nâng `unlockedTier` (kẹp 1…6), **không** ghi vào
   `starsByTier`/`bestScoreByTier`, lượt chơi thật đầu tiên sau khi chọn màn vẫn trả đủ XP + sao, và hợp
@@ -249,6 +291,26 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
 ## [1.1.0] - 2026-11-02
 
 ### Added
+- **Hồ sơ vòng đời theo `docs/step-by-step-guidance.md` (11 pha Agentic SDLC).** Người dùng yêu cầu
+  "triển khai dự án theo guide". **Đo trước khi làm:** bộ kit mà guide dẫn chiếu **không có trong repo**
+  (`find . -path ./node_modules -prune -o \( -iname "AI_SDLC-SOP.md" -o -iname "agentic-sdlc-process.md" -o -iname "*.xlsx" \) -print` ⇒ rỗng),
+  nên guide chỉ dùng được làm **lớp ánh xạ + log tailoring** — hệ quả là **không** dời `docs/specs/`,
+  `docs/plan/`, `qa/`, `evidence/` (bốn đường dẫn đó được `AGENTS.md`, `docs/specs/README.md` và skill
+  `kho-bau-measure-sync` dẫn tên; dời là gãy gate). Artifact mới, toàn bộ là docs:
+  `docs/lifecycle/10_SDLC_GUIDE_MAP.md` (11 pha → file thật, adaptation log, cổng 5 điều kiện, vai trò
+  là con người có tên, **3 quyết định tailoring cần người duyệt**: `.drawio` / `openapi.yaml` / ADR thành
+  file riêng — cả ba đề xuất `K/A` kèm lý do), `docs/01-intake/{intent,glossary,stakeholders,sources}.md`
+  (4 file — `intent` map `BO-xxx` sang `BG-01…BG-06` **đã có** thay vì lập sổ thứ hai, theo §C2 của guide;
+  `sources` ghi 19 nguồn trong repo + 5 chuẩn ngoài, kèm cảnh báo "repo không trích điều khoản nào của
+  chuẩn ⇒ không được viết 'tuân thủ'"), `docs/plan/RISK_REGISTER.md` (**11** RISK · **1** DEF ·
+  **7** OQ · **4** ASM), `docs/10-operations/{runbook,incident-log}.md` (runbook không có dashboard vì
+  app **không server, không telemetry** — SLI chỉ đo tại máy; 5 incident INC-01…INC-05 dẫn bằng chứng
+  `evidence/`), `docs/11-decommissioning/decommission.md` (kiểm kê 17 khoá bằng lệnh tái lập + disposal
+  cho 4 lớp dữ liệu ngoài `localStorage` + hai quy trình A/B). Kiểm đếm trước/sau: repo đã có sản phẩm
+  cho **8/11 pha**; ba pha 1/10/11 và register RISK/OQ/ASM là chỗ trống thật — nay đã có hồ sơ.
+  **Chính bộ hồ sơ này sinh ra `DEF-001`** (xem `### Fixed`) và giữ lại hai rủi ro **không** tự sửa vì
+  cần người duyệt: `RISK-01` (không có đường xoá dữ liệu cloud), `RISK-11` (export một chiều, trái
+  mô tả "sao lưu" trong `docs/SAFETY_PRIVACY.md` §2).
 - Trò chơi mới cho bé lớp 1 (tab Fun), mỗi trò có data pack deterministic 6 bậc +
   component + đăng ký đủ 4 nơi (`gamesCatalog`, `GAME_REGISTRY`, `LAUNCHABLE_GAME_IDS`,
   `qa/games.mjs`):

@@ -32,6 +32,25 @@ npm run qa:smoke        # probe Playwright thật trên dist/ (cần npm run bui
 
 Giai đoạn 1–2 có thể gộp với thay đổi nhỏ (sửa typo, đổi màu). Giai đoạn 4–5 **không bao giờ** bỏ.
 
+### 1.1 Lớp vòng đời 11 pha (guide nội bộ)
+
+Bảng trên là luồng cho **một thay đổi**. Vòng đời 11 pha của `docs/step-by-step-guidance.md` được
+ánh xạ sang layout repo — kèm nhật ký *vì sao mỗi lệch* — ở
+[`lifecycle/10_SDLC_GUIDE_MAP.md`](lifecycle/10_SDLC_GUIDE_MAP.md); kit của guide (file
+`AI_SDLC-SOP.md`, `agentic-sdlc-process.md`, spreadsheet) **không tồn tại trong repo** nên không có
+việc dời thư mục, chỉ có việc viết artifact còn thiếu. Ba hồ sơ đã viết bổ sung:
+
+| Pha | Artifact | Dùng để làm gì |
+|---|---|---|
+| 1 — Intake | [`01-intake/`](01-intake/) — `intent.md` · `glossary.md` · `stakeholders.md` · `sources.md` | chốt *sản phẩm này là gì / không là gì* trước khi FR nào được viết |
+| 10 — Operations | [`10-operations/runbook.md`](10-operations/runbook.md) + [`incident-log.md`](10-operations/incident-log.md) | ai đổ dữ vỡ thì làm gì — repo local-first nên phần lớn câu trả lời là "trên máy phụ huynh" |
+| 11 — Decommissioning | [`11-decommissioning/decommission.md`](11-decommissioning/decommission.md) | cách tắt một trò chơi / dừng dự án mà không mất dữ liệu bé |
+| mọi pha | [`plan/RISK_REGISTER.md`](plan/RISK_REGISTER.md) | `RISK-xx` · `OQ-xx` (câu hỏi mở) · `ASM-xx` (giả định) · `DEF-xx` (defect). **Một defect mới có ID ở đây trước khi sửa** — ví dụ `DEF-001` sinh ra đợt T43 |
+
+Rule chung của cả lớp này: mỗi ô trong Evidence Board phải mở được bằng **một lệnh** hoặc **một file
+có thật**, và mục nào agent tự ý định không được thì ghi `Blocked`/`NotRun` kèm lý do
+([`lifecycle/README.md`](lifecycle/README.md)).
+
 ---
 
 ## 2. Nhánh, commit, PR

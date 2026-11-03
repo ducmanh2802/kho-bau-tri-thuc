@@ -50,7 +50,7 @@ cổng máy** `77d90ce` và `4. Release` 41490669966 **success** ⇒ đối tư�
 | 1 | **RC commit** | chốt commit sẽ phát hành, tag `vX.Y.Z` trên **đúng** commit đã qua V&V gate | workflow `04-release.yml` trigger `push: tags v*.*.*` + `workflow_dispatch` | **đã tag** (2026-11-03): `77d90ce` mang `v1.1.0` = tag object `4f75f5d`; tag đầu `7d92246` bị xoá vì CI đỏ ở Install |
 | 2 | **Verdict** | mọi AC của **hai** lát cắt ở `TEST_CASES.md` §2 (6 US × 3 nhánh) + toàn bộ exit criteria `TEST_PLAN.md` §10 | 42/42 TC Pass (`TEST_CASES.md` §3) | phần lớn FR chưa xuống tầng TC — **không ghi con số "còn 83 FR"**: tổng FR khai báo (88) lệch số dòng FR thật trong `SRS.md` (89), xem `RTM.md` §9 rule 5 |
 | 3 | **Go/No-Go** | người chịu trách nhiệm ký; AI **không** ký | mục §3 dưới đây | chưa có phiên ký nào |
-| 4 | **Sẵn sàng vận hành** | expand/contract migration, restore drill, SLI/SLO, incident | ADR-02 + `MIGRATIONS` chain (`storage.ts:111`) | §5, §6 |
+| 4 | **Sẵn sàng vận hành** | expand/contract migration, restore drill, SLI/SLO, incident | ADR-02 + `MIGRATIONS` chain (`storage.ts:125`) | §5, §6 |
 | 5 | **Phát hành** | build → zip `dist/` → GitHub Release, note lấy từ `CHANGELOG.md` | workflow 04 làm đủ 3 bước | **đã chạy xanh lần đầu** (2026-11-03): run `41490669966` success 9 bước ⇒ release id `431754261` + asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte; còn thiếu: **0 lượt tải** và chưa ai mở zip trên máy thật |
 | 6 | **Sau phát hành** | smoke, theo dõi SLI, kế hoạch rollback | `qa/golden-path.mjs` dùng được làm smoke | không có telemetry ⇒ chỉ theo dõi được ở máy người dùng |
 
@@ -120,12 +120,12 @@ Căn cứ            : <dán output verify + golden-path + số TC NotRun còn l
 ## 4. Expand / Contract — đã có, đo được
 
 Không có DB server, nhưng có **schema `localStorage`** — đường hỏng thật là người dùng mở bản mới
-trên hồ sơ của bản cũ. Mô hình đang dùng (`storage.ts:105` `STORAGE_SCHEMA_VERSION = 'P43-v1'`):
+trên hồ sơ của bản cũ. Mô hình đang dùng (`storage.ts:119` `STORAGE_SCHEMA_VERSION = 'P43-v1'`):
 
 | Bước | Cơ chế | Tính hoàn tác |
 |---|---|---|
 | Expand | thêm field mới với mặc định do sanitizer dựng; **không** đổi nghĩa field cũ | có — field lạ bị bỏ, field cũ giữ |
-| Migrate | `MIGRATIONS` chain theo thứ tự, mỗi hàm *pure, defensive, idempotent* (`storage.ts:112`) | chạy lại không hỏng |
+| Migrate | `MIGRATIONS` chain theo thứ tự, mỗi hàm *pure, defensive, idempotent* (`storage.ts:126`) | chạy lại không hỏng |
 | Contract | chỉ bỏ field sau khi mọi bản đang chạy đều không đọc nó | **chưa có lịch contract** — nợ, xem `CHECKLIST.md` C-06 |
 
 Test: `tests/t14c-storage.test.ts`, `tests/t41c-idempotency.test.ts:299` (field mới phải sống qua

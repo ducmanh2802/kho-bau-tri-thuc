@@ -66,7 +66,7 @@ stage **từng file một**, không `git add -A`, không `git stash` trần. Đ�
 
 | # | Nợ | Vì sao chưa sửa | Owner | Hạn |
 |---|---|---|---|---|
-| D-1 | `storage.ts` 2628 dòng | gom mọi ghi vào một chỗ là lựa chọn có chủ đích; tách sẽ đụng 41 service | người giữ repo | trước khi bật cloudSync mặc định (T41D) |
+| D-1 | `storage.ts` 2746 dòng (đo 2026-11-03 lần bảy) | gom mọi ghi vào một chỗ là lựa chọn có chủ đích; tách sẽ đụng 42 service | người giữ repo | trước khi bật cloudSync mặc định (T41D) |
 | D-2 | `getMotivationState` **mutate khi đọc** (weekly shield, trần 2) | đọc có ghi làm hỏng giả định "pure getter"; chưa có bug thật | agent T41E | 2026-11-30 |
 | D-3 | `competitionEngine.ts:537` dùng `Date.now()` + `Math.random()` cho record id | vi phạm ADR-06 về deterministic *dữ liệu bài thi*; id bản ghi không ảnh hưởng đề | agent T41E | 2026-11-30 |
 | D-4 | `tests/decision-engine-storage.test.ts` `console.log` dump | đã xoá 3 khối console.log dump (addition/core actions/recs); test vẫn xanh, output CI sạch | agent T41E | **ĐÃ XONG 2026-11-02** |

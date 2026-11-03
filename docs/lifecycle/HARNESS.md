@@ -36,7 +36,7 @@
 | Test | bất biến 4 danh sách game | game đăng ký thiếu nơi thứ 4 | có — `tests/t23-mcp-servers.test.ts` |
 | Test | đồng hồ trò chơi | bé bấm tạm dừng mà bóng vẫn rơi / vẫn tính điểm | có — `tests/t43-game-pause.test.ts` (30 test, ablation M3/M4) + `qa/game-pause.mjs` |
 | Test | trần bộ nhớ / deterministic | `Math.random` trong data builder | có — `TEST_PLAN.md` §5 |
-| Runtime | sanitizer **whitelist** | field lạ trong `localStorage` | có — `storage.ts:782`, `:1460` |
+| Runtime | sanitizer **whitelist** | field lạ trong `localStorage` | có — `storage.ts:796`, `:1474` |
 | Runtime | `writeJSON → boolean` | ghi hỏng bị im lặng | có — T41C |
 | Cloud | `firestore.rules` | đọc/ghi hồ sơ của uid khác | có file, **chưa test end-to-end** (mock thôi) |
 

@@ -84,6 +84,20 @@ const STORAGE_KEYS = {
 };
 
 /**
+ * Khoá **không** thuộc về bé, nên "Đặt lại tiến độ" phải để nguyên:
+ * · `PARENT_SETTINGS` — chế độ đêm, bật/tắt phần thưởng, âm thanh; là lựa chọn
+ *   của người lớn trên thiết bị, xoá nó khiến phụ huynh phải cấu hình lại chỉ
+ *   vì muốn chơi lại từ đầu.
+ * Cờ phiên đăng nhập cloud (`kho_bau_cloud_session_hint`, `cloudSync.ts:10`) nằm
+ * ngoài `STORAGE_KEYS` nên đương nhiên không bị quét.
+ */
+const RESET_KEEP_KEYS: readonly string[] = [STORAGE_KEYS.PARENT_SETTINGS];
+
+function childDataResetKeys(): string[] {
+  return Object.values(STORAGE_KEYS).filter((key) => !RESET_KEEP_KEYS.includes(key));
+}
+
+/**
  * Versioned persistence schema for every localStorage-backed store.
  * Bumping a version requires a matching migration entry in MIGRATIONS below.
  *
@@ -2687,27 +2701,20 @@ public static getParentSettings(): ParentSettings {
     return { ok: true, reason: 'ok' };
   }
 
+  /**
+   * Nút "Đặt lại tiến độ" hứa trả hồ sơ bé về **mới tinh**
+   * (`ParentDashboardModal.tsx` — "Đã đặt lại tiến độ về dữ liệu mới tinh ban
+   * đầu!"). Danh sách khoá lấy **từ** `STORAGE_KEYS` trừ allowlist, nên thêm một
+   * khoá dữ liệu mới buộc người viết phải quyết định quét hay giữ ngay tại
+   * `RESET_KEEP_KEYS` — không âm thầm sót như bản liệt kê thủ công 13/17 trước.
+   */
   public static resetProgress() {
-    try {
-      localStorage.removeItem(STORAGE_KEYS.CHILD_PROFILE);
-      localStorage.removeItem(STORAGE_KEYS.ANALYTICS);
-      localStorage.removeItem(STORAGE_KEYS.DAILY_QUESTS);
-      localStorage.removeItem(STORAGE_KEYS.ACHIEVEMENTS);
-      localStorage.removeItem(STORAGE_KEYS.COMPETITION_HISTORY);
-      localStorage.removeItem(STORAGE_KEYS.LEARNING_OS_STORE);
-      localStorage.removeItem(STORAGE_KEYS.READING_STORE);
-      localStorage.removeItem(STORAGE_KEYS.KIDBOX_STORE);
-      localStorage.removeItem(STORAGE_KEYS.ENGLISH_MASTERY_STORE);
-      // T02B/B14 — parent reset also clears tier/star progress and the
-      // play-nonce store so a fresh start really starts fresh.
-      localStorage.removeItem(STORAGE_KEYS.GAME_PROGRESS);
-      localStorage.removeItem(STORAGE_KEYS.GAME_NONCE);
-      // T18A — kho động lực cũng về trắng (sticker, khiên, số liệu ngày).
-      localStorage.removeItem(STORAGE_KEYS.MOTIVATION);
-      // T26 — tiến độ luyện thế cờ tướng.
-      localStorage.removeItem(STORAGE_KEYS.COTUONG_PUZZLES);
-    } catch {
-      // Storage unavailable: nothing to clear.
+    for (const key of childDataResetKeys()) {
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // localStorage bị chặn (private mode): không có gì để xoá, coi như đã trắng.
+      }
     }
   }
 

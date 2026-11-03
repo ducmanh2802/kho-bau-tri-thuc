@@ -1,0 +1,84 @@
+# T43 — bằng chứng nhìn thấy được trên UI thật (AGENTS.md §1.3)
+
+Lệnh (build thật rồi `vite preview` cổng 4173 do runner tự khởi động):
+
+```
+npm run build
+node qa/run-one.mjs evidence/2026-11-03-T43/probe-t43-reset.mjs
+```
+
+Mã nguồn probe nằm ngay cạnh file này (`probe-t43-reset.mjs`) để tái lập được. Nó **không** đặt
+trong `qa/` vì `qa/*.mjs` được tài liệu đếm là probe — một helper lọt vào đó sẽ làm số probe tăng
+thật và lệch kiểm kê. Exit code `0` (`QA PASS`). Ngày đo 2026-11-03.
+
+## Luồng
+
+1. `localStorage.clear()` + reload để có máy mới tinh.
+2. Mở Parent Gate (`qa/lib.mjs:120 unlockParentDashboard`), vào tab "Cài Đặt & Thời Gian".
+3. Gieo 4 khoá: `kho_bau_review_days` (2 ngày đã ôn), `kho_bau_game_first_seen` (nhãn "MỚI" của một
+   trò), `kho_bau_tree_water` (cờ tưới cây hôm nay), `kho_bau_parent_settings` (lựa chọn của người
+   lớn — bắt buộc còn).
+4. Bấm "Đặt lại tiến độ" → "Xác nhận đặt lại" → chờ thông báo.
+5. Đọc lại `localStorage` và liệt kê mọi khoá `kho_bau_*` còn sống kèm giá trị.
+
+## Kết quả
+
+- Ba khoá dữ liệu bé biến mất: `review` / `firstSeen` / `tree` đều `null`.
+- `kho_bau_parent_settings` còn nguyên `{"nightMode":true,"rewardsEnabled":true}`.
+- Thông báo "Đã đặt lại tiến độ về dữ liệu mới tinh ban đầu!" hiện thật (`toastSeen: true`).
+- `ok: true`, `errors: []`.
+
+Bốn khoá còn trong `keysAfter` **không** phải dữ liệu cũ còn sót: trang đang mở nên app ghi lại giá
+trị mặc định sau reset. `kho_bau_child_profile` khớp `DEFAULT_CHILD_PROFILE`
+(`src/services/storage.ts:353`) — `xp: 0`, `stars: 0`, `gems: 0`, `completedLessons: []`.
+`kho_bau_daily_quests` là bộ nhiệm vụ ngày `2026-11-03` với `currentCount: 0` và `completed: false`
+cả 4 mục. `kho_bau_motivation` có `stickers: {}` và mọi tổng `*Total: 0`. Không có tiến bộ thật nào
+của bé quay lại.
+
+Dòng runner in ra `QA PASS — 0 step(s), 0 errors`: con số step bằng 0 vì probe này trả
+`errors` + `ok` chứ không có mảng `steps` (`qa/run-one.mjs` chỉ đếm `state.steps`), không phải lỗi.
+
+## Output nguyên văn
+
+```json
+{
+  "errors": [],
+  "seeded": {
+    "review": "[\"2026-11-01\",\"2026-11-02\"]",
+    "firstSeen": "{\"rhyme_hunter\":\"2026-09-01\"}",
+    "tree": "\"2026-11-03\"",
+    "parent": "{\"nightMode\":true,\"rewardsEnabled\":true}"
+  },
+  "keysBefore": [
+    "kho_bau_child_profile",
+    "kho_bau_daily_quests",
+    "kho_bau_game_first_seen",
+    "kho_bau_motivation",
+    "kho_bau_parent_settings",
+    "kho_bau_review_days",
+    "kho_bau_tree_water"
+  ],
+  "toastSeen": true,
+  "afterReset": {
+    "review": null,
+    "firstSeen": null,
+    "tree": null,
+    "parent": "{\"nightMode\":true,\"rewardsEnabled\":true}"
+  },
+  "childKeysCleared": true,
+  "parentSettingsKept": true,
+  "keysAfter": [
+    "kho_bau_child_profile",
+    "kho_bau_daily_quests",
+    "kho_bau_motivation",
+    "kho_bau_parent_settings"
+  ],
+  "valuesAfter": {
+    "kho_bau_child_profile": "{\"id\":\"child_1\",\"name\":\"Bé Minh\",\"grade\":1,\"avatarBase\":\"bear\",\"equipped\":{\"hat\":\"hat_cap\",\"glasses\":\"glasses_nerd\",\"backpack\":\"bag_dino\"},\"xp\":0,\"stars\":0,\"gems\":0,\"tickets\":0,\"streak\":1,\"lastActiveDate\":\"2026-11-03\",\"unlockedItems\":[\"hat_cap\",\"glasses_nerd\",\"bag_dino\"],\"completedLessons\":[],\"completedWeeklyChallenges\":[],\"lessonStars\":{},\"chestState\":{},\"unlockAllLessons\":false,\"isDemoData\":false}",
+    "kho_bau_daily_quests": "{\"date\":\"2026-11-03\",\"quests\":[{\"id\":\"quest_viet\",\"title\":\"Học 1 bài Tiếng Việt xinh\",\"targetCount\":1,\"currentCount\":0,\"rewardStars\":3,\"rewardXp\":30,\"completed\":false,\"type\":\"lesson_viet\"},{\"id\":\"quest_math\",\"title\":\"Làm quen 1 bài Toán kỳ thú\",\"targetCount\":1,\"currentCount\":0,\"rewardStars\":3,\"rewardXp\":30,\"completed\":false,\"type\":\"lesson_math\"},{\"id\":\"quest_life_2\",\"title\":\"Học 2 bài Em & Cuộc sống\",\"targetCount\":2,\"currentCount\":0,\"rewardStars\":4,\"rewardXp\":40,\"completed\":false,\"type\":\"lesson_life\"},{\"id\":\"quest_water\",\"title\":\"Tưới nước cho cây tri thức\",\"targetCount\":1,\"currentCount\":0,\"rewardStars\":2,\"rewardXp\":20,\"completed\":false,\"type\":\"fun\"}]}",
+    "kho_bau_motivation": "{\"schemaVersion\":\"P43-v1\",\"stickers\":{},\"claimedLevelRewards\":[],\"shields\":2,\"lastShieldWeek\":\"2026-W45\",\"streakDays\":[\"2026-11-03\"],\"shieldedDays\":[],\"shieldsUsedTotal\":0,\"gachaDrawsTotal\":0,\"questsCompletedTotal\":0,\"shopBoughtTotal\":0,\"comboBestAll\":0,\"starsEarnedTotal\":0,\"storiesReadTotal\":0,\"chestsOpenedTotal\":0,\"streakBest\":1,\"rewardClaims\":[],\"daily\":{\"date\":\"2026-11-03\",\"comboBest\":0,\"comboNow\":0,\"reviewQuestions\":0,\"gachaDraws\":0,\"correctBySubject\":{\"tieng-viet\":0,\"toan\":0,\"english\":0,\"cuoc-song\":0}}}",
+    "kho_bau_parent_settings": "{\"nightMode\":true,\"rewardsEnabled\":true}"
+  },
+  "ok": true
+}
+```

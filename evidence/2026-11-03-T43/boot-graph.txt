@@ -1,0 +1,10 @@
+# Boot graph — đo 2026-11-03 (lần bảy, nội dung = HEAD 195a4be + T43)
+
+$ grep -o "assets/[A-Za-z0-9_.-]*\.js" dist/index.html | sed "s#^#dist/#" | sort -u | xargs wc -c | tail -1
+435446 total
+
+435446 byte / 1024 = 425.2 KiB (docs ghi nhãn kB)
+
+$ npm run check:budget (dòng main)
+     210.9 kB  index-BYLrQykB.js  ← main
+Main chunk: index-BYLrQykB.js = 210.9 kB → PASS (meets 450 kB goal)

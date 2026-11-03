@@ -67,7 +67,7 @@ thì để trống và ghi lý do — không viết "sẽ làm".
 | Quality gate | Mọi thay đổi hành vi phải kèm test; `npx vitest run` trước/sau khi refactor | `AGENTS.md` §2 |
 | AI Level | **Mức 2** — agent sửa từng bước, người đọc diff theo 4 lớp | `08_MAINTENANCE_EVOLUTION.md` §3 |
 | RACI | R: agent · A: người giữ repo | — |
-| Metrics | 41/693 dòng policy là trần số dùng chung; 2628 dòng `storage.ts` là nợ thiết kế lớn nhất | `wc -l` (đo 2026-11-02) |
+| Metrics | `src/config/policy.ts` 693 dòng (17 export) là trần số dùng chung; `src/services/storage.ts` 2746 dòng là nợ thiết kế lớn nhất | `wc -l src/config/policy.ts src/services/storage.ts` (đo 2026-11-03 lần bảy, nội dung = HEAD `195a4be` + T43) |
 
 ---
 

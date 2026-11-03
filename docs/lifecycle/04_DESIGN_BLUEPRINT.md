@@ -13,7 +13,7 @@
 |---|---|---|---|
 | Dùng được offline trên điện thoại gia đình | boot graph **424.3 kB**, entry **209.9 kB** (đo 2026-11-03 lần năm) | BG-04 · NFR-P01 | ADR-16/17/18: vendor lớn phải nằm sau `React.lazy`; `three`/`firebase` không được import thẳng entry |
 | Không làm sai kiến thức lớp 1 | 0 lỗi validator, 18 WARNING đã xoá | BG-03 · NFR-C04 | ADR-05 nội dung là code tĩnh; ADR-06 deterministic theo `(tier, seed)` |
-| Tiến độ không bị hỏng vì thao tác lặp | 5 tầng idempotency | BG-06 · NFR-R04 | sanitizer whitelist + khoá biên lai (`storage.ts:2139`) |
+| Tiến độ không bị hỏng vì thao tác lặp | 5 tầng idempotency | BG-06 · NFR-R04 | sanitizer whitelist + khoá biên lai (`storage.ts:2265`) |
 | Trẻ không bị thu thập dữ liệu | 0 API key, 0 lời gọi mạng bắt buộc | `SAFETY_PRIVACY.md` §1–2 · `.env.example` | ADR-01 local-first; ADR-16 cloud mirror tuỳ chọn |
 | Thời lượng học hợp lứa tuổi | 15–20 phút/ngày | BG-01 · NFR-M01 | `policy.ts` 693 dòng giữ mọi trần số dùng chung |
 
@@ -89,7 +89,7 @@ Không có HTTP API ⇒ hợp đồng là **type + hàm**, do typecheck enforce.
 | ⚠ Ngoài registry | `kho_bau_ioe_store`, `kho_bau_cloud_session_hint` | DC-17, DC-19 — lỗ hổng thiết kế đang mở |
 
 **Trần kích cỡ (chống DoS chính mình):** `recentEvidences` ≤ 200 · `rewardClaims` ≤ 60
-(`storage.ts:1461`) · `appliedSessionIds` ≤ `READING_POLICY.MAX_RECENT_SESSIONS` = 30 (`policy.ts:110`).
+(`storage.ts:1475`) · `appliedSessionIds` ≤ `READING_POLICY.MAX_RECENT_SESSIONS` = 30 (`policy.ts:110`).
 
 **"OpenAPI" của lát cắt T41C** (hàm thuần, chữ ký là hợp đồng):
 
@@ -109,7 +109,7 @@ Vẽ theo đường đi của *dữ liệu trẻ*, không theo danh sách tính 
 | # | Chữ | Luồng bị đo | Nỗi | Kiểm soát đang có | Còn thiếu |
 |---|---|---|---|---|---|
 | T-1 | **S**poofing | `cloudSync` ghi `users/{uid}` | thiết bị khác mạo uid ghi vào | **enforcement point là `firestore.rules`** (`request.auth.uid == userId`), cộng với client chỉ ghi khi `state.user != null` sau Google login (`cloudSync.ts:231`); không có tài khoản trẻ em. API key web trong `firebase-applet-config.json` là public theo thiết kế Firebase (ADR-16) | chưa có test end-to-end với project Firebase thật — `tests/firebase-auth-sync.test.ts` dùng mock |
-| T-2 | **T**ampering | `localStorage` sửa bằng DevTools | tiến độ/ba mẹ bị bẻ | sanitizer **whitelist** (`storage.ts:782`, `:1460`) — field lạ bị reset về mặc định; `schemaVersion` migration (ADR-02) | chưa có test "field lạ bị xoá" cho từng store |
+| T-2 | **T**ampering | `localStorage` sửa bằng DevTools | tiến độ/ba mẹ bị bẻ | sanitizer **whitelist** (`storage.ts:796`, `:1474`) — field lạ bị reset về mặc định; `schemaVersion` migration (ADR-02) | chưa có test "field lạ bị xoá" cho từng store |
 | T-3 | **R**epudiation | nhật sử thay đổi | không truy được ai quyết định | git history + `commit-msg` bắt chuẩn + `CHANGELOG.md` | `.ai/CURRENT.md` nhiều lane ghi chồng |
 | T-4 | **I**nformation disclosure | agent đọc repo, log, Issue | lộ bài làm của bé | `progress/` gitignore; `AGENTS.md` §1.7 cấm dán dữ liệu trẻ; `evidence/` dùng hồ sơ giả; `SAFETY_PRIVACY.md` | **chưa có gate tự động** quét chuỗi dữ liệu trẻ trước khi agent in ra — `CHECKLIST.md` C-07 |
 | T-5 | **D**enial of service | `setItem` hết chỗ, mảng phình | app hỏng hoặc chậm vĩnh viễn | `writeJSON` trả `boolean` + hoàn tác bước ngày; 3 trần mảng ở Tầng 5 | chưa có probe "nhồi localStorage tới trần" |

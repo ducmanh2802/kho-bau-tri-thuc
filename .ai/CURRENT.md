@@ -170,6 +170,41 @@ khỏi job `qa-smoke`, kèm test hợp đồng cấm cờ quay lại; service wo
 `qa/offline-pwa.mjs` QA PASS 10 step / 0 errors),
 8 item "Hệ quả chưa đóng" ở `docs/plan/TASK_PLAN.md`.
 
+## GUIDE-MAP + T43 — hồ sơ pha 1/10/11 + sửa `resetProgress` (2026-11-03, lane này)
+
+Yêu cầu: "sử dụng file `docs/step-by-step-guidance.md` rồi triển khai dự án theo guide". **File guide
+đó thuộc lane khác và đang untracked** — lane này không sửa, không stage nó. Kit của guide
+(`AI_SDLC-SOP.md`, `agentic-sdlc-process.md`, spreadsheet) **không tồn tại trong repo**:
+
+```bash
+find . -path ./node_modules -prune -o \( -iname "AI_SDLC-SOP.md" -o -iname "agentic-sdlc-process.md" -o -iname "*.xlsx" \) -print   # ⇒ rỗng
+```
+
+Nên "triển khai theo guide" = **lớp ánh xạ + artifact thật**, không phải dời thư mục:
+
+- `docs/lifecycle/10_SDLC_GUIDE_MAP.md` — 11 pha của guide × layout repo, adaptation log, 3 quyết
+  định tailoring cần người duyệt (`.drawio` / `openapi.yaml` / ADR thành file riêng).
+- `docs/01-intake/` (4 file), `docs/10-operations/` (2 file), `docs/11-decommissioning/` (1 file),
+  `docs/plan/RISK_REGISTER.md` (11 `RISK-*` · 7 `OQ-*` · `DEF-001`).
+- Giấy tờ pha 10/11 **lòi ra bug thật**: `DEF-001` = `resetProgress()` liệt kê tay 13/17 khoá
+  (`STORAGE_KEYS` có 17) ⇒ "Đặt lại tiến độ" bỏ sót `kho_bau_review_days`,
+  `kho_bau_game_first_seen`, `kho_bau_tree_water`. Đã sửa test-first bằng allowlist
+  `RESET_KEEP_KEYS` (`src/services/storage.ts:94`) + `tests/t43a-…` (5 test), ablation
+  `4 failed | 1 passed (5)`, cổng `EXIT=0` · **100 file / 1377 test** · `Duration 28.57s` ·
+  `index-BYLrQykB.js` **210.9 kB** · boot graph `435446 total` = 425.2 kB. Bằng chứng UI
+  (AGENTS §1.3): `evidence/2026-11-03-T43/probe-t43-reset.mjs` chạy trên `dist/` ⇒ `ok: true`
+  (3 khoá con `null`, `kho_bau_parent_settings` còn nguyên), `qa/golden-path.mjs` vẫn
+  `QA PASS — 28 step(s), 0 errors`.
+- **Cố ý để mở, cần người duyệt — agent không tự đóng**: `RISK-01` (không có đường xoá dữ liệu
+  cloud; `resetProgress` chỉ dọn `localStorage`), `RISK-11` + `OQ-07` (`docs/SAFETY_PRIVACY.md` nói
+  "sao lưu" nhưng export một chiều), và quyết định sư phạm "tên bé có được giữ khi reset không"
+  (hiện `kho_bau_child_profile` bị quét vì không nằm trong allowlist).
+
+Số hiện trạng đã sync lần bảy trong ngày (BRD §7/Phụ lục A, `ARCHITECTURE.md` §12, SRS §11 + FR-P06,
+RTM, `TEST_PLAN.md` header/§4/§9, `TASK_PLAN.md` `K-03` + hai hàng §II, `docs/lifecycle/*`,
+`CHANGELOG.md`, `evidence/README.md` + `evidence/2026-11-03-T43/`). **Hygiene:** 6 file
+`docs/opencode/reports/img/*.png` đang modified **không phải của lane này** — không stage.
+
 ## Tree hygiene note (2026-10-06)
 
 P36, P38, P39 sessions share this working tree concurrently. Each lane left its

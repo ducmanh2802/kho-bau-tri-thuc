@@ -41,7 +41,7 @@ test phải đỏ vì đúng nguyên nhân, rồi hoàn tác.
 | Phép | Dòng bỏ | Test phải đỏ | Kết quả | Log |
 |---|---|---|---|---|
 | M1 | `readingEngine.ts:320` guard `appliedSessionIds` | TC-05 | `1 failed \| 24 skipped`, EXIT=1 | `mutation-M1-session-guard.txt` |
-| M2 | `storage.ts:2140` guard `rewardClaims` | TC-11, TC-12 | `2 failed \| 23 passed`, EXIT=1 | `mutation-M2-reward-claim-guard.txt` |
+| M2 | `storage.ts:2265` guard `rewardClaims` | TC-11, TC-12 | `2 failed \| 23 passed`, EXIT=1 | `mutation-M2-reward-claim-guard.txt` |
 | — | hoàn tác M1+M2 | toàn bộ lát cắt 1 | `25 passed`, EXIT=0 | `mutation-baseline-t41c.txt` |
 | M3 | `useGameStage.ts:24` bỏ `!s.pausedByUser` | TC-30, TC-32 | `2 failed \| 28 passed`, EXIT=1 | `mutation-M3-clock-decision.txt` |
 | M4 | `useGameStage.ts:139` bỏ một guard `if (!isRunning) return;` | TC-36 | `1 failed \| 29 passed`, EXIT=1 | `mutation-M4-score-guard.txt` |
