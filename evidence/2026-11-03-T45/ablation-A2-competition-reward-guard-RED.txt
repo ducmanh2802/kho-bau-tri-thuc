@@ -1,0 +1,102 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t45b-rewards-off-competition.test.ts (6 tests | 2 failed) 25ms
+   ❯ T45B — tắt phần thưởng là chặn hết, không phải chặn lịch sử (6)
+     ✓ khi bật: đề thi vẫn cộng xp + sao (baseline để chứng minh test sau không rỗng) 6ms
+     × khi TẮT: đề thi không được cộng xp/sao, nhưng kết quả + phân tích vẫn lưu 8ms
+     ✓ khi TẮT: checkAchievements không cộng XP và không mở thành tựu 1ms
+     ✓ khi BẬT lại: thành tựu mở khoá và có cộng XP (đường chặn không thành cửa chết) 1ms
+     ✓ hợp đồng mã nguồn: checkAchievements tự chặn bên trong (mọi lời gọi đều an toàn) 2ms
+     × hợp đồng mã nguồn: phần thưởng thi đấu nằm trong nhánh có điều kiện 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t45b-rewards-off-competition.test.ts > T45B — tắt phần thưởng là chặn hết, không phải chặn lịch sử > khi TẮT: đề thi không được cộng xp/sao, nhưng kết quả + phân tích vẫn lưu
+AssertionError: xp vẫn tăng dù ba mẹ tắt phần thưởng: expected 50 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 50
+
+ ❯ tests/t45b-rewards-off-competition.test.ts:124:62
+    122|     StorageService.recordCompetitionResult(buildExam('exam_t45b_off'),…
+    123|     const after = wallet();
+    124|     expect(after.xp, 'xp vẫn tăng dù ba mẹ tắt phần thưởng').toBe(befo…
+       |                                                              ^
+    125|     expect(after.stars, 'sao vẫn tăng dù ba mẹ tắt phần thưởng').toBe(…
+    126|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/t45b-rewards-off-competition.test.ts > T45B — tắt phần thưởng là chặn hết, không phải chặn lịch sử > hợp đồng mã nguồn: phần thưởng thi đấu nằm trong nhánh có điều kiện
+AssertionError: cộng xp thi đấu không có chốt areRewardsEnabled(): expected 'public static recordCompetitionResult…' to contain 'areRewardsEnabled()'
+
+- Expected
++ Received
+
+- areRewardsEnabled()
++ public static recordCompetitionResult(
++     result: CompetitionExamResult,
++     xpReward: number,
++     starsReward: number
++   ) {
++     const store = StorageService.getCompetitionHistory();
++     const existingIndex = store.examResults.findIndex((e) => e.id === result.id);
++ 
++     if (existingIndex >= 0) {
++       // Already recorded: avoid duplicate rewards
++       store.examResults[existingIndex] = result;
++       StorageService.saveCompetitionHistory(store);
++       return;
++     }
++ 
++     // Append new result
++     store.examResults.unshift(result);
++     if (store.examResults.length > 30) {
++       store.examResults.pop();
++     }
++ 
++     if (result.blueprintId.includes('speed')) {
++       store.speedTrialsCompleted += 1;
++     }
++ 
++     // Track practiced skills
++     Object.keys(result.skillBreakdown).forEach((sId) => {
++       const st = result.skillBreakdown[sId];
++       if (!store.practicedSkills[sId]) {
++         store.practicedSkills[sId] = { attempts: 0, correct: 0, lastPracticed: new Date().toISOString() };
++       }
++       store.practicedSkills[sId].attempts += st.total;
++       store.practicedSkills[sId].correct += st.correct;
++       store.practicedSkills[sId].lastPracticed = new Date().toISOString();
++     });
++ 
++     StorageService.saveCompetitionHistory(store);
++ 
++     // Reward child profile
++     // T45B — kết quả thi đấu và phân tích vẫn phải lưu (đó là dữ liệu học); chỉ
++     // tài nguyên bị chặn khi ba mẹ tắt phần thưởng.
++     const rewardsEnabled = true;
++     if (rewardsEnabled) {
++       const profile = StorageService.getChildProfile();
++       
+
+ ❯ tests/t45b-rewards-off-competition.test.ts:181:72
+    179|     expect(grantLine).toBeGreaterThan(-1);
+    180|     const guard = body.slice(0, grantLine);
+    181|     expect(guard, 'cộng xp thi đấu không có chốt areRewardsEnabled()')…
+       |                                                                        ^
+    182|   });
+    183| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  23:35:17
+   Duration  556ms (transform 61%, import 23%, tests 11%, worker 5%)
+

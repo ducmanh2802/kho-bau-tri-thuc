@@ -1,0 +1,76 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t45e-weekly-challenge-rotation.test.ts (7 tests | 4 failed) 24ms
+   ❯ T45E — id Thử Thách Tuần xoay theo tuần ISO (7)
+     ✓ streakEngine phải export weeklyChallengeIdOf (nơi sinh id duy nhất) 2ms
+     × hai ngày cùng tuần ⇒ cùng id; tuần sau ⇒ id khác 5ms
+     × id sinh ra không phải hằng số cũ 1ms
+     × làm ba tuần liên tiếp ⇒ completedWeeklyChallenges có 3 mục và stat weeklyChallenges = 3 9ms
+     ✓ hai lần trong CÙNG tuần chỉ tính một (chống farm) 1ms
+     × thành tựu ach_weekly_3 đạt được trên số liệu thật (đo bằng engine, không đoán) 3ms
+     ✓ màn Thử Thách Tuần không còn hard-code id tuần 1 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t45e-weekly-challenge-rotation.test.ts > T45E — id Thử Thách Tuần xoay theo tuần ISO > hai ngày cùng tuần ⇒ cùng id; tuần sau ⇒ id khác
+AssertionError: expected 'weekly-challenge-week-1' not to be 'weekly-challenge-week-1' // Object.is equality
+ ❯ tests/t45e-weekly-challenge-rotation.test.ts:68:51
+     66|     const weeklyChallengeIdOf = idFn();
+     67|     expect(weeklyChallengeIdOf('2026-11-02')).toBe(weeklyChallengeIdOf…
+     68|     expect(weeklyChallengeIdOf('2026-11-09')).not.toBe(weeklyChallenge…
+       |                                                   ^
+     69|     expect(weeklyChallengeIdOf('2026-11-02')).toContain(weekKeyOf('202…
+     70|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/t45e-weekly-challenge-rotation.test.ts > T45E — id Thử Thách Tuần xoay theo tuần ISO > id sinh ra không phải hằng số cũ
+AssertionError: expected 'weekly-challenge-week-1' not to be 'weekly-challenge-week-1' // Object.is equality
+ ❯ tests/t45e-weekly-challenge-rotation.test.ts:74:51
+     72|   it('id sinh ra không phải hằng số cũ', () => {
+     73|     const weeklyChallengeIdOf = idFn();
+     74|     expect(weeklyChallengeIdOf('2026-11-03')).not.toBe('weekly-challen…
+       |                                                   ^
+     75|   });
+     76|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/t45e-weekly-challenge-rotation.test.ts > T45E — id Thử Thách Tuần xoay theo tuần ISO > làm ba tuần liên tiếp ⇒ completedWeeklyChallenges có 3 mục và stat weeklyChallenges = 3
+AssertionError: expected [ 'weekly-challenge-week-1' ] to have a length of 3 but got 1
+
+- Expected
++ Received
+
+- 3
++ 1
+
+ ❯ tests/t45e-weekly-challenge-rotation.test.ts:85:72
+     83|     StorageService.recordWeeklyChallengeCompleted(id2);
+     84|     StorageService.recordWeeklyChallengeCompleted(id3);
+     85|     expect(StorageService.getChildProfile().completedWeeklyChallenges)…
+       |                                                                        ^
+     86|     expect(StorageService.buildMotivationStats().weeklyChallenges).toB…
+     87|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/t45e-weekly-challenge-rotation.test.ts > T45E — id Thử Thách Tuần xoay theo tuần ISO > thành tựu ach_weekly_3 đạt được trên số liệu thật (đo bằng engine, không đoán)
+AssertionError: expected [ 'ach_weekly_hero' ] to include 'ach_weekly_3'
+ ❯ tests/t45e-weekly-challenge-rotation.test.ts:106:48
+    104|     StorageService.recordWeeklyChallengeCompleted(weeklyChallengeIdOf(…
+    105|     const stats = StorageService.buildMotivationStats();
+    106|     expect(evaluateNewAchievements(stats, [])).toContain('ach_weekly_3…
+       |                                                ^
+    107|   });
+    108|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 3 passed (7)
+   Start at  23:34:06
+   Duration  537ms (transform 48%, import 31%, tests 14%, worker 7%)
+

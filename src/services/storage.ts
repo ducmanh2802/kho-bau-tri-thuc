@@ -2431,6 +2431,10 @@ public static getParentSettings(): ParentSettings {
    * 8 rule cũ cho kết quả y hệt trước đây (test T01 vẫn xanh).
    */
   public static checkAchievements() {
+    // T45B — chốt đặt **trong hàm**, không ở nơi gọi: 1639/2410 có che
+    // `if (rewardsEnabled)` nhưng 2560/2673/2703 thì không, nên bé vẫn nhận XP
+    // thành tựu sau khi ba mẹ tắt phần thưởng.
+    if (!StorageService.areRewardsEnabled()) return;
     const profile = StorageService.getChildProfile();
     const achs = StorageService.getAchievements();
     const stats = StorageService.buildMotivationStats();
@@ -2533,10 +2537,15 @@ public static getParentSettings(): ParentSettings {
     StorageService.saveCompetitionHistory(store);
 
     // Reward child profile
-    const profile = StorageService.getChildProfile();
-    profile.xp += xpReward;
-    profile.stars += starsReward;
-    StorageService.saveChildProfile(profile);
+    // T45B — kết quả thi đấu và phân tích vẫn phải lưu (đó là dữ liệu học); chỉ
+    // tài nguyên bị chặn khi ba mẹ tắt phần thưởng.
+    const rewardsEnabled = StorageService.areRewardsEnabled();
+    if (rewardsEnabled) {
+      const profile = StorageService.getChildProfile();
+      profile.xp += xpReward;
+      profile.stars += starsReward;
+      StorageService.saveChildProfile(profile);
+    }
 
     // Update analytics
     const analytics = StorageService.getAnalytics();
@@ -2587,6 +2596,18 @@ public static getParentSettings(): ParentSettings {
   }
 
   /**
+   * T45A — giới hạn lượt gắp/ngày **lấy từ cài đặt ba mẹ**, `null` = không giới hạn.
+   * UI dashboard render `0` thành "∞" và `t18a` ghi "0 nghĩa là không giới hạn",
+   * nên `drawGacha` không được đổi 0 thành 5 nữa; màn máy gắp cũng không được
+   * tự đặt hằng số riêng (bản cũ ép bé dừng ở lượt 5 dù ba mẹ cho 10).
+   */
+  public static getGachaDailyLimit(): number | null {
+    const value = StorageService.getParentSettings().maxGachaPerDay;
+    if (!Number.isFinite(value) || value < 0) return 5;
+    return value === 0 ? null : Math.round(value);
+  }
+
+  /**
    * T18C — Ghi nhận phần thưởng vào lịch sử (tối đa 50 mục, mới nhất lên đầu).
    */
   private static addRewardHistory(entry: Omit<RewardHistoryEntry, 'date'>): void {
@@ -2605,12 +2626,11 @@ public static getParentSettings(): ParentSettings {
    */
   public static drawGacha(rng?: RandomFn): GachaResult {
     if (!StorageService.areRewardsEnabled()) return { ok: false, reason: 'rewards-off' };
-    const settings = StorageService.getParentSettings();
-    const maxDaily = settings.maxGachaPerDay > 0 ? settings.maxGachaPerDay : 5;
+    const maxDaily = StorageService.getGachaDailyLimit();
     const profile = StorageService.getChildProfile();
     const motivation = StorageService.getMotivationState();
     if (profile.tickets < 1) return { ok: false, reason: 'no-ticket' };
-    if (motivation.daily.gachaDraws >= maxDaily) {
+    if (maxDaily !== null && motivation.daily.gachaDraws >= maxDaily) {
       return { ok: false, reason: 'daily-limit' };
     }
     const { stickerId, isNew } = drawSticker(motivation.stickers, rng);

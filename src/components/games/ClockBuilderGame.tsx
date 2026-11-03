@@ -28,6 +28,7 @@ export const ClockBuilderGame: React.FC<{ onExit: () => void }> = ({ onExit }) =
 
   return (
     <GameModalWrapper
+      onOverlayOpenChange={stage.setOverlayOpen}
       gameId="clock_builder"
       title="Thợ Sửa Đồng Hồ"
       subtitle="Chỉnh kim giờ đúng rồi xem thứ, xem ngày"
@@ -130,7 +131,7 @@ const ClockBuilderStage: React.FC<{ stage: GameStage; current: ClockRound }> = (
   };
 
   const handlePickText = (opt: string | number) => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     if (opt === current.answer) {
       reportCorrect(String(opt));
       speakResult(true, `Đúng rồi! ${current.answer}!`);
@@ -143,7 +144,7 @@ const ClockBuilderStage: React.FC<{ stage: GameStage; current: ClockRound }> = (
   };
 
   useEffect(() => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     const onKey = (e: KeyboardEvent) => {
       if (current.kind !== 'clock') {
         const n = Number(e.key);

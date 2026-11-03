@@ -3,6 +3,8 @@ import { Lesson, Question } from '../../types';
 import { getAllQuestions } from '../../data/curriculum';
 import { sound } from '../../services/sound';
 import { StorageService } from '../../services/storage';
+import { weeklyChallengeIdOf } from '../../services/streakEngine';
+import { localDateKey } from '../../services/dateUtils';
 import { LessonPlayerModal } from '../learning/LessonPlayerModal';
 import { ArrowLeft, Trophy, Star, Sparkles, Flame, ShieldAlert, Award } from 'lucide-react';
 
@@ -17,6 +19,11 @@ export const WeeklyChallengeScreen: React.FC<WeeklyChallengeScreenProps> = ({
 }) => {
   const profile = StorageService.getChildProfile();
   const [isPlaying, setIsPlaying] = useState(false);
+
+  // T45E — id phải xoay theo tuần: `completedWeeklyChallenges` là tập id nên một
+  // id cố định chỉ ghi được MỘT lần trong đời, kẹt stat `weeklyChallenges` ở 1 và
+  // làm thành tựu "Vượt qua 3 Thử Thách Tuần" không thể đạt.
+  const challengeId = weeklyChallengeIdOf(localDateKey());
 
   // Generate 8 balanced cross-subject questions for the weekly battle
   const challengeQuestions: Question[] = React.useMemo(() => {
@@ -33,10 +40,10 @@ export const WeeklyChallengeScreen: React.FC<WeeklyChallengeScreenProps> = ({
   }, []);
 
   const challengeLesson: Lesson = {
-    id: 'weekly-challenge-week-1',
+    id: challengeId,
     topicId: 'weekly-arena',
     subject: 'tieng-viet',
-    title: 'Đấu Trường Trạng Nguyên Nhí — Tuần 1',
+    title: 'Đấu Trường Trạng Nguyên Nhí — Thử Thách Tuần Này',
     description: 'Thử thách tổng hợp kiến thức Tiếng Việt, Toán và Tiếng Anh',
     mascotTip: 'Cú Thông Thái cổ vũ: Hãy tập trung tối đa để rinh Cúp Vàng Tuần nhé!',
     questions: challengeQuestions,
@@ -44,7 +51,7 @@ export const WeeklyChallengeScreen: React.FC<WeeklyChallengeScreenProps> = ({
     starReward: 10,
   };
 
-  const isCompletedThisWeek = profile.completedWeeklyChallenges.includes('weekly-challenge-week-1');
+  const isCompletedThisWeek = profile.completedWeeklyChallenges.includes(challengeId);
 
   const handleStart = () => {
     sound.playClick();
@@ -53,7 +60,7 @@ export const WeeklyChallengeScreen: React.FC<WeeklyChallengeScreenProps> = ({
 
   const handleComplete = () => {
     // T01/B10 — completing a weekly challenge unlocks ach_weekly_hero.
-    StorageService.recordWeeklyChallengeCompleted('weekly-challenge-week-1');
+    StorageService.recordWeeklyChallengeCompleted(challengeId);
     onProfileUpdate();
   };
 

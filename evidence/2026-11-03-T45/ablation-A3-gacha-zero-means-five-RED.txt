@@ -1,0 +1,57 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t45a-gacha-parent-limit.test.ts (5 tests | 2 failed) 32ms
+   ❯ T45A — giới hạn gắp lấy từ cài đặt ba mẹ, không phải hằng số của UI (5)
+     ✓ đặt 3 lượt/ngày ⇒ lượt thứ 4 bị chặn (hành vi đã đúng, giữ làm baseline) 10ms
+     × đặt 0 = KHÔNG giới hạn ⇒ 12 lượt liên tiếp đều ăn (lỗi: drawGacha ép 0 thành 5) 11ms
+     ✓ đặt 10 lượt ⇒ được đúng 10, chặn lượt 11 7ms
+     × getGachaDailyLimit(): null khi 0 (∞), đúng số khi > 0 1ms
+     ✓ màn máy gắp không còn tự đặt trần 5, mà đọc getGachaDailyLimit + in ∞ khi không giới hạn 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t45a-gacha-parent-limit.test.ts > T45A — giới hạn gắp lấy từ cài đặt ba mẹ, không phải hằng số của UI > đặt 0 = KHÔNG giới hạn ⇒ 12 lượt liên tiếp đều ăn (lỗi: drawGacha ép 0 thành 5)
+AssertionError: lượt 6 bị chặn oan: daily-limit: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/t45a-gacha-parent-limit.test.ts:72:72
+     70|     for (let i = 0; i < 12; i += 1) {
+     71|       const result = StorageService.drawGacha();
+     72|       expect(result.ok, `lượt ${i + 1} bị chặn oan: ${result.reason}`)…
+       |                                                                        ^
+     73|     }
+     74|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/t45a-gacha-parent-limit.test.ts > T45A — giới hạn gắp lấy từ cài đặt ba mẹ, không phải hằng số của UI > getGachaDailyLimit(): null khi 0 (∞), đúng số khi > 0
+AssertionError: expected 5 to be null
+
+- Expected:
+null
+
++ Received:
+5
+
+ ❯ tests/t45a-gacha-parent-limit.test.ts:89:109
+     87|     expect(typeof withNull, 'StorageService phải lộ getGachaDailyLimit…
+     88|     setLimit(0);
+     89|     expect((StorageService as unknown as { getGachaDailyLimit: () => n…
+       |                                                                                                             ^
+     90|     setLimit(7);
+     91|     expect((StorageService as unknown as { getGachaDailyLimit: () => n…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)
+   Start at  23:33:57
+   Duration  574ms (transform 59%, import 23%, tests 13%, worker 5%)
+

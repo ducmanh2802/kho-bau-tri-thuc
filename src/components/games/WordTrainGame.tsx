@@ -27,6 +27,7 @@ export const WordTrainGame: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
   return (
     <GameModalWrapper
+      onOverlayOpenChange={stage.setOverlayOpen}
       gameId="word_builder_train"
       title="Word Train — Tàu Chữ Tiếng Anh"
       subtitle="Chạm toa để nghe âm rồi xếp thành từ đúng"
@@ -132,7 +133,7 @@ const WordTrainStage: React.FC<{ stage: GameStage; current: WordTrainRound }> = 
   };
 
   useEffect(() => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     const onKey = (e: KeyboardEvent) => {
       const n = Number(e.key);
       if (Number.isInteger(n) && n >= 1 && n <= current.carriages.length) {

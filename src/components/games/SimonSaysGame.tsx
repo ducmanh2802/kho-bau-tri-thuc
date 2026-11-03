@@ -36,6 +36,7 @@ export const SimonSaysGame: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
   return (
     <GameModalWrapper
+      onOverlayOpenChange={stage.setOverlayOpen}
       gameId="simon_says"
       title="Simon Says — Gấu Ra Lệnh"
       subtitle="Nghe Gấu nói tiếng Anh và chạm đúng tranh"
@@ -131,7 +132,7 @@ const SimonSaysStage: React.FC<{ stage: GameStage; current: SimonRound }> = ({ s
   };
 
   useEffect(() => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     const onKey = (e: KeyboardEvent) => {
       const n = Number(e.key);
       if (Number.isInteger(n) && n >= 1 && n <= current.options.length) {

@@ -13,7 +13,9 @@ interface GachaMachineScreenProps {
   onProfileUpdate: () => void;
 }
 
-const MAX_DAILY_DRAWS = 5;
+// T45A — trần lượt/ngày là **cài đặt của ba mẹ** (`maxGachaPerDay`, 0 = ∞), không
+// phải hằng số của màn này. Bản cũ tự đặt 5 nên bé bị chặn ở lượt 5 dù ba mẹ cho
+// 10, và in "x / 5" dù dashboard đang hiển thị "∞".
 
 // Vị trí đống sticker trong cửa kính, tính theo % khung để màn hình rộng hay
 // hẹp đều xếp đều; bản cũ xoay 8 sticker quanh tâm với bán kính 60px nên trên
@@ -60,12 +62,18 @@ export const GachaMachineScreen: React.FC<GachaMachineScreenProps> = ({
   }, [profile.tickets]);
 
   const drawsToday = motivation.daily.gachaDraws;
-  const drawsLeft = Math.max(0, MAX_DAILY_DRAWS - drawsToday);
+  const dailyLimit = StorageService.getGachaDailyLimit();
+  const drawsLeft = dailyLimit === null
+    ? Number.POSITIVE_INFINITY
+    : Math.max(0, dailyLimit - drawsToday);
   // T41 — ba mẹ tắt phần thưởng thì máy kéo phải DỪNG, không chỉ từ chối bên
   // trong StorageService: bé bấm quay mà vé bị trừ, không ra sticker thì màn
   // hình chỉ báo lỗi vô hình.
   const rewardsEnabled = StorageService.areRewardsEnabled();
   const canDraw = rewardsEnabled && profile.tickets >= 1 && drawsLeft > 0;
+  // Không giới hạn thì in "∞" giống dashboard ba mẹ, không in "Infinity".
+  const drawsLeftLabel = Number.isFinite(drawsLeft) ? `${drawsLeft}` : '∞';
+  const dailyLimitLabel = dailyLimit === null ? '∞' : `${dailyLimit}`;
 
   const handleDraw = useCallback(() => {
     if (!canDraw || isSpinning) return;
@@ -168,7 +176,7 @@ export const GachaMachineScreen: React.FC<GachaMachineScreenProps> = ({
               <span className="tabular-nums">{profile.tickets}</span> Vé Còn Lại
             </Pill>
             <Pill variant="star" size="sm" icon="🎯" className={drawsLeft > 0 ? 'bg-emerald-500/20 border-emerald-300/50 text-white' : 'bg-rose-500/20 border-rose-300/50 text-white'}>
-              Hôm nay: <span className="tabular-nums">{drawsToday}</span> / {MAX_DAILY_DRAWS} lượt
+              Hôm nay: <span className="tabular-nums">{drawsToday}</span> / {dailyLimitLabel} lượt
             </Pill>
             <Pill variant="star" size="sm" icon="✨" className="bg-white/20 border-white/30 text-white">
               Tổng lượt: <span className="tabular-nums">{motivation.gachaDrawsTotal}</span>
@@ -267,7 +275,7 @@ export const GachaMachineScreen: React.FC<GachaMachineScreenProps> = ({
               </span>
             ) : canDraw ? (
               <span className="flex items-center gap-2">
-                🎟️ Gắp Ngay ({drawsLeft} lượt còn lại)
+                🎟️ Gắp Ngay ({drawsLeftLabel} lượt còn lại)
               </span>
             ) : !rewardsEnabled ? (
               <span className="flex items-center gap-2">Nhà Mình Đang Tắt Phần Thưởng</span>

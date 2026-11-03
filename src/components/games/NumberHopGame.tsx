@@ -28,6 +28,7 @@ export const NumberHopGame: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
   return (
     <GameModalWrapper
+      onOverlayOpenChange={stage.setOverlayOpen}
       gameId="number_line_hop"
       title="Ếch Nhảy Tia Số"
       subtitle="Bấm ếch nhảy từng bước rồi tìm số đích"
@@ -136,7 +137,7 @@ const NumberHopStage: React.FC<{ stage: GameStage; current: HopRound }> = ({ sta
   };
 
   useEffect(() => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     const onKey = (e: KeyboardEvent) => {
       const n = Number(e.key);
       if (Number.isInteger(n) && n >= 1 && n <= current.options.length) {

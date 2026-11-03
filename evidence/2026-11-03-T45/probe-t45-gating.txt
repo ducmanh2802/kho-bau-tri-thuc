@@ -1,0 +1,77 @@
+{
+  "steps": [
+    "A1 (đối chứng): bảng không bị che, 2 phím mũi tên → \"🐸 Ếch đang ở số 1\" thành \"🐸 Ếch đang ở số 0\" (phím còn ăn)",
+    "A2: lớp phủ \"Chọn Màn & Độ Khó\" phủ 390×844 px, chuột chạm bảng bị chặn (đỉnh điểm ảnh giữa bảng là <div>) — bản cũ phím vẫn lọt qua lớp phủ này",
+    "A3: 4 phím mũi tên lúc bị che → bảng đứng nguyên (\"🐸 Ếch đang ở số 0\", 🐣\nMàn 1/6 ▾\n· 🚀 Câu 2/5) — bé không nộp đáp án hộ được",
+    "A4 (đối chứng): đóng lớp phủ, phím lại hoạt động → \"🐸 Ếch đang ở số 0\" thành \"🐸 Ếch đang ở số 2\" (chặn là do lớp phủ)",
+    "B1: màn nhắc nghỉ chỉ còn đường nhờ ba mẹ, không còn nút tự cộng 10 phút",
+    "B2: bấm nhờ → mở \"Cổng Xác Nhận Phụ Huynh\", cài đặt giờ học vẫn 1 phút (không tự nới)",
+    "B3: vượt cổng ba mẹ xong, dailyLimitMinutes vẫn 1 — ba mẹ chưa đồng ý thì giờ học không tăng",
+    "C1: maxGachaPerDay = 0 → máy gắp hiện \"/ ∞ lượt\" và nút còn bấm được",
+    "C2: gắp liền 6 lượt (vượt trần cũ 5) → \"Hôm nay: 6 / ∞ lượt\", vé còn 2"
+  ],
+  "errors": [],
+  "facts": {
+    "keyboardUncovered": {
+      "before": "🐸 Ếch đang ở số 1",
+      "after": "🐸 Ếch đang ở số 0"
+    },
+    "overlay": {
+      "topTag": "div",
+      "topText": "🐣Màn 1: Khởi ĐộngLàm quen thật nhẹ nhàngĐang ch",
+      "mouseBlocked": true,
+      "dialogRect": {
+        "w": 390,
+        "h": 844
+      }
+    },
+    "keyboardCovered": {
+      "before": "🐸 Ếch đang ở số 0",
+      "after": "🐸 Ếch đang ở số 0",
+      "round": [
+        "🐣\nMàn 1/6 ▾\n· 🚀 Câu 2/5",
+        "🐣\nMàn 1/6 ▾\n· 🚀 Câu 2/5"
+      ]
+    },
+    "keyboardAfterClose": {
+      "before": "🐸 Ếch đang ở số 0",
+      "after": "🐸 Ếch đang ở số 2"
+    },
+    "limitBefore": 1,
+    "modalLabels": {
+      "askParent": true,
+      "selfServe": false
+    },
+    "gate": {
+      "gateVisible": true,
+      "limitBefore": 1,
+      "limitAfterAsk": 1
+    },
+    "afterUnlock": {
+      "limitAfterGate": 1,
+      "modalGone": true
+    },
+    "gachaLabels": {
+      "infinityShown": true,
+      "blockedLabel": false
+    },
+    "afterSixDraws": {
+      "draws": 6,
+      "limitLabel": "Hôm nay: 6 / ∞ lượt",
+      "tickets": 2,
+      "todayDraws": 6
+    }
+  },
+  "failedAt": null,
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-03-T45\\a2-lop-phu-che-bang.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-03-T45\\a4-sau-khi-dong-lop-phu.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-03-T45\\b1-man-nhac-nghi.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-03-T45\\b3-bang-ba-me.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-03-T45\\c1-gacha-infinity.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-03-T45\\c2-sau-6-luot.png"
+  ],
+  "ok": true
+}
+QA PASS — 9 step(s), 0 errors
+PROBE_EXIT=0

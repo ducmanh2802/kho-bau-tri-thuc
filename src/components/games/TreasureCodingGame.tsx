@@ -47,6 +47,7 @@ export const TreasureCodingGame: React.FC<{ onExit: () => void }> = ({ onExit })
 
   return (
     <GameModalWrapper
+      onOverlayOpenChange={stage.setOverlayOpen}
       gameId="treasure_coding"
       title="Lập Trình Tìm Kho Báu"
       subtitle="Xếp mũi tên rồi bấm Chạy để đưa Gấu tới rương"
@@ -232,7 +233,7 @@ const CodingStage: React.FC<{ stage: GameStage; current: CodingRound }> = ({ sta
   };
 
   useEffect(() => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     const onKey = (e: KeyboardEvent): void => {
       const map: Record<string, Dir> = {
         ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',

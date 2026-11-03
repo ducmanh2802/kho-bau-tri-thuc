@@ -27,6 +27,7 @@ export const RhymeTrainGame: React.FC<{ onExit: () => void }> = ({ onExit }) => 
 
   return (
     <GameModalWrapper
+      onOverlayOpenChange={stage.setOverlayOpen}
       gameId="rhyme_train"
       title="Đoàn Tàu Ghép Vần"
       subtitle="Nối toa tàu để tạo tiếng có nghĩa khớp với hình"
@@ -112,7 +113,7 @@ const RhymeTrainStage: React.FC<{ stage: GameStage; current: RhymeTrainRound }> 
   };
 
   useEffect(() => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     const onKey = (e: KeyboardEvent) => {
       const n = Number(e.key);
       if (Number.isInteger(n) && n >= 1 && n <= current.carOptions.length) {

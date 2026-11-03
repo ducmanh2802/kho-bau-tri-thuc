@@ -6,14 +6,19 @@ import { useFocusTrap } from '../../hooks/useFocusTrap';
 interface ScreenTimeModalProps {
   isOpen: boolean;
   minutesSpent: number;
-  onExtend: () => void;
+  /**
+   * T45C — prop cũ ("…Extend") tự ghi `dailyLimitMinutes + 10` vào cài đặt vĩnh
+   * viễn, nên bé bấm nút có nhãn "Ba mẹ:" là tự nới giới hạn không cần ai. Giờ lối
+   * này chỉ **đưa bé tới cổng xác nhận phụ huynh**; việc đổi giới hạn diễn ra sau cổng.
+   */
+  onAskParent: () => void;
   onTakeBreak: () => void;
 }
 
 export const ScreenTimeModal: React.FC<ScreenTimeModalProps> = ({
   isOpen,
   minutesSpent,
-  onExtend,
+  onAskParent,
   onTakeBreak,
 }) => {
   // §13/14 — containment + restoration. The hook is called unconditionally (it
@@ -66,11 +71,11 @@ export const ScreenTimeModal: React.FC<ScreenTimeModalProps> = ({
           </button>
 
           <button
-            onClick={onExtend}
-            className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl text-xs flex items-center justify-center gap-1.5 transition-all"
+            onClick={onAskParent}
+            className="w-full py-3.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl text-sm flex items-center justify-center gap-1.5 transition-all"
           >
             <ShieldCheck className="w-4 h-4 text-slate-500" />
-            <span>Ba mẹ: Cho phép học thêm 10 phút</span>
+            <span>Nhờ ba mẹ cho học thêm</span>
           </button>
         </div>
       </div>

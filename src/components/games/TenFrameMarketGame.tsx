@@ -29,6 +29,7 @@ export const TenFrameMarketGame: React.FC<{ onExit: () => void }> = ({ onExit })
 
   return (
     <GameModalWrapper
+      onOverlayOpenChange={stage.setOverlayOpen}
       gameId="ten_frame_market"
       title="Chợ Khung 10"
       subtitle="Giúp khách mua đủ quả, đủ que, đủ tiền"
@@ -101,7 +102,7 @@ const TenFrameMarketStage: React.FC<{ stage: GameStage; current: MarketRound }> 
   const showDonVi = filled % 10;
 
   const handleAdd = (step = 1) => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     if (added < current.need) {
       setAdded((a) => Math.min(a + step, current.need));
       sound.playClick();
@@ -109,7 +110,7 @@ const TenFrameMarketStage: React.FC<{ stage: GameStage; current: MarketRound }> 
   };
 
   const handlePick = (opt: number) => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     if (opt === current.need) {
       sound.playCorrect();
       sound.speakLater(`Đúng rồi! Cần thêm ${current.need}!`, 'vi-VN', 350);
@@ -125,7 +126,7 @@ const TenFrameMarketStage: React.FC<{ stage: GameStage; current: MarketRound }> 
   };
 
   useEffect(() => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     const onKey = (e: KeyboardEvent) => {
       const n = Number(e.key);
       if (Number.isInteger(n) && n >= 1 && n <= current.options.length) {

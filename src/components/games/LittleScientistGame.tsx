@@ -27,6 +27,7 @@ export const LittleScientistGame: React.FC<{ onExit: () => void }> = ({ onExit }
 
   return (
     <GameModalWrapper
+      onOverlayOpenChange={stage.setOverlayOpen}
       gameId="little_scientist"
       title="Nhà Khoa Học Nhí"
       subtitle="Thả vật vào chậu nước và phân loại cùng Gấu"
@@ -117,7 +118,7 @@ const ScientistStage: React.FC<{ stage: GameStage; current: SciRound }> = ({ sta
   };
 
   useEffect(() => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     const onKey = (e: KeyboardEvent): void => {
       const n = Number(e.key);
       if (Number.isInteger(n) && n >= 1 && n <= current.baskets.length) {

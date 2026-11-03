@@ -1,0 +1,40 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t45d-overlay-blocks-keyboard.test.ts (7 tests | 1 failed) 27ms
+   ❯ T45D — chốt input khi bảng bị che hoặc đang tạm dừng (7)
+     ✓ có trò chơi nghe window keydown để nộp đáp án (danh sách này là phạm vi của test) 2ms
+     ✓ useGameStage phải export isGameInputBlocked 0ms
+     × bảng bị che (overlayOpen) hoặc đang tạm dừng ⇒ input bị chặn; chỉ locked=false và trống trải ⇒ được gõ 8ms
+     ✓ stage trả về inputBlocked + overlayOpen cho linh kiện trò chơi dùng 2ms
+     ✓ mọi trò nghe phím phải chặn bằng stage.inputBlocked, không phải stage.locked trần 3ms
+     ✓ mọi trò nghe phím phải khai báo lớp phủ "Chọn Màn" vào stage 3ms
+     ✓ số trò khai báo lớp phủ không tụt lại dưới 4/30 như lúc lập hồ sơ (hồi quy diện rộng) 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t45d-overlay-blocks-keyboard.test.ts > T45D — chốt input khi bảng bị che hoặc đang tạm dừng > bảng bị che (overlayOpen) hoặc đang tạm dừng ⇒ input bị chặn; chỉ locked=false và trống trải ⇒ được gõ
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/t45d-overlay-blocks-keyboard.test.ts:50:91
+     48|   it('bảng bị che (overlayOpen) hoặc đang tạm dừng ⇒ input bị chặn; ch…
+     49|     const isGameInputBlocked = blockedFn();
+     50|     expect(isGameInputBlocked({ locked: false, pausedByUser: false, ov…
+       |                                                                                           ^
+     51|     expect(isGameInputBlocked({ locked: false, pausedByUser: true, ove…
+     52|     expect(isGameInputBlocked({ locked: true, pausedByUser: false, ove…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  23:34:02
+   Duration  536ms (transform 45%, import 37%, tests 13%, worker 5%)
+

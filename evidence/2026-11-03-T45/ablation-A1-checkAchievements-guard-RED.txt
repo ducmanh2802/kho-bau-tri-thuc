@@ -1,0 +1,64 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t45b-rewards-off-competition.test.ts (6 tests | 2 failed) 25ms
+   ❯ T45B — tắt phần thưởng là chặn hết, không phải chặn lịch sử (6)
+     ✓ khi bật: đề thi vẫn cộng xp + sao (baseline để chứng minh test sau không rỗng) 5ms
+     ✓ khi TẮT: đề thi không được cộng xp/sao, nhưng kết quả + phân tích vẫn lưu 2ms
+     × khi TẮT: checkAchievements không cộng XP và không mở thành tựu 8ms
+     ✓ khi BẬT lại: thành tựu mở khoá và có cộng XP (đường chặn không thành cửa chết) 1ms
+     × hợp đồng mã nguồn: checkAchievements tự chặn bên trong (mọi lời gọi đều an toàn) 5ms
+     ✓ hợp đồng mã nguồn: phần thưởng thi đấu nằm trong nhánh có điều kiện 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t45b-rewards-off-competition.test.ts > T45B — tắt phần thưởng là chặn hết, không phải chặn lịch sử > khi TẮT: checkAchievements không cộng XP và không mở thành tựu
+AssertionError: thành tựu vẫn trao XP khi phần thưởng đã tắt: expected 1000 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1000
+
+ ❯ tests/t45b-rewards-off-competition.test.ts:148:70
+    146|     const unlockedAfter = StorageService.getAchievements().filter((a) …
+    147|
+    148|     expect(after.xp, 'thành tựu vẫn trao XP khi phần thưởng đã tắt').t…
+       |                                                                      ^
+    149|     expect(unlockedAfter, 'thành tựu vẫn mở khoá khi phần thưởng đã tắ…
+    150|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/t45b-rewards-off-competition.test.ts > T45B — tắt phần thưởng là chặn hết, không phải chặn lịch sử > hợp đồng mã nguồn: checkAchievements tự chặn bên trong (mọi lời gọi đều an toàn)
+AssertionError: checkAchievements phải hỏi areRewardsEnabled() ngay đầu hàm: expected 'public static checkAchievements() {\r…' to contain 'areRewardsEnabled()'
+
+- Expected
++ Received
+
+- areRewardsEnabled()
++ public static checkAchievements() {
++     // T45B — chốt đặt **trong hàm**, không ở nơi gọi: 1639/2410 có che
++     // `if (rewardsEnabled)` nhưng 2560/2673/2703 thì không, nên bé vẫn nhận XP
++     // thành tựu sau khi ba mẹ tắt phần thưởng.
++     const profile = StorageService.getChildProfile();
++     const achs = StorageService.getAchievements();
++     const stats = StorageService.buildMotivationStats
+
+ ❯ tests/t45b-rewards-off-competition.test.ts:171:81
+    169|     const body = src.slice(src.indexOf('public static checkAchievement…
+    170|     const head = body.slice(0, 400);
+    171|     expect(head, 'checkAchievements phải hỏi areRewardsEnabled() ngay …
+       |                                                                                 ^
+    172|   });
+    173|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  23:33:49
+   Duration  569ms (transform 61%, import 23%, tests 11%, worker 5%)
+

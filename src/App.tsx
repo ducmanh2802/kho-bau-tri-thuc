@@ -472,14 +472,14 @@ export default function App() {
           isOpen={isScreenTimeAlertOpen}
           minutesSpent={minutesSpentToday}
           onTakeBreak={() => setIsScreenTimeAlertOpen(false)}
-          onExtend={() => {
+          onAskParent={() => {
+            // T45C — bé bấm "Nhờ ba mẹ cho học thêm" KHÔNG tự nới giới hạn nữa
+            // (bản cũ ghi `dailyLimitMinutes + 10` thẳng vào cài đặt vĩnh viễn).
+            // Mở dashboard ba mẹ ở tab Cài đặt: bảng điều khiển chỉ hiện sau cổng
+            // `!isAuthenticated`, nên phải có người lớn trả lời phép tính mới đổi được giờ.
             setIsScreenTimeAlertOpen(false);
-            // Allow extra 10 minutes
-            const settings = StorageService.getParentSettings();
-            StorageService.saveParentSettings({
-              ...settings,
-              dailyLimitMinutes: settings.dailyLimitMinutes + 10,
-            });
+            setParentInitialTab('settings');
+            setIsParentModalOpen(true);
           }}
         />
       </Suspense>

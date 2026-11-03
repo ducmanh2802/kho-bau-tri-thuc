@@ -27,6 +27,7 @@ export const ReadAndDoGame: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
   return (
     <GameModalWrapper
+      onOverlayOpenChange={stage.setOverlayOpen}
       gameId="read_and_do"
       title="Đọc Câu Làm Theo"
       subtitle="Đọc câu rồi đưa đồ vật vào đúng chỗ"
@@ -144,7 +145,7 @@ const ReadAndDoStage: React.FC<{ stage: GameStage; current: ReadDoRound }> = ({ 
   };
 
   useEffect(() => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     const onKey = (e: KeyboardEvent) => {
       const n = Number(e.key);
       if (!Number.isInteger(n) || n < 1) return;

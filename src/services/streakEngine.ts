@@ -58,6 +58,17 @@ function prevDayKey(cursor: string): string | null {
  * Ngày đã được khiên lấp thì chuỗi đi qua nhưng KHÔNG +1
  * (khiên giữ chuỗi chứ không tặng ngày học).
  */
+/**
+ * T45E — id của bài Thử Thách Tuần, xoay theo tuần ISO.
+ * `completedWeeklyChallenges` là một **tập id** (`storage.ts:2418-2421` chỉ đẩy id
+ * mới vào), nên id cố định `'weekly-challenge-week-1'` khiến mảng không bao giờ quá
+ * MỘT phần tử ⇒ `buildMotivationStats().weeklyChallenges` kẹt ở 1 và thành tựu
+ * `ach_weekly_3` ("Vượt qua 3 Thử Thách Tuần") là điều kiện không thể đạt.
+ */
+export function weeklyChallengeIdOf(dateKey: string): string {
+  return `weekly-challenge-${weekKeyOf(dateKey) ?? 'chua-xac-dinh-tuan'}`;
+}
+
 export function countStreak(
   streakDays: readonly string[],
   today: string,

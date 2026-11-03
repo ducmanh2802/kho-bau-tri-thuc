@@ -24,6 +24,25 @@ export function isGameClockRunning(s: GameClockState): boolean {
   return s.phase === 'playing' && !s.locked && !s.pausedByUser && !s.overlayOpen;
 }
 
+/**
+ * T45D — ba trạng thái **che bảng chơi** (lớp phủ "Chọn Màn", nút Tạm dừng, thời
+ * gian chờ sau một lượt). Chuột thì lớp phủ `absolute inset-0 z-50` đã chặn,
+ * nhưng `window.addEventListener('keydown', …)` của trò chơi nằm ngoài cây DOM đó
+ * nên phím vẫn nộp đáp án sau lớp phủ ⇒ bé mở ra đã thấy "Chưa đúng".
+ * Khác `isGameClockRunning`: đồng hồ phải **dừng hẳn** khi sang màn (`phase`), còn
+ * phím thì vẫn được phép ở màn "VƯỢT QUA MÀN" (điều hướng), nên không lấy `phase`
+ * làm chốt input.
+ */
+export interface GameInputBlockState {
+  locked: boolean;
+  pausedByUser: boolean;
+  overlayOpen: boolean;
+}
+
+export function isGameInputBlocked(s: GameInputBlockState): boolean {
+  return s.locked || s.pausedByUser || s.overlayOpen;
+}
+
 export interface UseGameStageOptions {
   gameId: string;
   /** Objectives/rounds inside each tier (index 0 = tier 1). Length = tier count. */
@@ -57,6 +76,10 @@ export interface GameStage {
   isPaused: boolean;
   /** Đồng hồ của trò chơi có được chạy không (xem `isGameClockRunning`). */
   isRunning: boolean;
+  /** Lớp phủ "Chọn Màn & Độ Khó" đang che bảng (wrapper báo qua `setOverlayOpen`). */
+  overlayOpen: boolean;
+  /** Lượt input (chuột **và** phím) phải bị bỏ qua — xem `isGameInputBlocked`. */
+  inputBlocked: boolean;
   togglePause: () => void;
   /** Wrapper báo lớp phủ "Chọn màn" mở/đóng để game ngừng đếm khi bị che. */
   setOverlayOpen: (open: boolean) => void;
@@ -120,6 +143,7 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
   const isLastTier = tierSafe >= Math.max(tierCount, 1);
   const xpEarned = GAME_LEVEL_POLICY.XP_PER_TIER[Math.min(tierSafe - 1, GAME_LEVEL_POLICY.XP_PER_TIER.length - 1)];
   const isRunning = isGameClockRunning({ phase, locked, pausedByUser, overlayOpen });
+  const inputBlocked = isGameInputBlocked({ locked, pausedByUser, overlayOpen });
 
   const togglePause = () => setPausedByUser((v) => !v);
   const setOverlayOpen = (open: boolean) => setOverlayOpenState(open);
@@ -250,6 +274,8 @@ export function useGameStage(options: UseGameStageOptions): GameStage {
     nonce,
     isPaused: pausedByUser,
     isRunning,
+    overlayOpen,
+    inputBlocked,
     togglePause,
     setOverlayOpen,
     submitCorrect,

@@ -1,0 +1,61 @@
+{
+  "viewports": [
+    {
+      "viewport": "360x800",
+      "homeOverflow": 0,
+      "navChecked": 5,
+      "lessonOverflow": 0,
+      "answersChecked": 4,
+      "hubOverflow": {
+        "overflow": 0,
+        "sources": []
+      }
+    },
+    {
+      "viewport": "375x812",
+      "homeOverflow": 0,
+      "navChecked": 5,
+      "lessonOverflow": 0,
+      "answersChecked": 4,
+      "hubOverflow": {
+        "overflow": 0,
+        "sources": []
+      }
+    },
+    {
+      "viewport": "390x844",
+      "homeOverflow": 0,
+      "navChecked": 5,
+      "lessonOverflow": 0,
+      "answersChecked": 4,
+      "hubOverflow": {
+        "overflow": 0,
+        "sources": []
+      }
+    },
+    {
+      "viewport": "412x915",
+      "homeOverflow": 0,
+      "navChecked": 5,
+      "lessonOverflow": 0,
+      "answersChecked": 4,
+      "hubOverflow": {
+        "overflow": 0,
+        "sources": []
+      }
+    }
+  ],
+  "rotation": {
+    "landscapeDialog": true,
+    "landscapeOverflow": 0,
+    "landscapeAnswered": true,
+    "backToPortrait": true
+  },
+  "interruption": {
+    "dialogSurvived": true,
+    "sameQuestion": true,
+    "stillAnswerable": true
+  },
+  "errors": []
+}
+QA PASS — 0 step(s), 0 errors

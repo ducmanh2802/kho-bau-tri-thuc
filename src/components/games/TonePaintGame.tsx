@@ -33,6 +33,7 @@ export const TonePaintGame: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
   return (
     <GameModalWrapper
+      onOverlayOpenChange={stage.setOverlayOpen}
       gameId="tone_paint"
       title="Tô Dấu Thanh"
       subtitle="Nghe tiếng, nhìn hình và tô đúng dấu thanh"
@@ -146,7 +147,7 @@ const TonePaintStage: React.FC<{ stage: GameStage; current: TonePaintRound }> = 
   };
 
   useEffect(() => {
-    if (stage.locked) return;
+    if (stage.inputBlocked) return;
     const onKey = (e: KeyboardEvent) => {
       const n = Number(e.key);
       const options = !toneOk ? current.toneOptions : (current.vowelOptions ?? []);
