@@ -483,6 +483,41 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug 
   (15 file `src/components/games/` + test + `evidence/2026-11-04-T47G/`) rồi push **một mình**, chờ ~90 s
   cho lượt CI khép (`RISK-16` điều kiện 2) mới push commit docs. **Không** stage
   `docs/step-by-step-guidance.md` và 6 ảnh `docs/opencode/reports/img/*.png` — đó là lane khác.
+- **T48A (2026-11-04, ngay sau mục trên) — lát cắt thứ 13: nút loa hứa "Đã đọc xong" khi máy chưa đọc gì.**
+  Người dùng vẫn đứng sau "check bug và fix" + "xong thì push code". `DEF-019(d)` trong sổ chỉ là một dòng
+  trần, nên đo trước khi sửa: `grep -rn "onerror =" src/` ⇒ **3** chỗ gán handler trên **2** file
+  (`useSpeak.ts` · `britishSpeech.ts:175` · `britishSpeech.ts:342`); lệnh grep thô đầu tiên
+  (`grep -rn "onerror" src/`) trả **4** dòng vì tính cả khai báo kiểu `britishSpeech.ts:205` — đó là số của
+  *chuỗi*, không phải số của *chỗ hỏng*. Chỗ thật sự nói dối với bé là `useSpeak.ts`: `onerror` rơi vào
+  **cùng nhánh** `setState('played')` với `onend`, mà `played` attach nhãn "Đã đọc xong, chạm để nghe lại"
+  ⇒ bấm loa, không có tiếng, màn hình vẫn báo đã nghe. `britishSpeech.ts:175` có đúng khuôn gộp-lỗi nhưng
+  **không hứa câu chữ nào** với bé ⇒ ghi lại cho lát cắt sau, **không** tự phong defect (nguyên tắc T47F).
+  Sửa: `SPEAK_INTERRUPT_REASONS` = `canceled` · `interrupted` · `rejected` · `audio-busy` (kênh bị giành/hoãn,
+  không phải máy hết nói) ⇒ `idle` để bé bấm lại; lý do hỏng ⇒ `unavailable` + "Thiết bị không đọc được, hãy
+  đọc cùng ba mẹ nhé"; `played` **chỉ** còn từ `onend`. Giữ `string` thay vì `SpeechSynthesisErrorCode` vì lib
+  DOM không liệt kê `rejected`/`audio-busy` mà Chromium vẫn bắn. `qa/audio.mjs` (9 bước) **không** chốt được
+  nhánh này — headless không có giọng nên chỉ đi đường "không có API" ⇒ probe mới
+  `evidence/2026-11-04-T48A/probe-t48a-speak-error-honest.mjs` dựng `window.speechSynthesis` giả bằng
+  `page.addInitScript` **trước** khi app đọc `synthesisAvailable()` và tự bắn handler ⇒ `QA PASS — 4 step(s),
+  0 errors` (A2 là characterization "`onend` vẫn phải ra `played`"; C Escape+mở lại rồi bắn `interrupted` ⇒
+  `idle`, chặn kiểu chữa cháy bằng một `unavailable` trần). **Ablation dùng ngay bài học T47G**: khôi phục
+  handler cũ ⇒ test `2 failed \| 3 passed` **và** probe `QA FAIL — 2 error(s) at B`, còn A1/A2 vẫn xanh.
+  Cổng: `npm run verify` **EXIT=0** · `121 file / 1513 test` · `Duration 27.92s` · `index-l9C6a6LW.js`
+  **211.1 kB** (đuôi `oKg0XRrb` → `l9C6a6LW`, kB đứng nguyên, boot graph vẫn `435603 total` byte). Hồi quy trên
+  **cùng** `dist/`: `qa/audio.mjs` 9 bước · `qa/games.mjs` `catalogCount: 31` · `qa/golden-path.mjs` 28 bước,
+  cả ba `errors: []` (`evidence/2026-11-04-T48A/probe-regression.txt`). Probe mới đặt trong `evidence/` ⇒ vẫn
+  **30** probe. Docs sync: `measure.mjs` exit 0.
+  Sổ: `DEF-019(d)` **ĐÓNG**; `DEF-019(e)` bị phép đo sửa lần nữa — "5 chuỗi `khóa` / 14 chỗ `khoá`" thành
+  **17 / 61** (`grep -rho "khóa" src --include=*.ts --include=*.tsx | wc -l`) nên vẫn **MỞ** chờ chốt chính tả;
+  `DEF-019(a)(b)(c)` chờ quyết định sản phẩm; `DEF-011` (chờ định nghĩa "total"), Ô 13 CI vẫn mở.
+  **Việc của lane sau:** lát cắt `DEF-019` còn lại — (e) "khóa/khoá" cần **chốt chuẩn chính tả** trước khi
+  sweep (probe `qa/` khớp chuỗi nguyên văn nên phải `grep` chuỗi cũ trong `qa/` trước), (a)(b)(c) cần người
+  quyết; `speakBritish()` ở `src/services/britishSpeech.ts:155` được export nhưng **không có cuộc gọi nào**
+  trong `src/`, `tests/`, `qa/` (`grep -rn "speakBritish" src tests qa` chỉ trả đúng dòng khai báo) — cùng
+  file có `:175` gộp `onerror` vào `onEnd`, ứng viên cùng họ. **Đã đóng hồ sơ lượt này:** commit code `647916d` push
+  **một mình** lúc `22:59:05Z`, ba run `#78` đều `completed success` (Build **21 s** · Quality **41 s** ·
+  Browser QA **69 s**, job "golden path trên Chromium" **65 s**), commit docs chỉ push sau khi ba run khép
+  ⇒ đủ **hai** điều kiện né `RISK-16`; đo ghi ở `evidence/2026-11-04-T48A/README.md` §7. **Không** stage `docs/step-by-step-guidance.md` và 6 ảnh `docs/opencode/reports/img/*.png` — đó là lane khác.
 
 
 

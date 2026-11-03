@@ -89,3 +89,18 @@ React trong unit test, hành vi do **probe** giữ.
 - `DEF-019(a)(b)(c)` vẫn chờ quyết định sản phẩm; `DEF-019(e)` (chính tả "khóa" 17 chỗ vs "khoá"
   61 chỗ trong `src/`) là lát cắt riêng, cần chốt chuẩn viết trước khi sweep chuỗi UI (probe `qa/`
   khớp chuỗi nguyên văn).
+
+## 7. CI của commit code (`647916d`) — đo sau khi ba run khép
+
+Lượt này thực thi đủ **hai** điều kiện né `RISK-16`: commit **code** push một mình lúc `22:59:05Z`
+(`a13da9a..647916d`), commit docs chỉ push sau khi ba run `completed` (`23:00:15Z`).
+
+| Run | Workflow | Kết quả | Thời gian |
+|---|---|---|---|
+| `#78` | `2. Build + artifact` (41735415349) | `success` | `22:59:06Z → 22:59:27Z` = **21 s** |
+| `#78` | `1. Quality` (41735415292) | `success` | `22:59:06Z → 22:59:47Z` = **41 s** |
+| `#78` | `3. Browser QA` (41735415266) | `success` | `22:59:06Z → 23:00:15Z` = **69 s**; job 126263245862 "golden path trên Chromium" **65 s** |
+
+`total_count: 3` ⇒ **không** run nào bị `cancel-in-progress` cắt. Lệnh tái lập:
+`SHA=$(git rev-parse 647916d)` → `curl -s "…/actions/runs?head_sha=$SHA"` →
+`curl -s "…/actions/runs/41735415266/jobs"`.

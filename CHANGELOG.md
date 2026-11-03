@@ -146,6 +146,28 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T48A — bé bấm nút loa, máy không đọc mà màn hình vẫn báo "Đã đọc xong" (`DEF-019(d)`).**
+  `onerror` của `SpeechSynthesisUtterance` trong `src/hooks/useSpeak.ts` được nối vào **cùng nhánh**
+  `setState('played')` với `onend`, dù `onerror` là bằng chứng **ngược lại**: không có tiếng nào đi tới
+  tai bé. Đo toàn repo (`grep -rn "onerror =" src/`): **3** chỗ gán handler trên **2** file — `useSpeak.ts`
+  (nói dối, có nhãn "Đã đọc xong" attach vào
+  trạng thái đó), `src/services/britishSpeech.ts:175` (`onerror = () => options.onEnd?.()` — cùng họ lỗi
+  nhưng không gắn nhãn cho bé nên **không** đổi ở lượt này, chỉ ghi lại), `:342` (speech recognition, đã
+  có fallback `finish(null)`). Sửa: `SPEAK_INTERRUPT_REASONS` (`canceled` · `interrupted` · `rejected` ·
+  `audio-busy` = kênh bị giành/hoãn, không phải máy hết nói) ⇒ `idle` để bé bấm lại; mọi lý do khác ⇒
+  `unavailable` với nhãn nói thẳng "không đọc được"; `played` **chỉ** còn đến từ `onend`. Lý do để
+  `string` thay vì `SpeechSynthesisErrorCode`: bộ lib DOM không liệt kê `rejected` / `audio-busy` mà
+  Chromium thật vẫn bắn. Test mới `tests/t48a-speak-error-not-played.test.ts` (5) — gồm test bóc thân
+  handler `onerror` từ nguồn và **cấm** `setState('played')` xuất hiện trong đó; hành vi thật khoá bằng probe
+  `evidence/2026-11-04-T48A/probe-t48a-speak-error-honest.mjs` dựng `speechSynthesis` giả trên `dist/`
+  (4 bước / 0 lỗi / 3 ảnh). **Ablation theo bài học T47G:** phục hồi handler cũ ⇒ test `2 failed | 3 passed`
+  **và** probe `QA FAIL — 2 error(s) at B`, còn hai bước characterization A1/A2 vẫn xanh ⇒ chứng minh lưới
+  bắt đúng bệnh chứ không bắt mọi thay đổi. Cổng: `npm run verify` **EXIT=0** · **121 file / 1513 test** ·
+  `Duration 27.92s` · entry `index-l9C6a6LW.js` **211.1 kB** (`src/` đổi nên **đổi hash** `oKg0XRrb` →
+  `l9C6a6LW`, kB đứng nguyên, boot graph vẫn `435603 total` byte); hồi quy trên cùng `dist/`: `qa/audio.mjs`
+  **9 bước 0 lỗi** · `qa/games.mjs` `catalogCount: 31` 0 lỗi · `qa/golden-path.mjs` **28 bước 0 lỗi**.
+  **Chưa đóng:** `sound.speak()` ở `src/services/sound.ts:308` return sớm khi muted (`:313`) và không gắn
+  state nào lên màn hình (im lặng có chủ đích, không phải chỗ nói dối — không đổi), `DEF-019(a)(b)(c)(e)` vẫn mở.
 - **T47G — lượt SAI chỉ có tiếng bíp ở 14 trò chơi: phản hồi HÌNH nay do framework dựng (`DEF-018(b)`).**
   Đo trước khi kết luận, và số đo **sửa lại chính danh sách bug**: trong `src/components/games/*.tsx` có
   **30** file bật `sound.playWrong()` khi bé bấm sai, nhưng chỉ **16** file gọi tiếp `reportWrong()` của
