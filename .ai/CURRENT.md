@@ -206,6 +206,13 @@ Nên "triển khai theo guide" = **lớp ánh xạ + artifact thật**, không p
   `docs/specs/BRD.md` R-04, `docs/plan/TEST_PLAN.md` ô 13 nay dẫn `evidence/2026-11-03-QA-RACE/ci-census-main-wf03.txt`
   (§17–§18 `ci-gate-race.txt`). Lưu ý đơn vị: `afb9eeb` từng ghi 63 s là **cấp run**, cấp **job** 59 s.
   Unauthenticated API chỉ 60 request/giờ ⇒ vòng kiểm kê tốn 23 request, mỗi giờ chạy được ~2 lần.
+- **Ba commit docs-only nối tiếp đã push** (`c7e9a00` → `ec7505a` → `8e27cd5`, `origin/main`): bằng
+  chứng T43 + kiểm kê, rồi ràng buộc hạn mức API ghi trong file kiểm kê. `npm run verify` trên
+  `8e27cd5`: **EXIT=0** · `Test Files 100 passed (100)` · `Tests 1377 passed (1377)` ·
+  `Duration 25.67s` · `index-BYLrQykB.js` **210.9 kB PASS** (hash/kB đứng nguyên vì ba commit chỉ đụng
+  `evidence/`, `.ai/`). **Lượt CI của ba commit này chưa đo** — hạn mức còn `0 / 60` tới `14:12:48Z`;
+  ai đo sau đó dùng `runs?head_sha=` (1 request/lượt) và cập nhật kiểm kê nếu cần — cộng ba lượt thì
+  **mẫu số thành 25**, tử số chỉ tăng với lượt xanh (cả ba xanh ⇒ 16/25).
 - **Cố ý để mở, cần người duyệt — agent không tự đóng**: `RISK-01` (không có đường xoá dữ liệu
   cloud; `resetProgress` chỉ dọn `localStorage`), `RISK-11` + `OQ-07` (`docs/SAFETY_PRIVACY.md` nói
   "sao lưu" nhưng export một chiều), và quyết định sư phạm "tên bé có được giữ khi reset không"
