@@ -274,7 +274,46 @@ Người dùng: "push code và check bug tiếp" ⇒ chạy skill `kho-bau-chang
   stage; `docs/step-by-step-guidance.md` là file untracked của lane khác (`?? `) — không đụng, không
   commit; `package-lock.json` vẫn được theo dõi (kiểm trước mỗi commit).
 
-## Tree hygiene note (2026-10-06)
+## T46 — ba defect còn lại của sổ K-05 (2026-11-04, lane này)
+
+Người dùng: "push code và check bug tiếp" (lát cắt thứ 9 của bug hunt, HEAD `0c92915`).
+**`src/` đổi 4 file, +42/−5** (`git diff --numstat HEAD -- src/`), **3 file test mới / 19 test**:
+
+- **T46A `DEF-010`** — `getEncouragementPhrase()` trả **thay thế**: có streak là mất câu chào theo giờ.
+  `tests/t46a-header-greeting.test.ts` (6).
+- **T46B `DEF-012`** — nút loa `ListenPickPhonicsGame.tsx` icon-only không tên ⇒ `aria-label="Nghe lại đề"`.
+  `tests/t46b-speaker-button-name.test.ts` (6) gồm cả **sweep nguồn** mọi file `src/components/games/**`.
+  Luật test: `aria-label` **hoặc** `title` (HTML AAM cho phép `title` làm tên dự phòng) — nhờ vậy 5/6
+  ứng viên quét được bị loại đúng, không sửa nhầm.
+- **T46C `DEF-013`** — `Esc` khi lớp phủ "Chọn Màn & Độ Khó" đang che vừa tắt bảng vừa **thoát trò chơi**:
+  `keydown` gắn trên `window`. `useModalHistory(onExit, { overlayOpen, onCloseOverlay })` +
+  `shouldEscapeCloseOverlay()`; `GameModalWrapper.tsx:202` khai báo `overlayOpen: showTierModal`.
+  `tests/t46c-escape-closes-overlay-first.test.ts` (7: bảng quyết định, **thứ tự** chốt trước
+  `history.back()`, wiring, không `keydown` thứ hai, regression `LessonPlayerModal` một tham số).
+  **Còn mở:** màn tạm dừng + biên lai phần thưởng vẫn để `Esc` đi thẳng tới `onExit` — đưa lại vào `K-05`.
+- Cổng: `npm run verify` **EXIT=0** · `113 file / 1460 test` · `Duration 24.58s` ·
+  `index-CprqGUdJ.js` **211.2 kB** (hash **đổi**, kB **đứng nguyên** so với T45 — hai số liệu độc lập);
+  boot graph `435718 total` byte = **425.5 kB** (+22 byte). Kiểm kê không đổi: 42 service, 30 probe QA,
+  31/31/31/31 trò, 105 file `src/data/**/*.ts`, 18 key `STORAGE_KEYS`. Log `evidence/2026-11-04-T46/verify.txt`.
+- Bằng chứng UI thật: `node qa/run-one.mjs evidence/2026-11-04-T46/probe-t46-escape-a11y.mjs` ⇒
+  `QA PASS — 7 step(s), 0 errors`, exit 0, 5 ảnh 390×844; **cùng probe** trên build không có chốt T46C
+  ⇒ `QA FAIL — 2 error(s) at A`. Ablation: A `1 failed | 6 passed (7)` · B `2 failed | 4 passed (6)` ·
+  C `2 failed | 4 passed (6)`. Probe đặt **ngoài** `qa/` ⇒ số probe vẫn **30**.
+- Hồi quy chạy tay (CI chỉ chạy một probe — `RISK-18`): `qa/games.mjs` `catalogCount: 31` 0 errors ·
+  `golden-path` 28 bước 0 errors · `focus` 0 errors · `parent-controls` 7 bước 0 errors (`qa/` trong evidence).
+- **Bài học quy trình (lần đầu trả giá thật):** `git checkout -- <file>` trong pha ablation đã **xoá mất
+  bản sửa chưa commit** của `useModalHistory.ts` ⇒ phải viết lại tay. Từ đó: ablation restore từ
+  `/tmp/*.GREEN.*`, và `tests-RED.txt` (RED **tái lập** bằng `git checkout HEAD --` đúng 4 file) có bảng
+  **md5 trước/sau** đối chiếu trong `evidence/2026-11-04-T46/README.md`. Không dùng `git checkout --`
+  cho file đang có sửa chưa commit.
+- Harness ghi lại: nút loa mang `animate-pulse-subtle` nên `locator.click()` báo *not stable* ⇒
+  `click({ timeout: 15000, force: true })` bọc try/catch và báo `clicked` ra `facts`; `page.mainWorld()`
+  **không tồn tại** trong Playwright đang dùng ⇒ đo khả năng speech bằng
+  `page.evaluate(() => 'speechSynthesis' in window)`.
+- **Hygiene:** vẫn **không** stage 6 file `docs/opencode/reports/img/*.png` và
+  `docs/step-by-step-guidance.md` (untracked, của lane khác); `package-lock.json` còn nguyên.
+
+
 
 P36, P38, P39 sessions share this working tree concurrently. Each lane left its
 changes uncommitted. Do not sweep other lanes' files into a single commit.

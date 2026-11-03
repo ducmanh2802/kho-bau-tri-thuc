@@ -15,9 +15,18 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1441 test / 110 file,
-   211.2 kB entry + 425.5 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-03** — lần cuối
-   ngay sau **T45** (năm defect một đợt: máy gắp bỏ qua trần `maxGachaPerDay` nên ba mẹ đặt **0** (= không
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1460 test / 113 file,
+   211.2 kB entry + 425.5 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
+   ngay sau **T46** (ba defect còn lại của đợt săn bug mà code tự sửa được, không phải quyết nội dung: câu
+   chào theo giờ bị lời khen streak **thay thế** nên bé đã có streak không bao giờ được chào, nút loa của
+   "Đôi Tai Thính — Nghe & Chọn" là icon-only **không tên truy cập** (không `aria-label` lẫn `title`), và
+   **Esc thoát luôn trò chơi** khi lớp phủ "Chọn Màn & Độ Khó" còn đang che bảng; **3** file test mới
+   `tests/t46a-header-greeting` (6) · `t46b-speaker-button-name` (6) ·
+   `t46c-escape-closes-overlay-first` (7) ⇒ 19 test; vẫn **42** service module, vẫn **30** probe QA
+   (probe bằng chứng đặt trong `evidence/2026-11-04-T46/`, không tính vào `qa/`); `src/` đổi nên entry
+   **đổi hash** (đuôi entry từ `C5J1ceAM` lên `CprqGUdJ`) trong khi **kB đứng nguyên** 211.2 —
+   bằng chứng `evidence/2026-11-04-T46/`),
+   đợt **T45** liền trước (năm defect một đợt: máy gắp bỏ qua trần `maxGachaPerDay` nên ba mẹ đặt **0** (= không
    giới hạn) bị hiểu thành 5 lượt, "Tắt phần thưởng" vẫn để thi đấu + thành tựu cộng XP/Sao, hết giờ học bé
    tự nới thêm 10 phút mà không qua cổng ba mẹ, phím vẫn thao tác bàn chơi khi lớp phủ "Chọn Màn & Độ Khó"
    đã che bảng, và Thử Thách Tuần phát id cứng `weekly-challenge-week-1` nên mọi tuần trùng nhau ⇒ thành tựu

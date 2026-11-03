@@ -34,10 +34,10 @@ hồ sơ pha mới: [`../01-intake/`](../01-intake/) (4 file) ·
 | Hạng | Số | Lệnh |
 |---|---|---|
 | Cổng chất lượng | `npm run verify` EXIT=0 | `evidence/2026-11-03-T45/verify.txt` (lần đo gần nhất, 2026-11-03 **lần chín**) · `evidence/2026-11-03-T44/verify.txt` · `evidence/2026-11-03-T43/verify.txt` · `evidence/2026-11-03-T42/verify.txt` · `evidence/2026-11-03-T41D/verify-t41d.txt` · `evidence/2026-11-03-QA-RACE/verify-1287.txt` · `verify-1286.txt` · `verify-1281.txt` · `verify-1280.txt` · `evidence/2026-11-02-KBT-ISSUE-43/verify-main-1278.txt` · `verify-rc.txt` · `verify.txt` · `evidence/2026-11-02-T41C/verify.txt` |
-| Test file / test | 110 / 1441 · suite 25.82 s (đo 2026-11-03 lần chín; các lần đo trước cùng ngày: 1410 / 25.78 s ở T44, 1377 / 28.57 s ở T43, 1372 / 24.14 s ở T42, 1327 / 22.32 s ở T41D, 1287 / 22.15 s trên commit `3b0122c`, 1286 / 22.18 s, 1281 / 22.58 s và 1280 / 21.88 s, ngày 2026-11-02 là 1278 / 23.64 s) | `npx vitest run` |
+| Test file / test | 113 / 1460 · suite 24.58 s (đo 2026-11-04 sau T46; đo 2026-11-03 lần chín: 1441 / 25.82 s ở T45, các lần đo trước cùng ngày: 1410 / 25.78 s ở T44, 1377 / 28.57 s ở T43, 1372 / 24.14 s ở T42, 1327 / 22.32 s ở T41D, 1287 / 22.15 s trên commit `3b0122c`, 1286 / 22.18 s, 1281 / 22.58 s và 1280 / 21.88 s, ngày 2026-11-02 là 1278 / 23.64 s) | `npx vitest run` |
 | Probe QA | 30 (29 `.mjs` + 1 `.cjs`) | `ls qa/*.mjs qa/*.cjs` trừ `lib.mjs`, `run-one.mjs` |
-| Entry chunk | **211.2 kB** `index-C5J1ceAM.js` | `npm run check:budget` |
-| Boot graph | **425.5 kB** | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `435696 total` (÷ 1024 = 425.5 KiB) |
+| Entry chunk | **211.2 kB** `index-CprqGUdJ.js` | `npm run check:budget` |
+| Boot graph | **425.5 kB** | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `435718 total` (÷ 1024 = 425.5 KiB) |
 | Trần | entry 600 kB cứng / 450 kB mục tiêu | `src/config/policy.ts` + `scripts/check-bundle-budget.mjs` |
 | Trò chơi đăng ký đủ 4 nơi | 31 = 31 = 31 = 31 | `tests/t23-mcp-servers.test.ts` |
 | Dependency runtime | 8 | `package.json → dependencies` |

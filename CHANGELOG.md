@@ -65,6 +65,30 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T46 — ba defect còn lại của lượt đo T45: một lời chào bị lời khen chặn, một nút không tên, một phím làm mất ván.**
+  (a) **`DEF-010` câu chào theo giờ biến mất với bé đã có streak**: `getEncouragementPhrase()`
+  `return` chuỗi **khen** khi `hasStreak`, tức câu chào `Chào buổi sáng/chiều/Tối rồi…` chỉ vang lên
+  ở lần chơi đầu tiên — mà lần chơi đầu chỉ có một. Sửa: câu chào luôn đứng trước, lời khen nối làm
+  phụ (`${greeting} Bé học đều lắm, giỏi quá!`). Đo bằng probe mục **C1**, chặn `speechSynthesis.speak`
+  bằng `addInitScript` **trước** lúc app boot (nếu cài sau mount thì lời chào đã nói xong):
+  `streak = 4` ⇒ chuỗi duy nhất được nói là `"Tối rồi, bé nhớ ngủ sớm nhé! Bé học đều lắm, giỏi quá!"`.
+  (b) **`DEF-012` nút loa icon-only không có tên truy cập được**: `<button onClick={playVoice}>` chỉ
+  chứa `<Volume2>` nên screen reader đọc "button" giữa lúc bé đang làm bài *Nghe & Chọn* — đúng trò
+  mà âm thanh là đầu vào. Thêm `aria-label="Nghe lại đề"`, kèm **quy ước quét** mọi nút icon-only trong
+  `src/components/games/**` (test nguồn) và một sweep **DOM thật** trong `[role="dialog"]` (probe B2).
+  Hai ứng viên từng bị nghi hoá ra **đúng** vì chúng có `title` — HTML AAM cho phép `title` làm tên dự
+  phòng — nên luật test viết là "`aria-label` **hoặc** `title`", không phải "bắt buộc `aria-label`".
+  (c) **`DEF-013` `Esc` làm mất ván đang chơi**: `keydown` gắn trên `window`, lớp phủ "Chọn Màn & Độ
+  Khó" chỉ chặn bằng CSS, nên một phím vừa đóng bảng vừa gọi `onExit` ⇒ bé mất cả ván chỉ vì muốn tắt
+  bảng chọn. `useModalHistory(onExit, { overlayOpen, onCloseOverlay })` + `shouldEscapeCloseOverlay()`:
+  khi có lớp phủ, `Esc` **đóng lớp phủ và không bóc entry history của modal** (dialog lồng nhau).
+  Ablation ở cả ba lát: `ablation-A-escape-routing-RED.txt` `1 failed | 6 passed (7)` ·
+  `ablation-B-speaker-label-RED.txt` `2 failed | 4 passed (6)` ·
+  `ablation-C-header-greeting-RED.txt` `2 failed | 4 passed (6)`; và **cùng probe** chạy trên build
+  không có chốt (c) ⇒ `QA FAIL — 2 error(s) at A`. `tests/t46a…t46c` = **19** test; cổng
+  `npm run verify` **EXIT=0** · `113 file / 1460 test`. **Chưa route** màn tạm dừng và biên lai phần
+  thưởng — hai overlay đó vẫn để `Esc` đi thẳng tới `onExit` (`K-05`).
+  Bằng chứng: `evidence/2026-11-04-T46/`.
 - **T45 — năm defect: hai quyền của ba mẹ bị code bỏ qua, một lớp phủ không chặn bàn phím, một thành tựu không thể đạt.**
   (a) **`maxGachaPerDay` chỉ dashboard đọc, máy gắp thì bỏ qua**: `GachaMachineScreen.tsx` tự đặt
   `MAX_DAILY_DRAWS = 5` còn `drawGacha()` quy `0 → 5`, trong khi chính UI ba mẹ và `tests/t18a` ghi
