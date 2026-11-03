@@ -1,0 +1,37 @@
+{
+  "steps": [
+    {
+      "step": "A1: bấm ⇒ playing, đúng một utterance gửi đi"
+    },
+    {
+      "step": "A2: onend ⇒ played + \"Đã đọc xong\" (characterization, xanh cả trước lẫn sau khi sửa)"
+    }
+  ],
+  "errors": [
+    "B: thiết bị báo lỗi \"synthesis-failed\" (không có tiếng) mà nút vẫn nói \"Đã đọc xong, chạm để nghe lại\" — đúng bệnh DEF-019(d): onerror bị gán chung state với onend",
+    "C: interrupted cũng bị gán played (\"Đã đọc xong, chạm để nghe lại\") — cùng bệnh, khác lý do"
+  ],
+  "facts": {
+    "speechApi": {
+      "present": true,
+      "isFake": true
+    },
+    "stateBeforePress": "playing",
+    "statePlaying": "playing",
+    "utterancesAfterPress": 1,
+    "stateAfterOnend": "played",
+    "labelAfterOnend": "Đã đọc xong, chạm để nghe lại",
+    "stateAfterRefusal": "played",
+    "labelAfterRefusal": "Đã đọc xong, chạm để nghe lại",
+    "stateOnFreshLesson": "playing",
+    "stateAfterInterrupt": "played",
+    "labelAfterInterrupt": "Đã đọc xong, chạm để nghe lại"
+  },
+  "failedAt": "B",
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T48A\\a2-onend-played.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T48A\\b-onerror-synthesis-failed.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T48A\\c-onerror-interrupted.png"
+  ]
+}
+QA FAIL — 2 error(s) at B

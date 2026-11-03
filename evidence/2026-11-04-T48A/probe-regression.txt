@@ -1,0 +1,580 @@
+### qa/audio.mjs (speechSynthesis THẬT trên Chromium, không có giọng)
+        "present": true,
+        "voices": 4,
+        "speaking": true,
+        "pending": false
+      }
+    },
+    {
+      "step": "autoplayOff",
+      "present": true,
+      "voices": 4,
+      "speaking": false,
+      "pending": false
+    },
+    {
+      "step": "passageAudio",
+      "before": "idle",
+      "after": "playing"
+    },
+    {
+      "step": "mathOperatorsSpoken",
+      "examsWalked": 6,
+      "symbolicSeen": 4,
+      "symbolicSpoken": 4,
+      "rawSpoken": [],
+      "spokenSamples": [
+        {
+          "de": "Vòng Tỉnh 2: Tháp số: 5 ở dưới, 3 ở giữa, trên cùng là 5 + 3 = ?",
+          "doc": "Vòng Tỉnh 2: Tháp số: 5 ở dưới, 3 ở giữa, trên cùng là 5 cộng 3 bằng mấy"
+        },
+        {
+          "de": "Chung kết 4: Điền số: ... + 27 = 60",
+          "doc": "Chung kết 4: Điền số: ... cộng 27 bằng 60"
+        },
+        {
+          "de": "Tính: 9 - 4 = ?",
+          "doc": "Tính: 9 trừ 4 bằng mấy"
+        },
+        {
+          "de": "Chung kết 4: Điền số: ... + 27 = 60",
+          "doc": "Chung kết 4: Điền số: ... cộng 27 bằng 60"
+        }
+      ]
+    },
+    {
+      "step": "voicelessPlatform",
+      "apiType": "undefined"
+    },
+    {
+      "step": "voicelessButton",
+      "state": "unavailable",
+      "label": "Thiết bị không đọc được, hãy đọc cùng ba mẹ nhé"
+    },
+    {
+      "step": "voicelessPressed",
+      "state": "unavailable"
+    }
+  ],
+  "errors": []
+}
+QA PASS — 9 step(s), 0 errors
+AUDIO_EXIT=0  # qa/audio.mjs — 9 bước, errors: []
+
+
+=== qa/games.mjs (chạy trên dist của cùng lượt build) ===
+{
+  "mountSmoke": [
+    {
+      "index": 0,
+      "game": "Bắt Chữ Cái Bay",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 1,
+      "game": "Xưởng Ghép Tiếng Lớp 1",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 2,
+      "game": "Săn Vần Trong Vườn Cây",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 3,
+      "game": "Đoàn Tàu Xếp Câu",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 4,
+      "game": "Đôi Tai Thính — Nghe & Chọn",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 5,
+      "game": "Đấu Trường Chính Tả",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 6,
+      "game": "Tô Dấu Thanh",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 7,
+      "game": "Đoàn Tàu Ghép Vần",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 8,
+      "game": "Đọc Câu Làm Theo",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 9,
+      "game": "Hứng Số Rơi Rộn Ràng",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 10,
+      "game": "Đường Đua Thần Tốc",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 11,
+      "game": "Xây Tháp Số Lên Mây",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 12,
+      "game": "Câu Cá Đại Dương Xanh",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 13,
+      "game": "Phân Loại Hình Học",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 14,
+      "game": "Thám Hiểm Giờ & Tiền Việt",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 15,
+      "game": "Chuyện Kể Toán Học",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 16,
+      "game": "Chợ Khung 10",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 17,
+      "game": "Ếch Nhảy Tia Số",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 18,
+      "game": "Thợ Sửa Đồng Hồ",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 19,
+      "game": "Safari Tiếng Anh — Loài Vật",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 20,
+      "game": "Đập Bóng Màu",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 21,
+      "game": "Phonics Pop — Bắn Âm",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 22,
+      "game": "Simon Says — Gấu Ra Lệnh",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 23,
+      "game": "Word Train — Tàu Chữ Tiếng Anh",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 24,
+      "game": "Lập Trình Tìm Kho Báu",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 25,
+      "game": "Nhà Khoa Học Nhí",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 26,
+      "game": "Lật Thẻ Trí Nhớ Vàng",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 27,
+      "game": "Bé Tập Vẽ & Tô Màu Diệu Kỳ",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 28,
+      "game": "Nối Số Tô Màu",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 29,
+      "game": "Đoán Bóng Hình",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    },
+    {
+      "index": 30,
+      "game": "Bé Xếp Hình Mosaic",
+      "hasTitle": true,
+      "hasCloseButton": true,
+      "hasMuteButton": true,
+      "mounted": true,
+      "overflowPx": 0,
+      "closed": true
+    }
+  ],
+  "rewards": {
+    "countBefore": 0,
+    "countAfterMountOnly": 0,
+    "countAfterRound1": 1,
+    "countAfterRound2": 2,
+    "mountOnlyAwardedNothing": true,
+    "round1AwardedOnce": true,
+    "round2AwardedOnce": true,
+    "gameOverShown": true,
+    "play1": {
+      "matched": true,
+      "total": 6,
+      "settled": 6,
+      "guard": 5
+    }
+  },
+  "errors": [],
+  "catalogCount": 31
+}
+QA PASS — 0 step(s), 0 errors
+GAMES_EXIT=0
+
+=== qa/golden-path.mjs ===
+{
+  "steps": [
+    {
+      "step": "home",
+      "readingCard": true,
+      "competitionCard": false,
+      "nextBestAction": true,
+      "readingHeadline": false
+    },
+    {
+      "step": "newChildIsClean",
+      "xp": 0
+    },
+    {
+      "step": "vietnameseSubject",
+      "lessonCount": 58
+    },
+    {
+      "step": "lessonOpened",
+      "ok": true
+    },
+    {
+      "step": "lessonCompleted",
+      "questionsAnswered": 11,
+      "completed": true
+    },
+    {
+      "step": "evidenceRecorded",
+      "schemaVersion": "P43-v1",
+      "skillCount": 3,
+      "evidenceCount": 11
+    },
+    {
+      "step": "levelUpCelebrationDismissed",
+      "ok": true,
+      "afterResultScreen": true
+    },
+    {
+      "step": "readingLadder",
+      "hasStages": true,
+      "allFiveStages": true,
+      "lockedStages": 4
+    },
+    {
+      "step": "stageGating",
+      "lockedStageButtons": 4
+    },
+    {
+      "step": "readingPassageShown",
+      "passages": 1
+    },
+    {
+      "step": "readingSession",
+      "itemsAnswered": 6,
+      "resultShown": true
+    },
+    {
+      "step": "readingPersisted",
+      "sessions": 1,
+      "readingIndex": 50,
+      "stageAccuracy": 50
+    },
+    {
+      "step": "SNAP_afterReading",
+      "xp": 110,
+      "lessons": 1,
+      "exams": 0,
+      "reading": 1,
+      "keys": "__sentinel,kho_bau_achievements,kho_bau_analytics,kho_bau_child_profile,kho_bau_daily_quests,kho_bau_learning_os_store,kho_bau_motivation,kho_bau_parent_settings,kho_bau_reading_store",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "competitionHub",
+      "ok": true
+    },
+    {
+      "step": "examDialog",
+      "hasTimer": true,
+      "timerSample": "04:59",
+      "showsQuestionType": true,
+      "typeLabel": "trắc nghiệm"
+    },
+    {
+      "step": "examAnswered",
+      "itemsAnswered": 6
+    },
+    {
+      "step": "examResult",
+      "shown": true
+    },
+    {
+      "step": "resultBreakdown",
+      "hasScoreBreakdown": true,
+      "hasTypeBreakdown": true,
+      "hasRemediation": true,
+      "hasFairnessNote": true
+    },
+    {
+      "step": "errorAnalysisRendered",
+      "hasMistakesHeading": true,
+      "hasCategoryLabel": false,
+      "hasRemediation": true,
+      "hasRemediationButton": true,
+      "showsCorrectAnswer": true
+    },
+    {
+      "step": "SNAP_afterExams",
+      "xp": 260,
+      "lessons": 1,
+      "exams": 2,
+      "reading": 1,
+      "keys": "__sentinel,kho_bau_achievements,kho_bau_analytics,kho_bau_child_profile,kho_bau_competition_history,kho_bau_daily_quests,kho_bau_learning_os_store,kho_bau_motivation,kho_bau_parent_settings,kho_bau_reading_store",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "parentGate",
+      "shown": true
+    },
+    {
+      "step": "parentUnlocked",
+      "ok": true,
+      "attempts": 1
+    },
+    {
+      "step": "parentReadingTab",
+      "hasIndex": true,
+      "hasLadder": true,
+      "hasAdvice": true,
+      "hasDemoBanner": false
+    },
+    {
+      "step": "parentCompetitionTab",
+      "hasExamCount": true,
+      "hasLog": true
+    },
+    {
+      "step": "SNAP_afterParent",
+      "xp": 260,
+      "lessons": 1,
+      "exams": 2,
+      "reading": 1,
+      "keys": "__sentinel,kho_bau_achievements,kho_bau_analytics,kho_bau_child_profile,kho_bau_competition_history,kho_bau_daily_quests,kho_bau_learning_os_store,kho_bau_motivation,kho_bau_parent_settings,kho_bau_reading_store",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "harnessGuard",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "persistenceAfterReload",
+      "before": {
+        "xp": 260,
+        "lessons": 1,
+        "exams": 2,
+        "readingSessions": 1
+      },
+      "after": {
+        "xp": 260,
+        "lessons": 1,
+        "exams": 2,
+        "readingSessions": 1
+      },
+      "persisted": true
+    },
+    {
+      "step": "noDuplicateRewards",
+      "xpBefore": 260,
+      "xpAfter": 260
+    }
+  ],
+  "errors": [],
+  "removals": []
+}
+QA PASS — 28 step(s), 0 errors
+GOLDEN_EXIT=0

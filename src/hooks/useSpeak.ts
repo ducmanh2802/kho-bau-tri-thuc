@@ -19,10 +19,28 @@ import { toSpeechText } from '../services/speechText';
  *     never stack uncontrolled playback;
  *   - unmount cancels any pending utterance (no ghost audio after navigation);
  *   - `speak()` returns whether audio actually started, and moves to
- *     `unavailable` when the platform refuses.
+ *     `unavailable` when the platform refuses;
+ *   - `onerror` never reports `played`: an error is evidence that nothing was
+ *     heard. Recoverable reasons (channel taken/deferred) go back to `idle` so
+ *     the child can press again; refusals say `unavailable` out loud.
  */
 
 export type SpeakState = 'idle' | 'playing' | 'played' | 'unavailable';
+
+/**
+ * Lý do `onerror` mà **không** có nghĩa là thiết bị hết nói được: kênh bị một bên khác giành
+ * hoặc hoãn (`cancel()` của chính app, giọng khác xen, hàng đợi bận). Những lý do còn lại
+ * (`synthesis-failed`, `not-allowed`, `network`, `audio-hardware`, `voice-unavailable`…) là từ
+ * chối thật ⇒ nút phải báo `unavailable`.
+ * Kiểu để `string` chứ không dùng `SpeechSynthesisErrorCode` vì bộ lib DOM không liệt kê đủ
+ * `rejected` / `audio-busy` mà Chromium thật vẫn bắn.
+ */
+const SPEAK_INTERRUPT_REASONS: ReadonlySet<string> = new Set([
+  'canceled',
+  'interrupted',
+  'rejected',
+  'audio-busy',
+]);
 
 function synthesisAvailable(): boolean {
   return (
@@ -87,10 +105,18 @@ export function useSpeak() {
             setState('played');
           }
         };
-        utterance.onerror = () => {
-          if (utteranceRef.current === utterance) {
-            utteranceRef.current = null;
-            setState('played');
+        utterance.onerror = (event) => {
+          if (utteranceRef.current !== utterance) return;
+          utteranceRef.current = null;
+          // T48A — `onerror` là bằng chứng **không có tiếng**, ngược hẳn `onend`, nên không được
+          // để lại `played`: nhãn của state đó là "Đã đọc xong, chạm để nghe lại", tức bé vừa
+          // không nghe thấy gì vừa được mời bấm lại một thứ chưa từng phát. Chia theo lý do:
+          // kênh bị giành/hoãn thì thiết bị vẫn nói được (về `idle` cho bấm lại), còn thiết bị
+          // từ chối thì phải báo thẳng `unavailable` — đúng nhãn "đọc cùng ba mẹ nhé".
+          if (SPEAK_INTERRUPT_REASONS.has(event.error)) {
+            setState('idle');
+          } else {
+            setState('unavailable');
           }
         };
         setState('playing');

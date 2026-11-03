@@ -1,0 +1,40 @@
+{
+  "steps": [
+    {
+      "step": "A1: bấm ⇒ playing, đúng một utterance gửi đi"
+    },
+    {
+      "step": "A2: onend ⇒ played + \"Đã đọc xong\" (characterization, xanh cả trước lẫn sau khi sửa)"
+    },
+    {
+      "step": "B: onerror(synthesis-failed) ⇒ unavailable + \"Thiết bị không đọc được, hãy đọc cùng ba mẹ nhé\""
+    },
+    {
+      "step": "C: onerror(interrupted) ⇒ idle + \"Đọc câu hỏi\" (bấm lại được, không báo hỏng)"
+    }
+  ],
+  "errors": [],
+  "facts": {
+    "speechApi": {
+      "present": true,
+      "isFake": true
+    },
+    "stateBeforePress": "playing",
+    "statePlaying": "playing",
+    "utterancesAfterPress": 1,
+    "stateAfterOnend": "played",
+    "labelAfterOnend": "Đã đọc xong, chạm để nghe lại",
+    "stateAfterRefusal": "unavailable",
+    "labelAfterRefusal": "Thiết bị không đọc được, hãy đọc cùng ba mẹ nhé",
+    "stateOnFreshLesson": "playing",
+    "stateAfterInterrupt": "idle",
+    "labelAfterInterrupt": "Đọc câu hỏi"
+  },
+  "failedAt": null,
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T48A\\a2-onend-played.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T48A\\b-onerror-synthesis-failed.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T48A\\c-onerror-interrupted.png"
+  ]
+}
+QA PASS — 4 step(s), 0 errors
