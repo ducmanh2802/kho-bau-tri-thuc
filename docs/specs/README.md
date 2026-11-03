@@ -15,9 +15,17 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1502 test / 119 file,
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1508 test / 120 file,
    211.1 kB entry + 425.4 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
-   ngay sau **T47F** (đóng `DEF-018(a)`: **sáu** chỗ mà nút "Chơi lại" không xoá trạng thái bảng —
+   ngay sau **T47G** (đóng `DEF-018(b)`: lượt **sai** chỉ có tiếng bíp ở **14** trò chơi — đo, không suy
+   luận: 30 file `src/components/games/*.tsx` gọi `sound.playWrong()` nhưng chỉ 16 gọi `reportWrong()`;
+   5 trong 14 tự vẽ phản hồi riêng, **9** không có gì trên màn hình. Sửa một chỗ trong framework:
+   `GameModalWrapper` nhận thêm prop `mistakes` (= `stage.mistakesInTier` mà `submitWrong()` đã tăng) và
+   khi số này **tăng** thì dựng đúng cặp mascot + bóng chữ mà `reportWrong()` vẫn dựng; 14 trò truyền prop,
+   không phải viết lại 14 màn chơi. **1** file test mới `tests/t47g-wrong-turn-visual.test.ts` (6) ⇒ +6 test;
+   vẫn **42** service module, vẫn **30** probe QA (bằng chứng đặt trong `evidence/2026-11-04-T47G/`);
+   `src/` đổi nên entry **đổi hash** (`DbfbtGg4` → `oKg0XRrb`) trong khi **kB đứng nguyên** 211.1),
+   đợt **T47F** liền trước (đóng `DEF-018(a)`: **sáu** chỗ mà nút "Chơi lại" không xoá trạng thái bảng —
    `NumberTowerGame.tsx:25`, `SentenceScrambleGame.tsx:31`, `ClockMoneyGame.tsx:36`,
    `EnglishAnimalSoundGame.tsx:30`, `ListenPickPhonicsGame.tsx:139` đều thiếu `stage.nonce` trong deps
    (chơi lại cùng màn chỉ bump `nonce`, không đổi `tier` ⇒ đề mới mà bảng cũ, nhẹ nhất là gợi ý cũ treo

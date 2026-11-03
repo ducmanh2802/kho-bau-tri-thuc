@@ -454,6 +454,35 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug 
   **3 lượt** (`e0fcb6f` → `4e47ff7`, đứt ở `198a6d9` *bị hủy*). **Cạm bẫy mới ghi lại:** `workflow_runs[].conclusion`
   là attempt **mới nhất** nên 9 lượt đỏ kiểm kê §18 biến mất khỏi cái nhìn cấp run (`{"success":35,"cancelled":2}`)
   — ai đọc cấp run sẽ kết luận sai "chưa từng có lượt đỏ". Ô 13 **vẫn MỞ**.
+- **T47G (2026-11-04, ngay sau mục trên) — lát cắt thứ 12, và là lần thứ hai *con số trong sổ bug* bị
+  phép đo sửa.** Người dùng vẫn đứng sau "check bug và fix" + "xong thì push code". `DEF-018(b)` ghi
+  "**năm** trò"; đo lại: `grep -l "sound.playWrong()" src/components/games/*.tsx` = **30** file,
+  `grep -l "reportWrong("` = 17 (= **16** trò + chính wrapper) ⇒ **14** file beep-trần, **5** trong số đó
+  tự vẽ phản hồi riêng (4 trò `bg-rose-500` + `SyllableBuilderGame` render `feedback`) ⇒ **9** trò
+  **không có gì trên màn hình** khi bé sai, trái `AGENTS.md` §3. Vì sao không sửa 14 màn chơi: bảng chơi
+  của chúng nằm *ngoài* subtree `GameModalWrapper`, gọi `useGameFeedback()` ở đó sẽ ném "must be used
+  within GameModalWrapper". Sửa **một chỗ**: wrapper nhận `mistakes?: number`, hiệu ứng keyed `[mistakes]`
+  so `prevMistakesRef` và chỉ bật khi **tăng** ⇒ dựng đúng cặp `showFeedback(getRandomReaction('wrong'),
+  resolvePraise({outcome:'ENCOURAGEMENT'}))`, **không** call `sound.*` (bíp đã có); 14 trò truyền
+  `mistakes={stage.mistakesInTier}`. Test: `tests/t47g-wrong-turn-visual.test.ts` (6) — bất biến
+  "beep thì wrapper phải thấy", không danh sách ngoại lệ.
+  **Bằng chứng đáng đọc nhất của đợt này là vòng 1 của ablation**: chèn `false &&` vào điều kiện hiệu ứng
+  làm **probe** đỏ ngay (`QA FAIL — 2 error(s) at A3`) trong khi **cả 6 test nguồn vẫn xanh** — chúng chỉ
+  đọc file và so chuỗi, còn repo **không có jsdom/testing-library** nên không dựng React trong unit test
+  được (thêm dependency phải hỏi — `AGENTS.md` §1.4). Đã siết thêm luật chặn `if (false` / `&& false` /
+  `\|\| true` (vòng 2 `1 failed | 5 passed`) **và** ghi giới hạn vào header test thay vì nói quá.
+  Probe: `evidence/2026-11-04-T47G/probe-t47g-wrong-turn-visual.mjs` trên `dist/`, hai trò thuộc nhóm 9
+  (`number_tower` 🏰 · `ocean_fishing` 🎣), mỗi trò 4 bước gồm bước characterization "bấm **đúng** không
+  được bật cố lên" ⇒ `QA PASS — 6 step(s), 0 errors` + 6 ảnh (`*-wrong-visual.png` vs `*-wrong-no-visual.png`).
+  Cổng: `npm run verify` **EXIT=0** · `120 file / 1508 test` · `Duration 25.58s` ·
+  `index-oKg0XRrb.js` **211.1 kB** (đuôi `DbfbtGg4` → `oKg0XRrb`, kB đứng nguyên, boot graph vẫn
+  `435603 total` byte). Hồi quy `qa/games.mjs` (`catalogCount: 31`) + `qa/golden-path.mjs` (28 bước) 0 lỗi;
+  probe mới đặt trong `evidence/` ⇒ vẫn **30** probe. Docs sync: `measure.mjs` exit 0.
+  Sổ: `DEF-018(b)` **ĐÓNG**. **Còn mở:** `DEF-019` (năm chỗ lệch chính sách chưa có test), `DEF-011`
+  (chờ chủ dự án quyết "total" nghĩa là gì), Ô 13 CI. **Việc của lane sau**: commit tách **code**
+  (15 file `src/components/games/` + test + `evidence/2026-11-04-T47G/`) rồi push **một mình**, chờ ~90 s
+  cho lượt CI khép (`RISK-16` điều kiện 2) mới push commit docs. **Không** stage
+  `docs/step-by-step-guidance.md` và 6 ảnh `docs/opencode/reports/img/*.png` — đó là lane khác.
 
 
 

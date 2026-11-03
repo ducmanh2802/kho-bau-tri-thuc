@@ -146,6 +146,30 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T47G — lượt SAI chỉ có tiếng bíp ở 14 trò chơi: phản hồi HÌNH nay do framework dựng (`DEF-018(b)`).**
+  Đo trước khi kết luận, và số đo **sửa lại chính danh sách bug**: trong `src/components/games/*.tsx` có
+  **30** file bật `sound.playWrong()` khi bé bấm sai, nhưng chỉ **16** file gọi tiếp `reportWrong()` của
+  `useGameFeedback()` — mascot và bóng chữ lời khen sống trong `showFeedback()` của `GameModalWrapper`, nên
+  **14** file còn lại bé chỉ *nghe* "tít". Năm trong 14 tự vẽ phản hồi riêng (nút đổi `bg-rose-500` ở
+  `ClockMoneyGame` · `PhonicsPopGame` · `SpellingDuelGame` · `WordStoryGame`, `setFeedback` ở
+  `SyllableBuilderGame`); **chín** trò kia không có *bất kỳ* thay đổi nào trên màn hình
+  (`EnglishAnimalSoundGame` · `EnglishColorBalloonGame` · `FallingNumbersMathGame` · `MathSpeedRacingGame` ·
+  `MemoryCardsGame` · `NumberTowerGame` · `OceanFishingGame` · `SentenceScrambleGame` · `ShapeSortingGame`).
+  Vì bảng chơi của 14 trò nằm **ngoài** subtree của wrapper, gọi `useGameFeedback()` ở đó sẽ ném
+  "must be used within GameModalWrapper" — sửa một chỗ thay vì dựng lại 14 màn: wrapper nhận thêm prop
+  `mistakes` (chính là `stage.mistakesInTier` mà `submitWrong()` đã tăng) và khi số này **tăng** thì dựng đúng
+  cặp phản hồi quen thuộc (mascot `getRandomReaction('wrong')` 1500 ms + bóng chữ ENCOURAGEMENT 2500 ms,
+  `data-testid="praise-toast"`); 14 trò truyền `mistakes={stage.mistakesInTier}`. Chỉ **chiều tăng** mới bật,
+  nên "Chơi lại"/sang màn (`mistakesInTier` về 0) không phản hồi oan, và lượt **đúng** không dính đường này.
+  Test mới `tests/t47g-wrong-turn-visual.test.ts` (6) gồm một **bất biến không danh sách ngoại lệ**: file nào
+  beep khi sai phải *hoặc* `reportWrong()` *hoặc* truyền `mistakes` ⇒ thêm trò mới không lọt lưới.
+  Ablation (`evidence/2026-11-04-T47G/mutation-dead-guard.txt`): chèn `if (false && …)` vào điều kiện làm probe
+  đỏ ngay (A3/B3) **nhưng sáu test nguồn vẫn xanh** — repo không có jsdom/testing-library nên test nguồn chỉ đọc
+  chuỗi và mù với guard chết; đã siết thêm luật "không hằng số chặn nhánh" và để hành vi cho probe giữ.
+  Bằng chứng `evidence/2026-11-04-T47G/`: probe trên `dist/` RED 2 lỗi → GREEN 6 bước 0 lỗi + 4 ảnh;
+  `npm run verify` **EXIT=0** · **120 file / 1508 test** · `Duration 25.58s` · entry **đổi hash**
+  `index-DbfbtGg4.js` → `index-oKg0XRrb.js` còn **kB đứng nguyên 211.1** và boot graph vẫn `435603 total` byte;
+  hồi quy `qa/golden-path.mjs` (28 bước) và `qa/games.mjs` (31 trò) đều EXIT=0.
 - **T47F — "Chơi lại" cùng màn không dựng lại bảng chơi ở năm trò, và bảng chọn màn của trò tô màu vẫn không về được màn dễ (`DEF-018(a)`).**
   Nút "Chơi lại" (cả ở biên lai phần thưởng) gọi `stage.restartGame()`, hàm này bump `nonce`
   (`StorageService.bumpPlayNonce`) nhưng **không đổi** `tier` khi bé chơi lại đúng màn hiện tại ⇒
