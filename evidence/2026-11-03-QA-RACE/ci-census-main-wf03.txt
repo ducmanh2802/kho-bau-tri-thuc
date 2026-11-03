@@ -123,3 +123,20 @@ trên `main` kể từ `3b0122c` là **9/9**.
 Điều kiểm kê này **không** chứng minh: 9 lượt đỏ là đỏ *thật* của một lỗi app chưa sửa (race "đề cổng
 phụ huynh" vẽ sau khung hình đầu), chưa từng có probe đỏ *giả* bị cổng chặn oan ⇒ ô 13
 `docs/plan/TEST_PLAN.md` §16 vẫn MỞ. Tỷ lệ cũng không phải điểm số phải tối ưu (quy tắc dừng §13).
+
+Ràng buộc đã chạm trong phiên đo — và hệ quả cho commit docs tiếp theo:
+
+```bash
+# đúng lệnh ở khối "preflight" đầu file, chạy lại SAU vòng đo:
+curl -s "https://api.github.com/rate_limit" \
+| node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const r=JSON.parse(s).resources.core;
+    console.log("core remaining:",r.remaining,"/",r.limit,"| reset:",new Date(r.reset*1000).toISOString());});'
+# core remaining: 0 / 60 | reset: 2026-11-03T14:12:48.000Z     (kèm `date -u` ⇒ 2026-11-03T13:41:41Z)
+```
+
+Vòng kiểm kê 22 run (23 request, tính cả preflight) làm **cạn** hạn mức chưa-token 60 request/giờ ngay
+sau khi đo xong ⇒ **chưa** đo được lượt CI của commit docs `c7e9a00` ("kiểm kê tỷ lệ cổng QA (13/22) +
+đóng bằng chứng nhìn thấy được cho T43") trong phiên này. Quy tắc ghi lại để lần sau không nói liều:
+**không** viết "CI xanh" cho `c7e9a00` ở bất kỳ tài liệu nào cho tới khi
+`runs?head_sha=c7e9a00…` trả kết quả thật. Nếu một lượt docs-only đỏ thì kiểm kê này thành **13/23**,
+không còn là 13/22 — nên con số 22 ở trên chỉ đúng cho các run **đã** đo, tính tới `3eb7d12`.
