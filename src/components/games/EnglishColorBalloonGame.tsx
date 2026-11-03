@@ -120,6 +120,7 @@ export const EnglishColorBalloonGame: React.FC<{ onExit: () => void }> = ({ onEx
       tierCount={stage.tierCount}
       roundNumber={stage.roundNumber}
       roundTotal={stage.roundTotal}
+      mistakes={stage.mistakesInTier}
       starsEarned={stage.starsEarned}
       nextTierMeta={stage.tier + 1 <= stage.tierCount ? getTierMeta(stage.tier + 1) : undefined}
       onNextTier={stage.startNextTier}

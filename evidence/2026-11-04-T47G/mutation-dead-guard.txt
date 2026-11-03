@@ -1,0 +1,77 @@
+================================================================================
+T47G — ABLATION của guard then chốt: `if (mistakes !== undefined && mistakes > prev)`
+================================================================================
+Đột biến: chèn hằng số `false &&` vào **đúng** điều kiện của hiệu ứng mới trong
+`src/components/games/GameModalWrapper.tsx` (dòng 327). Đây là dạng hỏng tự nhiên nhất
+của một hiệu ứng "nhìn bộ đếm": code còn nguyên, chuỗi còn nguyên, chỉ nhánh không bao giờ chạy.
+
+Lệnh tái lập:
+
+  cd /d/trithuc/kho-bau-tri-thuc
+  node -e 'const fs=require("fs"),f="src/components/games/GameModalWrapper.tsx";let s=fs.readFileSync(f,"utf8");
+           fs.writeFileSync(f,s.replace("if (mistakes !== undefined && mistakes > prev) {",
+                                       "if (false && mistakes !== undefined && mistakes > prev) {"));'
+  npx vitest run tests/t47g-wrong-turn-visual.test.ts
+  npm run build && node qa/run-one.mjs evidence/2026-11-04-T47G/probe-t47g-wrong-turn-visual.mjs
+  cp <backup> src/components/games/GameModalWrapper.tsx   # hoàn tác NGAY
+
+--------------------------------------------------------------------------------
+Vòng 1 — test CHƯA siết: probe ĐỎ, test nguồn XANH  ⇒ lộ một lỗ hổng thật
+--------------------------------------------------------------------------------
+`npx vitest run tests/t47g-wrong-turn-visual.test.ts`  →  EXIT 0
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+
+`node qa/run-one.mjs evidence/.../probe-t47g-wrong-turn-visual.mjs`  →  EXIT 1
+
+{
+  "errors": [
+    "A3: bé bấm sai (đáp án 3 ≠ undefined) mà sau 1,2 s không có phản hồi hình nào trên màn — đây chính là DEF-018(b): chỉ có sound.playWrong()",
+    "B3: bé bấm sai (đáp án 2 ≠ undefined) mà sau 1,2 s không có phản hồi hình nào trên màn — đây chính là DEF-018(b): chỉ có sound.playWrong()"
+  ],
+  "failedAt": "A3",
+  "ok": false
+}
+QA FAIL — 2 error(s) at A3
+
+Kết luận của vòng này (ghi lại vì nó là **bằng chứng về giới hạn của test nguồn**): sáu test
+trong `tests/t47g-wrong-turn-visual.test.ts` là test *hợp đồng mã nguồn* (đọc file, so chuỗi),
+nên một guard chết không làm đổi chuỗi nào ⇒ không đỏ. Repo không có jsdom/testing-library
+(thêm dependency phải hỏi trước — `AGENTS.md` §1.4) nên không thể dựng React để đo hành vi
+trong unit test; hành vi do probe giữ. Tuy vậy vẫn siết được đúng dạng đột biến này bằng một
+luật nhỏ, nên đã thêm vào test 4:
+
+    expect(body).not.toMatch(/\bif \(false\b|&&\s*false\b|\|\|\s*true\b/);
+
+(ghi kèm lý do ablation ngay trong comment của test.)
+
+--------------------------------------------------------------------------------
+Vòng 2 — test SAU khi siết: cùng một đột biến, test ĐỎ đúng một test
+--------------------------------------------------------------------------------
+`npx vitest run tests/t47g-wrong-turn-visual.test.ts`  →  EXIT 1
+
+     ✓ tiên đề: submitWrong() thật sự tăng mistakesInTier và hook lộ số đó ra ngoài
+     ✓ không còn trò nào beep khi sai mà wrapper không thấy lượt sai
+     ✓ mười bốn trò beep-trần nay đưa mistakesInTier vào wrapper
+     × wrapper dựng phản hồi hình khi số lượt sai TĂNG, và không bắn ở lần render đầu
+     ✓ phản hồi hình là mascot + chữ, không phải một tiếng bíp khác (tránh đọc hai lần)
+     ✓ phản hồi hình đo được bằng probe: toast + mascot có data-testid
+      Tests  1 failed | 5 passed (6)
+
+--------------------------------------------------------------------------------
+Vòng 3 — hoàn tác guard, cả hai cổng lại XANH
+--------------------------------------------------------------------------------
+`npx vitest run tests/t47g-wrong-turn-visual.test.ts`  →  EXIT 0
+      Tests  6 passed (6)
+
+`npm run build && node qa/run-one.mjs evidence/.../probe-t47g-wrong-turn-visual.mjs`  →  EXIT 0
+
+    "A3: lượt sai ⇒ mascot \"🏰\"→\"🤔\" + bóng chữ \"🤔 Thử lại nhé!\"",
+    "B3: lượt sai ⇒ mascot \"🎣\"→\"💪\" + bóng chữ \"💪 Cố lên nào!\"",
+QA PASS — 6 step(s), 0 errors
+
+Ảnh: `A-wrong-visual.png` / `B-wrong-visual.png` (vòng xanh, có bóng chữ + mascot đổi),
+`A-wrong-no-visual.png` / `B-wrong-no-visual.png` (vòng đỏ, màn hình không đổi gì sau cú sai).
+
+`git status --short -- src/` sau đột biến: chỉ các file T47G thật, **không còn dòng mutation dở**.

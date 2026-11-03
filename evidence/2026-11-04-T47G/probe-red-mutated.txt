@@ -1,0 +1,27 @@
+{
+  "steps": [
+    "A2: lượt đúng không bật bóng chữ \"cố lên\" ⇒ phản hồi mới gắn với bộ đếm lượt sai, không gắn với mọi cú chạm",
+    "B2: lượt đúng không bật bóng chữ \"cố lên\" ⇒ phản hồi mới gắn với bộ đếm lượt sai, không gắn với mọi cú chạm"
+  ],
+  "errors": [
+    "A3: bé bấm sai (đáp án 3 ≠ undefined) mà sau 1,2 s không có phản hồi hình nào trên màn — đây chính là DEF-018(b): chỉ có sound.playWrong()",
+    "B3: bé bấm sai (đáp án 2 ≠ undefined) mà sau 1,2 s không có phản hồi hình nào trên màn — đây chính là DEF-018(b): chỉ có sound.playWrong()"
+  ],
+  "facts": {
+    "A.toastAtOpen": false,
+    "A.mascotAtOpen": "🏰",
+    "A.toastAfterCorrect": false,
+    "B.toastAtOpen": false,
+    "B.mascotAtOpen": "🎣",
+    "B.toastAfterCorrect": false
+  },
+  "failedAt": "A3",
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47G\\A-correct.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47G\\A-wrong-no-visual.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47G\\B-correct.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47G\\B-wrong-no-visual.png"
+  ],
+  "ok": false
+}
+QA FAIL — 2 error(s) at A3

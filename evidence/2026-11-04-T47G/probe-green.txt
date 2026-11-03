@@ -1,0 +1,36 @@
+{
+  "steps": [
+    "A2: lượt đúng không bật bóng chữ \"cố lên\" ⇒ phản hồi mới gắn với bộ đếm lượt sai, không gắn với mọi cú chạm",
+    "A3: lượt sai ⇒ mascot \"🏰\"→\"🌈\" + bóng chữ \"🌈 Chưa đúng rồi, bé xem lại nhé!\"",
+    "A4: sau 2,8 s bóng chữ tắt, mascot về \"🏰\"",
+    "B2: lượt đúng không bật bóng chữ \"cố lên\" ⇒ phản hồi mới gắn với bộ đếm lượt sai, không gắn với mọi cú chạm",
+    "B3: lượt sai ⇒ mascot \"🎣\"→\"🌈\" + bóng chữ \"🌈 Bé cố gắng thêm chút nữa nhé!\"",
+    "B4: sau 2,8 s bóng chữ tắt, mascot về \"🎣\""
+  ],
+  "errors": [],
+  "facts": {
+    "A.toastAtOpen": false,
+    "A.mascotAtOpen": "🏰",
+    "A.toastAfterCorrect": false,
+    "A.praiseText": "🌈 Chưa đúng rồi, bé xem lại nhé!",
+    "A.mascotAfterWrong": "🌈",
+    "A.toastAfterClear": false,
+    "A.mascotAfterClear": "🏰",
+    "B.toastAtOpen": false,
+    "B.mascotAtOpen": "🎣",
+    "B.toastAfterCorrect": false,
+    "B.praiseText": "🌈 Bé cố gắng thêm chút nữa nhé!",
+    "B.mascotAfterWrong": "🌈",
+    "B.toastAfterClear": false,
+    "B.mascotAfterClear": "🎣"
+  },
+  "failedAt": null,
+  "shots": [
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47G\\A-correct.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47G\\A-wrong-visual.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47G\\B-correct.png",
+    "D:\\trithuc\\kho-bau-tri-thuc\\evidence\\2026-11-04-T47G\\B-wrong-visual.png"
+  ],
+  "ok": true
+}
+QA PASS — 6 step(s), 0 errors

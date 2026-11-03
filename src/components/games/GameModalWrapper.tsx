@@ -59,6 +59,13 @@ interface GameModalWrapperProps {
   phase?: GamePhaseProp;
   roundNumber?: number;
   roundTotal?: number;
+  /**
+   * T47G — số lượt sai của màn, tức `stage.mistakesInTier`. Trò nào báo lượt qua
+   * `reportWrong()` thì wrapper tự có phản hồi hình; trò **không** dùng `useGameFeedback`
+   * (bảng chơi nằm ngoài subtree của wrapper) vẫn phải cho bé *nhìn thấy* lỗi, nên đưa
+   * chính bộ đếm mà `submitWrong()` đã tăng vào đây.
+   */
+  mistakes?: number;
   starsEarned?: number;
   prevBestStars?: number;
   nextTierMeta?: GameTierMetaProp;
@@ -182,6 +189,7 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
   phase = 'playing',
   roundNumber,
   roundTotal,
+  mistakes,
   starsEarned,
   prevBestStars = 0,
   nextTierMeta,
@@ -304,6 +312,27 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
     setShowCorrectAnswer(false);
     setCorrectAnswer('');
   }, [roundNumber]);
+
+  // T47G — lượt sai phải có phản hồi **hình** (AGENTS.md §3), không chỉ tiếng bíp. Mười bốn trò
+  // beep trần mà không gọi `reportWrong()` vì bảng chơi của chúng nằm *ngoài* subtree của
+  // wrapper — gọi `useGameFeedback()` ở đó sẽ ném "must be used within GameModalWrapper". Thay
+  // vì dựng lại 14 màn chơi, cho wrapper nhìn thấy lượt sai qua chính bộ đếm `submitWrong()` đã tăng.
+  // Chỉ chiều **tăng** mới bật: `startNextTier` và "Chơi lại" kéo `mistakesInTier` về 0, mà một
+  // màn chưa chơi thì không có gì để "cố lên".
+  const prevMistakesRef = useRef(mistakes ?? 0);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const prev = prevMistakesRef.current;
+    prevMistakesRef.current = mistakes ?? 0;
+    if (mistakes !== undefined && mistakes > prev) {
+      const praise = resolvePraise({
+        subject: praiseSubject,
+        outcome: 'ENCOURAGEMENT',
+        seed: `game-wrong-visual-${gameId ?? 'legacy'}-${Date.now()}`,
+      });
+      showFeedback(getRandomReaction('wrong'), praise.text);
+    }
+  }, [mistakes]);
 
   const handleCorrect = useCallback((answer: string) => {
     questionAttemptRef.current = 0;
@@ -442,7 +471,7 @@ export const GameModalWrapper: React.FC<GameModalWrapperProps> = ({
               <X className="w-5 h-5" aria-hidden="true" />
             </button>
 
-            <span className="text-3xl shrink-0 leading-none animate-bounce" aria-hidden="true">{mascotReaction}</span>
+            <span data-testid="mascot-reaction" className="text-3xl shrink-0 leading-none animate-bounce" aria-hidden="true">{mascotReaction}</span>
 
             <div className="flex-1 min-w-0">
               <h2
