@@ -1,0 +1,91 @@
+T50B — ĐỘT BIẾN D: guard chữ của T49A phải đổi HÌNH DẠNG, không đổi Ý
+
+Bối cảnh: T49A khoá hành vi bằng /storage-unavailable[\s\S]{0,400}không lưu được/ — hai chuỗi phải
+nằm cạnh nhau. T50B chuyển câu chữ vào hằng số export NOTICE_MACHINE_NOT_SAVED (một nguồn cho
+banner nhìn thấy + giọng đọc, nằm cách nhánh ~110 dòng) ⇒ cổng verify đỏ **vì hình dạng đổi chứ
+không vì hành vi sai**: Test Files 1 failed | 125 passed (126) · Tests 1 failed | 1552 passed (1553) ·
+AssertionError: expected "import React, …" to match /storage-unavailable[\s\S]{0,400}không lưu được/.
+
+Guard viết lại theo đúng ý gốc (không nới, không xoá):
+  1) phải có một hằng số export chứa "không lưu được"  ⇒ nhãn của máy, không được im lặng;
+  2) trong 400 ký tự sau "storage-unavailable" phải có **đúng tên hằng số đó** ⇒ nhánh thật sự đọc nhãn;
+  3) text của nhãn không được chứa chữ "sao" ⇒ không được gộp sang lỗi của bé.
+
+Đột biến (một dòng, trong src/components/shop/AvatarShopScreen.tsx):
+  setNotice(NOTICE_MACHINE_NOT_SAVED)  ->  setNotice(NOTICE_UNLOCKED_NOT_EQUIPPED)
+Nhánh vẫn setNotice + vẫn đọc giọng ⇒ n3/n6 của t50b vẫn xanh; chỉ guard đối soát nhãn máy bắt được.
+
+Kỳ vọng: ĐỎ đúng 1 test — t49a "phòng thay đồ có nhãn riêng cho thất bại **của máy**, không im lặng".
+
+Chạy  :  npx vitest run tests/t49a-reward-write-honest.test.ts tests/t50b-shop-machine-save-notice.test.ts
+Hoàn tác bằng node (một lần replace đúng dòng đã đổi) — KHÔNG git checkout: bản sửa chưa commit.
+
+--- log ------------------------------------------------------------------------
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t49a-reward-write-honest.test.ts (13 tests | 1 failed) 36ms
+   ✓ T49A — quà cấp độ: không ăn mừng và không ghi biên lai khi máy từ chối ghi (7)
+     ✓ ghi được ⇒ nhận quà, cộng sao, đánh dấu đã nhận, có biên lai (characterization) 7ms
+     ✓ chặn hồ sơ + động lực ⇒ claimed rỗng (nguồn của confetti + hộp ăn mừng) 2ms
+     ✓ khi không ghi được thì biên lai "Quà cấp độ" cũng không được viết (lịch sử ba mẹ là bằng chứng) 1ms
+     ✓ chặn riêng key hồ sơ ⇒ không đánh dấu "đã nhận" (lỗi: bé mất quà vĩnh viễn, âm thầm) 1ms
+     ✓ chặn riêng key động lực ⇒ không khoe "+N sao" ảo và không viết biên lai 1ms
+     ✓ nhận lại sau khi hết chặn vẫn đủ quà (phép thử tự khép của hai đường hỏng) 1ms
+     ✓ tắt phần thưởng: vẫn đánh dấu đã nhận và trả claimed rỗng (characterization, không đổi) 0ms
+   ✓ T49A — phòng thay đồ: nút "Mua" chỉ được ăn mừng khi sao và món thật sự đổi (4)
+     ✓ ghi được ⇒ ok, trừ đúng giá, món mở khoá, có biên lai (characterization) 1ms
+     ✓ chặn ghi hồ sơ ⇒ reason storage-unavailable, không phải ok (lỗi: confetti + "đã mở khóa") 1ms
+     ✓ chặn ghi hồ sơ ⇒ không viết biên lai "Mua …" 0ms
+     ✓ hồ sơ ghi được nhưng bộ đếm động lực thì hỏng ⇒ vẫn giữ lời hứa (món về, sao tiêu) 1ms
+   ❯ T49A — hợp đồng chữ: UI và vùng mã sửa (2)
+     × phòng thay đồ có nhãn riêng cho thất bại **của máy**, không im lặng 14ms
+     ✓ đường đổi sao/mở khoá không còn bỏ qua kết quả ghi 2ms
+ ✓ tests/t50b-shop-machine-save-notice.test.ts (6 tests) 21ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t49a-reward-write-honest.test.ts > T49A — hợp đồng chữ: UI và vùng mã sửa > phòng thay đồ có nhãn riêng cho thất bại **của máy**, không im lặng
+AssertionError: nhánh storage-unavailable không đọc nhãn NOTICE_MACHINE_NOT_SAVED: expected '\'storage-unavailable\') {\r\n      /…' to contain 'NOTICE_MACHINE_NOT_SAVED'
+
+- Expected
++ Received
+
+- NOTICE_MACHINE_NOT_SAVED
++ 'storage-unavailable') {
++       // T49A — thất bại này là **của máy**, không phải của bé: sao chưa trừ, món
++       // chưa mở. Im lặng (hành vi cũ) khiến bé nghĩ mình đã mua và quay lại bấm
++       // liên tục, còn gộp vào nhãn "thiếu sao" thì nói dối một lần nữa.
++       // T50B — cùng thất bại đó còn phải **nhìn thấy** được, không chỉ nghe.
++       setNotice(NOTICE_UNLOCKED_NOT_EQUIPPED);
++       so
+
+ ❯ tests/t49a-reward-write-honest.test.ts:217:78
+    215|     expect(noticeName, 'phải có nhãn "máy không lưu được" trong một hằ…
+    216|     const branch = ui.slice(ui.indexOf("'storage-unavailable'"), ui.in…
+    217|     expect(branch, `nhánh storage-unavailable không đọc nhãn ${noticeN…
+       |                                                                              ^
+    218|     expect(noticeText, 'nhãn của máy lẫn sang chuyện bé thiếu sao').no…
+    219|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 18 passed (19)
+   Start at  11:39:11
+   Duration  651ms (import 58%, transform 25%, tests 12%, worker 5%)
+
+VITEST_EXIT=1
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t49a-reward-write-honest.test.ts (13 tests) 24ms
+ ✓ tests/t50b-shop-machine-save-notice.test.ts (6 tests) 20ms
+
+ Test Files  2 passed (2)
+      Tests  19 passed (19)
+   Start at  11:39:21
+   Duration  675ms (import 57%, transform 29%, tests 9%, worker 5%)
+
+VITEST_EXIT=0

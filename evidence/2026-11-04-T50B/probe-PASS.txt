@@ -1,0 +1,71 @@
+Lệnh: npm run build && node qa/run-one.mjs evidence/2026-11-04-T50B/probe-t50b-shop-save-notice.mjs
+Trạng thái mã: PROBE_EXIT=0  (chạy trên dist/ của đúng bản build ghi trong verify.txt: entry index--gQhs43l.js)
+Verdict: QA PASS — 4 step(s), 0 errors · 4 ảnh · máy chặn ghi thì màn HÌNH CHỮ hiện ra và hình/nút/sao KHÔNG đổi (storedAvatarBase vẫn fox); bỏ chặn thì lưu thật (fox→owl, không còn banner).
+{
+  "steps": [
+    {
+      "step": "A-avatar-blocked",
+      "alert": "Máy không lưu được thay đổi này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé! Đã hiểu",
+      "avatarBefore": "🦊",
+      "avatarAfter": "🦊",
+      "owlLabel": "🦉 Cú Thông Thái Uyên bác & Điềm đạm Chọn bạn này",
+      "storedAvatarBase": "fox"
+    },
+    {
+      "step": "B-equip-blocked",
+      "alert": "Máy không lưu được thay đổi này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé! Đã hiểu",
+      "hatButton": "Mặc vào",
+      "storedEquipped": {}
+    },
+    {
+      "step": "C-happy-path",
+      "alert": null,
+      "avatar": "🦉",
+      "owlLabel": "🦉 Cú Thông Thái Uyên bác & Điềm đạm Đang chọn ✓",
+      "storedAvatarBase": "owl"
+    },
+    {
+      "step": "D-buy-blocked",
+      "alert": "Máy không lưu được thay đổi này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé! Đã hiểu",
+      "hatButton": "Mở khóa",
+      "starsBefore": 284,
+      "starsAfter": 284
+    }
+  ],
+  "errors": [],
+  "facts": {
+    "A": {
+      "alert": "Máy không lưu được thay đổi này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé! Đã hiểu",
+      "avatarBefore": "🦊",
+      "avatarAfter": "🦊",
+      "owlLabel": "🦉 Cú Thông Thái Uyên bác & Điềm đạm Chọn bạn này",
+      "storedAvatarBase": "fox"
+    },
+    "B": {
+      "alert": "Máy không lưu được thay đổi này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé! Đã hiểu",
+      "hatButton": "Mặc vào",
+      "storedEquipped": {}
+    },
+    "C": {
+      "alert": null,
+      "avatar": "🦉",
+      "owlLabel": "🦉 Cú Thông Thái Uyên bác & Điềm đạm Đang chọn ✓",
+      "storedAvatarBase": "owl"
+    },
+    "D": {
+      "alert": "Máy không lưu được thay đổi này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé! Đã hiểu",
+      "hatButton": "Mở khóa",
+      "starsBefore": 284,
+      "starsAfter": 284
+    }
+  },
+  "failedAt": null,
+  "shots": [
+    "01-A-may-chan-ghi.png",
+    "02-B-mac-do-bi-chan.png",
+    "03-C-luu-duoc-that.png",
+    "04-D-mua-bi-chan.png"
+  ],
+  "ok": true
+}
+QA PASS — 4 step(s), 0 errors

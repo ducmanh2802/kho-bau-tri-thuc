@@ -1,0 +1,62 @@
+Đột biến C — cắt **thông báo nhìn thấy** ở nhánh `storage-unavailable` của `buyShopItem` (xoá một dòng `setNotice(NOTICE_MACHINE_NOT_SAVED);`), lời đọc vẫn còn.
+
+Lệnh: xoá dòng notice trong nhánh `else if (buy.reason === 'storage-unavailable')` rồi npx vitest run tests/t50b-shop-machine-save-notice.test.ts
+Trạng thái mã: VITEST_EXIT=1
+Verdict: ĐỎ **đúng một** test n6 (`1 failed | 5 passed (6)`). Đây là chỗ T49A để ngỏ: thất bại đã được gọi tên đúng (không đổ cho "thiếu sao") nhưng chỉ bằng `sound.speak`, nên cấp trình duyệt vẫn im lặng. Probe bước D bắt cùng hành vi đó trên `dist/` (xem `probe-PASS.txt`).
+
+Hoàn tác ngay sau khi chụp; `src/` trở lại đúng bản sửa (đối soát bằng so nội dung, không bằng `git status` vì file chưa commit).
+
+===== output vitest (đã bỏ ANSI) =====
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t50b-shop-machine-save-notice.test.ts (6 tests | 1 failed) 26ms
+   ❯ T50B — tủ đồ không được hứa suông khi máy chặn ghi (DEF-023) (6)
+     ✓ n1: **3** chỗ ghi hồ sơ và **cả 3** đều đọc giá trị trả về (không còn lời gọi vứt kết quả) 3ms
+     ✓ n2: mỗi chỗ ghi có nhánh hỏng — hoàn tác state **và** đặt thông báo nhìn thấy được 1ms
+     ✓ n3: màn có một node báo lỗi **bằng chữ** (role="alert") do state điều khiển, không chỉ bằng tiếng 0ms
+     ✓ n4: lời báo lỗi nói **máy** chứ không đổ cho bé; không nhắc tới sao 1ms
+     ✓ n5: hồ sơ bình thường thì màn **không** hiện bóng cáo lỗi (chống đỏ do dựng sẵn) 14ms
+     × n6: thất bại "storage-unavailable" của buyShopItem cũng phải hiện bằng chữ (trước chỉ có tiếng) 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t50b-shop-machine-save-notice.test.ts > T50B — tủ đồ không được hứa suông khi máy chặn ghi (DEF-023) > n6: thất bại "storage-unavailable" của buyShopItem cũng phải hiện bằng chữ (trước chỉ có tiếng)
+AssertionError: nhánh storage-unavailable phải đặt thông báo nhìn thấy được: expected '\'storage-unavailable\') {\r\n      /…' to match /setNotice\(/
+
+- Expected:
+/setNotice\(/
+
++ Received:
+"'storage-unavailable') {
+      // T49A — thất bại này là **của máy**, không phải của bé: sao chưa trừ, món
+      // chưa mở. Im lặng (hành vi cũ) khiến bé nghĩ mình đã mua và quay lại bấm
+      // liên tục, còn gộp vào nhãn \"thiếu sao\" thì nói dối một lần nữa.
+      // T50B — cùng thất bại đó còn phải **nhìn thấy** được, không chỉ nghe.
+      sound.speak(NOTICE_MACHINE_NOT_SAVED);
+    }
+  };
+
+  const filteredItems = AVATAR_SHOP_ITEMS.filter((i) => i.type === activeTab);
+
+  const equippedItem = (type: ShopItemType): AvatarItem | undefined => {
+    const id = profile.equipped[type];
+    return id ? AVATAR_SHOP_ITEMS.find((i) => i.id === id && i.type === type) : undefined;
+  };
+ "
+
+ ❯ tests/t50b-shop-machine-save-notice.test.ts:133:83
+    131|   it('n6: thất bại "storage-unavailable" của buyShopItem cũng phải hiệ…
+    132|     const branch = src.slice(src.indexOf("'storage-unavailable'"), src…
+    133|     expect(branch, 'nhánh storage-unavailable phải đặt thông báo nhìn …
+       |                                                                                   ^
+    134|   });
+    135| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  11:15:12
+   Duration  738ms (import 53%, transform 37%, tests 7%, worker 3%)

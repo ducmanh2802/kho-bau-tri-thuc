@@ -1,0 +1,35 @@
+Lệnh: npm run build && với mỗi probe: node qa/run-one.mjs <probe>   (chạy trên dist/ của bản build cuối, entry index--gQhs43l.js)
+Trạng thái mã: cả sáu probe EXIT=0
+Verdict: PASS — T50B 4 bước, golden-path 28, parent-controls 7, mobile-home 0, responsive-a11y 0; probe T49B cùng màn tủ đồ 5 bước. errors rỗng hết.
+Ghi chú: chạy probe T49B **ghi đè** năm ảnh trong evidence/2026-11-04-T49B/ (png dao động vài KB vì hiệu ứng
+ngẫu nhiên). Đã `git checkout -- evidence/2026-11-04-T49B/` để ảnh của mốc T49B giữ nguyên như commit;
+bằng chứng ở đây là output JSON + verdict, không phải ảnh.
+
+--- output (QA line + exit từng probe) ---------------------------------------
+===== node qa/run-one.mjs evidence/2026-11-04-T50B/probe-t50b-shop-save-notice.mjs =====
+  "errors": [],
+  "failedAt": null,
+QA PASS — 4 step(s), 0 errors
+EXIT=0
+===== node qa/run-one.mjs qa/golden-path.mjs =====
+      "step": "errorAnalysisRendered",
+  "errors": [],
+QA PASS — 28 step(s), 0 errors
+EXIT=0
+===== node qa/run-one.mjs qa/parent-controls.mjs =====
+  "errors": [],
+QA PASS — 7 step(s), 0 errors
+EXIT=0
+===== node qa/run-one.mjs qa/mobile-home.mjs =====
+  "errors": [],
+QA PASS — 0 step(s), 0 errors
+EXIT=0
+===== node qa/run-one.mjs qa/responsive-a11y.mjs =====
+  "errors": []
+QA PASS — 0 step(s), 0 errors
+EXIT=0
+===== node qa/run-one.mjs evidence/2026-11-04-T49B/probe-t49b-shop-tabs.mjs =====
+  "errors": [],
+  "failedAt": null,
+QA PASS — 5 step(s), 0 errors
+EXIT=0

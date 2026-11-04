@@ -53,24 +53,46 @@ const EQUIP_LAYER: Record<ShopItemType, string> = {
 /** `background` là lớp *sau* bé, các ô còn lại đè lên trên ⇒ vẽ làm hai nhóm. */
 export const EQUIP_OVERLAYS: ShopItemType[] = ['hat', 'glasses', 'shirt', 'backpack', 'pet', 'frame'];
 
+/**
+ * T50B — hai lời báo lỗi **của máy** (Safari chặn ghi / hết dung lượng), không phải của bé.
+ * Đặt ở đây vì màn này có **6** lời `sound.speak` mà **0** node nào nhìn thấy được: ba mẹ tắt tiếng
+ * thì bé mất toàn bộ phản hồi. Xuất khẩu để test đối soát được câu chữ.
+ */
+export const NOTICE_MACHINE_NOT_SAVED = 'Máy không lưu được thay đổi này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé!';
+export const NOTICE_UNLOCKED_NOT_EQUIPPED = 'Máy đã cất món quà nhưng chưa mặc được. Bé bấm lại món này để mặc nhé!';
+
 export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
   onBack,
   onProfileUpdate,
 }) => {
   const [profile, setProfile] = useState<ChildProfile>(StorageService.getChildProfile());
   const [activeTab, setActiveTab] = useState<'mascot' | ShopItemType>('mascot');
+  // T50B — máy chặn ghi (Safari chế độ ẩn danh, hết dung lượng) là thất bại **của máy**, còn
+  // ba mẹ có thể tắt tiếng ⇒ một lời `sound.speak` thôi không đủ. Thất bại phải hiện bằng **chữ**.
+  const [notice, setNotice] = useState<string | null>(null);
 
   const handleSelectMascot = (mId: ChildProfile['avatarBase']) => {
     sound.playClick();
+    setNotice(null);
     const fresh = StorageService.getChildProfile();
     const updated = { ...fresh, avatarBase: mId };
+    // Ghi **trước** mới ăn mừng: `saveChildProfile` trả false chứ không ném (writeJSON), nên
+    // lời "Bé đã chọn bạn …" cũ hứa một thứ chưa nằm xuống máy — tải lại trang là mất.
+    const saved = StorageService.saveChildProfile(updated);
+    if (!saved) {
+      setProfile(fresh);
+      setNotice(NOTICE_MACHINE_NOT_SAVED);
+      sound.playWrong();
+      sound.speak(NOTICE_MACHINE_NOT_SAVED);
+      return;
+    }
     setProfile(updated);
-    StorageService.saveChildProfile(updated);
     onProfileUpdate();
     sound.speak(`Bé đã chọn bạn ${SHOP_MASCOTS.find((m) => m.id === mId)?.name}!`);
   };
 
   const handleBuyOrEquip = (item: AvatarItem) => {
+    setNotice(null);
     const fresh = StorageService.getChildProfile();
     const isUnlocked = fresh.unlockedItems.includes(item.id);
 
@@ -86,8 +108,16 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
           [item.type]: newEquipped,
         },
       };
+      // Nút "Đang mặc" là một **tuyên bố đã lưu**; chỉ được đổi màu khi máy nhận bytes.
+      const saved = StorageService.saveChildProfile(updated);
+      if (!saved) {
+        setProfile(fresh);
+        setNotice(NOTICE_MACHINE_NOT_SAVED);
+        sound.playWrong();
+        sound.speak(NOTICE_MACHINE_NOT_SAVED);
+        return;
+      }
       setProfile(updated);
-      StorageService.saveChildProfile(updated);
       onProfileUpdate();
       return;
     }
@@ -97,8 +127,6 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
     // không đếm thành tựu, và vẫn tiêu được sao dù ba mẹ đã tắt quỹ thưởng.
     const buy = StorageService.buyShopItem(item.id);
     if (buy.ok) {
-      sound.playLevelUp();
-      fireCelebrationConfetti();
       const after = StorageService.getChildProfile();
       const updated: ChildProfile = {
         ...after,
@@ -107,9 +135,20 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
           [item.type]: item.id,
         },
       };
+      // buyShopItem đã ghi thật (sao đã trừ, món đã mở) — chỉ lần **mặc** ngay sau đó là
+      // có thể hỏng. Báo đúng phần hỏng, không ăn mừng bằng confetti rồi nói dối "Đang mặc".
+      const saved = StorageService.saveChildProfile(updated);
+      if (!saved) {
+        setProfile(after);
+        setNotice(NOTICE_UNLOCKED_NOT_EQUIPPED);
+        sound.playWrong();
+        sound.speak(NOTICE_UNLOCKED_NOT_EQUIPPED);
+        return;
+      }
       setProfile(updated);
-      StorageService.saveChildProfile(updated);
       onProfileUpdate();
+      sound.playLevelUp();
+      fireCelebrationConfetti();
       sound.speak(`Chúc mừng bé đã mở khóa ${item.name}!`);
       return;
     }
@@ -125,7 +164,9 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
       // T49A — thất bại này là **của máy**, không phải của bé: sao chưa trừ, món
       // chưa mở. Im lặng (hành vi cũ) khiến bé nghĩ mình đã mua và quay lại bấm
       // liên tục, còn gộp vào nhãn "thiếu sao" thì nói dối một lần nữa.
-      sound.speak('Máy không lưu được món quà này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé!');
+      // T50B — cùng thất bại đó còn phải **nhìn thấy** được, không chỉ nghe.
+      setNotice(NOTICE_MACHINE_NOT_SAVED);
+      sound.speak(NOTICE_MACHINE_NOT_SAVED);
     }
   };
 
@@ -159,6 +200,25 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
           </span>
         </div>
       </div>
+
+      {notice && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="flex items-center gap-3 bg-rose-50 border-2 border-rose-300 rounded-2xl px-4 py-3"
+        >
+          <span className="flex-1 text-sm md:text-base font-bold text-rose-950">{notice}</span>
+          <button
+            onClick={() => {
+              sound.playClick();
+              setNotice(null);
+            }}
+            className="min-h-[44px] px-4 py-2 bg-white border-2 border-rose-300 rounded-xl font-bold text-xs md:text-sm text-rose-950 active:scale-95 cursor-pointer"
+          >
+            Đã hiểu
+          </button>
+        </div>
+      )}
 
       {/* Avatar Dressing Stage & Preview */}
       <div className="bg-gradient-to-r from-amber-400 via-orange-300 to-amber-500 rounded-3xl p-6 md:p-8 text-white shadow-xl border-4 border-amber-200 flex flex-col md:flex-row items-center justify-between gap-6">

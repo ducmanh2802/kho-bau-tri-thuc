@@ -206,7 +206,16 @@ describe('T49A — hợp đồng chữ: UI và vùng mã sửa', () => {
   it('phòng thay đồ có nhãn riêng cho thất bại **của máy**, không im lặng', () => {
     const ui = read('src/components/shop/AvatarShopScreen.tsx');
     expect(ui).toContain("'storage-unavailable'");
-    expect(ui).toMatch(/storage-unavailable[\s\S]{0,400}không lưu được/);
+    // T50B — câu chữ chuyển vào một hằng số **export dùng chung** (banner nhìn thấy +
+    // giọng đọc), nên "nhãn nằm cạnh nhánh if" không còn là hình dạng đúng của hợp
+    // đồng. Giữ nguyên ý: phải có một nhãn "máy không lưu được", nhánh này phải **dùng**
+    // nó, và nó phải không phải nhãn "bé thiếu sao".
+    const label = ui.match(/export const (NOTICE_\w+)\s*=\s*'([^']*không lưu được[^']*)'/);
+    const [, noticeName, noticeText] = label ?? ['', '', ''];
+    expect(noticeName, 'phải có nhãn "máy không lưu được" trong một hằng số export').not.toBe('');
+    const branch = ui.slice(ui.indexOf("'storage-unavailable'"), ui.indexOf("'storage-unavailable'") + 400);
+    expect(branch, `nhánh storage-unavailable không đọc nhãn ${noticeName}`).toContain(noticeName);
+    expect(noticeText, 'nhãn của máy lẫn sang chuyện bé thiếu sao').not.toMatch(/sao/);
   });
 
   it('đường đổi sao/mở khoá không còn bỏ qua kết quả ghi', () => {
