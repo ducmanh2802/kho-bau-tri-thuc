@@ -1,0 +1,116 @@
+{
+  "ok": false,
+  "failedAt": "B",
+  "errors": [
+    "B: máy KHÔNG ghi được mà vẫn hứa đã mua: \"Chào buổi sáng, bé ơi! Bé học đều lắm, giỏi quá! / Chúc mừng bé đã mở khóa Mũ Lưỡi Trai Năng Động!\"",
+    "B: lời đọc không nói thẳng là máy không lưu được: \"Chào buổi sáng, bé ơi! Bé học đều lắm, giỏi quá! / Chúc mừng bé đã mở khóa Mũ Lưỡi Trai Năng Động!\"",
+    "B: biên lai \"Mua …\" xuất hiện dù giao dịch không nằm xuống máy (1 dòng)",
+    "C: hộp \"Chúc mừng bé lên cấp\" vẫn bật trong khi sao và dấu \"đã nhận\" không ghi được",
+    "C: lịch sử ba mẹ nhận thêm 2 biên lai \"Quà cấp độ\" ảo dù quà không nằm xuống máy",
+    "C: dấu \"đã nhận cấp 6\" nằm xuống máy trong khi sao thì không: [2,3,4,5,6]"
+  ],
+  "steps": [
+    {
+      "step": "A-mua-duoc",
+      "starsBefore": 100,
+      "starsAfter": 97,
+      "unlockedAfter": [
+        "hat_cap"
+      ],
+      "receiptsMua": 1,
+      "rows": [
+        "stars+2|Quà cấp độ 2",
+        "shop_item+1|Mua Mũ Lưỡi Trai Năng Động (5 sao)",
+        "xp+80|Mở khóa thành tựu: ach_shop_1"
+      ],
+      "spoken": "Chào buổi sáng, bé ơi! Bé học đều lắm, giỏi quá! / Chúc mừng bé đã mở khóa Mũ Lưỡi Trai Năng Động!"
+    },
+    {
+      "step": "B-may-choi-ghi",
+      "starsBefore": 100,
+      "starsAfter": 100,
+      "unlockedAfter": [],
+      "blockedWrites": 2,
+      "labelBefore": "Số sao của bé: 100",
+      "labelAfter": "Số sao của bé: 100",
+      "receiptsMua": 1,
+      "spoken": "Chào buổi sáng, bé ơi! Bé học đều lắm, giỏi quá! / Chúc mừng bé đã mở khóa Mũ Lưỡi Trai Năng Động!"
+    },
+    {
+      "step": "D-len-cap-luu-duoc",
+      "celebration": "✨ ⭐ 🎉 CẤP ĐỘ MỚI 7 Chúc Mừng Bé Đã Lên Cấp! Danh hiệu mới: Thợ Săn Chữ NHẬN THƯỞNG +3 Sao Vàng 🐻 Gấu Bút Chì đang ăn mừng cùng bé! 🎉 Tuyệ",
+      "claimed": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "receiptsQuaCapDo": 4
+    },
+    {
+      "step": "C-may-choi-ghi",
+      "celebrated": true,
+      "claimed": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "receiptsQuaCapDoMoi": 2
+    }
+  ],
+  "facts": {
+    "A": {
+      "stars": [
+        100,
+        97
+      ],
+      "unlocked": [
+        "hat_cap"
+      ],
+      "receiptsMua": 1,
+      "rows": [
+        "stars+2|Quà cấp độ 2",
+        "shop_item+1|Mua Mũ Lưỡi Trai Năng Động (5 sao)",
+        "xp+80|Mở khóa thành tựu: ach_shop_1"
+      ]
+    },
+    "B": {
+      "blockedWrites": 2,
+      "spoken": "Chào buổi sáng, bé ơi! Bé học đều lắm, giỏi quá! / Chúc mừng bé đã mở khóa Mũ Lưỡi Trai Năng Động!",
+      "receiptsMua": 1
+    },
+    "D": {
+      "claimed": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "receiptsQuaCapDo": 4
+    },
+    "C": {
+      "celebrated": true,
+      "claimed": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "receiptsQuaCapDoMoi": 2
+    }
+  },
+  "shots": [
+    "01-A-mua-duoc.png",
+    "02-B-may-choi-ghi.png",
+    "03-D-len-cap-luu-duoc.png",
+    "04-C-may-choi-ghi.png"
+  ]
+}
+QA FAIL — 6 error(s) at B

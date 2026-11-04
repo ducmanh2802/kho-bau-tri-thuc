@@ -86,6 +86,11 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
       sound.speak(`Món này cần bé lên thêm ${buy.missingLevels ?? 1} cấp. Học vui để tích điểm nhé!`);
     } else if (buy.reason === 'not-enough-stars') {
       sound.speak(`Bé còn thiếu ${buy.missingStars ?? item.priceStars} sao. Hãy học thêm bài để tích lũy sao nhé!`);
+    } else if (buy.reason === 'storage-unavailable') {
+      // T49A — thất bại này là **của máy**, không phải của bé: sao chưa trừ, món
+      // chưa mở. Im lặng (hành vi cũ) khiến bé nghĩ mình đã mua và quay lại bấm
+      // liên tục, còn gộp vào nhãn "thiếu sao" thì nói dối một lần nữa.
+      sound.speak('Máy không lưu được món quà này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé!');
     }
   };
 

@@ -1,0 +1,198 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t49a-reward-write-honest.test.ts (13 tests | 8 failed) 40ms
+   ❯ T49A — quà cấp độ: không ăn mừng và không ghi biên lai khi máy từ chối ghi (7)
+     ✓ ghi được ⇒ nhận quà, cộng sao, đánh dấu đã nhận, có biên lai (characterization) 9ms
+     × chặn hồ sơ + động lực ⇒ claimed rỗng (nguồn của confetti + hộp ăn mừng) 11ms
+     × khi không ghi được thì biên lai "Quà cấp độ" cũng không được viết (lịch sử ba mẹ là bằng chứng) 3ms
+     × chặn riêng key hồ sơ ⇒ không đánh dấu "đã nhận" (lỗi: bé mất quà vĩnh viễn, âm thầm) 2ms
+     × chặn riêng key động lực ⇒ không khoe "+N sao" ảo và không viết biên lai 1ms
+     × nhận lại sau khi hết chặn vẫn đủ quà (phép thử tự khép của hai đường hỏng) 1ms
+     ✓ tắt phần thưởng: vẫn đánh dấu đã nhận và trả claimed rỗng (characterization, không đổi) 0ms
+   ❯ T49A — phòng thay đồ: nút "Mua" chỉ được ăn mừng khi sao và món thật sự đổi (4)
+     ✓ ghi được ⇒ ok, trừ đúng giá, món mở khoá, có biên lai (characterization) 1ms
+     × chặn ghi hồ sơ ⇒ reason storage-unavailable, không phải ok (lỗi: confetti + "đã mở khóa") 1ms
+     × chặn ghi hồ sơ ⇒ không viết biên lai "Mua …" 2ms
+     ✓ hồ sơ ghi được nhưng bộ đếm động lực thì hỏng ⇒ vẫn giữ lời hứa (món về, sao tiêu) 1ms
+   ❯ T49A — hợp đồng chữ: UI và vùng mã sửa (2)
+     ✓ phòng thay đồ có nhãn riêng cho thất bại **của máy**, không im lặng 1ms
+     × đường đổi sao/mở khoá không còn bỏ qua kết quả ghi 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t49a-reward-write-honest.test.ts > T49A — quà cấp độ: không ăn mừng và không ghi biên lai khi máy từ chối ghi > chặn hồ sơ + động lực ⇒ claimed rỗng (nguồn của confetti + hộp ăn mừng)
+AssertionError: máy không ghi được byte nào mà vẫn báo đã nhận: {"claimed":[2,3,4,5,6],"stars":12,"tickets":1,"stickerIds":["st_vutru_4","st_tet_1"]}: expected [ 2, 3, 4, 5, 6 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   2,
++   3,
++   4,
++   5,
++   6,
++ ]
+
+ ❯ tests/t49a-reward-write-honest.test.ts:108:105
+    106|     ls.block([STORAGE_KEYS.CHILD_PROFILE, STORAGE_KEYS.MOTIVATION]);
+    107|     const result = StorageService.claimLevelRewards();
+    108|     expect(result.claimed, `máy không ghi được byte nào mà vẫn báo đã …
+       |                                                                                                         ^
+    109|     expect(result.stars).toBe(0);
+    110|     expect(result.tickets).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/t49a-reward-write-honest.test.ts > T49A — quà cấp độ: không ăn mừng và không ghi biên lai khi máy từ chối ghi > khi không ghi được thì biên lai "Quà cấp độ" cũng không được viết (lịch sử ba mẹ là bằng chứng)
+AssertionError: biên lai quà cấp độ xuất hiện dù quà không nằm xuống máy: ["sticker|Sticker từ quà level","sticker|Sticker từ quà level","tickets|Quà cấp độ 2, 3, 4, 5, 6","stars|Quà cấp độ 2, 3, 4, 5, 6","xp|Mở khóa thành tựu: ach_level_5"]: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/t49a-reward-write-honest.test.ts:121:7
+    119|       receipts().some((r) => r.includes('Quà cấp độ')),
+    120|       `biên lai quà cấp độ xuất hiện dù quà không nằm xuống máy: ${JSO…
+    121|     ).toBe(false);
+       |       ^
+    122|   });
+    123|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/t49a-reward-write-honest.test.ts > T49A — quà cấp độ: không ăn mừng và không ghi biên lai khi máy từ chối ghi > chặn riêng key hồ sơ ⇒ không đánh dấu "đã nhận" (lỗi: bé mất quà vĩnh viễn, âm thầm)
+AssertionError: expected [ 2, 3, 4, 5, 6 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   2,
++   3,
++   4,
++   5,
++   6,
++ ]
+
+ ❯ tests/t49a-reward-write-honest.test.ts:129:28
+    127|     const before = savedStars();
+    128|     const result = StorageService.claimLevelRewards();
+    129|     expect(result.claimed).toEqual([]);
+       |                            ^
+    130|     expect(savedStars()).toBe(before);
+    131|     expect(savedClaimedLevels(), 'level vẫn phải pending để bé nhận lạ…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/t49a-reward-write-honest.test.ts > T49A — quà cấp độ: không ăn mừng và không ghi biên lai khi máy từ chối ghi > chặn riêng key động lực ⇒ không khoe "+N sao" ảo và không viết biên lai
+AssertionError: expected [ 2, 3, 4, 5, 6 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   2,
++   3,
++   4,
++   5,
++   6,
++ ]
+
+ ❯ tests/t49a-reward-write-honest.test.ts:138:28
+    136|     ls.block([STORAGE_KEYS.MOTIVATION]);
+    137|     const result = StorageService.claimLevelRewards();
+    138|     expect(result.claimed).toEqual([]);
+       |                            ^
+    139|     expect(receipts().some((r) => r.includes('Quà cấp độ'))).toBe(fals…
+    140|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  tests/t49a-reward-write-honest.test.ts > T49A — quà cấp độ: không ăn mừng và không ghi biên lai khi máy từ chối ghi > nhận lại sau khi hết chặn vẫn đủ quà (phép thử tự khép của hai đường hỏng)
+AssertionError: expected [ 2, 3, 4, 5, 6 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   2,
++   3,
++   4,
++   5,
++   6,
++ ]
+
+ ❯ tests/t49a-reward-write-honest.test.ts:145:56
+    143|     grantXpToLevel(6);
+    144|     ls.block([STORAGE_KEYS.CHILD_PROFILE, STORAGE_KEYS.MOTIVATION]);
+    145|     expect(StorageService.claimLevelRewards().claimed).toEqual([]);
+       |                                                        ^
+    146|     ls.clear(); // bỏ chặn + giữ nguyên những gì đã nằm xuống máy
+    147|     grantXpToLevel(6);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  tests/t49a-reward-write-honest.test.ts > T49A — phòng thay đồ: nút "Mua" chỉ được ăn mừng khi sao và món thật sự đổi > chặn ghi hồ sơ ⇒ reason storage-unavailable, không phải ok (lỗi: confetti + "đã mở khóa")
+AssertionError: sao không bị trừ, món không mở khoá mà vẫn báo thành công: {"ok":true,"reason":"ok"}: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/t49a-reward-write-honest.test.ts:182:111
+    180|     ls.block([STORAGE_KEYS.CHILD_PROFILE]);
+    181|     const bought = StorageService.buyShopItem('shirt_yellow');
+    182|     expect(bought.ok, `sao không bị trừ, món không mở khoá mà vẫn báo …
+       |                                                                                                               ^
+    183|     expect(bought.reason).toBe('storage-unavailable');
+    184|     const after = StorageService.getChildProfile();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  tests/t49a-reward-write-honest.test.ts > T49A — phòng thay đồ: nút "Mua" chỉ được ăn mừng khi sao và món thật sự đổi > chặn ghi hồ sơ ⇒ không viết biên lai "Mua …"
+AssertionError: ["shop_item|Mua Áo Thun Vàng Nắng (6 sao)","xp|Mở khóa thành tựu: ach_shop_1"]: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ tests/t49a-reward-write-honest.test.ts:193:83
+    191|     ls.block([STORAGE_KEYS.CHILD_PROFILE]);
+    192|     StorageService.buyShopItem('shirt_yellow');
+    193|     expect(receipts().some((r) => r.includes('Mua')), JSON.stringify(r…
+       |                                                                                   ^
+    194|   });
+    195|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  tests/t49a-reward-write-honest.test.ts > T49A — hợp đồng chữ: UI và vùng mã sửa > đường đổi sao/mở khoá không còn bỏ qua kết quả ghi
+AssertionError: cả hai hàm phải đọc kết quả ghi trước khi hứa (claim: 2, buy: 1): expected 0 to be greater than or equal to 3
+ ❯ tests/t49a-reward-write-honest.test.ts:224:7
+    222|       (checked ?? []).length,
+    223|       'cả hai hàm phải đọc kết quả ghi trước khi hứa (claim: 2, buy: 1…
+    224|     ).toBeGreaterThanOrEqual(3);
+       |       ^
+    225|     const bare = grant.split('\n').map((l) => l.trim()).filter((l) => …
+    226|     // **Một** ngoại lệ có chủ đích, ghi rõ ở mã nguồn: `shopBoughtTot…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 5 passed (13)
+   Start at  07:37:56
+   Duration  640ms (transform 39%, import 35%, tests 20%, worker 6%)
+

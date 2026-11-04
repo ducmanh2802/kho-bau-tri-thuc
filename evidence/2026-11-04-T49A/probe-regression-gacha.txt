@@ -1,0 +1,42 @@
+{
+  "errors": [],
+  "shots": [
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t28-gacha\\01-gacha-pile.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t28-gacha\\02-gacha-spinning.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t28-gacha\\03-gacha-result.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t28-gacha\\04-gacha-history.png"
+  ],
+  "facts": {
+    "overflowPx": 0
+  },
+  "steps": [
+    {
+      "step": "pileLayout",
+      "count": 10,
+      "winW": 308,
+      "winH": 164,
+      "spreadX": 210,
+      "spreadXRatio": 68,
+      "spreadYRatio": 21,
+      "outside": 0
+    },
+    {
+      "step": "spinAnimation",
+      "claw": "claw-drop",
+      "pile": "gacha-jumble",
+      "spinningLabel": true
+    },
+    {
+      "step": "drawResult",
+      "resultText": "🚁 Sticker Mới! Bé nhận được Trực Thăng Cứu Hộ! 0 Đã lưu vào Bộ Sưu Tập! Tuyệt Vời!",
+      "ticketsLeft": 4
+    },
+    {
+      "step": "history",
+      "historyCount": 1,
+      "levelUpShown": true
+    }
+  ],
+  "ok": true
+}
+QA PASS — 4 step(s), 0 errors

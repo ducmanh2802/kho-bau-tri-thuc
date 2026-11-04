@@ -1,0 +1,100 @@
+{
+  "ok": true,
+  "failedAt": null,
+  "errors": [],
+  "steps": [
+    {
+      "step": "A-mua-duoc",
+      "starsBefore": 100,
+      "starsAfter": 97,
+      "unlockedAfter": [
+        "hat_cap"
+      ],
+      "receiptsMua": 1,
+      "rows": [
+        "stars+2|Quà cấp độ 2",
+        "shop_item+1|Mua Mũ Lưỡi Trai Năng Động (5 sao)",
+        "xp+80|Mở khóa thành tựu: ach_shop_1"
+      ],
+      "spoken": "Chào buổi sáng, bé ơi! Bé học đều lắm, giỏi quá! / Chúc mừng bé đã mở khóa Mũ Lưỡi Trai Năng Động!"
+    },
+    {
+      "step": "B-may-choi-ghi",
+      "starsBefore": 100,
+      "starsAfter": 100,
+      "unlockedAfter": [],
+      "blockedWrites": 1,
+      "labelBefore": "Số sao của bé: 100",
+      "labelAfter": "Số sao của bé: 100",
+      "receiptsMua": 0,
+      "spoken": "Chào buổi sáng, bé ơi! Bé học đều lắm, giỏi quá! / Máy không lưu được món quà này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé!"
+    },
+    {
+      "step": "D-len-cap-luu-duoc",
+      "celebration": "✨ ⭐ 🎉 CẤP ĐỘ MỚI 7 Chúc Mừng Bé Đã Lên Cấp! Danh hiệu mới: Thợ Săn Chữ NHẬN THƯỞNG +3 Sao Vàng 🐻 Gấu Bút Chì đang ăn mừng cùng bé! 🎉 Tuyệ",
+      "claimed": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "receiptsQuaCapDo": 4
+    },
+    {
+      "step": "C-may-choi-ghi",
+      "celebrated": false,
+      "claimed": [],
+      "receiptsQuaCapDoMoi": 0
+    },
+    {
+      "step": "C-pending-giu-nguyen",
+      "note": "level 2..6 vẫn pending ⇒ máy lưu được là nhận đủ"
+    }
+  ],
+  "facts": {
+    "A": {
+      "stars": [
+        100,
+        97
+      ],
+      "unlocked": [
+        "hat_cap"
+      ],
+      "receiptsMua": 1,
+      "rows": [
+        "stars+2|Quà cấp độ 2",
+        "shop_item+1|Mua Mũ Lưỡi Trai Năng Động (5 sao)",
+        "xp+80|Mở khóa thành tựu: ach_shop_1"
+      ]
+    },
+    "B": {
+      "blockedWrites": 1,
+      "spoken": "Chào buổi sáng, bé ơi! Bé học đều lắm, giỏi quá! / Máy không lưu được món quà này. Bé nhờ ba mẹ bật lại phần lưu của máy nhé!",
+      "receiptsMua": 0
+    },
+    "D": {
+      "claimed": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "receiptsQuaCapDo": 4
+    },
+    "C": {
+      "celebrated": false,
+      "claimed": [],
+      "receiptsQuaCapDoMoi": 0
+    }
+  },
+  "shots": [
+    "01-A-mua-duoc.png",
+    "02-B-may-choi-ghi.png",
+    "03-D-len-cap-luu-duoc.png",
+    "04-C-may-choi-ghi.png"
+  ]
+}

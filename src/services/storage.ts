@@ -2703,8 +2703,16 @@ public static getParentSettings(): ParentSettings {
     profile.tickets += result.tickets;
     motivation.claimedLevelRewards = [...motivation.claimedLevelRewards, ...result.claimed].sort((a, b) => a - b);
     motivation.starsEarnedTotal += result.stars;
-    StorageService.saveChildProfile(profile);
-    StorageService.saveMotivationState(motivation);
+    // T49A — hồ sơ ghi **trước**: chặn key hồ sơ thì chưa ghi gì cả, lần sau bé
+    // nhận lại đúng quà (không mất, không dồn). Chặn key động lực thì sao đã nằm
+    // xuống máy còn dấu "đã nhận" thì không ⇒ thà để bé có nguy cơ nhận trùng
+    // (nhìn thấy được, tự khép khi máy lưu lại) còn hơn mất quà âm thầm.
+    const nothingClaimed: LevelClaimResult = { claimed: [], stars: 0, tickets: 0, stickerIds: [] };
+    const profileSaved = StorageService.saveChildProfile(profile);
+    if (!profileSaved) return nothingClaimed;
+    const motivationSaved = StorageService.saveMotivationState(motivation);
+    if (!motivationSaved) return nothingClaimed;
+    // Biên lai và thành tựu chỉ nói về quà thật sự nằm xuống máy.
     StorageService.checkAchievements();
     if (result.stars > 0) {
       StorageService.addRewardHistory({ type: 'stars', amount: result.stars, description: `Quà cấp độ ${result.claimed.join(', ')}`, itemId: `level_${result.claimed[0]}` });
@@ -2731,7 +2739,13 @@ public static getParentSettings(): ParentSettings {
     if (!item) return { ok: false, reason: 'unknown-item' };
     profile.stars -= item.priceStars;
     profile.unlockedItems = [...profile.unlockedItems, itemId];
-    StorageService.saveChildProfile(profile);
+    // T49A — sao trừ và món mở khoá **cùng nằm** trong hồ sơ ⇒ hồ sơ ghi được
+    // chính là lời hứa của nút "Mua" đã giữ; hỏng thì phải nói thẳng, vì bé tin
+    // mình đã tiêu sao. Bộ đếm `shopBoughtTotal` chỉ nuôi thành tựu, không phải
+    // thứ bé nhận được ⇒ **chủ đích** bỏ qua kết quả ghi, nó không được phép lật
+    // ngược một giao dịch đã nằm xuống máy.
+    const profileSaved = StorageService.saveChildProfile(profile);
+    if (!profileSaved) return { ok: false, reason: 'storage-unavailable' };
     const motivation = StorageService.getMotivationState();
     motivation.shopBoughtTotal += 1;
     StorageService.saveMotivationState(motivation);
@@ -2785,7 +2799,7 @@ export interface LevelClaimResult {
 
 export interface ShopBuyResult {
   ok: boolean;
-  reason: 'unknown-item' | 'already-owned' | 'level-locked' | 'not-enough-stars' | 'rewards-off' | 'ok';
+  reason: 'unknown-item' | 'already-owned' | 'level-locked' | 'not-enough-stars' | 'rewards-off' | 'storage-unavailable' | 'ok';
   missingLevels?: number;
   missingStars?: number;
 }
