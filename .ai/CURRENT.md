@@ -683,6 +683,67 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug 
   `DEF-019(a)(b)(c)(e)`, `DEF-011`, Ô 13 CI vẫn mở.
 - **Không** stage `docs/step-by-step-guidance.md` và 6 ảnh `docs/opencode/reports/img/*.png` — đó là lane khác.
 
+## T50B — lát cắt thứ 18: tủ đồ không được hứa khi máy chưa lưu được (2026-11-04, lane này)
+
+- **Defect (`DEF-023`)**: `src/components/shop/AvatarShopScreen.tsx` có **3** đường ghi hồ sơ dạng statement
+  `StorageService.saveChildProfile(updated);` — dòng `68` (chọn bạn) · `90` (mặc/tháo) · `111` (mở khoá rồi mặc)
+  của `2852798`; phép đo `git show 2852798:src/components/shop/AvatarShopScreen.tsx | grep -cE "^\s+StorageService\.saveChildProfile"` = **3**,
+  còn HEAD hiện tại = **0** vì cả ba đã đọc kết quả. `saveChildProfile` (`src/services/storage.ts:1162`) chỉ là vỏ bọc
+  của `writeJSON` (`:302`), và `writeJSON` **cố ý** nuốt exception (Safari private mode, hết dung lượng) để trả `false`
+  ⇒ `setProfile(updated)` vẫn đổi preview, confetti vẫn nổ, tiếng vẫn nói "đã chọn", còn máy vẫn `avatarBase: 'fox'`;
+  tải lại trang là mọi thứ về như cũ.
+- **Phép đo thứ hai (vì sao bé không còn kênh nào)**: cùng màn `sound.speak` = **6** nhưng `role="alert"` = **0**
+  ⇒ màn này nói với bé **bằng tiếng** là chính, tắt tiếng thì cả thành công lẫn thất bại đều vô hình. Nhánh
+  `storage-unavailable` của `buyShopItem` (T49A đã trả `reason`) cũng chỉ `console.warn` + `speak`.
+- **Sửa (1 file `src/`)**: ba đường đều `const saved = StorageService.saveChildProfile(...)`; khi `false` thì
+  **hoàn tác về đúng bản đang nằm trên máy** (`setProfile(fresh)` / `setProfile(after)` — bản vừa đọc lại từ
+  `StorageService`, không "tin" bản trong bộ nhớ) **và** dựng banner `role="alert" aria-live="assertive"` + `speak`
+  **cùng một lời**; confetti/`playLevelUp` tụt xuống **sau** khi ghi được; nhãn đưa vào `NOTICE_MACHINE_NOT_SAVED` /
+  `NOTICE_UNLOCKED_NOT_EQUIPPED` (export) để banner lẫn giọng đọc dùng **một** câu và test đọc **đúng chuỗi bé thấy**.
+  Sau sửa: `sound.speak` **11**, `role="alert"` **1**, `const saved` ở `81 · 112 · 140`.
+- **RED đúng nguyên nhân**: `tests/t50b-shop-machine-save-notice.test.ts` (**6**) chạy trên bản mang bệnh ⇒
+  `4 failed | 2 passed (6)` với câu đỏ trích nguyên văn `StorageService.saveChildProfile(updated);` ⇒ đỏ vì hành vi,
+  không vì thiếu import. n5 `renderToString` với `localStorage` in-memory là ca chống đỏ-do-dựng-sẵn: hồ sơ bình
+  thường thì **không** được có node cáo lỗi nào.
+- **Hồi quy thật, và nó là loại khác**: `npm run verify` đỏ `Tests 1 failed | 1552 passed (1553)` ở
+  `tests/t49a-reward-write-honest.test.ts`, vì guard của T49A đòi chuỗi "không lưu được" nằm **trong 400 ký tự cạnh**
+  `storage-unavailable` mà T50B chuyển nó thành hằng số ở `:61` (nhánh ở `:163`). Đây là **hình dạng** của hợp đồng
+  đổi, không phải **ý định** bị phản bội ⇒ viết lại guard giữ nguyên ba điều khoản (có một nhãn "máy không lưu được" ·
+  nhánh `storage-unavailable` phải **dùng** nó · nhãn không lẫn sang "sao"), và điều khoản cuối vẫn bắt được ý định
+  blame-bé (`mutation-D-t49a-guard-doi-hinh-dang.txt` ⇒ `1 failed | 18 passed (19)`).
+- **Ablation 4 log, mỗi cái làm đỏ đúng một test** (bản sửa đã nằm trong HEAD `1344796` ⇒ `git checkout --` an toàn):
+  (A) `if (!saved)` → `if (false && !saved)` ⇒ n2 đỏ, và dựng `dist/` từ bản đó ⇒ `QA FAIL — 3 error(s) at A` với
+  `alert: null` + `avatarAfter: 🦉` trong khi `storedAvatarBase: fox`; (B) xoá JSX banner ⇒ n1 đỏ; (C) nhãn chỉ
+  `speak`, không `setNotice` ⇒ n2 đỏ; (D) như trên ⇒ `t49a` đỏ. `git status --short -- src/` in rỗng trước cổng cuối.
+- **Bằng chứng nhìn thấy được**: `evidence/2026-11-04-T50B/probe-t50b-shop-save-notice.mjs` trên `dist/` ⇒
+  **`QA PASS — 4 step(s), 0 errors`** + 4 ảnh; và chạy trên **đúng bản cũ** (`git show 2852798:… > …` + `npm run build`)
+  ⇒ **`QA FAIL — 6 error(s) at A`** (`probe-FAIL-before-fix.txt`: A + B + D đỏ, **C vẫn xanh** ⇒ đỏ không phải do probe
+  dựng sẵn). Lưu ý vận hành cho lane sau: **`qa/run-one.mjs` luôn ghi ảnh vào thư mục của probe** (không có cờ tắt) ⇒
+  ảnh của lượt FAIL được **đổi tên** thành `fail-before-fix-01…04*.png` để bộ ảnh PASS `01…04*.png` giữ nguyên;
+  `evidence/2026-11-04-T49B/` cũng đã phải `git checkout --` vì đúng lý do đó. Probe đặt **ngoài** `qa/` ⇒ tổng probe
+  vẫn **30**.
+- **Hồi quy cùng `dist/`**: `qa/golden-path.mjs` **28** bước · `qa/parent-controls.mjs` **7** ·
+  `qa/avatar-shop-tabs-coverage.mjs` (T49B) **5** · `qa/mobile-home.mjs` · `qa/responsive-a11y.mjs` — cả năm EXIT=0
+  (`regression-probes.txt`).
+- **Cổng**: `npm run verify` **EXIT=0** · **126 file / 1553 test** (124 `.ts` + 2 `.tsx`) · `Duration 29.07s` ·
+  entry **đổi hash mà không đổi độ dài** (`index-BZswaFkc.js` → `index--gQhs43l.js`, vẫn **214 kB = 219 142 byte**,
+  gzip 62.81 → **62.80 kB**) vì hai nhãn mới nằm trong chunk lazy `AvatarShopScreen-B-c_Xglz.js` (8 887 byte) còn
+  entry chỉ mang **tên** chunk — hai chuỗi 8 ký tự bằng nhau; boot graph giữ `438617` byte = **428.3 kB**; vẫn **42**
+  service module / **97** `.tsx` / **105** `src/data/*.ts` / **30** probe / **31** trò chơi. Commit code **`1344796`**
+  đã push (`6ce845f..1344796`). **Lockfile còn nguyên** (`package-lock.json`, 110 314 byte) ở thời điểm đo.
+- **Ghi sổ `DEF-024` (MỞ)**: `grep -rn "^\s*StorageService\.save[A-Za-z]*(" src --include=*.ts --include=*.tsx | wc -l`
+  = **66** lời gọi vẫn vứt kết quả (trước đợt này **69**; T50B khép đúng **3** chỗ của tủ đồ), **13** ở
+  `src/components`: `ParentDashboardModal.tsx` **12** (11 × `saveParentSettings` + 1 × `saveChildProfile` ở `:237`) và
+  `ReadingFluencyScreen.tsx:586` × `saveReadingParentRating`. Mỗi chỗ cần một **quyết định chính sách** (im lặng có
+  chủ đích · hiện chữ "máy không lưu được" · chặn thao tác) — không sửa đại trà trong một lát cắt.
+- **Bài học**: một màn chỉ nói bằng tiếng thì thất bại **của máy** vô hình với bé; và hoàn tác phải về **bản của máy**,
+  không về bản bộ nhớ trước đó — nếu giữ bản bộ nhớ thì sau một lần ghi hỏng bé vẫn thấy hình mình vừa chọn, tức vẫn
+  hứa suông chỉ là tinh vi hơn.
+- **Việc còn của lane sau**: `DEF-024` (66 chỗ), `DEF-022(b)` (Home không ghép `equipped` — đo `equipLayers: 0`),
+  `DEF-019(a)(b)(c)(e)`, `DEF-011`, ba nhãn "bé chưa đủ sao / chưa tới level / vé hôm nay hết" vẫn **chỉ có tiếng**,
+  `src/services/britishSpeech.ts:175` (`onError → onEnd`) cùng họ `DEF-019(d)` đã đo mà chưa quyết, Ô 13 CI vẫn mở.
+- **Không** stage `docs/step-by-step-guidance.md` và 6 ảnh `docs/opencode/reports/img/*.png` — đó là lane khác.
+
 ---
 
 P36, P38, P39 sessions share this working tree concurrently. Each lane left its

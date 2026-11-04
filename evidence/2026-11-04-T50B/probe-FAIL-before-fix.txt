@@ -1,0 +1,99 @@
+Bằng chứng FAIL-trước-khi-sửa — probe T50B chạy trên `dist/` dựng từ bản CŨ của màn tủ đồ.
+
+Lệnh (đúng thứ tự, tái lập được):
+  1) `git show 2852798:src/components/shop/AvatarShopScreen.tsx > src/components/shop/AvatarShopScreen.tsx`
+     (kiểm tra: `grep -c "^[[:space:]]\\+StorageService\\.saveChildProfile" <file>` = **3**, tức ba lời
+      gọi ở dòng 68 · 90 · 111 đều là statement — giá trị trả về bị vứt)
+  2) `npm run build`                                                     ⇒ BUILD_EXIT=0
+  3) `node qa/run-one.mjs evidence/2026-11-04-T50B/probe-t50b-shop-save-notice.mjs`
+     ⇒ PROBE_EXIT=1
+
+Trạng thái mã: PROBE_EXIT=1
+Verdict: **`QA FAIL — 6 error(s) at A`** (`failedAt: A` = `A-avatar-blocked`).
+Bước A chặn `setItem` của đúng hai key `kho_bau_child_profile` + `kho_bau_motivation` rồi bấm chọn
+bạn **Cú Thông Thái**. Bản cũ vẫn `setProfile(updated)` vô điều kiện ⇒ preview đổi sang 🦉, thẻ đổi
+thành "Đang chọn ✓", confetti + `sound.speak` báo đã chọn, trong khi `storedAvatarBase` vẫn là `fox`
+— đúng lời hứa suông của `DEF-023`; và `alert: null` ở **cả bốn** bước vì màn chỉ nói bằng tiếng
+(`grep -c role="alert"` trên bản cũ = **0**).
+
+Bốn ảnh của lượt dựng này được **đổi tên** thành `fail-before-fix-01…04*.png` để nằm cạnh bộ ảnh
+PASS đã commit (`01-A…png` giữ nguyên bản của lượt xanh — `git checkout --` khôi phục ngay sau đó,
+`git status` sạch với bốn file đó).
+
+===== errors[] nguyên văn (6) =====
+A: máy từ chối ghi mà màn hình **không hiện chữ** nào (chỉ có tiếng ⇒ bé tắt tiếng là mất hết phản hồi)
+A: preview đổi thành "🦉" dù máy chưa lưu gì ⇒ hình đang nói dối
+A: thẻ Cú đổi thành "🦉 Cú Thông Thái Uyên bác & Điềm đạm Đang chọn ✓" dù máy không lưu được
+B: mặc đồ thất bại mà không có thông báo nhìn thấy được
+B: nút đổi thành "Tháo ra" trong khi máy không lưu được ⇒ "Đang mặc" là lời hứa suông
+D: `buyShopItem` trả storage-unavailable nhưng bé chỉ **nghe** được, không **thấy**
+
+===== facts (bốn bước, bản cũ) =====
+A  alert=null · avatarBefore=🦊 · avatarAfter=🦉 · storedAvatarBase=fox     ← hình và máy ngược nhau
+B  alert=null · hatButton="Tháo ra" · storedEquipped={}                     ← "Đang mặc" mà máy rỗng
+C  alert=null · avatar=🦉 · storedAvatarBase=owl                            ← bước đối chứng: bản cũ
+     **vẫn xanh** ở đường ghi được, nên đỏ A/B/D không phải do probe dựng sẵn
+D  alert=null · hatButton="Mở khóa" · starsBefore=284 · starsAfter=284      ← sao không mất, nhưng
+     món không mở khoá mà màn hình cũng không nói vì sao
+
+===== output nguyên văn (đã bỏ mã màu) =====
+{
+  "steps": [
+    {
+      "step": "A-avatar-blocked",
+      "alert": null,
+      "avatarBefore": "🦊",
+      "avatarAfter": "🦉",
+      "owlLabel": "🦉 Cú Thông Thái Uyên bác & Điềm đạm Đang chọn ✓",
+      "storedAvatarBase": "fox"
+    },
+    {
+      "step": "B-equip-blocked",
+      "alert": null,
+      "hatButton": "Tháo ra",
+      "storedEquipped": {}
+    },
+    {
+      "step": "C-happy-path",
+      "alert": null,
+      "avatar": "🦉",
+      "owlLabel": "🦉 Cú Thông Thái Uyên bác & Điềm đạm Đang chọn ✓",
+      "storedAvatarBase": "owl"
+    },
+    {
+      "step": "D-buy-blocked",
+      "alert": null,
+      "hatButton": "Mở khóa",
+      "starsBefore": 284,
+      "starsAfter": 284
+    }
+  ],
+  "errors": [
+    "A: máy từ chối ghi mà màn hình **không hiện chữ** nào (chỉ có tiếng ⇒ bé tắt tiếng là mất hết phản hồi)",
+    "A: preview đổi thành \"🦉\" dù máy chưa lưu gì ⇒ hình đang nói dối",
+    "A: thẻ Cú đổi thành \"🦉 Cú Thông Thái Uyên bác & Điềm đạm Đang chọn ✓\" dù máy không lưu được",
+    "B: mặc đồ thất bại mà không có thông báo nhìn thấy được",
+    "B: nút đổi thành \"Tháo ra\" trong khi máy không lưu được ⇒ \"Đang mặc\" là lời hứa suông",
+    "D: `buyShopItem` trả storage-unavailable nhưng bé chỉ **nghe** được, không **thấy**"
+  ],
+  "facts": {
+    "A": { "alert": null, "avatarBefore": "🦊", "avatarAfter": "🦉", "storedAvatarBase": "fox" },
+    "B": { "alert": null, "hatButton": "Tháo ra", "storedEquipped": {} },
+    "C": { "alert": null, "avatar": "🦉", "storedAvatarBase": "owl" },
+    "D": { "alert": null, "hatButton": "Mở khóa", "starsBefore": 284, "starsAfter": 284 }
+  },
+  "failedAt": "A",
+  "ok": false
+}
+QA FAIL — 6 error(s) at A
+
+===== đối chứng: cùng probe, bản sửa đã commit =====
+`probe-PASS.txt` ⇒ `QA PASS — 4 step(s), 0 errors` trên entry `index--gQhs43l.js`.
+Khác biệt từng bước: A/B/D có node `role="alert"` chứa chữ "Máy không lưu được thay đổi của bé…" và
+`storedAvatarBase` / `storedEquipped` **không** đổi theo hình; C vẫn xanh (đường ghi thật không bị chặn).
+
+===== dọn dẹp sau lượt dựng này =====
+  `git checkout -- src/components/shop/AvatarShopScreen.tsx` ⇒ `git status --short -- src/` in rỗng,
+  `grep -c "const saved = StorageService.saveChildProfile" …` = **3** (bản sửa đã nằm trong HEAD
+  `1344796` nên hoàn tác bằng `git checkout --` là an toàn — khác với các lượt đột biến trước commit).
+  `npm run build` chạy lại để `dist/` khớp nội dung HEAD.

@@ -10,21 +10,27 @@ Ba đường ghi hồ sơ trong `AvatarShopScreen` **vứt** giá trị trả v�
 khi trình duyệt chặn ghi (Safari private mode) hoặc hết dung lượng — nó không ném:
 
 ```bash
-git show HEAD:src/components/shop/AvatarShopScreen.tsx | grep -cE "^\s+StorageService\.saveChildProfile"   # 3
-git show HEAD:src/components/shop/AvatarShopScreen.tsx | grep -c "sound.speak"                              # 6
-git show HEAD:src/components/shop/AvatarShopScreen.tsx | grep -c "role=\"alert\""                           # 0  (grep exit 1)
+git show 2852798:src/components/shop/AvatarShopScreen.tsx | grep -cE "^\s+StorageService\.saveChildProfile"   # 3
+git show 2852798:src/components/shop/AvatarShopScreen.tsx | grep -o "sound.speak" | wc -l                     # 6
+git show 2852798:src/components/shop/AvatarShopScreen.tsx | grep -c "role=\"alert\""                          # 0  (grep exit 1)
 ```
+
+(chạy trên `2852798` chứ **không** trên `HEAD`: từ `1344796` cả ba số đã đổi — `0` · `11` · `1`.
+Ba dòng statement nằm ở `68` (chọn bạn) · `90` (mặc/tháo) · `111` (mở khoá rồi mặc).)
 
 Ba hệ quả, cùng một khuôn với `DEF-020` (máy gắp, T48B) và `DEF-021` (quà cấp độ + mua món, T49A):
 
 1. **Chọn bạn / mặc / cởi** — `setProfile(updated)` chạy vô điều kiện ⇒ giao diện nói "Bé đã chọn bạn
    Cú Thông Thái", tải lại trang thì hồ sơ vẫn `fox`. Bé tin mình đã đổi và không hiểu sao Home trả
-   về con thỏ (chồng lên `DEF-022(a)` mà T50A vừa khép).
+   về **con cáo** 🦊 (`DEF-022(a)` đã được T50A khép, nên từ đợt này Home vẽ đúng bản **đang nằm trên
+   máy** — chính xác hơn, và vì thế lời hứa suông của tủ đồ càng dễ thấy: hai màn cãi nhau thật).
 2. **Mua món** — sau `buyShopItem` trả `ok`, màn hình bắn confetti + `playLevelUp()` **trước** khi biết
    kết quả ghi hồ sơ; `buyShopItem` đã được T49A dạy nói thật, nhưng màn này vẫn không nghe.
 3. **Thất bại `storage-unavailable`** — T49A đã gọi đúng tên (không đổ cho "bé thiếu sao") nhưng chỉ
-   bằng `sound.speak`. Cả màn có **6** lời đọc và **0** node chữ nào nhìn thấy được ⇒ ba mẹ tắt tiếng
-   (hoặc máy ở chế độ im lặng — mặc định của lớp 1) thì bé mất **toàn bộ** phản hồi.
+   bằng `sound.speak`. Cả màn có **6** lời đọc và **0** node chữ nào nhìn thấy được ⇒ khi **không có
+   âm thanh** — thiết bị tắt tiếng, loa hỏng, hay bé đang ở nơi không bật tiếng được (repo chưa đo mặc
+   định âm lượng của bất kỳ lớp nào, nên câu này chỉ nói điều kiện, không đoán) — bé mất **toàn bộ**
+   phản hồi, cả thành công lẫn thất bại.
 
 ## 2. Sửa — một file `src/`, không thêm dependency
 
@@ -49,8 +55,11 @@ và ba lời báo lỗi **của bé** (`rewards-off` / `level-locked` / `not-eno
 
 ## 3. Test viết **trước**, đã đỏ vì đúng nguyên nhân
 
-`tests/t50b-shop-machine-save-notice.test.ts` — 6 test, `renderToString` trên chính component +
-mock `localStorage` chặn theo key (n5 dựng hồ sơ lành để chứng minh lưới không đỏ do dựng sẵn):
+`tests/t50b-shop-machine-save-notice.test.ts` — 6 test: n1/n2/n6 đọc **nguyên văn source** của component,
+n3 chốt cấu trúc UI (`{notice && (`, `role="alert"`, ≥4 chỗ `setNotice(`), n4 chốt **nhãn**, còn n5
+`renderToString` trên chính component với một `localStorage` in-memory (n5 dựng hồ sơ **lành** để chứng
+minh lưới không đỏ do dựng sẵn — `setItem` thật **không** bị chặn ở cấp test; cảnh "máy từ chối ghi" là
+do **probe** dựng, §4):
 
 | Test | Khoá gì |
 |---|---|
@@ -78,6 +87,8 @@ phép đo không tự dối bằng cách so với code cũ. GREEN: `6 passed (6)
 | `node qa/run-one.mjs qa/parent-controls.mjs` | `QA PASS — 7 step(s), 0 errors` — `regression-probes.txt` |
 | `node qa/run-one.mjs qa/mobile-home.mjs` · `qa/responsive-a11y.mjs` | `QA PASS — 0 step(s), 0 errors` — `regression-probes.txt` |
 | `node qa/run-one.mjs evidence/2026-11-04-T49B/probe-t49b-shop-tabs.mjs` | `QA PASS — 5 step(s), 0 errors` — cùng màn tủ đồ, không hồi quy |
+| bản **cũ** + cùng probe: `git show 2852798:src/components/shop/AvatarShopScreen.tsx > src/components/shop/AvatarShopScreen.tsx && npm run build && node qa/run-one.mjs evidence/2026-11-04-T50B/probe-t50b-shop-save-notice.mjs` | **`QA FAIL — 6 error(s) at A`** — `probe-FAIL-before-fix.txt`: A `alert: null` + `avatarAfter: 🦉` trong khi `storedAvatarBase: fox` · B `storedEquipped: {}` mà nút đã đổi "Tháo ra" · D `buyShopItem` trả `storage-unavailable` nhưng bé chỉ nghe; **C vẫn xanh** ⇒ đỏ không phải do probe dựng sẵn, mà vì bản cũ thật. Ảnh lượt này đổi tên `fail-before-fix-01…04*.png` (`run-one.mjs` luôn ghi ảnh vào thư mục probe, không có cờ tắt) |
+| `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/1344796/check-runs` | `total_count: 3`, cả ba `completed success` — `typecheck + tests` `126398732491` · `build + bundle budget` `126398733743` · `golden path trên Chromium` `126398732590` |
 
 Probe đặt trong `evidence/` chứ **không** đặt trong `qa/` ⇒ tổng probe vẫn **30**
 (`ls qa/*.mjs qa/*.cjs` trừ `lib.mjs`, `run-one.mjs`).

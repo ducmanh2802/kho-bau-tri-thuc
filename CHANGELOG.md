@@ -156,6 +156,58 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T50B — tủ đồ báo "bé đã chọn bạn Cú" khi máy chưa lưu được một byte (`DEF-023`).**
+  Màn tủ đồ có **3** đường ghi hồ sơ và **cả ba** vứt kết quả: trên `2852798`,
+  `grep -n "^[[:space:]]*StorageService\.saveChildProfile(" src/components/shop/AvatarShopScreen.tsx`
+  in ra **3 dòng statement** ở `68` (chọn bạn) · `90` (mặc/tháo) · `111` (mở khoá rồi mặc). Chúng không vô
+  tội: `saveChildProfile` (`src/services/storage.ts:1162`) chỉ là vỏ bọc của `writeJSON` (`:302`), và
+  `writeJSON` **cố ý** nuốt exception (Safari private mode, hết dung lượng) để trả `false` — không ném, nên
+  cũng không có gì bắt được. Hệ quả bé nhìn thấy: `setProfile(updated)` chạy vô điều kiện ⇒ preview đổi sang
+  🦉, thẻ đổi thành "Đang chọn ✓", confetti nổ, `sound.speak` nói "đã chọn", còn `localStorage` thì vẫn
+  `avatarBase: 'fox'`; reload là mọi thứ về như cũ. Phép đo thứ hai cho biết bé **không còn kênh nào**:
+  `grep -o 'sound.speak' … | wc -l` = **6** trong khi `grep -c 'role="alert"'` = **0** — màn này nói với bé
+  bằng tiếng là chính, nên tắt tiếng (hoặc máy mute) thì cả thành công lẫn thất bại đều biến mất; nhánh
+  `storage-unavailable` của `buyShopItem` (T49A mới *gọi tên* bằng lời đọc) cũng chỉ `console.warn` + `speak`.
+  Sửa trong **1** file `src/`: ba đường đều `const saved = StorageService.saveChildProfile(...)`, khi `false`
+  thì **hoàn tác về đúng bản đang nằm trên máy** (`setProfile(fresh)` / `setProfile(after)` — bản vừa đọc lại
+  từ `StorageService`, không "tin" bản trong bộ nhớ, vì giữ `setProfile(trước)` sẽ cho bé thấy hình mình vừa
+  chọn dù máy từ chối: vẫn hứa suông, chỉ tinh vi hơn) **và** dựng banner `role="alert" aria-live="assertive"`
+  + `sound.speak` **cùng một lời**; confetti/`playLevelUp` tụt xuống **sau** khi ghi được; nhãn đưa vào
+  `NOTICE_MACHINE_NOT_SAVED` / `NOTICE_UNLOCKED_NOT_EQUIPPED` (export) để banner lẫn giọng đọc dùng **một**
+  câu và test đọc **đúng chuỗi bé thấy**. Sau sửa: `sound.speak` **11**, `role="alert"` **1**, `const saved`
+  ở `81 · 112 · 140`. Test mới `tests/t50b-shop-machine-save-notice.test.ts` (**6**) — n1/n2/n6 soi
+  nguyên văn source, n3 là hợp đồng cấu trúc UI, n4 soi nhãn (phải nói *máy*, cấm nhắc "sao"), n5
+  `renderToString` để chứng minh hồ sơ bình thường thì **không** có node cáo lỗi; RED trên bản mang bệnh
+  `4 failed | 2 passed (6)` với câu đỏ trích đúng `StorageService.saveChildProfile(updated);` ⇒ đỏ vì hành
+  vi, không vì thiếu import. **Một hồi quy thật, thuộc loại khác**: `npm run verify` đỏ
+  `Tests 1 failed | 1552 passed (1553)` ở `tests/t49a-reward-write-honest.test.ts`, vì guard của T49A đòi
+  chuỗi "không lưu được" nằm **trong 400 ký tự cạnh** `storage-unavailable` mà T50B chuyển nó thành hằng số
+  ở `:61` (nhánh ở `:163`). Đây là **hình dạng** của hợp đồng đổi, không phải **ý định** bị phản bội ⇒ viết
+  lại guard giữ nguyên ba điều khoản (có một nhãn "máy không lưu được" · nhánh `storage-unavailable` phải
+  **dùng** nó · nhãn không lẫn sang "sao"), và điều khoản cuối vẫn bắt được ý định "nhãn máy lẫn sang lời
+  blame bé". Ablation **4** log, mỗi cái làm đỏ **đúng một** test rồi khôi phục ngay (bản sửa đã nằm trong
+  HEAD `1344796` nên `git checkout --` an toàn): (A) `if (!saved)` → `if (false && !saved)` ⇒ n2 đỏ, và
+  cùng bản dựng `dist/` ⇒ `QA FAIL — 3 error(s) at A` với `alert: null` + `avatarAfter: 🦉` trong khi
+  `storedAvatarBase: fox`; (B) xoá JSX banner ⇒ n1 đỏ; (C) nhãn chỉ `speak`, không `setNotice` ⇒ n2 đỏ;
+  (D) đổi nhãn máy thành `NOTICE_NOT_ENOUGH_STARS` ⇒ `t49a` đỏ `1 failed | 18 passed (19)` vì nhánh
+  `storage-unavailable` không còn đọc nhãn của máy. Bằng chứng nhìn thấy được: probe mới
+  `evidence/2026-11-04-T50B/probe-t50b-shop-save-notice.mjs` (đặt **ngoài** `qa/` nên tổng probe vẫn **30**)
+  **`QA PASS — 4 step(s), 0 errors`** + 4 ảnh trên `dist/`, và chạy trên **đúng bản cũ** (`git show 2852798:… > …`
+  + `npm run build`) ⇒ **`QA FAIL — 6 error(s) at A`** (`probe-FAIL-before-fix.txt`: A + B + D đỏ, **C vẫn
+  xanh** ⇒ đỏ không phải do probe dựng sẵn); bốn ảnh của lượt FAIL **đổi tên** thành `fail-before-fix-01…04*.png`
+  vì `run-one.mjs` luôn ghi ảnh vào thư mục của probe (không có cờ tắt). Cổng: `npm run verify` **EXIT=0** ·
+  **126 file / 1553 test** (124 `.ts` + 2 `.tsx`) · `Duration 29.07s` · entry **đổi hash mà không đổi độ dài**
+  (`index-BZswaFkc.js` → `index--gQhs43l.js`, vẫn **214 kB = 219 142 byte**, `gzip` 62.81 → **62.80 kB**)
+  vì hai nhãn mới nằm trong chunk lazy `AvatarShopScreen-B-c_Xglz.js` (8 887 byte) còn entry chỉ mang **tên**
+  chunk — hai chuỗi 8 ký tự bằng nhau; boot graph giữ `438617` byte = **428.3 kB**. Hồi quy cùng `dist/`:
+  `qa/golden-path.mjs` QA PASS **28** bước, `qa/parent-controls.mjs` **7**, `qa/avatar-shop-tabs-coverage.mjs`
+  (T49B) **5**, `qa/mobile-home.mjs` và `qa/responsive-a11y.mjs` 0 bước 0 lỗi (`regression-probes.txt`).
+  **Ghi sổ `DEF-024` (MỞ)** — phép đo toàn nhà: `grep -rn "^[[:space:]]*StorageService\.save[A-Za-z]*(" src
+  --include=*.ts --include=*.tsx | wc -l` = **66** lời gọi vẫn vứt kết quả (trước đợt này **69**), **13** ở
+  `src/components`: `ParentDashboardModal.tsx` **12** (11 × `saveParentSettings` + 1 × `saveChildProfile` ở
+  `:237`) và `ReadingFluencyScreen.tsx:586` × `saveReadingParentRating`; mỗi chỗ cần một **quyết định chính
+  sách** (im lặng · hiện chữ · chặn thao tác) nên không sửa đại trà trong một lát cắt. **Phạm vi giữ lại**:
+  ba nhãn "bé chưa đủ sao / chưa tới level / vé hôm nay hết" vẫn chỉ có tiếng ⇒ `DEF-011` còn mở.
 - **T50A — bé chọn "Cú Thông Thái" xong về Home thì cú hóa thỏ (`DEF-022a`).**
   Hồ sơ cho phép **4** bạn mascot (`src/types/index.ts` `avatarBase = 'bear' | 'fox' | 'rabbit' | 'owl'`),
   nhưng `src/components/home/HomeScreen.tsx:254` vẽ bằng ternary **3** nhánh có `else`
