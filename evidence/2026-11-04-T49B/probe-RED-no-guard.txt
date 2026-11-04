@@ -1,0 +1,39 @@
+{
+  "steps": [
+    {
+      "step": "A-tabs",
+      "Chọn Bạn Mascot": 4,
+      "Mũ & Nón": 8,
+      "Kính Mắt": 5,
+      "Ba Lô": 4,
+      "Thú Cưng": 7
+    },
+    {
+      "step": "E-empty-preview",
+      "preview": "🦊"
+    }
+  ],
+  "errors": [
+    "A: tab \"Áo & Trang Phục\" không tồn tại trên màn hình",
+    "A: tab \"Nền\" không tồn tại trên màn hình",
+    "A: tab \"Khung\" không tồn tại trên màn hình",
+    "B: tab \"Áo & Trang Phục\" không tồn tại trên màn hình",
+    "C: tab \"Nền\" không tồn tại trên màn hình",
+    "D: tab \"Khung\" không tồn tại trên màn hình"
+  ],
+  "facts": {
+    "mởKhóa_Chọn Bạn Mascot": 0,
+    "mởKhóa_Mũ & Nón": 7,
+    "mởKhóa_Kính Mắt": 4,
+    "mởKhóa_Ba Lô": 3,
+    "mởKhóa_Thú Cưng": 7,
+    "plainPreview": "🦊"
+  },
+  "failedAt": "A",
+  "shots": [
+    "01-A-tam-tab.png",
+    "02-E-khong-mac-gi.png"
+  ],
+  "ok": false
+}
+QA FAIL — 6 error(s) at A

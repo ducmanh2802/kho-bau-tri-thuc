@@ -340,7 +340,7 @@ function migrateToCurrentSchema(raw: Record<string, unknown>): Record<string, un
 }
 
 /**
- * T18A — Shop 43 món (catalog ở `src/data/shopCatalog.ts`).
+ * T18A — Shop 41 món (catalog ở `src/data/shopCatalog.ts`).
  * 12 món đầu giữ nguyên id/giá/trạng thái như trước P42 nên đồ bé đã mở
  * không bao giờ mất; chỉ thêm `minLevel` (món cũ mở bán ngay từ level 1–20).
  */

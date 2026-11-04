@@ -1,0 +1,318 @@
+### qa/gacha-machine.mjs
+{
+  "errors": [],
+  "shots": [
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t28-gacha\\01-gacha-pile.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t28-gacha\\02-gacha-spinning.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t28-gacha\\03-gacha-result.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t28-gacha\\04-gacha-history.png"
+  ],
+  "facts": {
+    "overflowPx": 0
+  },
+  "steps": [
+    {
+      "step": "pileLayout",
+      "count": 10,
+      "winW": 308,
+      "winH": 164,
+      "spreadX": 210,
+      "spreadXRatio": 68,
+      "spreadYRatio": 21,
+      "outside": 0
+    },
+    {
+      "step": "spinAnimation",
+      "claw": "claw-drop",
+      "pile": "gacha-jumble",
+      "spinningLabel": true
+    },
+    {
+      "step": "drawResult",
+      "resultText": "⛵ Sticker Mới! Bé nhận được Thuyền Buồm Ra Khơi! 0 Đã lưu vào Bộ Sưu Tập! Tuyệt Vời!",
+      "ticketsLeft": 4
+    },
+    {
+      "step": "history",
+      "historyCount": 1,
+      "levelUpShown": true
+    }
+  ],
+  "ok": true
+}
+QA PASS — 4 step(s), 0 errors
+EXIT=0
+### qa/parent-controls.mjs
+{
+  "errors": [],
+  "shots": [
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\01-vi-sao-mo-insight.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\02-tat-phan-thuong.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\03-shop-tat-thuong.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\04-ket-qua-khi-tat-thuong.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\05-shop-sau-khi-bat.png",
+    "C:\\Users\\Windows\\AppData\\Local\\Temp\\shots-t41a\\06-cta-mo-dich.png"
+  ],
+  "facts": {
+    "section": "6-cta",
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "steps": [
+    {
+      "step": "whyOpensInsights",
+      "report": true
+    },
+    {
+      "step": "rewardsSwitch",
+      "rewardsEnabled": false
+    },
+    {
+      "step": "shopWhileOff",
+      "beforeShop": {
+        "stars": 999,
+        "xp": 5000,
+        "tickets": 0,
+        "owned": 3
+      },
+      "afterShop": {
+        "stars": 999,
+        "xp": 5000,
+        "tickets": 0,
+        "owned": 3
+      }
+    },
+    {
+      "step": "lessonWhileOff",
+      "answered": 11,
+      "reachedResult": true,
+      "rewardsOffVisible": true,
+      "rewardsOffText": "Bé hoàn thành bài rồi! Nhà mình đang tắt phần thưởng nên lượt này không cộng Sao, XP hay Vé — Gấu vẫn ghi nhớ bài học của bé.",
+      "resultText": "🐻 Chữ A, B, C thân thương Câu hỏi 11 / 11 · ⏱ 0:06 Chuẩn Nâng cao 🔥 4 đúng Một sao! Bé thử lại cho chắc nhé! CHÚC MỪNG BÉ HOÀN THÀNH! Bé đã làm đúng 4 / 11 câ",
+      "beforeLesson": {
+        "stars": 999,
+        "xp": 5000,
+        "tickets": 0,
+        "owned": 3
+      },
+      "afterLesson": {
+        "stars": 999,
+        "xp": 5000,
+        "tickets": 0,
+        "owned": 3
+      }
+    },
+    {
+      "step": "rewardsBackOn",
+      "rewardsEnabled": true
+    },
+    {
+      "step": "shopAfterReopen",
+      "beforeBuy": {
+        "stars": 999,
+        "xp": 5000,
+        "tickets": 0,
+        "owned": 3
+      },
+      "afterBuy": {
+        "stars": 992,
+        "xp": 5850,
+        "tickets": 1,
+        "owned": 4
+      }
+    },
+    {
+      "step": "ctaRouting",
+      "ctaLabel": "Bắt đầu: Trò Chơi: Bóng Bay Màu Sắc",
+      "playerOpen": false,
+      "gameOpen": false,
+      "gamesHub": true,
+      "onSubjectMap": false
+    }
+  ],
+  "ok": true
+}
+QA PASS — 7 step(s), 0 errors
+EXIT=0
+### qa/golden-path.mjs
+{
+  "steps": [
+    {
+      "step": "home",
+      "readingCard": true,
+      "competitionCard": false,
+      "nextBestAction": true,
+      "readingHeadline": false
+    },
+    {
+      "step": "newChildIsClean",
+      "xp": 0
+    },
+    {
+      "step": "vietnameseSubject",
+      "lessonCount": 58
+    },
+    {
+      "step": "lessonOpened",
+      "ok": true
+    },
+    {
+      "step": "lessonCompleted",
+      "questionsAnswered": 11,
+      "completed": true
+    },
+    {
+      "step": "evidenceRecorded",
+      "schemaVersion": "P43-v1",
+      "skillCount": 3,
+      "evidenceCount": 11
+    },
+    {
+      "step": "levelUpCelebrationDismissed",
+      "ok": true,
+      "afterResultScreen": true
+    },
+    {
+      "step": "readingLadder",
+      "hasStages": true,
+      "allFiveStages": true,
+      "lockedStages": 4
+    },
+    {
+      "step": "stageGating",
+      "lockedStageButtons": 4
+    },
+    {
+      "step": "readingPassageShown",
+      "passages": 1
+    },
+    {
+      "step": "readingSession",
+      "itemsAnswered": 6,
+      "resultShown": true
+    },
+    {
+      "step": "readingPersisted",
+      "sessions": 1,
+      "readingIndex": 50,
+      "stageAccuracy": 50
+    },
+    {
+      "step": "SNAP_afterReading",
+      "xp": 110,
+      "lessons": 1,
+      "exams": 0,
+      "reading": 1,
+      "keys": "__sentinel,kho_bau_achievements,kho_bau_analytics,kho_bau_child_profile,kho_bau_daily_quests,kho_bau_learning_os_store,kho_bau_motivation,kho_bau_parent_settings,kho_bau_reading_store",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "competitionHub",
+      "ok": true
+    },
+    {
+      "step": "examDialog",
+      "hasTimer": true,
+      "timerSample": "04:59",
+      "showsQuestionType": true,
+      "typeLabel": "trắc nghiệm"
+    },
+    {
+      "step": "examAnswered",
+      "itemsAnswered": 6
+    },
+    {
+      "step": "examResult",
+      "shown": true
+    },
+    {
+      "step": "resultBreakdown",
+      "hasScoreBreakdown": true,
+      "hasTypeBreakdown": true,
+      "hasRemediation": true,
+      "hasFairnessNote": true
+    },
+    {
+      "step": "errorAnalysisRendered",
+      "hasMistakesHeading": true,
+      "hasCategoryLabel": false,
+      "hasRemediation": true,
+      "hasRemediationButton": true,
+      "showsCorrectAnswer": true
+    },
+    {
+      "step": "SNAP_afterExams",
+      "xp": 260,
+      "lessons": 1,
+      "exams": 2,
+      "reading": 1,
+      "keys": "__sentinel,kho_bau_achievements,kho_bau_analytics,kho_bau_child_profile,kho_bau_competition_history,kho_bau_daily_quests,kho_bau_learning_os_store,kho_bau_motivation,kho_bau_parent_settings,kho_bau_reading_store",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "parentGate",
+      "shown": true
+    },
+    {
+      "step": "parentUnlocked",
+      "ok": true,
+      "attempts": 1
+    },
+    {
+      "step": "parentReadingTab",
+      "hasIndex": true,
+      "hasLadder": true,
+      "hasAdvice": true,
+      "hasDemoBanner": false
+    },
+    {
+      "step": "parentCompetitionTab",
+      "hasExamCount": true,
+      "hasLog": true
+    },
+    {
+      "step": "SNAP_afterParent",
+      "xp": 260,
+      "lessons": 1,
+      "exams": 2,
+      "reading": 1,
+      "keys": "__sentinel,kho_bau_achievements,kho_bau_analytics,kho_bau_child_profile,kho_bau_competition_history,kho_bau_daily_quests,kho_bau_learning_os_store,kho_bau_motivation,kho_bau_parent_settings,kho_bau_reading_store",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "harnessGuard",
+      "origin": "http://localhost:4173",
+      "sentinel": "alive"
+    },
+    {
+      "step": "persistenceAfterReload",
+      "before": {
+        "xp": 260,
+        "lessons": 1,
+        "exams": 2,
+        "readingSessions": 1
+      },
+      "after": {
+        "xp": 260,
+        "lessons": 1,
+        "exams": 2,
+        "readingSessions": 1
+      },
+      "persisted": true
+    },
+    {
+      "step": "noDuplicateRewards",
+      "xpBefore": 260,
+      "xpAfter": 260
+    }
+  ],
+  "errors": [],
+  "removals": []
+}
+QA PASS — 28 step(s), 0 errors
+EXIT=0

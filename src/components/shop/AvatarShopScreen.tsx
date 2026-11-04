@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AvatarItem, ChildProfile } from '../../types';
+import { ShopItemType } from '../../types/motivation';
 import { AVATAR_SHOP_ITEMS, StorageService } from '../../services/storage';
 import { xpToLevel } from '../../services/levelEngine';
 import { sound } from '../../services/sound';
@@ -11,19 +12,59 @@ interface AvatarShopScreenProps {
   onProfileUpdate: () => void;
 }
 
+export const SHOP_MASCOTS = [
+  { id: 'bear', name: 'Gấu Bút Chì', emoji: '🐻', desc: 'Chăm chỉ & Thân thiện' },
+  { id: 'fox', name: 'Cáo Toán Học', emoji: '🦊', desc: 'Thông minh & Tinh anh' },
+  { id: 'rabbit', name: 'Thỏ Tiếng Anh', emoji: '🐰', desc: 'Nhanh nhẹn & Đáng yêu' },
+  { id: 'owl', name: 'Cú Thông Thái', emoji: '🦉', desc: 'Uyên bác & Điềm đạm' },
+] as const;
+
+export interface ShopTab {
+  id: 'mascot' | ShopItemType;
+  label: string;
+  icon: string;
+}
+
+/**
+ * Tab của tủ đồ. Danh sách này và `ShopItemType` phải phủ hết catalogue —
+ * `tests/t49b-shop-tabs-cover-catalog.test.ts` b2/b3 giữ bất biến đó (thêm một
+ * `type` mới mà quên thêm tab là 6 món sẽ mồ côi như áo/nền/khung trước đây).
+ */
+export const SHOP_TABS: ShopTab[] = [
+  { id: 'mascot', label: 'Chọn Bạn Mascot', icon: '🦊' },
+  { id: 'hat', label: 'Mũ & Nón', icon: '🧢' },
+  { id: 'glasses', label: 'Kính Mắt', icon: '👓' },
+  { id: 'shirt', label: 'Áo & Trang Phục', icon: '👕' },
+  { id: 'backpack', label: 'Ba Lô', icon: '🎒' },
+  { id: 'pet', label: 'Thú Cưng', icon: '🐱' },
+  { id: 'background', label: 'Nền', icon: '🌊' },
+  { id: 'frame', label: 'Khung', icon: '🖼️' },
+];
+
+/**
+ * Lớp của từng ô trang bị trong ô preview. `Record<ShopItemType, string>` buộc
+ * một `type` mới phải có chỗ đứng — thêm tab mà bé mặc vào không thấy gì thì
+ * nút "Đang mặc" lại thành một lời hứa suông kiểu `shirt`/`background`/`frame`.
+ */
+const EQUIP_LAYER: Record<ShopItemType, string> = {
+  background: 'absolute inset-0 flex items-center justify-center text-5xl md:text-6xl opacity-25',
+  hat: 'absolute -top-3 left-1/2 -translate-x-1/2 text-3xl',
+  glasses: 'absolute top-8 left-1/2 -translate-x-1/2 text-2xl',
+  shirt: 'absolute bottom-1 left-1/2 -translate-x-1/2 text-3xl',
+  backpack: 'absolute -bottom-2 -left-2 text-2xl',
+  pet: 'absolute -bottom-2 -right-2 text-2xl animate-bounce',
+  frame: 'absolute -top-3 -left-3 text-xl',
+};
+
+/** `background` là lớp *sau* bé, các ô còn lại đè lên trên ⇒ vẽ làm hai nhóm. */
+export const EQUIP_OVERLAYS: ShopItemType[] = ['hat', 'glasses', 'shirt', 'backpack', 'pet', 'frame'];
+
 export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
   onBack,
   onProfileUpdate,
 }) => {
   const [profile, setProfile] = useState<ChildProfile>(StorageService.getChildProfile());
-  const [activeTab, setActiveTab] = useState<'mascot' | 'hat' | 'glasses' | 'backpack' | 'pet'>('mascot');
-
-  const MASCOTS = [
-    { id: 'bear', name: 'Gấu Bút Chì', emoji: '🐻', desc: 'Chăm chỉ & Thân thiện' },
-    { id: 'fox', name: 'Cáo Toán Học', emoji: '🦊', desc: 'Thông minh & Tinh anh' },
-    { id: 'rabbit', name: 'Thỏ Tiếng Anh', emoji: '🐰', desc: 'Nhanh nhẹn & Đáng yêu' },
-    { id: 'owl', name: 'Cú Thông Thái', emoji: '🦉', desc: 'Uyên bác & Điềm đạm' },
-  ];
+  const [activeTab, setActiveTab] = useState<'mascot' | ShopItemType>('mascot');
 
   const handleSelectMascot = (mId: 'bear' | 'fox' | 'rabbit' | 'owl') => {
     sound.playClick();
@@ -32,7 +73,7 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
     setProfile(updated);
     StorageService.saveChildProfile(updated);
     onProfileUpdate();
-    sound.speak(`Bé đã chọn bạn ${MASCOTS.find((m) => m.id === mId)?.name}!`);
+    sound.speak(`Bé đã chọn bạn ${SHOP_MASCOTS.find((m) => m.id === mId)?.name}!`);
   };
 
   const handleBuyOrEquip = (item: AvatarItem) => {
@@ -96,6 +137,12 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
 
   const filteredItems = AVATAR_SHOP_ITEMS.filter((i) => i.type === activeTab);
 
+  const equippedItem = (type: ShopItemType): AvatarItem | undefined => {
+    const id = profile.equipped[type];
+    return id ? AVATAR_SHOP_ITEMS.find((i) => i.id === id && i.type === type) : undefined;
+  };
+  const backgroundItem = equippedItem('background');
+
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6 md:py-8 space-y-6 select-none">
       {/* Top Bar with back button */}
@@ -124,32 +171,24 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
         <div className="flex items-center gap-6">
           {/* Avatar Composite Preview */}
           <div className="relative w-28 h-28 md:w-32 md:h-32 bg-white rounded-3xl shadow-xl border-4 border-amber-200 flex items-center justify-center text-6xl md:text-7xl">
-            {profile.avatarBase === 'bear' ? '🐻' : profile.avatarBase === 'fox' ? '🦊' : profile.avatarBase === 'rabbit' ? '🐰' : '🦉'}
+            {backgroundItem && (
+              <span aria-hidden className={EQUIP_LAYER.background}>
+                {backgroundItem.emoji}
+              </span>
+            )}
 
-            {/* Hat */}
-            {profile.equipped.hat && (
-              <span className="absolute -top-3 text-3xl">
-                {AVATAR_SHOP_ITEMS.find((i) => i.id === profile.equipped.hat)?.emoji}
-              </span>
-            )}
-            {/* Glasses */}
-            {profile.equipped.glasses && (
-              <span className="absolute top-8 text-2xl">
-                {AVATAR_SHOP_ITEMS.find((i) => i.id === profile.equipped.glasses)?.emoji}
-              </span>
-            )}
-            {/* Backpack */}
-            {profile.equipped.backpack && (
-              <span className="absolute -bottom-2 -left-2 text-2xl">
-                {AVATAR_SHOP_ITEMS.find((i) => i.id === profile.equipped.backpack)?.emoji}
-              </span>
-            )}
-            {/* Pet */}
-            {profile.equipped.pet && (
-              <span className="absolute -bottom-2 -right-2 text-2xl animate-bounce">
-                {AVATAR_SHOP_ITEMS.find((i) => i.id === profile.equipped.pet)?.emoji}
-              </span>
-            )}
+            <span className="relative">
+              {profile.avatarBase === 'bear' ? '🐻' : profile.avatarBase === 'fox' ? '🦊' : profile.avatarBase === 'rabbit' ? '🐰' : '🦉'}
+            </span>
+
+            {EQUIP_OVERLAYS.map((type) => {
+              const item = equippedItem(type);
+              return item ? (
+                <span key={type} aria-hidden className={EQUIP_LAYER[type]}>
+                  {item.emoji}
+                </span>
+              ) : null;
+            })}
           </div>
 
           <div>
@@ -172,18 +211,12 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
 
       {/* Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {[
-          { id: 'mascot', label: 'Chọn Bạn Mascot', icon: '🦊' },
-          { id: 'hat', label: 'Mũ & Nón', icon: '🧢' },
-          { id: 'glasses', label: 'Kính Mắt', icon: '👓' },
-          { id: 'backpack', label: 'Ba Lô', icon: '🎒' },
-          { id: 'pet', label: 'Thú Cưng', icon: '🐱' },
-        ].map((tab) => (
+        {SHOP_TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => {
               sound.playClick();
-              setActiveTab(tab.id as typeof activeTab);
+              setActiveTab(tab.id);
             }}
             className={`px-4 min-h-[44px] py-2 rounded-2xl text-xs md:text-sm font-black flex items-center gap-1.5 transition-all whitespace-nowrap cursor-pointer active:scale-95 ${
               activeTab === tab.id
@@ -202,7 +235,7 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
         {activeTab === 'mascot' ? (
           // Mascot choices
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {MASCOTS.map((m) => {
+            {SHOP_MASCOTS.map((m) => {
               const isSelected = profile.avatarBase === m.id;
               return (
                 <button

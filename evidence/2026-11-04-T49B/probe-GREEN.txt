@@ -1,0 +1,65 @@
+{
+  "steps": [
+    {
+      "step": "A-tabs",
+      "Chọn Bạn Mascot": 4,
+      "Mũ & Nón": 8,
+      "Kính Mắt": 5,
+      "Áo & Trang Phục": 6,
+      "Ba Lô": 4,
+      "Thú Cưng": 7,
+      "Nền": 6,
+      "Khung": 5
+    },
+    {
+      "step": "B",
+      "id": "shirt_yellow",
+      "before": 284,
+      "after": 278,
+      "preview": "🦊👕"
+    },
+    {
+      "step": "C",
+      "id": "bg_sea",
+      "before": 278,
+      "after": 263,
+      "preview": "🌊🦊👕"
+    },
+    {
+      "step": "D",
+      "id": "frame_gold",
+      "before": 263,
+      "after": 253,
+      "preview": "🌊🦊👕⭐"
+    },
+    {
+      "step": "E-empty-preview",
+      "preview": "🦊"
+    }
+  ],
+  "errors": [],
+  "facts": {
+    "mởKhóa_Chọn Bạn Mascot": 0,
+    "mởKhóa_Mũ & Nón": 7,
+    "mởKhóa_Kính Mắt": 4,
+    "mởKhóa_Áo & Trang Phục": 6,
+    "mởKhóa_Ba Lô": 3,
+    "mởKhóa_Thú Cưng": 7,
+    "mởKhóa_Nền": 6,
+    "mởKhóa_Khung": 5,
+    "B_stars": "284→278",
+    "C_stars": "278→263",
+    "D_stars": "263→253",
+    "plainPreview": "🦊"
+  },
+  "failedAt": null,
+  "shots": [
+    "01-A-tam-tab.png",
+    "B-shirt_yellow.png",
+    "C-bg_sea.png",
+    "D-frame_gold.png",
+    "02-E-khong-mac-gi.png"
+  ],
+  "ok": true
+}
+QA PASS — 5 step(s), 0 errors

@@ -1,5 +1,5 @@
 /**
- * T18A — Shop: 43 món (mũ, kính, áo, ba lô, thú cưng, nền, khung avatar).
+ * T18A — Shop: 41 món (mũ, kính, áo, ba lô, thú cưng, nền, khung avatar).
  * Món mở theo level của bé (`minLevel`); sao dùng để mua, vé dùng cho
  * máy gắp sticker. 12 món đầu giữ nguyên id/giá/trạng thái như trước
  * P42 để không mất đồ bé đã mở.

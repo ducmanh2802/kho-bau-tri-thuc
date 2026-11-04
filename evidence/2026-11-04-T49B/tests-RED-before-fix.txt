@@ -1,0 +1,98 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts (7 tests | 4 failed) 37ms
+   ❯ T49B — catalogue quà và tab của tủ đồ (7)
+     ✓ b1: 41 món, chia theo type đúng như phép đo 3ms
+     × b2: mọi type trong catalogue đều có một tab ⇒ không món nào mồ côi 8ms
+     × b3: không tab nào rỗng và không món nào rơi ngoài tab 1ms
+     ✓ b4: mọi type là một ô trang bị thật của hồ sơ ⇒ mặc vào có chỗ chứa 1ms
+     ✓ b5: đủ tab hiện trên màn hình, nhãn tiếng Việt, không trùng id 14ms
+     × b6: mặc áo / nền / khung thì nhân vật preview đổi thật 8ms
+     × b7: chú thích số món trong nguồn khớp số đo (hết "43 món") 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t49b-shop-tabs-cover-catalog.test.ts > T49B — catalogue quà và tab của tủ đồ > b2: mọi type trong catalogue đều có một tab ⇒ không món nào mồ côi
+AssertionError: expected [ 'shirt', 'background', 'frame' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "shirt",
++   "background",
++   "frame",
++ ]
+
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts:104:21
+    102|   it('b2: mọi type trong catalogue đều có một tab ⇒ không món nào mồ c…
+    103|     const orphans = catalogTypes.filter((t) => !tabIds.includes(t as n…
+    104|     expect(orphans).toEqual([]);
+       |                     ^
+    105|   });
+    106|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/t49b-shop-tabs-cover-catalog.test.ts > T49B — catalogue quà và tab của tủ đồ > b3: không tab nào rỗng và không món nào rơi ngoài tab
+AssertionError: expected 24 to be 41 // Object.is equality
+
+- Expected
++ Received
+
+- 41
++ 24
+
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts:115:21
+    113|       if (tab.id !== 'mascot') covered += count;
+    114|     }
+    115|     expect(covered).toBe(AVATAR_SHOP_ITEMS.length);
+       |                     ^
+    116|   });
+    117|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/t49b-shop-tabs-cover-catalog.test.ts > T49B — catalogue quà và tab của tủ đồ > b6: mặc áo / nền / khung thì nhân vật preview đổi thật
+AssertionError: expected '<div class="w-full max-w-4xl mx-auto …' to contain '🦸'
+
+Expected: "🦸"
+Received: "<div class="w-full max-w-4xl mx-auto px-4 py-6 md:py-8 space-y-6 select-none"><div class="flex items-center justify-between"><button class="flex items-center gap-1.5 px-4 min-h-[44px] py-2 bg-white hover:bg-amber-50 border-2 bord …[cắt HTML dài]
+
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts:151:18
+    149|     const emojiOf = (id: string) => AVATAR_SHOP_ITEMS.find((i) => i.id…
+    150|     const html = screen();
+    151|     expect(html).toContain(emojiOf('shirt_super'));
+       |                  ^
+    152|     expect(html).toContain(emojiOf('bg_sea'));
+    153|     expect(html).toContain(emojiOf('frame_gold'));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/t49b-shop-tabs-cover-catalog.test.ts > T49B — catalogue quà và tab của tủ đồ > b7: chú thích số món trong nguồn khớp số đo (hết "43 món")
+AssertionError: expected 43 to be 41 // Object.is equality
+
+- Expected
++ Received
+
+- 41
++ 43
+
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts:169:25
+    167|     for (const c of comments) {
+    168|       expect(c, 'thiếu chú thích số món để đối chiếu').toBeTruthy();
+    169|       expect(Number(c)).toBe(n);
+       |                         ^
+    170|     }
+    171|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 3 passed (7)
+   Start at  08:12:45
+   Duration  775ms (import 52%, transform 36%, tests 9%, worker 3%)
+

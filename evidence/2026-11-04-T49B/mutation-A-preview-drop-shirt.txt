@@ -1,0 +1,31 @@
+MUTATION A — bỏ 'shirt' khỏi EQUIP_OVERLAYS (preview không còn lớp áo)
+Lệnh: npx vitest run tests/t49b-shop-tabs-cover-catalog.test.ts
+Mục đích: chứng minh b6 thật sự đo ô preview, không phải đo tab.
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts (7 tests | 1 failed) 34ms
+   ❯ T49B — catalogue quà và tab của tủ đồ (7)
+     ✓ b1: 41 món, chia theo type đúng như phép đo 3ms
+     ✓ b2: mọi type trong catalogue đều có một tab ⇒ không món nào mồ côi 0ms
+     ✓ b3: không tab nào rỗng và không món nào rơi ngoài tab 0ms
+     ✓ b4: mọi type là một ô trang bị thật của hồ sơ ⇒ mặc vào có chỗ chứa 0ms
+     ✓ b5: đủ tab hiện trên màn hình, nhãn tiếng Việt, không trùng id 15ms
+     × b6: mặc áo / nền / khung thì nhân vật preview đổi thật 13ms
+     ✓ b7: chú thích số món trong nguồn khớp số đo (hết "43 món") 0ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/t49b-shop-tabs-cover-catalog.test.ts > T49B — catalogue quà và tab của tủ đồ > b6: mặc áo / nền / khung thì nhân vật preview đổi thật
+AssertionError: món shirt_super mặc vào mà preview không đổi: expected '<div class="w-full max-w-4xl mx-auto …' to contain '🦸'
+Expected: "🦸"
+Received: "<div class="w-full max-w-4xl mx-auto px-4 py-6 md:py-8 space-y-6 select-none"><div class="flex items-center justify-between"><button class="flex items-center gap-1.5 px-4 min-h-[44px] py-2  …[cắt HTML]
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts:154:82
+    152|     const emojiOf = (id: string) => AVATAR_SHOP_ITEMS.find((i) => i.id…
+    153|     const html = screen();
+    154|     for (const id of ids) expect(html, `món ${id} mặc vào mà preview k…
+       |                                                                                  ^
+    155|
+    156|     seedProfile({ unlockedItems: [], equipped: {} });
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  08:16:36
+   Duration  717ms (import 58%, transform 29%, tests 9%, worker 3%)

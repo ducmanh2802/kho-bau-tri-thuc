@@ -1,0 +1,47 @@
+MUTATION C — gỡ 'glasses' khỏi EQUIP_OVERLAYS (mặc kính vào thì nhân vật không đổi)
+Lệnh: npx vitest run tests/t49b-shop-tabs-cover-catalog.test.ts
+Mục đích: b8 phải phủ **mọi** type, không riêng ba món b6 chấm; EQUIP_OVERLAYS là mảng thường nên tsc không bắt được.
+
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts (8 tests | 1 failed) 35ms
+   ❯ T49B — catalogue quà và tab của tủ đồ (8)
+     ✓ b1: 41 món, chia theo type đúng như phép đo 3ms
+     ✓ b2: mọi type trong catalogue đều có một tab ⇒ không món nào mồ côi 0ms
+     ✓ b3: không tab nào rỗng và không món nào rơi ngoài tab 1ms
+     ✓ b4: mọi type là một ô trang bị thật của hồ sơ ⇒ mặc vào có chỗ chứa 0ms
+     ✓ b5: đủ tab hiện trên màn hình, nhãn tiếng Việt, không trùng id 15ms
+     ✓ b6: mặc áo / nền / khung thì nhân vật preview đổi thật 7ms
+     ✓ b7: chú thích số món trong nguồn khớp số đo (hết "43 món") 0ms
+     × b8: mọi type có một **lớp preview**, không riêng ba món của b6 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t49b-shop-tabs-cover-catalog.test.ts > T49B — catalogue quà và tab của tủ đồ > b8: mọi type có một **lớp preview**, không riêng ba món của b6
+AssertionError: mặc glasses vào thì bé không thấy gì trên nhân vật: expected [ 'glasses' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "glasses",
++ ]
+
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts:185:89
+    183|     const rendered = [...EQUIP_OVERLAYS, 'background'];
+    184|     const missing = catalogTypes.filter((t) => !rendered.includes(t as…
+    185|     expect(missing, `mặc ${missing.join(', ')} vào thì bé không thấy g…
+       |                                                                                         ^
+    186|     expect(new Set(rendered).size).toBe(rendered.length);
+    187|     expect(rendered.length).toBe(catalogTypes.length);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 passed (8)
+   Start at  08:36:33
+   Duration  690ms (import 58%, transform 29%, tests 10%, worker 3%)
+

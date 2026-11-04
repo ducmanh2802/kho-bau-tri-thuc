@@ -1,0 +1,49 @@
+MUTATION B — bỏ tab 'shirt' khỏi SHOP_TABS (tab Áo & Trang Phục biến mất)
+Lệnh: npx vitest run tests/t49b-shop-tabs-cover-catalog.test.ts
+Mục đích: b2/b3 phải đỏ vì món mồ côi, không phải vì harness.
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts (7 tests | 2 failed) 37ms
+   ❯ T49B — catalogue quà và tab của tủ đồ (7)
+     ✓ b1: 41 món, chia theo type đúng như phép đo 3ms
+     × b2: mọi type trong catalogue đều có một tab ⇒ không món nào mồ côi 10ms
+     × b3: không tab nào rỗng và không món nào rơi ngoài tab 1ms
+     ✓ b4: mọi type là một ô trang bị thật của hồ sơ ⇒ mặc vào có chỗ chứa 0ms
+     ✓ b5: đủ tab hiện trên màn hình, nhãn tiếng Việt, không trùng id 14ms
+     ✓ b6: mặc áo / nền / khung thì nhân vật preview đổi thật 5ms
+     ✓ b7: chú thích số món trong nguồn khớp số đo (hết "43 món") 0ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  tests/t49b-shop-tabs-cover-catalog.test.ts > T49B — catalogue quà và tab của tủ đồ > b2: mọi type trong catalogue đều có một tab ⇒ không món nào mồ côi
+AssertionError: expected [ 'shirt' ] to deeply equal []
+- Expected
++ Received
+- []
++ [
++   "shirt",
++ ]
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts:104:21
+    102|   it('b2: mọi type trong catalogue đều có một tab ⇒ không món nào mồ c…
+    103|     const orphans = catalogTypes.filter((t) => !tabIds.includes(t as n…
+    104|     expect(orphans).toEqual([]);
+       |                     ^
+    105|   });
+    106|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+ FAIL  tests/t49b-shop-tabs-cover-catalog.test.ts > T49B — catalogue quà và tab của tủ đồ > b3: không tab nào rỗng và không món nào rơi ngoài tab
+AssertionError: expected 35 to be 41 // Object.is equality
+- Expected
++ Received
+- 41
++ 35
+ ❯ tests/t49b-shop-tabs-cover-catalog.test.ts:115:21
+    113|       if (tab.id !== 'mascot') covered += count;
+    114|     }
+    115|     expect(covered).toBe(AVATAR_SHOP_ITEMS.length);
+       |                     ^
+    116|   });
+    117|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+ Test Files  1 failed (1)
+      Tests  2 failed | 5 passed (7)
+   Start at  08:16:49
+   Duration  757ms (import 51%, transform 37%, tests 9%, worker 3%)
