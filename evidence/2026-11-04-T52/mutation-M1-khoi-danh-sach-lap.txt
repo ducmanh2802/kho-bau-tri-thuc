@@ -1,0 +1,516 @@
+{
+  "steps": [
+    {
+      "step": "vp375",
+      "pageHeight": 3697,
+      "mainNodes": 391,
+      "infiniteAnimations": 3
+    },
+    {
+      "step": "vp1280",
+      "pageHeight": 3027,
+      "mainNodes": 391,
+      "infiniteAnimations": 3
+    }
+  ],
+  "errors": [
+    "vp375: mỗi việc hiện hai lần [Học 2 bài Tiếng Việt thật hay, Học 2 bài Em & Cuộc sống, Đọc 1 truyện thật hay] ⇒ còn khối danh sách lặp",
+    "vp375: 391 node DOM trong <main> > 380",
+    "vp375: trang cao 3697px > 3400px (5.54 màn) ⇒ chưa gọn",
+    "vp1280: mỗi việc hiện hai lần [Học 2 bài Tiếng Việt thật hay, Học 2 bài Em & Cuộc sống, Đọc 1 truyện thật hay] ⇒ còn khối danh sách lặp",
+    "vp1280: trang cao 3027px > 2700px ⇒ chưa gọn"
+  ],
+  "facts": {
+    "vp375": {
+      "pageHeight": 3697,
+      "innerHeight": 667,
+      "screensOfScroll": 5.54,
+      "mainNodes": 391,
+      "duplicateQuestTitles": [
+        "Học 2 bài Tiếng Việt thật hay",
+        "Học 2 bài Em & Cuộc sống",
+        "Đọc 1 truyện thật hay"
+      ],
+      "questRowCount": 3,
+      "subjectCardCount": 4,
+      "infiniteAnimations": 3,
+      "animationNames": [
+        "bounce",
+        "float",
+        "pulse-subtle"
+      ],
+      "headings": [
+        {
+          "text": "Chào Bé Minh! 👋",
+          "top": 96,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Lưu Kết Quả & Điểm Số Lên Google",
+          "top": 464,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Hôm Nay Bé Học Gì?",
+          "top": 583,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Tiếng Việt",
+          "top": 665,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Toán Học",
+          "top": 665,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Tiếng Anh",
+          "top": 859,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Em & Cuộc Sống",
+          "top": 859,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Nhiệm Vụ Hôm Nay",
+          "top": 1049,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Lối Tắt Nhanh",
+          "top": 1291,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Trò Chơi",
+          "top": 1370,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Luyện Đọc",
+          "top": 1370,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Tiếng Anh IOE",
+          "top": 1473,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Cờ Vua 3D",
+          "top": 1473,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Cờ Tướng",
+          "top": 1576,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Hệ Thống Động Lực",
+          "top": 1641,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Bộ Sưu Tập Sticker",
+          "top": 1720,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Máy Gắp",
+          "top": 1738,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Lịch Chuỗi",
+          "top": 1738,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Hôm Nay Bé Nên Học Gì?",
+          "top": 1858,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Trò Chơi: Bắt Chữ Cái Bay",
+          "top": 2083,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Đếm Số 0 Đến 5 Kỳ Thú",
+          "top": 2252,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Khám Phá Chữ Cái A, B, C",
+          "top": 2421,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "ÔN TẬP HÔM NAY5 mục · ~18 phút",
+          "top": 2575,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Kế hoạch phiên họcKhám phá · 3/2",
+          "top": 3110,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Danh Sách Nhiệm Vụ",
+          "top": 3297,
+          "visibleFirstScreen": false
+        }
+      ],
+      "blocks": [
+        {
+          "h": 353,
+          "text": "Chào Bé Minh! 👋"
+        },
+        {
+          "h": 124,
+          "text": "Lưu Kết Quả & Điểm Số Lên Go"
+        },
+        {
+          "h": 430,
+          "text": "Hôm Nay Bé Học Gì?"
+        },
+        {
+          "h": 251,
+          "text": "Nhiệm Vụ Hôm Nay"
+        },
+        {
+          "h": 336,
+          "text": "Lối Tắt Nhanh"
+        },
+        {
+          "h": 181,
+          "text": "Hệ Thống Động Lực"
+        },
+        {
+          "h": 1425,
+          "text": "Hôm Nay Bé Nên Học Gì?"
+        },
+        {
+          "h": 334,
+          "text": "Danh Sách Nhiệm Vụ"
+        }
+      ],
+      "cta": {
+        "label": "Bắt đầu: Trò Chơi: Bắt Chữ Cái Bay",
+        "height": 92
+      },
+      "overflowX": 0,
+      "paint": {
+        "first-paint": 672,
+        "first-contentful-paint": 1036
+      },
+      "domContentLoaded": 95,
+      "load": 96,
+      "transferredJs": 368773,
+      "transferredCss": 77746,
+      "transferredTotal": 446519,
+      "requestedChunks": [
+        "index-DSjVHtfR.js",
+        "rolldown-runtime-XKyaHtl9.js",
+        "react-vendor-BNCMh3YF.js",
+        "NextBestActionCard-CKwL_kwT.js",
+        "chevron-right-DR-_ZzvQ.js",
+        "clock-BajojCuy.js",
+        "lightbulb-BCjrvJPQ.js",
+        "list-checks-BVxk1mKe.js",
+        "target-8W6mbEEj.js",
+        "zap-DJJ0YQrq.js",
+        "decisionLabels-DBFvTV3H.js",
+        "ParentDashboardModal-By82gMuJ.js",
+        "book-open-D0cJM8zr.js",
+        "circle-check-big-DR6N66Qj.js",
+        "lock-C420wINS.js",
+        "timer-Dwf_6rYD.js",
+        "trash-2-B7PS-4fk.js",
+        "trending-up-DvN7COzl.js",
+        "trophy-deupLish.js",
+        "curriculum-Kqz3GTSh.js",
+        "english-bank-CBDGF6Vb.js",
+        "math-bank-BaP_gCx8.js",
+        "kidBoxTaxonomy-DtoU2xWE.js",
+        "readingTaxonomy-DHaSXDuV.js",
+        "useFocusTrap-mtTBqRCl.js",
+        "competitionEngine-Wpf_5EOd.js",
+        "competitionQuestions-boIslmox.js",
+        "kidBoxEngine-DmQU3qRf.js",
+        "adaptive-Cza8XrH7.js",
+        "gameLevels-CuUoNXlh.js",
+        "decisionEngine-Ccf2mzus.js",
+        "UpdateBanner-BwNB4iAn.js",
+        "heart-CMdQMd9Y.js",
+        "ScreenTimeModal-PVbX-b5S.js",
+        "LevelUpCelebrationModal-BNWMkEsl.js",
+        "confetti-CIDaEY5s.js"
+      ],
+      "entryBytes": 201537,
+      "entrySizes": {
+        "transferSize": 58220,
+        "encodedBodySize": 57920,
+        "decodedBodySize": 201537
+      }
+    },
+    "vp1280": {
+      "pageHeight": 3027,
+      "innerHeight": 800,
+      "screensOfScroll": 3.78,
+      "mainNodes": 391,
+      "duplicateQuestTitles": [
+        "Học 2 bài Tiếng Việt thật hay",
+        "Học 2 bài Em & Cuộc sống",
+        "Đọc 1 truyện thật hay"
+      ],
+      "questRowCount": 3,
+      "subjectCardCount": 4,
+      "infiniteAnimations": 3,
+      "animationNames": [
+        "bounce",
+        "float",
+        "pulse-subtle"
+      ],
+      "headings": [
+        {
+          "text": "Chào Bé Minh! 👋",
+          "top": 119,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Lưu Kết Quả & Điểm Số Lên Google",
+          "top": 291,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Hôm Nay Bé Học Gì?",
+          "top": 370,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Tiếng Việt",
+          "top": 478,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Toán Học",
+          "top": 478,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Tiếng Anh",
+          "top": 700,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Em & Cuộc Sống",
+          "top": 700,
+          "visibleFirstScreen": true
+        },
+        {
+          "text": "Nhiệm Vụ Hôm Nay",
+          "top": 878,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Lối Tắt Nhanh",
+          "top": 1077,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Trò Chơi",
+          "top": 1176,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Luyện Đọc",
+          "top": 1176,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Tiếng Anh IOE",
+          "top": 1176,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Cờ Vua 3D",
+          "top": 1176,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Cờ Tướng",
+          "top": 1176,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Hệ Thống Động Lực",
+          "top": 1250,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Bộ Sưu Tập Sticker",
+          "top": 1349,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Máy Gắp",
+          "top": 1349,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Lịch Chuỗi",
+          "top": 1349,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Hôm Nay Bé Nên Học Gì?",
+          "top": 1449,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Trò Chơi: Bắt Chữ Cái Bay",
+          "top": 1616,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Đếm Số 0 Đến 5 Kỳ Thú",
+          "top": 1777,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Khám Phá Chữ Cái A, B, C",
+          "top": 1938,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "ÔN TẬP HÔM NAY5 mục · ~18 phút",
+          "top": 2094,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Kế hoạch phiên họcKhám phá · 3/2",
+          "top": 2518,
+          "visibleFirstScreen": false
+        },
+        {
+          "text": "Danh Sách Nhiệm Vụ",
+          "top": 2663,
+          "visibleFirstScreen": false
+        }
+      ],
+      "blocks": [
+        {
+          "h": 168,
+          "text": "Chào Bé Minh! 👋"
+        },
+        {
+          "h": 84,
+          "text": "Lưu Kết Quả & Điểm Số Lên Go"
+        },
+        {
+          "h": 463,
+          "text": "Hôm Nay Bé Học Gì?"
+        },
+        {
+          "h": 212,
+          "text": "Nhiệm Vụ Hôm Nay"
+        },
+        {
+          "h": 157,
+          "text": "Lối Tắt Nhanh"
+        },
+        {
+          "h": 157,
+          "text": "Hệ Thống Động Lực"
+        },
+        {
+          "h": 1198,
+          "text": "Hôm Nay Bé Nên Học Gì?"
+        },
+        {
+          "h": 346,
+          "text": "Danh Sách Nhiệm Vụ"
+        }
+      ],
+      "cta": {
+        "label": "Bắt đầu: Trò Chơi: Bắt Chữ Cái Bay",
+        "height": 68
+      },
+      "overflowX": 0,
+      "paint": {
+        "first-paint": 672,
+        "first-contentful-paint": 1036
+      },
+      "domContentLoaded": 95,
+      "load": 96,
+      "transferredJs": 368773,
+      "transferredCss": 77746,
+      "transferredTotal": 446519,
+      "requestedChunks": [
+        "index-DSjVHtfR.js",
+        "rolldown-runtime-XKyaHtl9.js",
+        "react-vendor-BNCMh3YF.js",
+        "NextBestActionCard-CKwL_kwT.js",
+        "chevron-right-DR-_ZzvQ.js",
+        "clock-BajojCuy.js",
+        "lightbulb-BCjrvJPQ.js",
+        "list-checks-BVxk1mKe.js",
+        "target-8W6mbEEj.js",
+        "zap-DJJ0YQrq.js",
+        "decisionLabels-DBFvTV3H.js",
+        "ParentDashboardModal-By82gMuJ.js",
+        "book-open-D0cJM8zr.js",
+        "circle-check-big-DR6N66Qj.js",
+        "lock-C420wINS.js",
+        "timer-Dwf_6rYD.js",
+        "trash-2-B7PS-4fk.js",
+        "trending-up-DvN7COzl.js",
+        "trophy-deupLish.js",
+        "curriculum-Kqz3GTSh.js",
+        "english-bank-CBDGF6Vb.js",
+        "math-bank-BaP_gCx8.js",
+        "kidBoxTaxonomy-DtoU2xWE.js",
+        "readingTaxonomy-DHaSXDuV.js",
+        "useFocusTrap-mtTBqRCl.js",
+        "competitionEngine-Wpf_5EOd.js",
+        "competitionQuestions-boIslmox.js",
+        "kidBoxEngine-DmQU3qRf.js",
+        "adaptive-Cza8XrH7.js",
+        "gameLevels-CuUoNXlh.js",
+        "decisionEngine-Ccf2mzus.js",
+        "UpdateBanner-BwNB4iAn.js",
+        "heart-CMdQMd9Y.js",
+        "ScreenTimeModal-PVbX-b5S.js",
+        "LevelUpCelebrationModal-BNWMkEsl.js",
+        "confetti-CIDaEY5s.js"
+      ],
+      "entryBytes": 201537,
+      "entrySizes": {
+        "transferSize": 58220,
+        "encodedBodySize": 57920,
+        "decodedBodySize": 201537
+      }
+    },
+    "label": "m1",
+    "expected": {
+      "pageHeight375": 3400,
+      "pageHeight1280": 2700,
+      "mainNodes": 380,
+      "duplicateQuestTitles": 0,
+      "infiniteAnimations": 3,
+      "entryBytes": 209920
+    }
+  },
+  "failedAt": "vp375",
+  "shots": [
+    "01-home-375-m1.png",
+    "02-home-1280-m1.png"
+  ]
+}
+QA FAIL — 5 error(s) at vp375

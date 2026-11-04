@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Cloud, CheckCircle2, RefreshCw, Sparkles, ShieldCheck } from 'lucide-react';
 import { CloudSyncService, type CloudSyncState } from '../../services/cloudSync';
-import { AccountModal } from './AccountModal';
 import { sound } from '../../services/sound';
 import type { ChildProfile } from '../../types';
+
+/**
+ * T52 — hộp đăng nhập chỉ mở khi ba mẹ bấm banner. Nhập tĩnh nó vào entry bắt mọi
+ * lượt tải trang trả tiền cho một màn có thể không bao giờ mở (`AccountModal` ~18 kB).
+ */
+const AccountModal = lazy(() => import('./AccountModal').then((m) => ({ default: m.AccountModal })));
 
 interface CloudSyncBannerProps {
   profile: ChildProfile;
@@ -130,12 +135,16 @@ export const CloudSyncBanner: React.FC<CloudSyncBannerProps> = ({ profile }) => 
         </div>
       </div>
 
-      <AccountModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        syncState={syncState}
-        profile={profile}
-      />
+      {isModalOpen && (
+        <Suspense fallback={null}>
+          <AccountModal
+            isOpen
+            onClose={() => setIsModalOpen(false)}
+            syncState={syncState}
+            profile={profile}
+          />
+        </Suspense>
+      )}
     </>
   );
 };

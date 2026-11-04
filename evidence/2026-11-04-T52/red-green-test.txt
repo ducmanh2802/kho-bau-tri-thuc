@@ -1,0 +1,25 @@
+=== RED: source TRƯỚC T52 (git checkout HEAD -- 2 file) — npx vitest run tests/t52-home-compact.test.ts
+
+     × chỉ còn một chỗ vẽ danh sách nhiệm vụ (ô biểu tượng), không còn khối danh sách lặp 9ms
+     × ô nhiệm vụ in tên đầy đủ trong 2 dòng, không cắt ở 10 ký tự + "…" 1ms
+     × bỏ nền gradient chạy và nhấp nháy trên khối hero 1ms
+     × thẻ "nên học gì tiếp theo" nạp động, không import tĩnh 2ms
+     × pháo giấy chỉ tải khi bé mở rương, không nằm trong entry 1ms
+     × hộp đăng nhập của ba mẹ nạp động khi bấm banner 0ms
+AssertionError: expected 'import React, { useState, useEffect, …' not to match />\s*Danh Sách Nhiệm Vụ\s*</
+AssertionError: expected 'import React, { useState, useEffect, …' not to match /q\.title\.slice\(/
+AssertionError: expected 'import React, { useState, useEffect, …' not to match /className="[^"]*animate-gradient/
+AssertionError: expected 'import React, { useState, useEffect, …' not to match /^import .*NextBestActionCard/m
+AssertionError: expected 'import React, { useState, useEffect, …' not to match /^import .*fireCelebrationConfetti/m
+AssertionError: expected 'import React, { useState, useEffect }…' not to match /^import \{ AccountModal …/AccountModal'
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
+EXIT=1
+
+=== GREEN: source T52 — npx vitest run tests/t52-home-compact.test.ts
+
+ ✓ tests/t52-home-compact.test.ts (6 tests) 8ms
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Duration  393ms (import 48%, worker 21%, transform 18%, tests 13%)
+EXIT=0

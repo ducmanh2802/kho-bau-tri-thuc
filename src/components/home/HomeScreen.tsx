@@ -1,16 +1,23 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { ActiveScreen, ChildProfile, DailyQuest, ReadingProfile, SubjectType } from '../../types';
 import { sound } from '../../services/sound';
 import { localDateKey } from '../../services/dateUtils';
-import { fireCelebrationConfetti } from '../../services/confetti';
 import { StorageService } from '../../services/storage';
 import { GAMES_CATALOG } from '../../data/gamesCatalog';
 import { AvatarPreview } from '../common/AvatarPreview';
-import { NextBestActionCard } from '../learning/NextBestActionCard';
-import { Star, Sparkles, Gift, Check, ArrowRight, BookOpen, Target, Trophy, Gamepad2, Sparkle, RotateCcw } from 'lucide-react';
+import { Gift, ArrowRight } from 'lucide-react';
 import { KidButton, KidCard, Pill, SectionTitle } from '../ui';
 import { CloudSyncBanner } from '../auth/CloudSyncBanner';
 import type { DecisionRecommendation } from '../../types/decisionEngine';
+
+/**
+ * T52 — thẻ "nên học gì tiếp theo" nằm dưới màn hình đầu trên cả điện thoại lẫn
+ * desktop, lại tự dựng skeleton trong lúc chờ DecisionEngine. Tách khỏi entry thì
+ * lần vẽ đầu không phải tải/nạp/parse nó; phần chờ vẫn là skeleton nên không nhảy layout.
+ */
+const NextBestActionCard = lazy(() =>
+  import('../learning/NextBestActionCard').then((m) => ({ default: m.NextBestActionCard }))
+);
 
 interface HomeScreenProps {
   profile: ChildProfile;
@@ -171,7 +178,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     // T18A — rương ngày qua storage chung (+10 sao, +50 XP, đếm rương + quest vui).
     if (!StorageService.claimDailyChest()) return;
     sound.playLevelUp();
-    fireCelebrationConfetti();
+    // T52 — confetti chỉ chạy khi bé **mở được** rương (một lần mỗi ngày); nhập tĩnh
+    // nó vào entry bắt mọi lượt tải trang trả tiền cho hiệu ứng hiếm dùng.
+    void import('../../services/confetti').then((m) => m.fireCelebrationConfetti());
     setChestClaimed(true);
     onProfileUpdate();
     sound.speak('Bé đã mở rương kho báu thành công! Nhận thêm mười sao vàng!');
@@ -235,11 +244,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   }, [onSelectSubject]);
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-3 sm:px-4 py-4 md:py-6 space-y-5 sm:space-y-6 overflow-x-clip">
+    <div className="w-full max-w-5xl mx-auto px-3 sm:px-4 py-3 md:py-5 space-y-3.5 sm:space-y-4 overflow-x-clip">
       {/* 1. HERO: Gấu Bút Chì (wave) + greeting bubble + 3 pills */}
-      <div className="relative animate-gradient kb-hero-pattern bg-gradient-to-r from-amber-700 via-orange-700 to-rose-700 rounded-3xl p-4 sm:p-5 md:p-6 shadow-xl text-white overflow-hidden border-4 border-amber-200">
+      {/* T52 — bỏ `animate-gradient`: nền gradient chạy vô hạn trên một khối lớn là
+          animation đắt nhất trang, trong khi bé không cần nó để biết đây là màn chính. */}
+      <div className="relative kb-hero-pattern bg-gradient-to-r from-amber-700 via-orange-700 to-rose-700 rounded-3xl p-3.5 sm:p-4 md:p-5 shadow-xl text-white overflow-hidden border-4 border-amber-200">
         {/* Background decorative shapes */}
-        <div className="absolute top-2 right-4 text-6xl opacity-20 pointer-events-none animate-pulse-slow">✨</div>
+        <div className="absolute top-2 right-4 text-6xl opacity-20 pointer-events-none">✨</div>
         <div className="absolute -bottom-4 -left-4 text-8xl opacity-15 pointer-events-none">⭐</div>
 
         {/* Side by side only from lg: at md (768px) the "Học tiếp" button cannot
@@ -370,7 +381,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               variant={subject.variant}
               size="tile"
               fullWidth
-              className={`min-h-[140px] md:min-h-[150px] text-left ${
+              className={`min-h-[120px] md:min-h-[132px] text-left ${
                 subject.locked ? 'opacity-60 cursor-not-allowed' : ''
               }`}
               onClick={() => handleSubjectClick(subject)}
@@ -444,7 +455,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* 3. "NHIỆM VỤ HÔM NAY" - 3 round quest icons + treasure chest */}
-      <KidCard subjectBorder="none" className="space-y-3">
+      <KidCard subjectBorder="none" className="space-y-2.5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <SectionTitle icon="🎯" size="md" className="mb-0">
@@ -491,8 +502,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <span className="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">
                 {q.completed ? '✅' : idx === 0 ? '📚' : idx === 1 ? '🎮' : '📖'}
               </span>
-              <span className="max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 [overflow-wrap:anywhere]">
-                {q.title.length > 10 ? q.title.slice(0, 10) + '…' : q.title}
+              {/* T52 — hiện **đủ** tên việc trong 2 dòng thay vì cắt ở 10 ký tự + "…":
+                  khối "Danh Sách Nhiệm Vụ" lặp lại bên dưới đã bỏ, nên đây là chỗ duy nhất
+                  bé đọc được tên việc. */}
+              <span className="max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 line-clamp-2 [overflow-wrap:anywhere]">
+                {q.title}
               </span>
               <Pill variant="star" size="xs" className="absolute -top-1 -right-1">
                 <span className="text-[9px]">+{q.rewardStars}</span>
@@ -532,14 +546,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <SectionTitle icon="⚡" size="md">
           Lối Tắt Nhanh
         </SectionTitle>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3 mt-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-2.5 mt-2">
           {SHORTCUT_CARDS.map((shortcut) => (
             <KidButton
               key={shortcut.screen}
               variant="primary"
               size="tile"
               fullWidth
-              className={`min-h-[100px] text-center bg-gradient-to-br ${shortcut.gradient} ${shortcut.border} border-3 hover:scale-[1.02] active:scale-95 text-white`}
+              className={`min-h-[88px] text-center bg-gradient-to-br ${shortcut.gradient} ${shortcut.border} border-3 hover:scale-[1.02] active:scale-95 text-white`}
               onClick={() => handleShortcutClick(shortcut.screen)}
             >
               <div className="flex-1 flex flex-col items-center justify-center gap-1 min-w-0">
@@ -557,12 +571,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <SectionTitle icon="🎁" size="md">
           Hệ Thống Động Lực
         </SectionTitle>
-        <div className="grid grid-cols-3 gap-3 mt-3">
+        <div className="grid grid-cols-3 gap-2 mt-2">
           <KidButton
             variant="primary"
             size="tile"
             fullWidth
-            className="min-h-[100px] text-center bg-gradient-to-br from-amber-500 to-orange-500 border-3 border-amber-300 hover:scale-[1.02] active:scale-95 text-white"
+            className="min-h-[88px] text-center bg-gradient-to-br from-amber-500 to-orange-500 border-3 border-amber-300 hover:scale-[1.02] active:scale-95 text-white"
             onClick={() => onNavigate('sticker_album')}
           >
             <div className="flex-1 flex flex-col items-center justify-center gap-1 min-w-0">
@@ -575,7 +589,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             variant="primary"
             size="tile"
             fullWidth
-            className="min-h-[100px] text-center bg-gradient-to-br from-rose-500 to-pink-500 border-3 border-rose-300 hover:scale-[1.02] active:scale-95 text-white"
+            className="min-h-[88px] text-center bg-gradient-to-br from-rose-500 to-pink-500 border-3 border-rose-300 hover:scale-[1.02] active:scale-95 text-white"
             onClick={() => onNavigate('gacha_machine')}
           >
             <div className="flex-1 flex flex-col items-center justify-center gap-1 min-w-0">
@@ -588,7 +602,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             variant="primary"
             size="tile"
             fullWidth
-            className="min-h-[100px] text-center bg-gradient-to-br from-emerald-500 to-teal-500 border-3 border-emerald-300 hover:scale-[1.02] active:scale-95 text-white"
+            className="min-h-[88px] text-center bg-gradient-to-br from-emerald-500 to-teal-500 border-3 border-emerald-300 hover:scale-[1.02] active:scale-95 text-white"
             onClick={() => onNavigate('streak_calendar')}
           >
             <div className="flex-1 flex flex-col items-center justify-center gap-1 min-w-0">
@@ -601,41 +615,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       </div>
 
       {/* 6. NEXT BEST ACTION CARD (from DecisionEngine) - compact version for Home */}
-      <NextBestActionCard onNavigate={onNavigate} />
-
-      {/* 6. DAILY QUESTS LIST (compact, below the fold on mobile) */}
-      <KidCard subjectBorder="none" className="space-y-3">
-        <SectionTitle icon="📋" size="md">
-          Danh Sách Nhiệm Vụ
-        </SectionTitle>
-        <div className="space-y-2">
-          {quests.map((q) => (
-            <div
-              key={q.id}
-              className={`p-3 rounded-2xl border-2 flex items-center justify-between transition-all ${
-                q.completed
-                  ? 'bg-emerald-50/70 border-emerald-300 text-emerald-950'
-                  : 'bg-amber-50/40 border-amber-200 text-slate-700'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black ${
-                    q.completed ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'
-                  }`}
-                >
-                  {q.completed ? <Check className="w-4 h-4" /> : '•'}
-                </div>
-                <span className="text-xs font-bold">{q.title}</span>
-              </div>
-
-              <Pill variant="star" size="sm" className="gap-1">
-                <span>+{q.rewardStars}</span>
-              </Pill>
-            </div>
-          ))}
-        </div>
-      </KidCard>
+      <Suspense fallback={null}>
+        <NextBestActionCard onNavigate={onNavigate} />
+      </Suspense>
     </div>
   );
 };
