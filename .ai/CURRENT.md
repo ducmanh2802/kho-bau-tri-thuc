@@ -521,5 +521,52 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug 
 
 
 
+## T48B — lát cắt thứ 14: máy gắp hứa "Đã lưu" khi trình duyệt chưa ghi byte nào (2026-11-04, lane này)
+
+- **T48B `DEF-020(a)`** — bé bấm "Gắp Ngay", màn hình bắn confetti + "Đã lưu vào Bộ Sưu Tập!" trong khi
+  **không có gì nằm xuống máy**: `StorageService.drawGacha()` gọi `saveChildProfile` + `saveMotivationState`
+  rồi **bỏ qua** giá trị chúng trả về, mà `writeJSON` (`storage.ts:302`) **cố ý** trả `false` khi trình duyệt
+  chặn ghi (Safari chế độ ẩn danh) hoặc hết dung lượng ⇒ tải lại trang, sticker **và vé** đều như cũ.
+  Phép đo trước khi sửa: `grep -rn "StorageService\.save" src | wc -l` = **79** dòng nhưng
+  `grep -rho "StorageService\.save[A-Za-z]*(" src | wc -l` = **78** lời gọi thật (`readingEngine.ts:536` là chú
+  thích), và đúng **1** chỗ đọc kết quả — tức toàn bộ app còn lại cũng mù, nhưng lát cắt này chỉ sửa nơi **bé
+  bị hứa láo**, phần còn lại ghi sổ (`DEF-020(b)`: `claimLevelRewards()` `storage.ts:2702-2703` + `buyShopItem()`
+  `:2730`, `:2733` — nặng hơn vì sao đã trừ rồi mới báo thành công). Sửa: `drawGacha` xét cả hai lượt ghi,
+  hỏng ⇒ `reason: 'storage-unavailable'`; `GachaMachineScreen.tsx` có **nhánh riêng** (gộp vào nhãn "hết lượt"
+  là lời dối thứ hai vì bé **vẫn còn vé**); câu "đã gắp đủ **5** lượt" thành `dailyLimitLabel` lấy từ cài đặt
+  ba mẹ (T45A đã sửa *logic*, **câu chữ** vẫn mang hằng số). **Trong lúc review phát hiện thêm một hỏng hóc
+  cùng họ**: biên lai "+2 sao an ủi" viết **trước** canh bảo ⇒ lịch sử phần thưởng cho một lượt chưa lưu; dời
+  xuống sau guard. `tests/t48b-gacha-result-honest.test.ts` **8** test, RED trước khi sửa `7 failed | 1 passed`
+  với payload đỏ chính là `{"ok":true,"reason":"ok",…}`. Probe `evidence/2026-11-04-T48B/probe-t48b-gacha-save-honest.mjs`
+  bọc `Storage.prototype.setItem` bằng `page.addInitScript` để **ném** trên đúng hai khoá phần thưởng, chạy
+  trên `dist/` ⇒ `QA PASS — 3 step(s), 0 errors`, `blockedWrites: 2`, vé bước B **trước = sau**. **Ablation hai
+  vòng**: tháo guard ⇒ `4 failed | 4 passed` **và** `QA FAIL — 2 error(s)` đúng bước B (bước A vẫn xanh, lưới chỉ
+  bắt lời dối); dời biên lai lên trước guard ⇒ `1 failed | 7 passed` — **lần chạy đầu tiên của vòng 2 là lưới
+  chết**: seed `i < 5 ? 2 : 1` cho `dupes = 6` nên `6 % 5 ≠ 0`, nhánh sao an ủi không bao giờ bật, test chỉ
+  khẳng định trên một điều kiện không kích hoạt được; sửa seed thành `i < 4` ⇒ `dupes = 5` thì đột biến mới đỏ.
+  Cổng: `npm run verify` **EXIT=0** · `122 file / 1521 test` · `Duration 27.98s` · `index-BO_jehy4.js` **211.1 kB**.
+- **Lane dùng chung — lần thứ ba `package-lock.json` biến mất.** Push `3fad1b4` bị từ chối vì `origin/main`
+  đã có `d6771f5` (một lane khác: `src/services/sound.ts` + `CotuongMoveDemo.tsx` + `CotuongPieceSvg.tsx`).
+  `git merge origin/main` ⇒ `487cddb` **không xung đột** (không giao file nào với T48B) nhưng mang theo hỏng
+  hóc im lặng: lượt đó **xoá lockfile** — lần thứ **3** (`3727f04`, `fd3e7da`, `d6771f5`) — trong khi **cả 4**
+  workflow chạy `npm ci` ⇒ pipeline chết ngay bước `Setup Node` (`cache: npm` cần lockfile). Kiểm định trước khi khôi phục:
+  `git diff 258ec68 HEAD -- package.json` **rỗng** ⇒ không dependency mới ⇒ `git checkout 258ec68 --
+  package-lock.json` ⇒ `5753844`. **Số liệu của cây trước merge không còn là hiện trạng**: đo lại
+  `npm run verify` **EXIT=0** · **122 file / 1521 test** (merge không thêm test) · `Duration 27.94s` · entry
+  **đổi cả hash lẫn kB** `BO_jehy4` 211.1 → `index-B-vz_G_Z.js` **213.6 kB** · boot graph `438192 total` =
+  **427.9 kB** · component `.tsx` **95 → 97**; vẫn **42** service / **5** hook / **105** file dữ liệu / **30**
+  probe QA / **31** trò chơi. Probe T48B + `qa/gacha-machine.mjs` (4 bước) + `qa/t33-feedback-timers.mjs`
+  (6 bước) chạy lại trên `dist/` của lượt merge, cả ba `QA PASS`, 0 lỗi
+  (`evidence/2026-11-04-T48B/verify-merged.txt`, `probe-merged.txt`).
+- **Sổ:** `DEF-020` **MỞ** — (a) đóng bằng lát cắt này, (b) `claimLevelRewards` + `buyShopItem` chưa sửa để
+  giữ phạm vi một commit; `DEF-019(e)` chính tả `khóa`/`khoá` vẫn chờ người chốt; `DEF-019(a)(b)(c)` chờ quyết
+  định sản phẩm; `DEF-011` và Ô 13 CI vẫn mở. **Việc của lane sau:** `speakBritish()`
+  (`src/services/britishSpeech.ts:155`) export không caller; `AccountModal.tsx:273` in "Đã đồng bộ an toàn"
+  cho **mọi** trạng thái không-syncing/không-error và `formatLastSynced(null)` in "Vừa mới đây";
+  `CloudSyncStatus 'idle'` khai báo mà không nơi nào gán. **Không** stage `docs/step-by-step-guidance.md` và
+  6 ảnh `docs/opencode/reports/img/*.png` — đó là lane khác.
+
+
+
 P36, P38, P39 sessions share this working tree concurrently. Each lane left its
 changes uncommitted. Do not sweep other lanes' files into a single commit.

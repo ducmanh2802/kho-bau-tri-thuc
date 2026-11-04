@@ -15,9 +15,23 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1513 test / 121 file,
-   211.1 kB entry + 425.4 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
-   ngay sau **T48A** (đóng `DEF-019(d)`: `src/hooks/useSpeak.ts` gán **cùng một** state `played` cho cả
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1521 test / 122 file,
+   213.6 kB entry + 427.9 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
+   ngay sau **T48B cộng merge `487cddb`** (nội dung `origin/main` `d6771f5` vào thêm `src/services/sound.ts` +
+   2 component cờ tướng ⇒ `src/` đổi nên entry **đổi cả hash lẫn kB**: `BO_jehy4` → `B-vz_G_Z`,
+   211.1 → **213.6**, component `.tsx` **95 → 97**, trong khi **test / service / probe / game không đổi**;
+   cũng merge đó **xoá `package-lock.json`** — lần thứ ba (`3727f04`, `fd3e7da`, `d6771f5` — nên khôi phục ở
+   `5753844`, vì cả 4 workflow chạy `npm ci`. Máy gắp **hứa** những gì nó chưa làm được: `StorageService.drawGacha()` bỏ qua giá trị
+   `false` của `writeJSON` — phép đo `grep -rn "StorageService\.save" src` in ra **79** dòng nhưng chỉ **78**
+   là lời gọi thật (`readingEngine.ts:536` là chú thích), và đúng **1** lời gọi đọc kết quả (`storage.ts:1099`) — nên khi trình duyệt chặn ghi (Safari private mode) hoặc hết dung lượng, hộp kết quả vẫn bắn
+   confetti và in "Đã lưu vào Bộ Sưu Tập!" rồi tải lại trang sticker lẫn vé đều như cũ; `drawGacha` nay trả
+   `reason: 'storage-unavailable'` và `GachaMachineScreen` có nhãn riêng cho thất bại *của máy*, đồng thời
+   câu "đã gắp đủ 5 lượt" được thay bằng số lượt **thật** theo cài đặt ba mẹ (`dailyLimitLabel`, phần logic
+   đã sửa ở T45A nhưng câu chữ vẫn mang hằng số 5). **1** file test mới `tests/t48b-gacha-result-honest.test.ts`
+   (8) ⇒ +8 test; probe dựng `Storage.prototype.setItem` ném trên `dist/` đặt trong `evidence/2026-11-04-T48B/`
+   ⇒ vẫn **30** probe QA, vẫn **42** service module; entry **đổi hash** (`l9C6a6LW` → `BO_jehy4`) còn
+   **kB đứng nguyên** 211.1),
+   đợt **T48A** liền trước (đóng `DEF-019(d)`: `src/hooks/useSpeak.ts` gán **cùng một** state `played` cho cả
    `utterance.onend` *lẫn* `utterance.onerror`, mà hai biến cố là hai bằng chứng ngược nhau ⇒ bé bấm loa,
    không nghe thấy gì, nút vẫn hứa "Đã đọc xong, chạm để nghe lại" (`aria-label` của `LessonPlayerModal`).
    Sửa theo lý do: `canceled`/`interrupted`/`rejected`/`audio-busy` (kênh bị giành) ⇒ `idle` bấm lại được;

@@ -1,0 +1,110 @@
+# Chạy lại trên dist/ của lượt merge 487cddb (nội dung origin/main d6771f5 + T48B 3fad1b4 + lockfile 5753844)
+# npm run verify EXIT=0 · 122 file / 1521 test · Duration 27.94s · Main chunk: index-B-vz_G_Z.js = 213.6 kB -> PASS (meets 450 kB goal)
+
+## node qa/run-one.mjs evidence/2026-11-04-T48B/probe-t48b-gacha-save-honest.mjs
+{
+  "errors": [],
+  "shots": [
+    "01-A-luu-duoc.png",
+    "02-B-khong-luu-duoc.png"
+  ],
+  "facts": {
+    "A": {
+      "beforeA": {
+        "tickets": 5,
+        "stars": 50,
+        "stickerKinds": 0,
+        "drawsTotal": 0
+      },
+      "afterA": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      }
+    },
+    "B": {
+      "beforeB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "afterB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "blockedWrites": 2
+    }
+  },
+  "steps": [
+    {
+      "step": "A-lưu-được",
+      "text": "👨‍🌾 Sticker Mới! Bé nhận được Bác Nông Dân Chăm Chỉ! 0 Đã lưu vào Bộ Sưu Tập! Tuyệt Vời!",
+      "beforeA": {
+        "tickets": 5,
+        "stars": 50,
+        "stickerKinds": 0,
+        "drawsTotal": 0
+      },
+      "afterA": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      }
+    },
+    {
+      "step": "B-khong-luu-duoc",
+      "text": "😢 Không Thể Gắp Máy không lưu được sticker vào máy này. Bé nhờ ba mẹ bật lại phần lưu nhé! Hiểu Rồi",
+      "beforeB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "afterB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "blockedWrites": 2
+    },
+    {
+      "step": "C-may-dung-nguyen",
+      "beforeB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      },
+      "afterB": {
+        "tickets": 4,
+        "stars": 56,
+        "stickerKinds": 2,
+        "drawsTotal": 1
+      }
+    }
+  ],
+  "ok": true
+}
+QA PASS — 3 step(s), 0 errors
+
+## node qa/run-one.mjs qa/gacha-machine.mjs
+  "errors": [],
+QA PASS — 4 step(s), 0 errors
+
+## node qa/run-one.mjs qa/t33-feedback-timers.mjs
+  "errors": [],
+QA PASS — 6 step(s), 0 errors
+
+## boot graph (dist/index.html tham chiếu tĩnh)
+438192 total
+## counts
+services=$(ls src/services/*.ts | wc -l) = 42
+components_tsx=$(find src/components -name '*.tsx' | wc -l) = 97
+data_ts=$(find src/data -name '*.ts' | wc -l) = 105
+probes=$(ls qa/*.mjs qa/*.cjs | grep -v 'lib.mjs|run-one.mjs' | wc -l) = 30

@@ -81,7 +81,9 @@ không có cách tất định làm đầy `localStorage` của người dùng t
 | `mutation-2-consolation-receipt.txt` | đột biến 2 (viết biên lai sao **trước** canh bảo) ⇒ `1 failed \| 7 passed (8)`, đúng test 5, kèm payload nguyên văn `{"type":"stars","amount":2,"description":"5 sticker trùng tặng 2 sao an ủi","itemId":"st_dongvat_1"}` |
 | `mutation-probe.txt` | đột biến 1 trên `dist/` ⇒ `QA FAIL — 2 error(s)`: (1) "máy KHÔNG ghi được mà vẫn hứa đã lưu", (2) "hộp kết quả không nói thẳng là không lưu được" — cả hai lấy nguyên văn text `⛵ Sticker Mới! … Đã lưu vào Bộ Sưu Tập!` |
 | `probe-regression.txt` | `qa/gacha-machine.mjs` `QA PASS — 4 step(s)` (`GACHA_EXIT=0`) + `qa/t33-feedback-timers.mjs` `QA PASS — 6 step(s)` (`T33_EXIT=0`), cùng `dist/` của lượt build này |
-| `verify.txt` | `npm run verify` **EXIT=0** · **122 file / 1521 test** · `Duration 27.98s` · `Main chunk: index-BO_jehy4.js = 211.1 kB → PASS (meets 450 kB goal)` |
+| `verify.txt` | `npm run verify` **EXIT=0** · **122 file / 1521 test** · `Duration 27.98s` · `Main chunk: index-BO_jehy4.js = 211.1 kB → PASS (meets 450 kB goal)` — **trên working tree trước merge** |
+| `verify-merged.txt` | `npm run verify` **EXIT=0** · **122 file / 1521 test** (merge không thêm test nào) · `Duration 27.94s` · `Main chunk: index-B-vz_G_Z.js = 213.6 kB → PASS` — **trên nội dung merge `487cddb`** (`origin/main` `d6771f5`: `src/services/sound.ts` + `CotuongMoveDemo.tsx` + `CotuongPieceSvg.tsx`, và **xoá `package-lock.json`** ⇒ khôi phục ở `5753844`) |
+| `probe-merged.txt` | chạy lại probe này + hai probe hồi quy trên `dist/` của lượt merge: `QA PASS — 3 step(s), 0 errors` (`blockedWrites: 2`, vé trước = sau ở bước B) · `qa/gacha-machine.mjs` `QA PASS — 4 step(s)` · `qa/t33-feedback-timers.mjs` `QA PASS — 6 step(s)`, kèm boot graph `438192 total` = **427.9 kB** và các số kiểm kê `wc`/`find` |
 
 ## 5. Ablation
 
@@ -128,3 +130,33 @@ bằng cách xoá luôn điều kiện.
 nhãn `kB`. Cùng một file `index` hiện ra `216.18` ở output build và `211.1` ở cổng (`216.18 / 1.024 =
 211.1`). Vì vậy: **không có** chuyện bundle phình 5 kB ở đợt này — `src/` đổi nên entry **đổi hash**
 (`l9C6a6LW` → `BO_jehy4`) còn **kB đứng nguyên**; boot graph vẫn 3 file và `435661 total` byte = 425.4 kB.
+
+**Nhưng lượt đo thứ hai (sau merge) thì kB đổi thật**, và đổi vì nguyên nhân khác: `d6771f5` thêm
+`src/services/sound.ts` + hai component cờ tướng vào `src/`, nên `BO_jehy4` **211.1** → `B-vz_G_Z`
+**213.6**, boot graph `438192 total` = **427.9 kB**. Hai số liệu vẫn độc lập: hash đổi vì *tên file*
+sinh từ nội dung, kB đổi vì *nội dung* thật sự lớn hơn. Kiểm chứng bằng chính `npm run check:budget`
+trên từng lượt (`verify.txt` vs `verify-merged.txt`).
+
+## 8. Lane dùng chung: một merge và lần thứ ba lockfile biến mất
+
+Push `3fad1b4` bị từ chối vì `origin/main` đã có `d6771f5` (một lane khác làm cờ tướng + âm thanh).
+Xử lý: `git merge origin/main` ⇒ `487cddb`, rồi **`package-lock.json` không còn trong tree** — đây là
+lần thứ ba (`3727f04`, `fd3e7da`, `d6771f5`) trong khi cả **4** workflow CI chạy `npm ci`, tức mọi
+pipeline từ `d6771f5` trở đi chết ngay bước `Setup Node` (`actions/setup-node@v4` với `cache: npm` cần lockfile làm key cache — `npm ci` chưa kịp chạy). Khôi phục bằng `git checkout 258ec68 --
+package-lock.json` ⇒ commit `5753844`, sau khi đã kiểm tra `git diff 258ec68 HEAD -- package.json`
+**rỗng** (merge không thêm dependency nào, nên lockfile cũ vẫn là nguồn thật hợp lệ).
+
+Hệ quả với hồ sơ này: mọi số liệu phải đo lại trên nội dung merge, không được lấy số của cây trước.
+Test không đổi (**122 file / 1521 test**) vì `d6771f5` không thêm test; cổng `npm run verify` **EXIT=0**;
+probe T48B và hai probe hồi quy chạy lại trên `dist/` mới vẫn xanh (`probe-merged.txt`).
+
+**Bằng liệu CI cho chính nhận định trên** (đọc qua API, `curl -s
+https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/<sha>/check-runs`):
+
+| Commit | Ba run | Ghi chú |
+|---|---|---|
+| `d6771f5` (không lockfile) | **cả ba `failure`** — "1. Quality" `41738810613` · "2. Build + artifact" `41738810770` · "3. Browser QA" `41738810872` | bước đỏ là **`Setup Node`** (job "build + bundle budget", step number 3), không phải test hay build |
+| `5753844` (sau khôi phục) | **cả ba `completed success`** lúc `00:02:39Z` / `00:02:52Z` / `00:03:14Z` | Build **+bundle budget** **22 s** · typecheck + tests **35 s** · golden path trên Chromium **57 s**, push `d6771f5..5753844` lúc `00:02:17Z` |
+
+Hai commit code (`3fad1b4` + `487cddb` + `5753844`) đi trong **một** lượt push và commit docs chỉ push
+sau khi ba run của `5753844` khép — đúng hai điều kiện của `RISK-16`.

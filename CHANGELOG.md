@@ -17,6 +17,16 @@ asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện 
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
 ### Changed
+- **Lane dùng chung: merge `487cddb` đưa `origin/main` `d6771f5` (âm thanh + cờ tướng) vào `main`, và
+  `package-lock.json` — bị lượt đó làm mất — được khôi phục ở `5753844`.** Đây là **lần thứ ba**
+  (`3727f04`, `fd3e7da`, `d6771f5`) trong khi cả **4** workflow CI chạy `npm ci`, tức pipeline chết ngay
+  bước `Setup Node` (`cache: npm` cần lockfile làm key cache) — `npm ci` chưa kịp chạy. Kiểm trước khi khôi phục: `git diff 258ec68 HEAD -- package.json` **rỗng** ⇒ lockfile cũ
+  vẫn là nguồn thật. **Đo lại toàn bộ trên nội dung merge** (không lấy số của cây trước): `npm run verify`
+  **EXIT=0** · **122 file / 1521 test** (merge không thêm test) · `Duration 27.94s` · entry `BO_jehy4` **211.1**
+  → `index-B-vz_G_Z.js` **213.6 kB** · boot graph `438192 total` byte = **427.9 kB** · component `.tsx`
+  **95 → 97**; vẫn **42** service module / **30** probe QA / **31** trò chơi. Probe T48B + `qa/gacha-machine.mjs`
+  + `qa/t33-feedback-timers.mjs` chạy lại trên `dist/` của lượt merge: `QA PASS` 3 / 4 / 6 bước, 0 lỗi
+  (`evidence/2026-11-04-T48B/verify-merged.txt`, `probe-merged.txt`).
 - **`RISK-16`: điều kiện thứ hai nay có dữ liệu — commit code T47F khép đủ ba run vì lượt docs chờ lượt CI khép.**
   `4e47ff7033b7fbb28b29811793c05f2a059e2287` (code) push lúc `21:32:00Z`, ba run `completed success` lúc
   `21:33:09Z`; commit docs `5b361a7` (số liệu kiểm kê + §25) chỉ được đẩy sau `21:40Z` — khoảng cách **≈ 8
@@ -146,6 +156,27 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T48B — máy gắp báo "Đã lưu vào Bộ Sưu Tập!" trong khi trình duyệt chưa nhận byte nào (`DEF-020(a)`).**
+  `StorageService.drawGacha()` gọi `saveChildProfile` + `saveMotivationState` rồi **bỏ qua** giá trị trả về,
+  mà `writeJSON` (`src/services/storage.ts:302`) cố ý trả `false` khi `setItem` ném (Safari private mode,
+  hết dung lượng) ⇒ hộp kết quả bắn confetti, chơi nhạc thắng, in "Đã lưu vào Bộ Sưu Tập!", còn tải lại
+  trang thì sticker **và vé** đều về như cũ. Phép đo trước khi sửa: `grep -rn "StorageService\.save" src`
+  in ra **79** dòng, `grep -rho "StorageService\.save[A-Za-z]*(" src` = **78** lời gọi thật (một dòng là chú
+  thích ở `readingEngine.ts:536`), và đúng **1** lời gọi đọc kết quả (`storage.ts:1099`). Sửa: `drawGacha`
+  xét cả hai lượt ghi, hỏng thì trả `reason: 'storage-unavailable'` (thất bại *của máy*, không phải của bé);
+  `GachaMachineScreen.tsx` có **nhánh riêng** cho lý do này — gộp vào nhãn "hết lượt" sẽ là lời dối thứ hai
+  vì bé **vẫn còn vé**. Cùng hộp còn một hứa sai nữa: "Hôm nay bé đã gắp đủ **5** lượt" là hằng số dù T45A
+  đã sửa *logic* theo `getGachaDailyLimit()` ⇒ nay in số lượt **thật** (`dailyLimitLabel`). Test mới
+  `tests/t48b-gacha-result-honest.test.ts` (**8**, RED `7 failed | 1 passed` với payload chính là `ok: true,
+  reason: 'ok'`); probe mới `evidence/2026-11-04-T48B/probe-t48b-gacha-save-honest.mjs` bọc
+  `Storage.prototype.setItem` bằng `page.addInitScript` để **ném** trên đúng hai khoá phần thưởng, chạy trên
+  `dist/` ⇒ `QA PASS — 3 bước / 0 lỗi` (A ghi được: vé 5→4, sticker 0→2; B ghi hỏng: vé trước = sau,
+  `blockedWrites: 2`); ablation bỏ guard ⇒ `4 failed | 4 passed` **và** `QA FAIL — 2 error(s)` đúng bước B,
+  bước A vẫn xanh. Hồi quy cùng `dist/`: `qa/gacha-machine.mjs` QA PASS 4 bước · `qa/t33-feedback-timers.mjs`
+  QA PASS 6 bước. `npm run verify` **EXIT=0** · **122 file / 1521 test** · `Duration 27.98s` · entry **đổi
+  hash** (`l9C6a6LW` → `BO_jehy4`) còn **kB đứng nguyên** 211.1; vẫn **42** service module, vẫn **30** probe QA.
+  **Chưa sửa, ghi vào sổ (`DEF-020(b)`):** `claimLevelRewards()` (`storage.ts:2702-2703`) và `buyShopItem()`
+  (`:2730`, `:2733`) cũng bỏ qua kết quả ghi — nặng hơn vì sao/ngọc đã bị trừ rồi mới báo thành công.
 - **T48A — bé bấm nút loa, máy không đọc mà màn hình vẫn báo "Đã đọc xong" (`DEF-019(d)`).**
   `onerror` của `SpeechSynthesisUtterance` trong `src/hooks/useSpeak.ts` được nối vào **cùng nhánh**
   `setState('played')` với `onend`, dù `onerror` là bằng chứng **ngược lại**: không có tiếng nào đi tới
