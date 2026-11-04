@@ -1,5 +1,32 @@
 # CURRENT — KHO BÁU TRI THỨC (Lớp 1)
 
+**Cập nhật 2026-11-04 (đợt bảy) — lát cắt này là của T51 + T52, lane khác không bị đụng:** người dùng
+yêu cầu "tối ưu trang chủ cho gọn và load nhanh", trước đó là "check bug và fix". **T51** đóng
+`DEF-022(b)` — Home không ghép lớp trang bị: đo trước khi sửa `grep -c equipped
+src/components/home/HomeScreen.tsx` ⇒ **0**, probe T50A bước D in `{"mascotText":"🦉","equipLayers":0}`
+trong khi bé mặc đủ 7 ô; sửa bằng **một** component chung `src/components/common/AvatarPreview.tsx`
+(`container-type: inline-size` + `cqw`, không dùng offset tĩnh `-top-3 text-3xl` của tủ đồ), `role="img"`
++ `aria-label` đủ 7 tên món; test mới `tests/t51-avatar-preview-shared-layers.test.ts` (**7**, RED
+`7 failed (7)` → GREEN `12 passed (12)` cùng `t50a`); ba đột biến, quan trọng nhất **M2 bỏ
+`container-type` ⇒ unit test vẫn 7/7 xanh nhưng probe FAIL 29 lỗi** (mũ 108.8 px trong ô 73.1 px) — hình
+học là thứ `renderToString` không thấy. **T52** làm trang chủ gọn hơn: đo trên `dist/` thật hai lượt
+`truoc`/`sau` (probe `evidence/2026-11-04-T52/probe-home-compact-load.mjs`, cache tắt qua CDP để đọc
+`decodedBodySize`) — trang 375×667 **3 781 → 3 349 px** (5.67 → **5.02** màn), 1280×800 **3 109 → 2 665
+px**, DOM `<main>` **399 → 365**, animation vô hạn **5 → 3**, entry **219 963 → 201 040 byte** (214.8 →
+**196.3 kB**), boot graph **439 438 → 420 515** byte (**429.1 → 410.6 kB**), 3 tên nhiệm vụ lặp → **0**;
+đổi lại request **27 → 36**. Sửa: bỏ khối "Danh Sách Nhiệm Vụ" lặp 3 việc (**334 px**) và cho ô việc in
+đủ tên 2 dòng; bỏ `animate-gradient` + `animate-pulse-slow`; `React.lazy` + `Suspense` cho
+`NextBestActionCard` + `AccountModal`; pháo giấy `import()` trong `handleClaimChest`. Test mới
+`tests/t52-home-compact.test.ts` (**6**, RED `6 failed (6)`); ba đột biến (M1 khôi phục danh sách lặp ·
+M2 gắn lại animation vô hạn · **M3 import tĩnh ⇒ entry 213 087 byte, `check:budget` vẫn xanh nhưng probe
+đỏ**), hồ sơ `evidence/2026-11-04-T52/`. Cổng máy trên đúng nội dung commit: `npm run verify`
+**EXIT=0** · **128 file / 1566 test** (T51: 127/1560) · `Duration 38.73s` · `Main chunk:
+index-91ZWxzIR.js = 196.3 kB → PASS (meets 450 kB goal)`; CSS lần tải đầu **166 222 byte = 162.3 kB**
+(vẫn render-blocking — mục tiêu "load nhanh" kế tiếp). Commit code+test+bằng chứng **`cd7e633`**
+(16 file, +3306/−61); commit docs theo sau. **Không stage:** 6 ảnh `docs/opencode/reports/img/*.png` và
+`docs/step-by-step-guidance.md` của lane khác; `package-lock.json` còn nguyên. Tag `v1.1.0` vẫn ở
+`77d90ce`; chữ ký Go/No-Go vẫn trống — việc của người giữ repo.
+
 **Cập nhật 2026-11-03 (đợt sáu) — lát cắt này là của T42, lane khác không bị đụng:** người dùng nói
 "check bug và fix"; hai nhánh Explore lập 18 ứng viên, soát lại từng chỗ trong source và giữ **8 defect
 thật** ⇒ **7 file test mới / 45 test** (`tests/t42a…` → `tests/t42g…`, mô tả `T42/G` + `T42/H` cùng nằm

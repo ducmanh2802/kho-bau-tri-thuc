@@ -17,6 +17,42 @@ asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện 
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
 ### Changed
+- **T52 — trang chủ gọn hơn 11.4 % và entry nhẹ hơn 18.9 kB (yêu cầu "tối ưu trang chủ cho gọn và
+  load nhanh").** Đo trên `dist/` thật, probe `evidence/2026-11-04-T52/probe-home-compact-load.mjs`
+  (ngoài `qa/` ⇒ tổng probe vẫn **30**), hai lượt `truoc`/`sau`: trang 375×667 **3 781 → 3 349 px**
+  (5.67 → **5.02** màn), 1280×800 **3 109 → 2 665 px**, DOM trong `<main>` **399 → 365**, animation CSS
+  vô hạn **5 → 3**, entry `index-D4JIfahy.js` 219 963 → **`index-91ZWxzIR.js` 201 040 byte** (214.8 →
+  **196.3 kB**), nhóm JS lần tải đầu 439 438 → **420 515** byte. Ba nguồn phình: khối **"Danh Sách Nhiệm
+  Vụ"** vẽ lặp đúng 3 việc đã có ô biểu tượng (**334 px**) ⇒ bỏ hẳn và cho ô biểu tượng in **đủ tên việc**
+  trong 2 dòng (trước cắt `slice(0, 10) + '…'`); `animate-gradient` + `animate-pulse-slow` chạy vô hạn
+  trên hero; và entry mang cả `NextBestActionCard` (1 425 px, nằm dưới màn hình đầu ở cả hai cỡ) — nay
+  `lazy` + `Suspense`, còn pháo giấy `import()` trong `handleClaimChest` và `AccountModal` của
+  `CloudSyncBanner` cũng nạp khi mở. Test mới `tests/t52-home-compact.test.ts` (**6**) RED trên mã cũ
+  `6 failed (6)` ⇒ GREEN `6 passed (6)`; ablation M1 khôi phục danh sách lặp (probe `QA FAIL — 5
+  error(s)`), M2 trả `animate-gradient` (`4 animation vô hạn`), M3 import tĩnh `NextBestActionCard`
+  (`entry 213 087 byte > 209 920`). Cổng `npm run verify` **EXIT=0** · **128 file / 1566 test** (T51:
+  127/1560) · `Duration 38.73s` · `Main chunk: index-91ZWxzIR.js = 196.3 kB → PASS (meets 450 kB goal)`;
+  CSS lần tải đầu 165 862 → 166 222 byte (+360, Tailwind sinh class mới). Hồ sơ
+  `evidence/2026-11-04-T52/`. **Còn mở:** `NextBestActionCard` vẫn chiếm **42 %** chiều cao trang mobile
+  (cắt phải sửa `qa/decision-engine.mjs` cùng lúc) và thẻ môn đang vẽ vòng tiến độ giả "50 %".
+- **T51 — màn Home không ghép lớp trang bị: bé mặc 7 món mà màn chính vẽ 0 lớp (`DEF-022(b)` đóng).**
+  Phép đo trước khi sửa: `grep -c equipped src/components/home/HomeScreen.tsx` ⇒ **0**, còn bước D của probe
+  T50A trên `dist/` với hồ sơ mặc đủ 7 ô in ra `{"mascotText":"🦉","equipLayers":0}`. Bê nguyên
+  `EQUIP_LAYER` của tủ đồ sang Home **không được**: bản đồ đó định vị bằng offset tĩnh (`-top-3`,
+  `text-3xl`) hợp với ô `w-28`, trong khi ô Home là `w-20 sm:w-24 md:w-28`. Sửa = một component chung
+  `src/components/common/AvatarPreview.tsx` cho **cả hai** màn, định vị lớp theo ô bằng
+  `container-type: inline-size` + đơn vị `cqw`; `role="img"` + `aria-label` ghép tên bạn và **đủ 7** tên món
+  (8 phần ` · `), mọi `data-equip` đều `aria-hidden`. Test mới
+  `tests/t51-avatar-preview-shared-layers.test.ts` (**7**) RED `7 failed (7)` ⇒ GREEN `12 passed (12)` cùng
+  `t50a`; hai test cũ `t50a`/`t49b` đổi **phép đo** (bám `data-avatar-mascot` / nhập từ component chung)
+  chứ không đổi ý. Probe 4 bước trên `dist/` thật (`evidence/2026-11-04-T51/`): ô Home **73.3 px** và ô tủ
+  đồ **104 px** giữ **cùng** tỉ lệ `hat .29 · glasses .23 · shirt .29 · backpack .23 · pet .23 ·
+  background .45 · frame .19`; ba đột biến: M1 tủ đồ tự vẽ mascot ⇒ 3 đỏ, **M2 `container-type: normal` ⇒
+  unit test vẫn 7/7 xanh nhưng probe FAIL 29 lỗi** (mũ `108.8 px` trong ô `73.1 px` = **1.488**, mong
+  `0.29` — hình học là thứ `renderToString` không nhìn thấy), M3 bỏ tên nền khỏi `aria-label` ⇒ 1 đỏ. Cổng
+  `npm run verify` **EXIT=0** · **127 file / 1560 test** · `Main chunk: index-D4JIfahy.js = 214.8 kB → PASS`
+  · boot graph `439438 total` byte = **429.1 kB**; CSS lần tải đầu **165 862 byte = 161.97 kB** vẫn là mục
+  tiêu "load nhanh" kế tiếp.
 - **Lane dùng chung: merge `487cddb` đưa `origin/main` `d6771f5` (âm thanh + cờ tướng) vào `main`, và
   `package-lock.json` — bị lượt đó làm mất — được khôi phục ở `5753844`.** Đây là **lần thứ ba**
   (`3727f04`, `fd3e7da`, `d6771f5`) trong khi cả **4** workflow CI chạy `npm ci`, tức pipeline chết ngay
