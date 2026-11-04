@@ -1,16 +1,26 @@
-Lệnh: npx vitest run tests/t50a-home-mascot-single-source.test.ts (sau khi đặt owl = thỏ = cùng một emoji 🐰)
-Verdict: ĐỎ — a1 bắt "emoji trùng nhau" ngay cả khi tsc vẫn xanh; a3/a4 bắt symptom Home≠tủ đồ. Chứng minh guard a1 có cắn (message: emoji trùng nhau: 🐻 🦊 🐰 🐰: expected 3 to be 4).
+Lệnh: { npm run typecheck; npx vitest run tests/t50a-home-mascot-single-source.test.ts; } (sau khi đặt owl = thỏ = cùng một emoji 🐰 trong src/data/shopCatalog.ts)
+Trạng thái mã: TYPECHECK_EXIT=0 · VITEST_EXIT=1
+Verdict: ĐỎ — đây là log chứng minh "`tsc` vẫn xanh": hai bạn trùng emoji **không** phải lỗi type (`Record<avatarBase, string>` vẫn phủ đủ bốn khoá, nên `tsc` EXIT=0), mà chỉ test a1 bắt được qua tiêu chí "bốn hình đôi một khác nhau" (`emoji trùng nhau: 🐻 🦊 🐰 🐰: expected 3 to be 4`). a3/a4 bắt symptom Home ≠ tủ đồ. Ablation B (xoá hẳn khoá `owl`) mới là cấp biên dịch — xem `mutation-B-mascot-emoji-thieu-owl.txt`.
 
+--- output nguyên văn (đã bỏ mã màu ANSI) ---
+=== npm run typecheck ===
+
+> kho-bau-tri-thuc-lop-1@1.1.0 typecheck
+> tsc --noEmit
+
+TYPECHECK_EXIT=0
+
+=== npx vitest run tests/t50a-home-mascot-single-source.test.ts ===
 
  RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
 
- ❯ tests/t50a-home-mascot-single-source.test.ts (5 tests | 3 failed) 114ms
+ ❯ tests/t50a-home-mascot-single-source.test.ts (5 tests | 3 failed) 112ms
    ❯ T50A — một nguồn duy nhất cho hình mascot (DEF-022a) (5)
-     × a1: MASCOT_EMOJI phủ đúng union avatarBase và bốn hình **đôi một khác nhau** 11ms
+     × a1: MASCOT_EMOJI phủ đúng union avatarBase và bốn hình **đôi một khác nhau** 10ms
      ✓ a2: danh sách chọn bạn và bản đồ hình khớp nhau ⇒ không id nào không có hình 1ms
-     × a3: bé chọn Cú Thông Thái thì màn Home vẽ con cú, không phải con thỏ 15ms
-     × a4: màn Home và tủ đồ hiển thị **cùng một hình** cho cả bốn bạn 85ms
-     ✓ a5: Home không còn tự viết bản đồ emoji riêng (nguồn là MASCOT_EMOJI) 1ms
+     × a3: bé chọn Cú Thông Thái thì màn Home vẽ con cú, không phải con thỏ 16ms
+     × a4: màn Home và tủ đồ hiển thị **cùng một hình** cho cả bốn bạn 82ms
+     ✓ a5: Home không còn tự viết bản đồ emoji riêng (nguồn là MASCOT_EMOJI) 0ms
 
 ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
 
@@ -71,6 +81,7 @@ AssertionError: bạn nào cũng giống nhau thì bé không phân biệt đư�
 
  Test Files  1 failed (1)
       Tests  3 failed | 2 passed (5)
-   Start at  09:12:49
-   Duration  1.07s (import 47%, transform 35%, tests 16%, worker 2%)
+   Start at  10:24:53
+   Duration  935ms (import 43%, transform 35%, tests 20%, worker 2%)
 
+VITEST_EXIT=1

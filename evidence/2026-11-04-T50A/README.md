@@ -88,11 +88,11 @@ Probe **không** đặt trong `qa/` ⇒ tổng probe vẫn **30** (`ls qa/*.mjs 
 | `HomeScreen.tsx` trở lại ternary 3 nhánh | test | `mutation-A-home-ternary-3-nhanh.txt` ⇒ **3 failed \| 2 passed (5)**, a3/a4 báo đích danh `🐰` vs `🦉` |
 | cùng đột biến, `npm run build` rồi chạy probe trên `dist/` | probe | `probe-MUTATED-home-ternary-3-nhanh.txt` ⇒ **`QA FAIL — 4 error(s) at A-owl`**: `A-owl: Home vẽ "🐰" … mong "🦉"` · `B-owl: Home "🐰" ≠ tủ đồ "🦉"` · `C: Home vẽ trùng hình cho nhiều bạn (🐻 🦊 🐰)` · `C: cú vẫn hóa thỏ trên Home ⇒ ternary cũ còn sống`; `facts.homeSeen = bear=🐻 fox=🦊 rabbit=🐰 owl=🐰`, `distinctHomeShapes 3` |
 | xoá khoá `owl` khỏi `MASCOT_EMOJI` | biên dịch | `mutation-B-mascot-emoji-thieu-owl.txt` ⇒ `error TS2741: Property 'owl' is missing … required in type 'Record<"bear" \| "fox" \| "owl" \| "rabbit", string>'` — guard mà một **mảng** runtime không bao giờ cho được |
-| đặt `owl` = `rabbit` = cùng 🐰 | test | `mutation-C-hai-mascot-trung-emoji.txt` ⇒ **3 failed \| 2 passed (5)** với `emoji trùng nhau: 🐻 🦊 🐰 🐰: expected 3 to be 4` — `tsc` vẫn xanh nên a1 là lớp duy nhất bắt được |
+| đặt `owl` = `rabbit` = cùng 🐰 | test | `mutation-C-hai-mascot-trung-emoji.txt` ⇒ **3 failed \| 2 passed (5)** với `emoji trùng nhau: 🐻 🦊 🐰 🐰: expected 3 to be 4`; log chụp **cả hai** cổng trong một lượt nên "`tsc` vẫn xanh" là số đo chứ không phải lập luận: `TYPECHECK_EXIT=0` rồi `VITEST_EXIT=1` ⇒ a1 là lớp duy nhất bắt được |
 
-Bản sửa chưa nằm trong HEAD ⇒ hoàn tác bằng node/Edit trên đúng một dòng, **không** dùng
-`git checkout --` (sẽ xoá luôn phần sửa của đợt này); sau mỗi đột biến
-`git diff --stat -- src/` trở lại đúng ba file của đợt.
+Bản sửa **đã** nằm trong HEAD `2852798` ⇒ mỗi đột biến hoàn tác bằng `git checkout -- src/<file>` và
+`git status --short -- src/` phải in rỗng trước khi chạy cổng cuối (bốn lần đột biến trong bảng trên
+đều đóng theo khuôn đó).
 
 ## 6. Vì sao probe có bước C và bước D
 

@@ -15,9 +15,10 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1542 test / 124 file,
-   213.7 kB entry + 428.0 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
-   ngay sau **T49B** `e969f1c` (đóng `DEF-021`: **hai nửa của cùng một lời hứa**. Nửa đường vào —
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1547 test / 125 file,
+   214 kB entry + 428.3 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
+   ngay sau **T50A** `2852798` (đóng `DEF-022(a)`: union `avatarBase` có **4** giá trị trong `src/types/index.ts` mà `HomeScreen.tsx:254` vẽ mascot bằng ternary **3** nhánh có `else` ⇒ bé chọn "Cú Thông Thái" xong về Home thì **cú hóa thỏ**, còn tủ đồ `AvatarShopScreen.tsx:181` có ternary **4** nhánh độc lập nên **cùng một hồ sơ, hai hình**; `MASCOT_EMOJI: Record<ChildProfile['avatarBase'], string>` + `SHOP_MASCOTS` đặt vào `src/data/shopCatalog.ts` ⇒ Home **và** tủ đồ đọc **cùng một** nguồn, và `Record` biến "quên một bạn" thành lỗi **biên dịch** (TS2741) thay vì lỗi hiển thị; **1** file test mới `tests/t50a-home-mascot-single-source.test.ts` (5) ⇒ +5 test; probe `evidence/2026-11-04-T50A/probe-t50a-home-mascot.mjs` trên `dist/` **QA PASS 3 bước** với `homeSeen = shopSeen = 🐻 🦊 🐰 🦉` và **QA FAIL 4 lỗi ở `failedAt: A-owl`** khi đột biến về ternary cũ, đặt cùng 3 log đột biến + 4 ảnh (bước D **chỉ đo**: `equipped` 7 ô mà `equipLayers: 0` ⇒ `DEF-022(b)` **MỞ**) ⇒ vẫn **30** probe QA, vẫn **42** service module; `src/` đổi nên entry **đổi cả hash lẫn kB** (`vYzkzZ5R` → `BZswaFkc`, 213.7 → **214**) và boot graph `438305` → `438617` byte = **428.3 kB** (module dữ liệu vốn đã nằm trong graph entry qua `services/storage`, nên giá chỉ **+0.3 kB**)),
+   đợt **T49B** `e969f1c` liền trước (đóng `DEF-021`: **hai nửa của cùng một lời hứa**. Nửa đường vào —
    `grep -c "id: '" src/data/shopCatalog.ts` = **41** món chia theo 7 `type` (mũ 8 · thú 7 · áo 6 · nền 6 ·
    khung 5 · kính 5 · ba lô 4) trong khi tab của `AvatarShopScreen` chỉ khai 5 nhánh
    `mascot|hat|glasses|backpack|pet` ⇒ **17** món (áo 6 + nền 6 + khung 5) không thuộc tab nào, bé không

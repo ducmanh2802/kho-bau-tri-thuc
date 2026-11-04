@@ -156,6 +156,35 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T50A — bé chọn "Cú Thông Thái" xong về Home thì cú hóa thỏ (`DEF-022a`).**
+  Hồ sơ cho phép **4** bạn mascot (`src/types/index.ts` `avatarBase = 'bear' | 'fox' | 'rabbit' | 'owl'`),
+  nhưng `src/components/home/HomeScreen.tsx:254` vẽ bằng ternary **3** nhánh có `else`
+  (`bear ? 🐻 : fox ? 🦊 : 🐰`) ⇒ `owl` rơi vào `else` và **trùng hình với** `rabbit`; tủ đồ
+  `AvatarShopScreen.tsx:181` lại có một ternary **4** nhánh **độc lập**, nên cùng một bé cho hai hình khác
+  nhau tuỳ màn. Phép đo thứ ba: `grep -c equipped src/components/home/HomeScreen.tsx` = **0** ⇒ Home chưa
+  từng ghép lớp trang bị (`DEF-022b`, vẫn MỞ — ghi ở bước D của probe). Sửa trong **3** file `src/`: thêm
+  `MASCOT_EMOJI: Record<ChildProfile['avatarBase'], string>` + `SHOP_MASCOTS` vào `src/data/shopCatalog.ts`
+  và cho **cả hai** màn đọc cùng một nguồn — `Record` khiến `avatarBase` mới bắt buộc có chỗ (TypeScript
+  TS2741, một mảng runtime không cho được tính chất này); constant đặt ở **module dữ liệu** chứ không ở
+  component vì `HomeScreen` nằm trong entry chunk còn `AvatarShopScreen` đứng sau `React.lazy`.
+  Test mới `tests/t50a-home-mascot-single-source.test.ts` (**5**) RED trên code cũ **3 failed | 2 passed (5)**
+  vì đúng nguyên nhân (`expected '🐰' to be '🦉'`), không đỏ vì thiếu import. Ablation **3 cấp**:
+  (A) Home trở lại ternary 3 nhánh ⇒ test đỏ y như RED ban đầu; (B) xoá khoá `owl` khỏi `MASCOT_EMOJI` ⇒
+  đỏ ở cấp **biên dịch** (`Property 'owl' is missing … Record<"bear" | "fox" | "owl" | "rabbit", string>`);
+  (C) đặt `owl = rabbit = 🐰` ⇒ `tsc` vẫn xanh mà a1 đỏ `emoji trùng nhau: 🐻 🦊 🐰 🐰: expected 3 to be 4`.
+  Ablation cấp probe: cùng bản (A) build ra `dist/` ⇒ `QA FAIL — 4 error(s) at A-owl`.
+  Probe mới `evidence/2026-11-04-T50A/probe-t50a-home-mascot.mjs` (đặt **ngoài** `qa/` nên tổng probe vẫn **30**)
+  sau sửa: **`QA PASS — 3 step(s), 0 errors`** + 4 ảnh, đo trên `dist/` cả bốn bạn ở **cả hai** màn và
+  bắt chống xanh rỗng bằng `distinct.length === 4`; bước D ghi lại sự thật `equipLayers: 0` khi hồ sơ mặc
+  **7** ô ⇒ DEF-022b được **đo** chứ không đoán, và lát cắt này **không** sửa (Home cần một component preview
+  chung có responsive, lớp `EQUIP_LAYER` của tủ đồ đang cộng hưởng với ô `w-28` nên không bê nguyên sang ô
+  `w-20` được).
+  Hồi quy cùng `dist/`: `qa/golden-path.mjs` QA PASS **28** bước, `qa/parent-controls.mjs` **7** bước,
+  `qa/mobile-home.mjs` và `qa/responsive-a11y.mjs` 0 bước 0 lỗi (`regression-probes.txt`).
+  `npm run verify` **EXIT=0** · **125 file / 1547 test** · `Duration 30.59s` · entry `index-vYzkzZ5R.js` 213.7
+  → `index-BZswaFkc.js` **214 kB** · boot graph `438305` → `438617 total` byte = **428.3 kB** (chỉ **+0.3 kB** vì
+  `shopCatalog` đã nằm trong graph entry qua `services/storage`); vẫn **42** service module / **97** component
+  `.tsx` / **30** probe QA / **31** trò chơi. Commit `2852798` (code + test + evidence).
 - **T49B — 17 món quà trong catalogue không có tab nào, và ba món "Đang mặc" mà nhân vật không đổi (`DEF-021`).**
   Lời hứa "tủ đồ có N món" hỏng ở **hai** đầu. Đầu tab: `AvatarShopScreen.tsx:19` khai báo `activeTab`
   chỉ `mascot` · `hat` · `glasses` · `backpack` · `pet` rồi `:97` lọc `AVATAR_SHOP_ITEMS.filter((i) => i.type === activeTab)`,

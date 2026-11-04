@@ -646,6 +646,43 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug 
 - **Không** stage `docs/step-by-step-guidance.md` và 6 ảnh `docs/opencode/reports/img/*.png` — đó là lane khác.
 
 
+## T50A — lát cắt thứ 17: một nguồn hình duy nhất cho bốn bạn mascot (2026-11-04, lane này)
+
+- **Việc đã làm (1 lát cắt, 3 file `src/` + 1 test + 1 probe):** đóng **`DEF-022(a)`** — defect do chính probe
+  T49B đo ra. `HomeScreen.tsx:254` dựng avatar bằng ternary **3** nhánh (`bear`→🐻, `fox`→🦊, **mọi id còn lại**→🐰)
+  trong khi union `avatarBase` (`src/types/index.ts`) có **4** giá trị ⇒ bé chọn "Cú Thông Thái" xong về Home thì
+  **cú hóa thỏ**; tủ đồ `AvatarShopScreen.tsx:181` có ternary **4** nhánh **độc lập** nên cùng một hồ sơ cho hai
+  hình khác nhau tuỳ màn. Phép đo thứ ba: `grep -c equipped src/components/home/HomeScreen.tsx` = **0**.
+- **Sửa:** `MASCOT_EMOJI: Record<ChildProfile['avatarBase'], string>` + `SHOP_MASCOTS` đặt vào
+  `src/data/shopCatalog.ts`, cả hai màn đọc **cùng một** nguồn và ternary của tủ đồ bị xoá. Constant **không** đặt
+  ở component: `HomeScreen` nằm trong entry chunk còn `AvatarShopScreen` đứng sau `React.lazy` — import ngược
+  chiều đó sẽ kéo cả tủ đồ vào entry. `Record` là guard cấp **biên dịch**: thêm `avatarBase` mà quên hình là `tsc` đỏ.
+- **RED đúng nguyên nhân:** `tests/t50a-home-mascot-single-source.test.ts` (**5**) chạy trên code cũ ⇒
+  `3 failed / 2 passed (5)` với `expected '🐰' to be '🦉'` — đỏ vì hành vi, không vì thiếu import.
+- **Ablation ba cấp + một cấp probe** (log trong `evidence/2026-11-04-T50A/`): (A) Home trở lại ternary 3 nhánh
+  ⇒ đỏ y như RED; (B) xoá khoá `owl` khỏi `MASCOT_EMOJI` ⇒ đỏ cấp biên dịch `TS2741`; (C) đặt `owl = rabbit = 🐰`
+  ⇒ `tsc` vẫn xanh mà a1 đỏ `emoji trùng nhau … expected 3 to be 4`; dựng lại (A) rồi build ⇒
+  `QA FAIL — 4 error(s) at A-owl`. Bốn lần đều hoàn tác ngay; `git status --short -- src/` sạch trước khi chạy cổng.
+- **Bằng chứng nhìn thấy được:** `evidence/2026-11-04-T50A/probe-t50a-home-mascot.mjs` trên `dist/` ⇒
+  `QA PASS — 3 step(s), 0 errors` + 4 ảnh; `homeSeen` = `shopSeen` = `bear=🐻 fox=🦊 rabbit=🐰 owl=🦉`, bước C chặn
+  xanh rỗng bằng `distinct.length === 4`. Bước D **chỉ ghi sự thật, không sửa**: hồ sơ mặc **7** ô mà ô avatar Home
+  có `equipLayers: 0` ⇒ **`DEF-022(b)` vẫn MỞ** và cố ý để mở — `EQUIP_LAYER` của tủ đồ cộng hưởng với ô `w-28`,
+  muốn Home dùng được cần một **component preview avatar chung** có responsive chứ không phải bê class. Probe đặt
+  **ngoài** `qa/` ⇒ tổng probe vẫn **30**. Hồi quy cùng `dist/`: `qa/golden-path.mjs` **28** bước,
+  `qa/parent-controls.mjs` **7** bước, `qa/mobile-home.mjs` và `qa/responsive-a11y.mjs` 0 bước 0 lỗi.
+- **Cổng:** `npm run verify` **EXIT=0** · **125 file / 1547 test** · `Duration 30.59s` · entry
+  `index-vYzkzZ5R.js` 213.7 → `index-BZswaFkc.js` **214 kB** · boot graph `438305` → `438617 total` byte =
+  **428.3 kB** (chỉ **+0.3 kB** vì `shopCatalog` đã nằm trong graph entry qua `services/storage`); vẫn **42** service
+  / **97** `.tsx` / **30** probe / **31** trò chơi. Commit code **`2852798`** (18 file, +1738/−16).
+  `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/2852798/check-runs` ⇒
+  `total_count: 3`, cả ba `completed success` (job `126349682685` / `126349683099` / `126349682718`) —
+  `evidence/2026-11-04-T50A/ci-checkruns.txt`. **Lockfile còn nguyên** (`package-lock.json`, 110314 byte) ở thời điểm đo.
+- **Việc còn của lane sau:** `DEF-022(b)` (Home không ghép `equipped`), nhãn "máy không lưu được" của phòng thay đồ
+  **chỉ có tiếng, chưa có chữ**, `handleSelectMascot` và hai đường mặc/mua vẫn **bỏ qua** kết quả `saveChildProfile`,
+  ~70 chỗ ghi còn lại cần một **quyết định chính sách** "chỗ nào phải đọc kết quả" chứ không sửa tuần tự,
+  `DEF-019(a)(b)(c)(e)`, `DEF-011`, Ô 13 CI vẫn mở.
+- **Không** stage `docs/step-by-step-guidance.md` và 6 ảnh `docs/opencode/reports/img/*.png` — đó là lane khác.
+
 ---
 
 P36, P38, P39 sessions share this working tree concurrently. Each lane left its
