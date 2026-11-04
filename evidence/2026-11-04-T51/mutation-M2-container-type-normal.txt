@@ -1,0 +1,115 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t51-avatar-preview-shared-layers.test.ts (7 tests) 166ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  17:21:39
+   Duration  1.09s (import 42%, transform 31%, tests 24%, worker 2%)
+
+
+
+===== Cùng đột biến, chạy probe trên dist/ (build-m2 + probe-m2) =====
+
+$ npm run build  ⇒  built in 2.28s
+
+$ node qa/run-one.mjs evidence/2026-11-04-T51/probe-t51-avatar-preview-layers.mjs
+{
+  "steps": [
+    {
+      "step": "A-home-375",
+      "equipLayers": 7,
+      "innerPx": 73.1,
+      "ratios": {
+        "hat": 1.488,
+        "glasses": 1.18,
+        "shirt": 1.488,
+        "backpack": 1.18,
+        "pet": 1.18,
+        "background": 2.31,
+        "frame": 0.975
+      }
+    },
+    {
+      "step": "B-shop-vs-home",
+      "homeInnerPx": 73.1,
+      "shopInnerPx": 104,
+      "sameLabel": true
+    },
+    {
+      "step": "C-empty",
+      "layers": 0,
+      "ariaLabel": "Cú Thông Thái"
+    },
+    {
+      "step": "D-accessible-name",
+      "role": "img",
+      "parts": 8
+    }
+  ],
+  "errors": [
+    "A: Home: lớp hat cỡ 108.8px trong ô 73.1px = 1.488 (mong 0.29 ±0.03) ⇒ định vị không theo ô",
+    "A: Home: lớp glasses cỡ 86.3px trong ô 73.1px = 1.180 (mong 0.23 ±0.03) ⇒ định vị không theo ô",
+    "A: Home: lớp shirt cỡ 108.8px trong ô 73.1px = 1.488 (mong 0.29 ±0.03) ⇒ định vị không theo ô",
+    "A: Home: lớp backpack cỡ 86.3px trong ô 73.1px = 1.180 (mong 0.23 ±0.03) ⇒ định vị không theo ô",
+    "A: Home: lớp pet cỡ 86.3px trong ô 73.1px = 1.180 (mong 0.23 ±0.03) ⇒ định vị không theo ô",
+    "A: Home: lớp background cỡ 168.8px trong ô 73.1px = 2.310 (mong 0.45 ±0.03) ⇒ định vị không theo ô",
+    "A: Home: lớp frame cỡ 71.3px trong ô 73.1px = 0.975 (mong 0.19 ±0.03) ⇒ định vị không theo ô",
+    "A: preview phải là container truy vấn (container-type: inline-size), máy trả về \"normal\" ⇒ cqi không có mốc",
+    "B: tủ đồ: lớp hat cỡ 108.8px trong ô 104.0px = 1.046 (mong 0.29 ±0.03) ⇒ định vị không theo ô",
+    "B: tủ đồ: lớp glasses cỡ 86.3px trong ô 104.0px = 0.829 (mong 0.23 ±0.03) ⇒ định vị không theo ô",
+    "B: tủ đồ: lớp shirt cỡ 108.8px trong ô 104.0px = 1.046 (mong 0.29 ±0.03) ⇒ định vị không theo ô",
+    "B: tủ đồ: lớp backpack cỡ 86.3px trong ô 104.0px = 0.829 (mong 0.23 ±0.03) ⇒ định vị không theo ô",
+    "B: tủ đồ: lớp pet cỡ 86.3px trong ô 104.0px = 0.829 (mong 0.23 ±0.03) ⇒ định vị không theo ô",
+    "B: tủ đồ: lớp background cỡ 168.8px trong ô 104.0px = 1.623 (mong 0.45 ±0.03) ⇒ định vị không theo ô",
+    "B: tủ đồ: lớp frame cỡ 71.3px trong ô 104.0px = 0.685 (mong 0.19 ±0.03) ⇒ định vị không theo ô",
+    "B: hat: tỉ lệ Home 1.488 ≠ tủ đồ 1.046 ⇒ hai màn dùng hai bản đồ khác nhau (đúng bệnh DEF-022)",
+    "B: hat: tủ đồ 108.8px, mong 154.8px = tỉ lệ Home × bề rộng ô tủ đồ ⇒ không scale theo ô",
+    "B: glasses: tỉ lệ Home 1.18 ≠ tủ đồ 0.829 ⇒ hai màn dùng hai bản đồ khác nhau (đúng bệnh DEF-022)",
+    "B: glasses: tủ đồ 86.3px, mong 122.7px = tỉ lệ Home × bề rộng ô tủ đồ ⇒ không scale theo ô",
+    "B: shirt: tỉ lệ Home 1.488 ≠ tủ đồ 1.046 ⇒ hai màn dùng hai bản đồ khác nhau (đúng bệnh DEF-022)",
+    "B: shirt: tủ đồ 108.8px, mong 154.8px = tỉ lệ Home × bề rộng ô tủ đồ ⇒ không scale theo ô",
+    "B: backpack: tỉ lệ Home 1.18 ≠ tủ đồ 0.829 ⇒ hai màn dùng hai bản đồ khác nhau (đúng bệnh DEF-022)",
+    "B: backpack: tủ đồ 86.3px, mong 122.7px = tỉ lệ Home × bề rộng ô tủ đồ ⇒ không scale theo ô",
+    "B: pet: tỉ lệ Home 1.18 ≠ tủ đồ 0.829 ⇒ hai màn dùng hai bản đồ khác nhau (đúng bệnh DEF-022)",
+    "B: pet: tủ đồ 86.3px, mong 122.7px = tỉ lệ Home × bề rộng ô tủ đồ ⇒ không scale theo ô",
+    "B: background: tỉ lệ Home 2.31 ≠ tủ đồ 1.623 ⇒ hai màn dùng hai bản đồ khác nhau (đúng bệnh DEF-022)",
+    "B: background: tủ đồ 168.8px, mong 240.2px = tỉ lệ Home × bề rộng ô tủ đồ ⇒ không scale theo ô",
+    "B: frame: tỉ lệ Home 0.975 ≠ tủ đồ 0.685 ⇒ hai màn dùng hai bản đồ khác nhau (đúng bệnh DEF-022)",
+    "B: frame: tủ đồ 71.3px, mong 101.4px = tỉ lệ Home × bề rộng ô tủ đồ ⇒ không scale theo ô"
+  ],
+  "facts": {
+    "homeInnerPx": 73.1,
+    "homeLayerRatios": {
+      "hat": 1.488,
+      "glasses": 1.18,
+      "shirt": 1.488,
+      "backpack": 1.18,
+      "pet": 1.18,
+      "background": 2.31,
+      "frame": 0.975
+    },
+    "homeEquipLayers": 7,
+    "shopScrollVsViewport": "375/375",
+    "shopInnerPx": 104,
+    "shopLayerRatios": {
+      "hat": 1.046,
+      "glasses": 0.829,
+      "shirt": 1.046,
+      "backpack": 0.829,
+      "pet": 0.829,
+      "background": 1.623,
+      "frame": 0.685
+    },
+    "ariaLabel": "Cú Thông Thái · Nền Biển Xanh Rì Rào · Mũ Lưỡi Trai Năng Động · Kính Tròn Tri Thức · Áo Thun Vàng Nắng · Balo Khủng Long Xanh · Mèo Miu Miu Đồng Hành · Khung Vàng Lấp Lánh",
+    "labelParts": 8
+  },
+  "failedAt": "A",
+  "shots": [
+    "01-home-375-du-7-lop.png",
+    "02-tu-do-du-7-lop.png",
+    "03-home-khong-mac-gi.png"
+  ]
+}
+QA FAIL — 29 error(s) at A

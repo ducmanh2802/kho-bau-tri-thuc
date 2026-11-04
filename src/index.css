@@ -472,6 +472,83 @@
     position: relative;
     z-index: 1;
   }
+
+  /*
+   * T51 — `DEF-022(b)`: một preview avatar **dùng chung** cho màn Home và tủ đồ
+   * (`src/components/common/AvatarPreview.tsx`).
+   *
+   * Vì sao định vị bằng `cqi` mà không bằng class Tailwind tĩnh như bản cũ: bản đồ
+   * `EQUIP_LAYER` của tủ đồ dùng offset tuyệt đối (`-top-3`, `text-3xl`) chỉ đúng với
+   * ô `w-28`; màn Home là `w-20 sm:w-24 md:w-28` ⇒ bê nguyên sang Home thì mũ lệch
+   * khỏi đầu, đó là lý do lát cắt này để mở ở T50A. `cqi` = 1% bề rộng **của chính ô**
+   * (nhờ `container-type: inline-size`) nên một bộ số dùng được cho mọi kích cỡ.
+   *
+   * Đơn vị `px`/`rem` trong các quy tắc dưới đây là **lỗi**: test `v5`
+   * (tests/t51-avatar-preview-shared-layers.test.ts) chặn đúng chỗ đó.
+   */
+  .kb-avatar-preview {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    container-type: inline-size;
+  }
+  .kb-avatar-layer {
+    position: absolute;
+    line-height: 1;
+  }
+  .kb-avatar-layer[data-equip='background'] {
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 45cqi;
+    opacity: 0.25;
+  }
+  .kb-avatar-layer[data-equip='hat'] {
+    top: -11cqi;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 29cqi;
+  }
+  .kb-avatar-layer[data-equip='glasses'] {
+    top: 31cqi;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 23cqi;
+  }
+  .kb-avatar-layer[data-equip='shirt'] {
+    bottom: 4cqi;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 29cqi;
+  }
+  .kb-avatar-layer[data-equip='backpack'] {
+    bottom: -8cqi;
+    left: -8cqi;
+    font-size: 23cqi;
+  }
+  .kb-avatar-layer[data-equip='pet'] {
+    bottom: -8cqi;
+    right: -8cqi;
+    font-size: 23cqi;
+    animation: kb-avatar-bounce 1s infinite;
+  }
+  .kb-avatar-layer[data-equip='frame'] {
+    top: -12cqi;
+    left: -12cqi;
+    font-size: 19cqi;
+  }
+}
+
+@keyframes kb-avatar-bounce {
+  0%,
+  100% {
+    transform: translateY(-10%);
+  }
+  50% {
+    transform: translateY(0);
+  }
 }
 
 .kb-tier-dot {

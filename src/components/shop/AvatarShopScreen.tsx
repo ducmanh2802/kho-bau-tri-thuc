@@ -3,6 +3,7 @@ import { AvatarItem, ChildProfile } from '../../types';
 import { ShopItemType } from '../../types/motivation';
 import { AVATAR_SHOP_ITEMS, StorageService } from '../../services/storage';
 import { MASCOT_EMOJI, SHOP_MASCOTS } from '../../data/shopCatalog';
+import { AvatarPreview } from '../common/AvatarPreview';
 import { xpToLevel } from '../../services/levelEngine';
 import { sound } from '../../services/sound';
 import { fireCelebrationConfetti } from '../../services/confetti';
@@ -34,24 +35,6 @@ export const SHOP_TABS: ShopTab[] = [
   { id: 'background', label: 'Nền', icon: '🌊' },
   { id: 'frame', label: 'Khung', icon: '🖼️' },
 ];
-
-/**
- * Lớp của từng ô trang bị trong ô preview. `Record<ShopItemType, string>` buộc
- * một `type` mới phải có chỗ đứng — thêm tab mà bé mặc vào không thấy gì thì
- * nút "Đang mặc" lại thành một lời hứa suông kiểu `shirt`/`background`/`frame`.
- */
-const EQUIP_LAYER: Record<ShopItemType, string> = {
-  background: 'absolute inset-0 flex items-center justify-center text-5xl md:text-6xl opacity-25',
-  hat: 'absolute -top-3 left-1/2 -translate-x-1/2 text-3xl',
-  glasses: 'absolute top-8 left-1/2 -translate-x-1/2 text-2xl',
-  shirt: 'absolute bottom-1 left-1/2 -translate-x-1/2 text-3xl',
-  backpack: 'absolute -bottom-2 -left-2 text-2xl',
-  pet: 'absolute -bottom-2 -right-2 text-2xl animate-bounce',
-  frame: 'absolute -top-3 -left-3 text-xl',
-};
-
-/** `background` là lớp *sau* bé, các ô còn lại đè lên trên ⇒ vẽ làm hai nhóm. */
-export const EQUIP_OVERLAYS: ShopItemType[] = ['hat', 'glasses', 'shirt', 'backpack', 'pet', 'frame'];
 
 /**
  * T50B — hai lời báo lỗi **của máy** (Safari chặn ghi / hết dung lượng), không phải của bé.
@@ -172,12 +155,6 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
 
   const filteredItems = AVATAR_SHOP_ITEMS.filter((i) => i.type === activeTab);
 
-  const equippedItem = (type: ShopItemType): AvatarItem | undefined => {
-    const id = profile.equipped[type];
-    return id ? AVATAR_SHOP_ITEMS.find((i) => i.id === id && i.type === type) : undefined;
-  };
-  const backgroundItem = equippedItem('background');
-
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-6 md:py-8 space-y-6 select-none">
       {/* Top Bar with back button */}
@@ -223,25 +200,14 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
       {/* Avatar Dressing Stage & Preview */}
       <div className="bg-gradient-to-r from-amber-400 via-orange-300 to-amber-500 rounded-3xl p-6 md:p-8 text-white shadow-xl border-4 border-amber-200 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-6">
-          {/* Avatar Composite Preview */}
-          <div className="relative w-28 h-28 md:w-32 md:h-32 bg-white rounded-3xl shadow-xl border-4 border-amber-200 flex items-center justify-center text-6xl md:text-7xl">
-            {backgroundItem && (
-              <span aria-hidden className={EQUIP_LAYER.background}>
-                {backgroundItem.emoji}
-              </span>
-            )}
-
-            <span className="relative">{MASCOT_EMOJI[profile.avatarBase]}</span>
-
-            {EQUIP_OVERLAYS.map((type) => {
-              const item = equippedItem(type);
-              return item ? (
-                <span key={type} aria-hidden className={EQUIP_LAYER[type]}>
-                  {item.emoji}
-                </span>
-              ) : null;
-            })}
-          </div>
+          {/* Avatar Composite Preview — cùng một component với màn Home (T51, `DEF-022(b)`).
+              `shrink-0`: ô này nằm trong hàng `flex items-center gap-6` cạnh khối chữ, nên
+              không giữ số đo thì nó co còn ~62 px trên màn 375 px (đo ở probe bước B) ⇒ các
+              lớp `cqi` vẫn đúng tỉ lệ nhưng cả bé lẫn mũ đều teo theo. */}
+          <AvatarPreview
+            profile={profile}
+            frameClassName="w-28 h-28 shrink-0 md:w-32 md:h-32 bg-white rounded-3xl shadow-xl border-4 border-amber-200 text-6xl md:text-7xl"
+          />
 
           <div>
             <span className="text-xs font-black uppercase tracking-wider text-amber-950/70">

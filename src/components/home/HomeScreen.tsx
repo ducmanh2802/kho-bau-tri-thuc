@@ -5,7 +5,7 @@ import { localDateKey } from '../../services/dateUtils';
 import { fireCelebrationConfetti } from '../../services/confetti';
 import { StorageService } from '../../services/storage';
 import { GAMES_CATALOG } from '../../data/gamesCatalog';
-import { MASCOT_EMOJI } from '../../data/shopCatalog';
+import { AvatarPreview } from '../common/AvatarPreview';
 import { NextBestActionCard } from '../learning/NextBestActionCard';
 import { Star, Sparkles, Gift, Check, ArrowRight, BookOpen, Target, Trophy, Gamepad2, Sparkle, RotateCcw } from 'lucide-react';
 import { KidButton, KidCard, Pill, SectionTitle } from '../ui';
@@ -251,9 +251,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           <div className="min-w-0 flex-1 flex flex-col min-[340px]:flex-row items-center gap-4 md:gap-5 text-center min-[340px]:text-left md:text-left">
             {/* Mascot Avatar with wave pose */}
             <div className="relative shrink-0">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white/95 rounded-3xl shadow-xl flex items-center justify-center text-5xl sm:text-6xl md:text-7xl border-4 border-amber-200 animate-float">
-                {MASCOT_EMOJI[profile.avatarBase]}
-              </div>
+              <AvatarPreview
+                profile={profile}
+                frameClassName="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white/95 rounded-3xl shadow-xl text-5xl sm:text-6xl md:text-7xl border-4 border-amber-200 animate-float"
+              />
               {/* Wave animation indicator */}
               <span className="absolute -bottom-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs animate-bounce" aria-hidden="true">👋</span>
               <span className="absolute -top-1 -left-1 px-2 py-0.5 bg-amber-900 text-amber-100 text-[9px] font-black rounded-full shadow-sm">

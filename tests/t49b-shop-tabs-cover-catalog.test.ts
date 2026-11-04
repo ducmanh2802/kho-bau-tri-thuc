@@ -49,11 +49,8 @@ const ls = globalThis.localStorage;
 
 import { AVATAR_SHOP_ITEMS, STORAGE_KEYS } from '../src/services/storage';
 import { SHOP_CATALOG, SHOP_MASCOTS } from '../src/data/shopCatalog';
-import {
-  SHOP_TABS,
-  EQUIP_OVERLAYS,
-  AvatarShopScreen,
-} from '../src/components/shop/AvatarShopScreen';
+import { SHOP_TABS, AvatarShopScreen } from '../src/components/shop/AvatarShopScreen';
+import { EQUIP_OVERLAYS } from '../src/components/common/AvatarPreview';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const shopCatalogSrc = readFileSync(join(here, '..', 'src', 'data', 'shopCatalog.ts'), 'utf8');
@@ -176,9 +173,10 @@ describe('T49B — catalogue quà và tab của tủ đồ', () => {
   });
 
   it('b8: mọi type có một **lớp preview**, không riêng ba món của b6', () => {
-    // `EQUIP_LAYER` là `Record<ShopItemType, string>` nên typecheck đã bắt thiếu;
-    // còn `EQUIP_OVERLAYS` là mảng thường ⇒ một `type` mới (hoặc một ô bị gỡ) lọt
-    // qua cả `tsc` lẫn b6, đúng kiểu lỗi đang đóng. `background` vẽ làm lớp sau.
+    // T51: `EQUIP_LAYER` (Record, chỉ đúng với ô `w-28`) đã thành quy tắc CSS `cqi` trong
+    // `src/components/common/AvatarPreview.tsx` — chỗ đó có `tests/t51-…-shared-layers.test.ts`
+    // v4/v5 quét. Ở đây vẫn phải giữ ca này vì `EQUIP_OVERLAYS` là **mảng thường**: một `type`
+    // mới (hoặc một ô bị gỡ) lọt qua `tsc` lẫn b6, đúng kiểu lỗi đang đóng. `background` vẽ làm lớp sau.
     const rendered = [...EQUIP_OVERLAYS, 'background'];
     const missing = catalogTypes.filter((t) => !rendered.includes(t as never));
     expect(missing, `mặc ${missing.join(', ')} vào thì bé không thấy gì trên nhân vật`).toEqual([]);

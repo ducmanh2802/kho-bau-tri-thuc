@@ -96,19 +96,19 @@ const shopHtml = (base: ChildProfile['avatarBase']) => {
   return renderToString(React.createElement(AvatarShopScreen, { onBack: noop, onProfileUpdate: noop }));
 };
 
-/** Ô avatar trên màn Home — lấy **trong ô**, không lấy cả trang, vì trang Home còn có emoji khác. */
-const homeAvatarEmoji = (html: string) => {
-  const m = html.match(/class="w-20 h-20[^"]*"[^>]*>\s*([^<\s][^<]*)/);
-  if (!m) throw new Error('không tìm thấy ô avatar của màn Home (layout đã đổi? cập nhật phép đo, đừng bỏ test)');
+/**
+ * Emoji của bạn mascot **trong ô avatar** — T51 tách preview thành
+ * `src/components/common/AvatarPreview.tsx` nên cả hai màn đọc cùng một móc
+ * `data-avatar-mascot`, không đo bằng class layout nữa (class đổi là test chết oan).
+ */
+const avatarEmoji = (html: string, screen: string) => {
+  const m = html.match(/data-avatar-mascot[^>]*>\s*([^<\s][^<]*)/);
+  if (!m) throw new Error(`${screen}: không tìm thấy mascot trong preview (markup đã đổi? cập nhật phép đo, đừng bỏ test)`);
   return m[1].trim();
 };
 
-/** Ô mascot trong preview của tủ đồ (`<span className="relative">` ngay trong khung w-28). */
-const shopAvatarEmoji = (html: string) => {
-  const m = html.match(/<span class="relative">([^<]+)<\/span>/);
-  if (!m) throw new Error('không tìm thấy ô mascot trong preview tủ đồ (layout đã đổi?)');
-  return m[1].trim();
-};
+const homeAvatarEmoji = (html: string) => avatarEmoji(html, 'màn Home');
+const shopAvatarEmoji = (html: string) => avatarEmoji(html, 'tủ đồ');
 
 describe('T50A — một nguồn duy nhất cho hình mascot (DEF-022a)', () => {
   it('a1: MASCOT_EMOJI phủ đúng union avatarBase và bốn hình **đôi một khác nhau**', () => {
@@ -142,8 +142,11 @@ describe('T50A — một nguồn duy nhất cho hình mascot (DEF-022a)', () => 
     expect([...new Set(pairs.map((p) => p.home))].length, 'bạn nào cũng giống nhau thì bé không phân biệt được').toBe(4);
   });
 
-  it('a5: Home không còn tự viết bản đồ emoji riêng (nguồn là MASCOT_EMOJI)', () => {
-    expect(homeSrc).toContain('MASCOT_EMOJI');
+  it('a5: Home không tự viết bản đồ emoji riêng — màn chỉ dùng preview chung', () => {
+    // Ý gốc của ca này là "Home không có nguồn thứ hai". T51 move `MASCOT_EMOJI` vào
+    // `AvatarPreview` ⇒ phép đo đổi **hình dạng** (Home phải *không* còn nhắc bản đồ), ý giữ nguyên.
+    expect(homeSrc).toMatch(/<AvatarPreview/);
+    expect(homeSrc).not.toMatch(/MASCOT_EMOJI/);
     expect(homeSrc).not.toMatch(/avatarBase === 'bear' \?/);
   });
 });

@@ -1,0 +1,1826 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t51-avatar-preview-shared-layers.test.ts (7 tests | 7 failed) 122ms
+   ❯ T51 — một preview avatar chung ghép đủ lớp trang bị (DEF-022b) (7)
+     × v1: hồ sơ mặc đủ 7 ô thì **màn Home** vẽ đủ 7 lớp đúng emoji của món 37ms
+     × v2: Home và tủ đồ render **cùng một tập lớp** cho cùng một hồ sơ ⇒ một nguồn duy nhất 39ms
+     × v3: chống đỏ do dựng sẵn — hồ sơ không mặc gì thì **cả hai** màn không có lớp nào, mascot vẫn nguyên 19ms
+     × v4: mọi type trong catalogue có **một quy tắc CSS** riêng ⇒ type mới không lọt qua lưới 1ms
+     × v5: lớp định vị bằng đơn vị **theo ô** (cqi), không px ⇒ ô Home nhỏ hơn ô tủ đồ vẫn đúng tỉ lệ 1ms
+     × v6: hai màn không tự viết lớp riêng — cùng dùng một component preview 1ms
+     × v7: bé dùng màn đọc vẫn biết mình mặc gì — preview có tên, còn lớp trang trí thì im 22ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t51-avatar-preview-shared-layers.test.ts > T51 — một preview avatar chung ghép đủ lớp trang bị (DEF-022b) > v1: hồ sơ mặc đủ 7 ô thì **màn Home** vẽ đủ 7 lớp đúng emoji của món
+AssertionError: Home mặc 7 ô mà chỉ vẽ 0 lớp: expected {} to deeply equal { hat: '🧢', glasses: '🕶️', …(5) }
+
+- Expected
++ Received
+
+- {
+-   "background": "🌊",
+-   "backpack": "🎒",
+-   "frame": "⭐",
+-   "glasses": "🕶️",
+-   "hat": "🧢",
+-   "pet": "🐱",
+-   "shirt": "🦸",
+- }
++ {}
+
+ ❯ tests/t51-avatar-preview-shared-layers.test.ts:140:110
+    138|     for (const t of TYPES) expected[t] = emojiOf(equipped[t]);
+    139|     expect(Object.keys(expected).length, 'catalogue phải có đủ 7 type …
+    140|     expect(layers, `Home mặc ${Object.keys(equipped).length} ô mà chỉ …
+       |                                                                                                              ^
+    141|   });
+    142|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/t51-avatar-preview-shared-layers.test.ts > T51 — một preview avatar chung ghép đủ lớp trang bị (DEF-022b) > v2: Home và tủ đồ render **cùng một tập lớp** cho cùng một hồ sơ ⇒ một nguồn duy nhất
+Error: không tìm thấy mascot trong preview (markup đã đổi? cập nhật phép đo, đừng bỏ test)
+ ❯ mascotOf tests/t51-avatar-preview-shared-layers.test.ts:124:17
+    122| const mascotOf = (html: string) => {
+    123|   const m = html.match(/data-avatar-mascot[^>]*>\s*([^<\s][^<]*)/);
+    124|   if (!m) throw new Error('không tìm thấy mascot trong preview (markup…
+       |                 ^
+    125|   return m[1].trim();
+    126| };
+ ❯ tests/t51-avatar-preview-shared-layers.test.ts:146:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/t51-avatar-preview-shared-layers.test.ts > T51 — một preview avatar chung ghép đủ lớp trang bị (DEF-022b) > v3: chống đỏ do dựng sẵn — hồ sơ không mặc gì thì **cả hai** màn không có lớp nào, mascot vẫn nguyên
+Error: không tìm thấy mascot trong preview (markup đã đổi? cập nhật phép đo, đừng bỏ test)
+ ❯ mascotOf tests/t51-avatar-preview-shared-layers.test.ts:124:17
+    122| const mascotOf = (html: string) => {
+    123|   const m = html.match(/data-avatar-mascot[^>]*>\s*([^<\s][^<]*)/);
+    124|   if (!m) throw new Error('không tìm thấy mascot trong preview (markup…
+       |                 ^
+    125|   return m[1].trim();
+    126| };
+ ❯ tests/t51-avatar-preview-shared-layers.test.ts:152:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/t51-avatar-preview-shared-layers.test.ts > T51 — một preview avatar chung ghép đủ lớp trang bị (DEF-022b) > v4: mọi type trong catalogue có **một quy tắc CSS** riêng ⇒ type mới không lọt qua lưới
+AssertionError: type hat không có quy tắc lớp trong src/index.css: expected '@import "tailwindcss";\r\n\r\n/*\r\n …' to match /\[data-equip=("|')hat("|')\]/
+
+- Expected:
+/\[data-equip=("|')hat("|')\]/
+
++ Received:
+"@import \"tailwindcss\";
+
+/*
+ * T01B/5 — font Nunito phải thắng class `font-sans` của Tailwind.
+ * Tailwind v4 sinh `font-sans` từ token `--font-sans`; trước đây token này
+ * vẫn là stack hệ thống nên div gốc `font-sans` (App.tsx) ghi đè body.
+ */
+@theme {
+  --font-sans: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Comfortaa', 'Nunito', cursive, sans-serif;
+
+  /* ===== T03A — Design tokens ===== */
+  /* Colors — subject palette with 3 shades each (50/500/700) */
+  --color-subject-viet-50: #fff7ed;
+  --color-subject-viet-500: #fb923c;
+  --color-subject-viet-700: #c2410c;
+
+  --color-subject-math-50: #eff6ff;
+  --color-subject-math-500: #3b82f6;
+  --color-subject-math-700: #1d4ed8;
+
+  --color-subject-english-50: #ecfdf5;
+  --color-subject-english-500: #10b981;
+  --color-subject-english-700: #047857;
+
+  --color-subject-life-50: #faf5ff;
+  --color-subject-life-500: #a855f7;
+  --color-subject-life-700: #7e22ce;
+
+  --color-subject-games-50: #fdf4ff;
+  --color-subject-games-500: #ec4899;
+  --color-subject-games-700: #be185d;
+
+  /* Neutral palette (gộp từ :root --kb-*) */
+  --color-kb-gold: #f59e0b;
+  --color-kb-orange: #fb923c;
+  --color-kb-ink: #1e293b;
+  --color-kb-card: #ffffff;
+  --color-kb-ring: rgba(245, 158, 11, 0.35);
+  --color-kb-shadow-soft: 0 10px 30px -12px rgba(180, 83, 9, 0.35);
+  --color-kb-shadow-pop: 0 18px 50px -18px rgba(124, 45, 18, 0.45);
+
+  /* Radii */
+  --radius-card: 1.5rem;   /* 24px */
+  --radius-pill: 9999px;   /* full pill */
+  --radius-xl: 1.25rem;    /* 20px */
+  --radius-2xl: 1.5rem;    /* 24px */
+
+  /* Shadows */
+  --shadow-soft: 0 10px 30px -12px rgba(180, 83, 9, 0.35);
+  --shadow-pop: 0 18px 50px -18px rgba(124, 45, 18, 0.45);
+
+  /* Kid-friendly text sizes */
+  --text-kid-sm: 1rem;     /* 16px */
+  --text-kid-md: 1.25rem;  /* 20px */
+  --text-kid-lg: 1.75rem;  /* 28px */
+  --text-kid-xl: 2.5rem;   /* 40px */
+
+  /* Standard border width */
+  --border-width-kid: 3px;
+}
+
+/*
+ * T01/B12 — self-hosted fonts (offline-first). Nunito + Comfortaa woff2,
+ * subsets latin + vietnamese, in public/fonts/. No Google Fonts requests.
+ *
+ * FIX font-nhoe (2026-10-17): Google Fonts chỉ phục vụ 1 file VARIABLE duy
+ * nhất cho mọi weight (đã verify byte-identical giữa 400..900). Khai báo cũ
+ * giữ 10-14 block @font-face weight tĩnh trỏ vào cùng 1 file khiến browser
+ * TỰ TỔNG HỢP độ đậm (synthetic bold) → chữ tiếng Việt có dấu bị nhòe/méo.
+ * Khai báo variable-range `font-weight: 400 900` để browser NỘI SUY weight
+ * thật từ trục wght. Đồng thời bổ sung weight 400 (normal) vốn bị thiếu
+ * khiến text thường cũng bị faux-bold.
+ */
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url('/fonts/nunito-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url('/fonts/nunito-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/comfortaa-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/comfortaa-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ===== T03A — Night mode tokens ===== */
+[data-theme=\"night\"] {
+  --color-kb-card: #1e293b;
+  --color-kb-ink: #f1f5f9;
+  --color-kb-ring: rgba(245, 158, 11, 0.5);
+  --color-kb-shadow-soft: 0 10px 30px -12px rgba(0, 0, 0, 0.5);
+  --color-kb-shadow-pop: 0 18px 50px -18px rgba(0, 0, 0, 0.6);
+
+  /* Subject colors adjusted for dark mode */
+  --color-subject-viet-50: #3a250a;
+  --color-subject-math-50: #1e3a5f;
+  --color-subject-english-50: #064e3b;
+  --color-subject-life-50: #2e1065;
+  --color-subject-games-50: #4c052d;
+
+  --color-subject-viet-500: #fb923c;
+  --color-subject-math-500: #60a5fa;
+  --color-subject-english-500: #34d399;
+  --color-subject-life-500: #c084fc;
+  --color-subject-games-500: #f472b6;
+
+  --color-subject-viet-700: #f97316;
+  --color-subject-math-700: #3b82f6;
+  --color-subject-english-700: #10b981;
+  --color-subject-life-700: #a855f7;
+  --color-subject-games-700: #ec4899;
+
+  /* Scrollbar for night mode */
+  ::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #f59e0b, #fb923c);
+  }
+}
+
+/* Height kept free above the fixed bottom navigation (App.tsx, below lg):
+   the 5 tabs are 48-58px tall (2-line labels on 360px phones) + 12px padding
+   + border. <main> and floating banners reserve this + the safe-area inset. */
+:root {
+  --kb-bottom-nav-h: 4.75rem;
+}
+
+@layer base {
+  html {
+    overflow-x: clip;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    height: 100%;
+  }
+
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+    background-color: var(--color-kb-card);
+    color: var(--color-kb-ink);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    overflow-x: clip;
+    min-height: 100%;
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: auto;
+  }
+
+  #root {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-x: clip;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Comfortaa', 'Nunito', cursive, sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: #fde68a;
+    color: #78350f;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-kb-ring);
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+
+  /* Slim playful scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #fff7ed;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #fbbf24, #fb923c);
+    border-radius: 999px;
+    border: 2px solid #fff7ed;
+  }
+}
+
+/* ---------- Kid-friendly motion system ---------- */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes pop-in {
+  0% { transform: scale(0.7); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@keyframes bounce-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@keyframes gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes sparkle-spin {
+  0% { transform: rotate(0deg) scale(1); opacity: 0.9; }
+  50% { transform: rotate(180deg) scale(1.15); opacity: 1; }
+  100% { transform: rotate(360deg) scale(1); opacity: 0.9; }
+}
+
+@keyframes rise-in {
+  0% { transform: translateY(14px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-pop {
+  animation: pop-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+.animate-wiggle {
+  animation: wiggle 1.6s ease-in-out infinite;
+}
+
+/* T15 — dấu bật ra / toa lắc khi sai (CSS thuần, tôn trọng reduced-motion chung ở cuối file). */
+@keyframes shake-x {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake-x 0.4s ease-in-out;
+}
+
+.animate-bounce-soft {
+  animation: bounce-soft 2.2s ease-in-out infinite;
+}
+
+.animate-rise {
+  animation: rise-in 0.45s ease-out both;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-pan 8s ease infinite;
+}
+
+/* T28 — các lớp animate-* đã dùng trong UI nhưng chưa từng được khai báo
+   (Tailwind không sinh class tuỳ biến): modal, máy gắp sticker, sao trang trí
+   trước đây đứng im. */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.55); }
+  50% { box-shadow: 0 0 0 7px rgba(251, 191, 36, 0); }
+}
+
+@keyframes claw-drop {
+  0%, 100% { transform: translate(-50%, 0); }
+  45%, 60% { transform: translate(-50%, 30px); }
+}
+
+@keyframes gacha-jumble {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-3px, -2px); }
+  50% { transform: translate(3px, 1px); }
+  75% { transform: translate(-2px, 2px); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out both;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+.animate-pop-in {
+  animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2.6s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.8s ease-in-out infinite;
+}
+
+.animate-claw-drop {
+  animation: claw-drop 1.1s ease-in-out infinite;
+}
+
+.gacha-shuffle {
+  animation: gacha-jumble 0.7s ease-in-out infinite;
+}
+
+/* ---------- Modern kid UI primitives ---------- */
+.kb-card {
+  background: var(--color-kb-card);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-soft);
+  border: 2px solid #fde68a;
+}
+
+.kb-card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.kb-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-pop);
+  border-color: #c084fc;
+}
+
+.kb-btn {
+  position: relative;
+  isolation: isolate;
+  transition: transform 0.15s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+.kb-btn:active {
+  transform: scale(0.96);
+}
+.kb-btn-primary {
+  box-shadow: 0 10px 24px -10px rgba(245, 158, 11, 0.7), inset 0 -3px 0 rgba(0,0,0,0.12);
+}
+.kb-btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.kb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: var(--radius-pill);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.kb-skeleton {
+  background: linear-gradient(90deg, #fef3c7 25%, #fffbeb 50%, #fef3c7 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+  border-radius: 12px;
+  min-height: 14px;
+}
+
+.kb-glass {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@layer components {
+  /*
+   * T01/B1 — hero dot pattern MUST NOT override the Tailwind gradient.
+   * The old rule set `background-image` on the element itself, which replaced
+   * `bg-gradient-*` (also a background-image) with a white/transparent dot
+   * layer → white banner. Now the dots live in a ::before overlay while the
+   * element keeps its own gradient background.
+   */
+  .kb-hero-pattern {
+    position: relative;
+    isolation: isolate;
+  }
+  .kb-hero-pattern::before {
+    content: \"\";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(255,255,255,0.28) 0 8px, transparent 9px),
+      radial-gradient(circle at 88% 22%, rgba(255,255,255,0.22) 0 10px, transparent 11px),
+      radial-gradient(circle at 72% 82%, rgba(255,255,255,0.18) 0 12px, transparent 13px),
+      radial-gradient(circle at 22% 78%, rgba(255,255,255,0.16) 0 7px, transparent 8px);
+  }
+  .kb-hero-pattern > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.kb-tier-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+/* Staggered entrance for grids */
+.stagger > * {
+  animation: rise-in 0.5s ease-out both;
+}
+.stagger > *:nth-child(2) { animation-delay: 0.05s; }
+.stagger > *:nth-child(3) { animation-delay: 0.1s; }
+.stagger > *:nth-child(4) { animation-delay: 0.15s; }
+.stagger > *:nth-child(5) { animation-delay: 0.2s; }
+.stagger > *:nth-child(6) { animation-delay: 0.25s; }
+.stagger > *:nth-child(7) { animation-delay: 0.3s; }
+.stagger > *:nth-child(8) { animation-delay: 0.35s; }
+
+/* Confetti-safe overflow for game modals */
+.kb-game-stage {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+/* =====================================================================
+   Cờ tướng 3D — CSS-only perspective board (no WebGL dependency)
+   ===================================================================== */
+.ct-scene {
+  --ct-tilt: 20deg;
+  max-width: 620px;
+  margin: 0 auto;
+  perspective: 1500px;
+  perspective-origin: 50% 8%;
+  padding: 5% 3% 12%;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.ct-scene.is-flat {
+  --ct-tilt: 0deg;
+  perspective: none;
+  padding: 2% 0 3%;
+}
+
+.ct-plate {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  container-type: inline-size;
+  transform: rotateX(var(--ct-tilt)) translateZ(0);
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+
+/* Wooden frame with a fake-but-convincing thickness (hard shadows + slab). */
+.ct-board {
+  position: absolute;
+  inset: -3.4%;
+  border-radius: 18px;
+  background:
+    linear-gradient(155deg, rgba(255, 220, 170, 0.18), rgba(0, 0, 0, 0) 40%),
+    linear-gradient(160deg, #7c4b25 0%, #5a331b 45%, #3a1f0d 100%);
+  border: 1px solid #9a6a37;
+  box-shadow:
+    0 8px 0 #321a0a,
+    0 15px 0 #261306,
+    0 26px 34px -14px rgba(45, 22, 0, 0.7),
+    inset 0 2px 1px rgba(255, 220, 160, 0.22),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.5);
+  transform: translateZ(-8px);
+}
+
+.ct-board::before {
+  content: '';
+  position: absolute;
+  inset: 2.4%;
+  border-radius: 11px;
+  border: 1.5px solid rgba(255, 208, 130, 0.35);
+  box-shadow: inset 0 0 14px rgba(255, 190, 90, 0.16);
+  pointer-events: none;
+}
+
+.ct-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: 9px;
+  transform-style: preserve-3d;
+  background:
+    radial-gradient(120% 85% at 28% 18%, rgba(255, 248, 226, 0.95), rgba(255, 248, 226, 0) 62%),
+    repeating-linear-gradient(92deg, rgba(150, 100, 40, 0.05) 0 2px, rgba(255, 255, 255, 0) 2px 8px),
+    linear-gradient(150deg, #f8e5bd 0%, #f0d3a0 45%, #e3bf87 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(150, 100, 45, 0.55),
+    inset 0 0 40px rgba(120, 70, 20, 0.22);
+}
+
+.ct-grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(0.1px);
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.ct-grid line,
+.ct-grid path {
+  fill: none;
+  stroke: #8a5424;
+  stroke-width: 0.03;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
+.ct-grid .ct-border {
+  stroke-width: 0.052;
+  opacity: 0.92;
+}
+
+.ct-grid .ct-mark {
+  stroke-width: 0.024;
+  opacity: 0.55;
+}
+
+.ct-river-label {
+  position: absolute;
+  transform: translate(-50%, -50%) translateZ(0.2px);
+  z-index: 1;
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+  font-size: clamp(11px, 3.4vw, 22px);
+  font-size: 3.4cqw;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(138, 84, 36, 0.55);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---- pieces ---- */
+.ct-piece {
+  position: absolute;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) translateZ(4px);
+  transform-style: preserve-3d;
+  pointer-events: none;
+  z-index: 10;
+  transition:
+    left 0.34s cubic-bezier(0.2, 0.85, 0.3, 1),
+    top 0.34s cubic-bezier(0.2, 0.85, 0.3, 1);
+  animation: ct-drop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+
+.ct-piece.is-selected {
+  transform: translate(-50%, -50%) translateZ(10px);
+  z-index: 20;
+}
+
+/* Bóng tiếp đất nằm DƯỚI quân và lấn ra ngoài đĩa — bản cũ lọt hoàn toàn
+   trong lòng quân nên quân trông như dán phẳng lên mặt bàn. */
+.ct-piece__shadow {
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  top: 54%;
+  bottom: -24%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 50% 32%,
+    rgba(64, 33, 6, 0.62) 0%,
+    rgba(64, 33, 6, 0.3) 42%,
+    rgba(64, 33, 6, 0) 74%
+  );
+  filter: blur(1.2px);
+  transform: translateZ(0.6px);
+}
+
+/* Thành quân: hơi rộng và dài xuống phía người nhìn để lộ vành gỗ dưới mặt
+   quân, nhờ đó quân có độ dày chứ không chỉ là một hình tròn. */
+.ct-piece__base {
+  position: absolute;
+  inset: 2% 2% -6% 2%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #c79a5f 0%, #ab7d47 42%, #7a5326 74%, #5b3c19 100%);
+  box-shadow: 0 2px 3px rgba(45, 22, 0, 0.5);
+  transform: translateZ(5px);
+  transition: transform 0.22s ease;
+}
+
+.ct-piece__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 34% 24%, #fffdf8 0%, #f9ecce 40%, #edd3a2 70%, #cf9f60 100%);
+  border: 1px solid #a9763a;
+  box-shadow:
+    inset 0 2px 2px rgba(255, 255, 255, 0.95),
+    inset 0 -3px 7px rgba(110, 70, 25, 0.42),
+    0 2px 0 rgba(128, 86, 36, 0.8),
+    0 5px 6px -1px rgba(60, 30, 0, 0.35);
+  transform: translateZ(14px);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.ct-piece__face::after {
+  content: '';
+  position: absolute;
+  inset: 7%;
+  border-radius: 999px;
+  border: 1.5px solid rgba(140, 95, 45, 0.45);
+  pointer-events: none;
+}
+
+.ct-piece__char {
+  position: relative;
+  font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', 'Kaiti SC', 'STKaiti', 'KaiTi', 'Microsoft YaHei', 'PingFang SC', serif;
+  font-weight: 900;
+  line-height: 1;
+  font-size: clamp(14px, 4.6vw, 30px);
+  font-size: 5.5cqw;
+  transform: translateZ(0.8px);
+}
+
+.ct-piece[data-color='red'] .ct-piece__char {
+  color: #b91c1c;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 -1px 0 rgba(140, 20, 20, 0.35);
+}
+
+.ct-piece[data-color='black'] .ct-piece__char {
+  color: #1e293b;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8), 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+
+.ct-piece__viet-only {
+  position: relative;
+  font-family: inherit;
+  font-weight: 900;
+  line-height: 1;
+  font-size: clamp(10px, 3.2vw, 19px);
+  font-size: 3.2cqw;
+  letter-spacing: -0.02em;
+  transform: translateZ(0.8px);
+}
+
+.ct-coord {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.32px;
+  fill: #8a5424;
+  opacity: 0.72;
+  user-select: none;
+  pointer-events: none;
+}
+
+.theme-ebony .ct-coord {
+  fill: #d4af37;
+  opacity: 0.85;
+}
+
+.theme-bamboo .ct-coord {
+  fill: #735122;
+  opacity: 0.85;
+}
+
+.ct-piece[data-color='red'] .ct-piece__viet-only {
+  color: #b91c1c;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.ct-piece[data-color='black'] .ct-piece__viet-only {
+  color: #1f2937;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.ct-piece.is-selected .ct-piece__base {
+  transform: translateZ(20px);
+}
+
+.ct-piece.is-selected .ct-piece__face {
+  transform: translateZ(30px) scale(1.05);
+  box-shadow:
+    0 0 0 3px #fbbf24,
+    0 3px 0 rgba(128, 86, 36, 0.8),
+    0 12px 18px -3px rgba(60, 30, 0, 0.45),
+    inset 0 2px 2px rgba(255, 255, 255, 0.95);
+}
+
+/* Board Themes */
+.theme-ebony .ct-board {
+  background: linear-gradient(145deg, #2b2523, #181514);
+  border-color: #524741;
+  box-shadow: 0 8px 0 #100e0d, 0 15px 0 #070605, 0 26px 34px -14px rgba(0, 0, 0, 0.9);
+}
+
+.theme-ebony .ct-surface {
+  background:
+    radial-gradient(120% 85% at 28% 18%, rgba(60, 52, 48, 0.95), rgba(30, 26, 24, 0) 62%),
+    linear-gradient(150deg, #26211f 0%, #1c1817 45%, #12100f 100%);
+  box-shadow: inset 0 0 0 2px rgba(180, 140, 75, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.7);
+}
+
+.theme-ebony .ct-grid line,
+.theme-ebony .ct-grid path {
+  stroke: #d4af37;
+  opacity: 0.65;
+}
+
+.theme-ebony .ct-river-label {
+  color: rgba(212, 175, 55, 0.6);
+}
+
+.theme-bamboo .ct-board {
+  background: linear-gradient(145deg, #a37c40, #735122);
+  border-color: #ba9354;
+}
+
+.theme-bamboo .ct-surface {
+  background:
+    radial-gradient(120% 85% at 28% 18%, rgba(255, 252, 238, 0.95), rgba(255, 252, 238, 0) 62%),
+    linear-gradient(150deg, #fbf4db 0%, #f4e3b5 45%, #e9ce8e 100%);
+}
+
+/* ---- board markers ---- */
+.ct-dot,
+.ct-target-ring,
+.ct-last,
+.ct-sel-ring,
+.ct-check,
+.ct-boom {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ct-last {
+  width: 10.2%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  transform: translate(-50%, -50%) translateZ(0.7px);
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.45), rgba(251, 191, 36, 0) 70%);
+}
+
+.ct-last-to {
+  background: radial-gradient(circle, rgba(251, 191, 36, 0.62), rgba(251, 191, 36, 0) 72%);
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.45);
+}
+
+.ct-sel-ring {
+  width: 10.6%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  border: 2px dashed rgba(180, 83, 9, 0.55);
+  transform: translate(-50%, -50%) translateZ(0.9px);
+}
+
+.ct-dot {
+  aspect-ratio: 1;
+  border-radius: 999px;
+  transform: translate(-50%, -50%) translateZ(2px);
+  background: radial-gradient(circle at 35% 30%, #6ee7b7, #10b981 70%);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.85);
+  animation: ct-breathe 1.4s ease-in-out infinite;
+}
+
+.ct-target-ring {
+  aspect-ratio: 1;
+  border-radius: 999px;
+  border: 3px solid #10b981;
+  transform: translate(-50%, -50%) translateZ(2px);
+  animation: ct-ring-glow 1.4s ease-in-out infinite;
+}
+
+.ct-check {
+  width: 10.8%;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  border: 3px solid #ef4444;
+  transform: translate(-50%, -50%) translateZ(1.2px);
+  animation: ct-danger 0.9s ease-in-out infinite;
+}
+
+.ct-boom {
+  transform: translate(-50%, -50%) translateZ(24px);
+  font-size: 6cqw;
+  animation: ct-boom 0.65s ease-out forwards;
+}
+
+.ct-cells {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  z-index: 15;
+}
+
+.ct-cell {
+  position: absolute;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 9999px;
+  pointer-events: auto;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ct-cell:hover:not(:disabled) {
+  background: rgba(251, 191, 36, 0.16);
+}
+
+.ct-cell:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.ct-cell:disabled {
+  cursor: default;
+}
+
+.ct-cell.is-last {
+  background: rgba(251, 191, 36, 0.14);
+}
+
+.ct-cell.is-target {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.ct-cell.is-last.is-target {
+  background: rgba(16, 185, 129, 0.18);
+}
+
+/* ---- small bits ---- */
+.ct-mini-disc {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  font-family: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  background: radial-gradient(circle at 34% 24%, #fffdf7, #efd9ac 70%, #d3ab72);
+  border: 1px solid #b07f42;
+  box-shadow: 0 1px 2px rgba(80, 45, 10, 0.35), inset 0 1px 0 #fff;
+}
+
+.ct-mini-disc--red {
+  color: #b91c1c;
+}
+
+.ct-mini-disc--black {
+  color: #1f2937;
+}
+
+.ct-dot-wave {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: ct-wave 1s ease-in-out infinite;
+}
+
+.ct-dot-wave:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.ct-dot-wave:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes ct-drop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -95%) translateZ(24px) scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateZ(4px) scale(1);
+  }
+}
+
+@keyframes ct-breathe {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@keyframes ct-ring-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.35); }
+  50% { box-shadow: 0 0 18px rgba(16, 185, 129, 0.85); }
+}
+
+@keyframes ct-danger {
+  0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.45); }
+  50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.95); }
+}
+
+@keyframes ct-boom {
+  0% { opacity: 0; transform: translate(-50%, -50%) translateZ(20px) scale(0.4); }
+  40% { opacity: 1; transform: translate(-50%, -50%) translateZ(26px) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translateZ(32px) scale(1.5); }
+}
+
+@keyframes ct-wave {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
+@media (max-width: 640px) {
+  .ct-scene {
+    --ct-tilt: 13deg;
+    perspective: 1100px;
+    max-width: none;
+    padding: 4% 1% 9%;
+  }
+  .ct-piece__char {
+    font-size: clamp(12px, 4.2vw, 24px);
+    font-size: 5.4cqw;
+  }
+}
+
+/* Sân chơi game bên trong GameModalWrapper:
+ * Ngăn chặn lỗi co hẹp về 0px (biến thành sợi chỉ đứng) trong Chromium/WebKit
+ * khi component con chỉ chứa các phần tử tuyệt đối (position: absolute).
+ */
+.game-stage-canvas,
+[role=\"dialog\"] .self-stretch > * {
+  width: 100% !important;
+  min-width: 100% !important;
+  align-self: stretch !important;
+}
+
+"
+
+ ❯ tests/t51-avatar-preview-shared-layers.test.ts:159:76
+    157|   it('v4: mọi type trong catalogue có **một quy tắc CSS** riêng ⇒ type…
+    158|     for (const t of TYPES) {
+    159|       expect(cssSrc, `type ${t} không có quy tắc lớp trong src/index.c…
+       |                                                                            ^
+    160|         new RegExp(`\\[data-equip=("|')${t}("|')\\]`)
+    161|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/t51-avatar-preview-shared-layers.test.ts > T51 — một preview avatar chung ghép đủ lớp trang bị (DEF-022b) > v5: lớp định vị bằng đơn vị **theo ô** (cqi), không px ⇒ ô Home nhỏ hơn ô tủ đồ vẫn đúng tỉ lệ
+AssertionError: thiếu quy tắc CSS cho hat: expected null to be truthy
+
+- Expected:
+true
+
++ Received:
+null
+
+ ❯ tests/t51-avatar-preview-shared-layers.test.ts:168:50
+    166|     for (const t of TYPES) {
+    167|       const rule = cssSrc.match(new RegExp(`\\[data-equip=("|')${t}("|…
+    168|       expect(rule, `thiếu quy tắc CSS cho ${t}`).toBeTruthy();
+       |                                                  ^
+    169|       const body = rule![2];
+    170|       expect(body, `lớp ${t} phải định vị/cỡ chữ theo ô (cqi)`).toMatc…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/t51-avatar-preview-shared-layers.test.ts > T51 — một preview avatar chung ghép đủ lớp trang bị (DEF-022b) > v6: hai màn không tự viết lớp riêng — cùng dùng một component preview
+AssertionError: expected 'import React, { useState, useEffect, …' to match /import\s+\{?\s*AvatarPreview/
+
+- Expected:
+/import\s+\{?\s*AvatarPreview/
+
++ Received:
+"import React, { useState, useEffect, useCallback } from 'react';
+import { ActiveScreen, ChildProfile, DailyQuest, ReadingProfile, SubjectType } from '../../types';
+import { sound } from '../../services/sound';
+import { localDateKey } from '../../services/dateUtils';
+import { fireCelebrationConfetti } from '../../services/confetti';
+import { StorageService } from '../../services/storage';
+import { GAMES_CATALOG } from '../../data/gamesCatalog';
+import { MASCOT_EMOJI } from '../../data/shopCatalog';
+import { NextBestActionCard } from '../learning/NextBestActionCard';
+import { Star, Sparkles, Gift, Check, ArrowRight, BookOpen, Target, Trophy, Gamepad2, Sparkle, RotateCcw } from 'lucide-react';
+import { KidButton, KidCard, Pill, SectionTitle } from '../ui';
+import { CloudSyncBanner } from '../auth/CloudSyncBanner';
+import type { DecisionRecommendation } from '../../types/decisionEngine';
+
+interface HomeScreenProps {
+  profile: ChildProfile;
+  onNavigate: (screen: ActiveScreen) => void;
+  onSelectSubject: (sub: SubjectType) => void;
+  onOpenGames: () => void;
+  onOpenDailyReview: () => void;
+  onOpenWeeklyChallenge: () => void;
+  onProfileUpdate: () => void;
+  onOpenParent: (tab?: 'progress' | 'reading' | 'insights' | 'competition' | 'kidbox' | 'settings') => void;
+  onOpenLesson: (subject: SubjectType, lessonId: string) => void;
+}
+
+interface SubjectCard {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: string;
+  gradient: string;
+  border: string;
+  progressColor: string;
+  variant: 'subject-viet' | 'subject-math' | 'subject-english' | 'subject-life';
+  locked?: boolean;
+  subjectType?: SubjectType; // Only for unlocked subjects
+}
+
+interface ShortcutCard {
+  screen: ActiveScreen;
+  label: string;
+  icon: string;
+  desc: string;
+  gradient: string;
+  border: string;
+}
+
+const SUBJECT_CARDS: readonly SubjectCard[] = [
+  {
+    id: 'tieng-viet',
+    title: 'Tiếng Việt',
+    subtitle: 'Chữ cái · Dấu thanh · Vần ghép · Đọc truyện',
+    icon: '📚',
+    gradient: 'from-amber-500 to-orange-500',
+    border: 'border-amber-300',
+    progressColor: 'amber',
+    variant: 'subject-viet',
+    subjectType: 'tieng-viet',
+  },
+  {
+    id: 'toan',
+    title: 'Toán Học',
+    subtitle: 'Đếm số 0–100 · Cộng trừ · Hình học · Đo lường',
+    icon: '🔢',
+    gradient: 'from-blue-500 to-cyan-500',
+    border: 'border-blue-300',
+    progressColor: 'blue',
+    variant: 'subject-math',
+    subjectType: 'toan',
+  },
+  {
+    id: 'english',
+    title: 'Tiếng Anh',
+    subtitle: 'Chữ cái · Số đếm · Màu sắc · Động vật',
+    icon: '🇬🇧',
+    gradient: 'from-emerald-500 to-teal-500',
+    border: 'border-emerald-300',
+    progressColor: 'emerald',
+    variant: 'subject-english',
+    subjectType: 'english',
+  },
+  {
+    id: 'em-cuoc-song',
+    title: 'Em & Cuộc Sống',
+    subtitle: 'Cảm xúc · An toàn · Kỹ năng sống · Nghệ thuật',
+    icon: '💜',
+    gradient: 'from-purple-500 to-violet-500',
+    border: 'border-purple-300',
+    progressColor: 'purple',
+    variant: 'subject-life',
+    locked: false,
+    subjectType: 'cuoc-song',
+  },
+];
+
+const SHORTCUT_CARDS: readonly ShortcutCard[] = [
+  {
+    screen: 'games',
+    label: 'Trò Chơi',
+    icon: '🎮',
+    desc: `${GAMES_CATALOG.length} trò vui`,
+    gradient: 'from-purple-500 to-indigo-600',
+    border: 'border-purple-300',
+  },
+  {
+    screen: 'reading_fluency',
+    label: 'Luyện Đọc',
+    icon: '📖',
+    desc: 'Đọc trôi chảy',
+    gradient: 'from-sky-500 to-cyan-600',
+    border: 'border-sky-300',
+  },
+  {
+    screen: 'english_ioe',
+    label: 'Tiếng Anh IOE',
+    icon: '🇬🇧',
+    desc: 'Luyện IOE lớp 1',
+    gradient: 'from-emerald-500 to-teal-600',
+    border: 'border-emerald-300',
+  },
+  {
+    screen: 'chess',
+    label: 'Cờ Vua 3D',
+    icon: '♟',
+    desc: 'Đấu trí 3D siêu đẹp',
+    gradient: 'from-amber-600 to-yellow-600',
+    border: 'border-amber-300',
+  },
+  {
+    screen: 'cotuong',
+    label: 'Cờ Tướng',
+    icon: '🪖',
+    desc: 'Vương quốc cờ tướng',
+    gradient: 'from-red-500 to-orange-600',
+    border: 'border-red-300',
+  },
+];
+
+export const HomeScreen: React.FC<HomeScreenProps> = ({
+  profile,
+  onNavigate,
+  onSelectSubject,
+  onOpenGames,
+  onOpenDailyReview,
+  onOpenWeeklyChallenge,
+  onProfileUpdate,
+  onOpenParent,
+  onOpenLesson,
+}) => {
+  const [quests, setQuests] = useState<DailyQuest[]>(StorageService.getDailyQuests());
+  const [reading, setReading] = useState<ReadingProfile>(() => StorageService.getReadingProfile());
+  const [chestClaimed, setChestClaimed] = useState(
+    profile.dailyChestClaimedDate === localDateKey()
+  );
+  const [nextBestAction, setNextBestAction] = useState<DecisionRecommendation | null>(null);
+  const [decisionLoading, setDecisionLoading] = useState(true);
+
+  const completedQuestsCount = quests.filter((q) => q.completed).length;
+  const canClaimChest = completedQuestsCount >= 3 && !chestClaimed;
+
+  const handleClaimChest = useCallback(() => {
+    if (!canClaimChest) return;
+    // T41 — claimDailyChest từ chối khi ba mẹ tắt quỹ thưởng; nếu chỉ `return`
+    // thì bé bấm rương mà không có phản hồi nào (app có vẻ bị lì).
+    if (!StorageService.areRewardsEnabled()) {
+      sound.playWrong();
+      sound.speak('Ba mẹ đang tắt phần thưởng nên rương hôm nay chưa mở được. Bé nhờ ba mẹ bật lại trong mục Ba Mẹ nhé!');
+      return;
+    }
+    // T18A — rương ngày qua storage chung (+10 sao, +50 XP, đếm rương + quest vui).
+    if (!StorageService.claimDailyChest()) return;
+    sound.playLevelUp();
+    fireCelebrationConfetti();
+    setChestClaimed(true);
+    onProfileUpdate();
+    sound.speak('Bé đã mở rương kho báu thành công! Nhận thêm mười sao vàng!');
+  }, [canClaimChest, onProfileUpdate]);
+
+  const playWelcomeVoice = useCallback(() => {
+    sound.speak(`Xin chào ${profile.name}! Hôm nay mình tìm kho báu nào nào?`);
+  }, [profile.name]);
+
+  // Load next best action from DecisionEngine (async, non-blocking)
+  useEffect(() => {
+    let live = true;
+    import('../../services/decisionEngine')
+      .then((m) => {
+        if (!live) return;
+        try {
+          const decision = m.DecisionEngine.decide();
+          if (decision.nextBestAction) {
+            setNextBestAction(decision.nextBestAction);
+          }
+        } catch {
+          // Silently fail — the card is a recommendation, never a blocker
+        } finally {
+          setDecisionLoading(false);
+        }
+      })
+      .catch(() => {
+        if (live) setDecisionLoading(false);
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const handleNextBestAction = useCallback(() => {
+    if (!nextBestAction?.launchRoute) return;
+    sound.playClick();
+    if (nextBestAction.type === 'LEARN' && nextBestAction.lessonId) {
+      onOpenLesson(nextBestAction.subject, nextBestAction.lessonId);
+      return;
+    }
+    if (nextBestAction.launchRoute === 'subject') {
+      onSelectSubject(nextBestAction.subject);
+      return;
+    }
+    onNavigate(nextBestAction.launchRoute);
+  }, [nextBestAction, onNavigate, onOpenLesson, onSelectSubject]);
+
+  const handleShortcutClick = useCallback((screen: ActiveScreen) => {
+    sound.playClick();
+    onNavigate(screen);
+  }, [onNavigate]);
+
+  const handleSubjectClick = useCallback((subject: SubjectCard) => {
+    if (subject.locked || !subject.subjectType) {
+      sound.speak('Môn học này sắp mở. Bé hãy kiên nhẫn chờ nhé!');
+      return;
+    }
+    sound.playClick();
+    onSelectSubject(subject.subjectType);
+  }, [onSelectSubject]);
+
+  return (
+    <div className=\"w-full max-w-5xl mx-auto px-3 sm:px-4 py-4 md:py-6 space-y-5 sm:space-y-6 overflow-x-clip\">
+      {/* 1. HERO: Gấu Bút Chì (wave) + greeting bubble + 3 pills */}
+      <div className=\"relative animate-gradient kb-hero-pattern bg-gradient-to-r from-amber-700 via-orange-700 to-rose-700 rounded-3xl p-4 sm:p-5 md:p-6 shadow-xl text-white overflow-hidden border-4 border-amber-200\">
+        {/* Background decorative shapes */}
+        <div className=\"absolute top-2 right-4 text-6xl opacity-20 pointer-events-none animate-pulse-slow\">✨</div>
+        <div className=\"absolute -bottom-4 -left-4 text-8xl opacity-15 pointer-events-none\">⭐</div>
+
+        {/* Side by side only from lg: at md (768px) the \"Học tiếp\" button cannot
+            shrink (~360px), which left ~170px for the greeting (one word per line). */}
+        <div className=\"relative z-10 flex flex-col lg:flex-row items-center justify-between gap-5\">
+          {/* Left: Mascot + Greeting + Stats */}
+          {/* min-w-0 flex-1: next to the \"Học tiếp\" button (lg+) this block takes
+              the remaining width instead of being squeezed. */}
+          <div className=\"min-w-0 flex-1 flex flex-col min-[340px]:flex-row items-center gap-4 md:gap-5 text-center min-[340px]:text-left md:text-left\">
+            {/* Mascot Avatar with wave pose */}
+            <div className=\"relative shrink-0\">
+              <div className=\"w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white/95 rounded-3xl shadow-xl flex items-center justify-center text-5xl sm:text-6xl md:text-7xl border-4 border-amber-200 animate-float\">
+                {MASCOT_EMOJI[profile.avatarBase]}
+              </div>
+              {/* Wave animation indicator */}
+              <span className=\"absolute -bottom-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs animate-bounce\" aria-hidden=\"true\">👋</span>
+              <span className=\"absolute -top-1 -left-1 px-2 py-0.5 bg-amber-900 text-amber-100 text-[9px] font-black rounded-full shadow-sm\">
+                Lớp 1
+              </span>
+            </div>
+
+            {/* min-w-0: the greeting column may shrink next to the mascot; the
+                speaker is a fixed 44px icon button (size \"md\" carried 24px side
+                padding and squeezed \"Chào Bé Minh!\" to one word per line). */}
+            <div className=\"min-w-0\">
+              <div className=\"flex items-center gap-2 justify-center md:justify-start\">
+                <h1 className=\"min-w-0 text-2xl md:text-3xl leading-tight font-black font-display tracking-tight text-white drop-shadow-sm [overflow-wrap:anywhere]\">
+                  Chào {profile.name}! 👋
+                </h1>
+                <KidButton
+                  variant=\"secondary\"
+                  size=\"icon\"
+                  className=\"shrink-0\"
+                  onClick={playWelcomeVoice}
+                  aria-label=\"Nghe lời chào\"
+                  leftIcon=\"🔊\"
+                />
+              </div>
+
+              <p className=\"text-amber-50 text-xs md:text-sm font-bold mt-1 max-w-md\">
+                Hôm nay mình tìm kho báu nào nào?
+              </p>
+
+              {/* Stats pills */}
+              <div className=\"flex flex-wrap items-center gap-2 mt-3 justify-center md:justify-start\">
+                <Pill variant=\"star\" size=\"sm\" icon=\"⭐\">
+                  <span className=\"tabular-nums\">{profile.stars}</span> Sao
+                </Pill>
+                <Pill variant=\"streak\" size=\"sm\" icon=\"🔥\">
+                  Chuỗi <span className=\"tabular-nums\">{profile.streak}</span> ngày
+                </Pill>
+                <Pill variant=\"ticket\" size=\"sm\" icon=\"🎟️\">
+                  <span className=\"tabular-nums\">{profile.tickets}</span> Vé
+                </Pill>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Giant \"Học tiếp\" button */}
+          <div className=\"w-full lg:w-auto shrink-0 flex flex-col items-stretch lg:items-end gap-2\">
+            <KidButton
+              variant=\"primary\"
+              size=\"xl\"
+              fullWidth={false}
+              className=\"min-h-[56px] md:min-h-[60px] min-w-[200px] text-base md:text-lg font-black gap-2 animate-pulse-subtle\"
+              onClick={handleNextBestAction}
+              disabled={decisionLoading || !nextBestAction?.launchRoute}
+              rightIcon={<ArrowRight className=\"w-6 h-6\" />}
+              aria-label={nextBestAction ? `Bắt đầu: ${nextBestAction.title}` : 'Đang tải gợi ý...'}
+            >
+              {decisionLoading ? (
+                <span className=\"flex items-center gap-2\">
+                  <span className=\"w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin\" aria-hidden=\"true\" />
+                  Đang tải...
+                </span>
+              ) : nextBestAction ? (
+                <>
+                  ▶ {nextBestAction.title}
+                </>
+              ) : (
+                'Học tiếp'
+              )}
+            </KidButton>
+            {/* \"Vì sao?\" link to Parent Dashboard */}
+            {nextBestAction && (
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  onOpenParent('insights');
+                }}
+                // T20A / B-07 — 00_RULES §7: every tappable target ≥ 44px.
+                // This text link was 16px tall (min-w/44 + py-1 keeps the
+                // inline look while giving the finger a real target).
+                className=\"min-h-[44px] px-1 py-2 inline-flex items-center text-xs md:text-sm font-bold text-amber-100 hover:text-white underline underline-offset-2\"
+                aria-label=\"Xem lý do gợi ý này ở Bảng Phụ Huynh\"
+              >
+                Vì sao gợi ý này?
+              </button>
+            )}
+            {decisionLoading && (
+              <p className=\"text-amber-50 text-[11px] font-medium text-center lg:text-right\">
+                Đang tìm hoạt động tốt nhất cho bé...
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Cloud Sync & Google Account Banner (prominent on Home Screen) */}
+      <CloudSyncBanner profile={profile} />
+
+      {/* 2. 4 SUBJECT CARDS with progress rings */}
+      <div>
+        <SectionTitle icon=\"🎯\" size=\"lg\">
+          Hôm Nay Bé Học Gì?
+        </SectionTitle>
+
+        {/* Mobile: 2 equal columns (grid-cols-2 = repeat(2, minmax(0, 1fr))).
+            Cards use KidButton size \"tile\": explicit 12px padding on phones
+            (size \"lg\" forced 32px side padding, leaving ~90px for content at
+            375px) and content stretched to the card width instead of centred,
+            so nothing can spill over both edges into the neighbouring card. */}
+        <div className=\"grid grid-cols-2 gap-3 md:gap-4\">
+          {SUBJECT_CARDS.map((subject) => (
+            <KidButton
+              key={subject.id}
+              variant={subject.variant}
+              size=\"tile\"
+              fullWidth
+              className={`min-h-[140px] md:min-h-[150px] text-left ${
+                subject.locked ? 'opacity-60 cursor-not-allowed' : ''
+              }`}
+              onClick={() => handleSubjectClick(subject)}
+              disabled={subject.locked}
+              aria-disabled={subject.locked}
+            >
+              {/* Label + icon share the first row; the title gets the full card
+                  width below them, so \"Tiếng Việt\" / \"Toán Học\" stay on one line
+                  on a 360px phone instead of being squeezed next to the icon.
+                  T20A / B-08 — `min-w-0` lets the label shrink below its
+                  longest word (it used to push the cards wider than 360px). */}
+              <div className=\"flex items-start justify-between gap-2\">
+                <span className=\"min-w-0 text-[10px] sm:text-[11px] uppercase font-black tracking-wide sm:tracking-widest text-white/80\">
+                  Môn Học Lớp 1
+                </span>
+                <span className=\"text-3xl sm:text-4xl md:text-5xl leading-none group-hover:scale-110 transition-transform shrink-0\" aria-hidden=\"true\">{subject.icon}</span>
+              </div>
+              <h3 className=\"text-lg sm:text-xl leading-tight font-black font-display mt-1 [overflow-wrap:anywhere]\">
+                {subject.title}
+                {subject.locked && (
+                  <span className=\"inline-block ml-1 text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full\">🔒 Sắp mở</span>
+                )}
+              </h3>
+
+              <div className=\"mt-auto pt-2\">
+                <p className=\"text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]\">{subject.subtitle}</p>
+                {/* Progress ring placeholder */}
+                <div className=\"flex items-center gap-2\">
+                  <div className=\"relative w-11 h-11 sm:w-14 sm:h-14 flex-shrink-0\" aria-hidden=\"true\">
+                    <svg className=\"w-11 h-11 sm:w-14 sm:h-14 transform -rotate-90\" viewBox=\"0 0 28 28\">
+                      <circle
+                        cx=\"14\"
+                        cy=\"14\"
+                        r=\"12\"
+                        fill=\"none\"
+                        stroke=\"white\"
+                        strokeWidth=\"2.5\"
+                        strokeOpacity=\"0.2\"
+                      />
+                      <circle
+                        cx=\"14\"
+                        cy=\"14\"
+                        r=\"12\"
+                        fill=\"none\"
+                        stroke=\"white\"
+                        strokeWidth=\"2.5\"
+                        strokeDasharray=\"75.4\"
+                        strokeDashoffset=\"37.7\"
+                        strokeLinecap=\"round\"
+                        className=\"text-white\"
+                      />
+                    </svg>
+                    <span className=\"absolute inset-0 flex items-center justify-center text-[10px] font-black text-white\">
+                      50%
+                    </span>
+                  </div>
+                  <div className=\"flex-1 min-w-0\">
+                    <div className=\"h-2 bg-white/20 rounded-full overflow-hidden\">
+                      <div
+                        className=\"h-full bg-white rounded-full transition-all duration-500\"
+                        style={{ width: '50%' }}
+                      />
+                    </div>
+                    <p className=\"text-[10px] leading-tight text-white/80 font-bold mt-1\">Tiến độ: 50%</p>
+                  </div>
+                </div>
+              </div>
+            </KidButton>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. \"NHIỆM VỤ HÔM NAY\" - 3 round quest icons + treasure chest */}
+      <KidCard subjectBorder=\"none\" className=\"space-y-3\">
+        <div className=\"flex flex-col sm:flex-row sm:items-center justify-between gap-3\">
+          <div>
+            <SectionTitle icon=\"🎯\" size=\"md\" className=\"mb-0\">
+              Nhiệm Vụ Hôm Nay
+            </SectionTitle>
+            <p className=\"text-xs text-slate-500 font-bold\">
+              Hoàn thành 3 nhiệm vụ để mở Rương Kho Báu (+10 Sao, +50 XP)!
+            </p>
+          </div>
+
+          {/* Treasure chest button */}
+          <KidButton
+            variant={chestClaimed ? 'secondary' : canClaimChest ? 'primary' : 'secondary'}
+            size=\"md\"
+            disabled={!canClaimChest && chestClaimed}
+            className={`min-h-[44px] ${chestClaimed ? '' : canClaimChest ? 'animate-bounce' : 'opacity-60 cursor-not-allowed'}`}
+            leftIcon={<Gift className=\"w-5 h-5\" />}
+            onClick={handleClaimChest}
+          >
+            {chestClaimed
+              ? 'Đã Nhận Rương'
+              : canClaimChest
+              ? 'Mở Rương Kho Báu!'
+              : `Mở Rương (${completedQuestsCount}/3)`}
+          </KidButton>
+        </div>
+
+        {/* Quest icons row - exactly 3 round icons + chest. A 4-column grid of
+            square cells (max 96px): four fixed 80px tiles + gaps (356px) were
+            wider than the card on a 360px phone and spilled out on both sides. */}
+        <div className=\"grid grid-cols-4 gap-2 sm:gap-3 md:gap-4 max-w-md mx-auto\">
+          {quests.slice(0, 3).map((q, idx) => (
+            <button
+              key={q.id}
+              onClick={() => {}}
+              disabled={q.completed}
+              className={`relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all ${
+                q.completed
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-950 cursor-default'
+                  : 'bg-amber-50 border-amber-200 text-slate-700 hover:border-amber-400 hover:shadow-md cursor-pointer'
+              }`}
+              aria-label={q.completed ? `Nhiệm vụ ${idx + 1}: ${q.title} - đã hoàn thành` : `Nhiệm vụ ${idx + 1}: ${q.title}`}
+            >
+              <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">
+                {q.completed ? '✅' : idx === 0 ? '📚' : idx === 1 ? '🎮' : '📖'}
+              </span>
+              <span className=\"max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 [overflow-wrap:anywhere]\">
+                {q.title.length > 10 ? q.title.slice(0, 10) + '…' : q.title}
+              </span>
+              <Pill variant=\"star\" size=\"xs\" className=\"absolute -top-1 -right-1\">
+                <span className=\"text-[9px]\">+{q.rewardStars}</span>
+              </Pill>
+            </button>
+          ))}
+          {/* Treasure chest as 4th item when all 3 done or always show */}
+          <button
+            onClick={handleClaimChest}
+            disabled={!canClaimChest || chestClaimed}
+            className={`relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all ${
+              chestClaimed
+                ? 'bg-amber-50 border-amber-200 text-slate-500 cursor-default'
+                : canClaimChest
+                ? 'bg-gradient-to-br from-amber-400 to-amber-600 border-amber-300 text-white animate-bounce cursor-pointer shadow-lg hover:shadow-xl'
+                : 'bg-amber-50 border-amber-200 text-slate-400 cursor-not-allowed opacity-60'
+            }`}
+            aria-label={chestClaimed ? 'Rương kho báu đã nhận hôm nay' : canClaimChest ? 'Mở rương kho báu nhận thưởng' : `Rương kho báu - cần ${3 - completedQuestsCount} nhiệm vụ nữa`}
+          >
+            <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">
+              {chestClaimed ? '🎁' : canClaimChest ? '🧨' : '🔒'}
+            </span>
+            <span className=\"max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 [overflow-wrap:anywhere]\">
+              {chestClaimed ? 'Đã mở' : 'Rương'}
+            </span>
+            {!chestClaimed && canClaimChest && (
+              <span className=\"absolute -top-1 -right-1 w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[9px] font-black animate-pulse\">
+                +
+              </span>
+            )}
+          </button>
+        </div>
+      </KidCard>
+
+      {/* 4. HORIZONTAL 3 SHORTCUTS: Trò chơi · Luyện đọc · Thử thách tuần */}
+      <div>
+        <SectionTitle icon=\"⚡\" size=\"md\">
+          Lối Tắt Nhanh
+        </SectionTitle>
+        <div className=\"grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3 mt-3\">
+          {SHORTCUT_CARDS.map((shortcut) => (
+            <KidButton
+              key={shortcut.screen}
+              variant=\"primary\"
+              size=\"tile\"
+              fullWidth
+              className={`min-h-[100px] text-center bg-gradient-to-br ${shortcut.gradient} ${shortcut.border} border-3 hover:scale-[1.02] active:scale-95 text-white`}
+              onClick={() => handleShortcutClick(shortcut.screen)}
+            >
+              <div className=\"flex-1 flex flex-col items-center justify-center gap-1 min-w-0\">
+                <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">{shortcut.icon}</span>
+                <h4 className=\"font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]\">{shortcut.label}</h4>
+                <p className=\"text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]\">{shortcut.desc}</p>
+              </div>
+            </KidButton>
+          ))}
+        </div>
+      </div>
+
+      {/* 5. HỆ THỐNG ĐỘNG LỨC: Album · Máy Gắp · Lịch Chuỗi */}
+      <div>
+        <SectionTitle icon=\"🎁\" size=\"md\">
+          Hệ Thống Động Lực
+        </SectionTitle>
+        <div className=\"grid grid-cols-3 gap-3 mt-3\">
+          <KidButton
+            variant=\"primary\"
+            size=\"tile\"
+            fullWidth
+            className=\"min-h-[100px] text-center bg-gradient-to-br from-amber-500 to-orange-500 border-3 border-amber-300 hover:scale-[1.02] active:scale-95 text-white\"
+            onClick={() => onNavigate('sticker_album')}
+          >
+            <div className=\"flex-1 flex flex-col items-center justify-center gap-1 min-w-0\">
+              <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">📚</span>
+              <h4 className=\"font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]\">Bộ Sưu Tập Sticker</h4>
+              <p className=\"text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]\">Sưu tầm 60 sticker</p>
+            </div>
+          </KidButton>
+          <KidButton
+            variant=\"primary\"
+            size=\"tile\"
+            fullWidth
+            className=\"min-h-[100px] text-center bg-gradient-to-br from-rose-500 to-pink-500 border-3 border-rose-300 hover:scale-[1.02] active:scale-95 text-white\"
+            onClick={() => onNavigate('gacha_machine')}
+          >
+            <div className=\"flex-1 flex flex-col items-center justify-center gap-1 min-w-0\">
+              <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">🎰</span>
+              <h4 className=\"font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]\">Máy Gắp</h4>
+              <p className=\"text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]\">Dùng vé quay sticker</p>
+            </div>
+          </KidButton>
+          <KidButton
+            variant=\"primary\"
+            size=\"tile\"
+            fullWidth
+            className=\"min-h-[100px] text-center bg-gradient-to-br from-emerald-500 to-teal-500 border-3 border-emerald-300 hover:scale-[1.02] active:scale-95 text-white\"
+            onClick={() => onNavigate('streak_calendar')}
+          >
+            <div className=\"flex-1 flex flex-col items-center justify-center gap-1 min-w-0\">
+              <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">📅</span>
+              <h4 className=\"font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]\">Lịch Chuỗi</h4>
+              <p className=\"text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]\">Dấu chân Gấu Bút Chì</p>
+            </div>
+          </KidButton>
+        </div>
+      </div>
+
+      {/* 6. NEXT BEST ACTION CARD (from DecisionEngine) - compact version for Home */}
+      <NextBestActionCard onNavigate={onNavigate} />
+
+      {/* 6. DAILY QUESTS LIST (compact, below the fold on mobile) */}
+      <KidCard subjectBorder=\"none\" className=\"space-y-3\">
+        <SectionTitle icon=\"📋\" size=\"md\">
+          Danh Sách Nhiệm Vụ
+        </SectionTitle>
+        <div className=\"space-y-2\">
+          {quests.map((q) => (
+            <div
+              key={q.id}
+              className={`p-3 rounded-2xl border-2 flex items-center justify-between transition-all ${
+                q.completed
+                  ? 'bg-emerald-50/70 border-emerald-300 text-emerald-950'
+                  : 'bg-amber-50/40 border-amber-200 text-slate-700'
+              }`}
+            >
+              <div className=\"flex items-center gap-2.5\">
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black ${
+                    q.completed ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-500'
+                  }`}
+                >
+                  {q.completed ? <Check className=\"w-4 h-4\" /> : '•'}
+                </div>
+                <span className=\"text-xs font-bold\">{q.title}</span>
+              </div>
+
+              <Pill variant=\"star\" size=\"sm\" className=\"gap-1\">
+                <span>+{q.rewardStars}</span>
+              </Pill>
+            </div>
+          ))}
+        </div>
+      </KidCard>
+    </div>
+  );
+};"
+
+ ❯ tests/t51-avatar-preview-shared-layers.test.ts:176:21
+    174|
+    175|   it('v6: hai màn không tự viết lớp riêng — cùng dùng một component pr…
+    176|     expect(homeSrc).toMatch(/import\s+\{?\s*AvatarPreview/);
+       |                     ^
+    177|     expect(shopSrc).toMatch(/import\s+\{?\s*AvatarPreview/);
+    178|     expect(homeSrc).toMatch(/<AvatarPreview/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/t51-avatar-preview-shared-layers.test.ts > T51 — một preview avatar chung ghép đủ lớp trang bị (DEF-022b) > v7: bé dùng màn đọc vẫn biết mình mặc gì — preview có tên, còn lớp trang trí thì im
+AssertionError: Home: preview avatar phải là một node có thuộc tính (role/aria-label): expected null to be truthy
+
+- Expected:
+true
+
++ Received:
+null
+
+ ❯ tests/t51-avatar-preview-shared-layers.test.ts:192:97
+    190|     ] as const) {
+    191|       const tag = previewOf(html);
+    192|       expect(tag, `${screen}: preview avatar phải là một node có thuộc…
+       |                                                                                                 ^
+    193|       expect(tag, `${screen}: preview phải có role="img"`).toMatch(/ro…
+    194|       const label = /aria-label="([^"]*)"/.exec(tag!)![1];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed (7)
+   Start at  13:42:58
+   Duration  999ms (import 42%, transform 33%, tests 22%, worker 2%)
+
+
+
+===== GREEN sau khi sửa =====
+
+$ npx vitest run tests/t51-avatar-preview-shared-layers.test.ts tests/t50a-home-mascot-single-source.test.ts
+Test Files  2 passed (2)
+     Tests  12 passed (12)
+
+(GREEN của cả lưới rộng hơn nằm trong verify.txt: 127 file / 1560 test.)

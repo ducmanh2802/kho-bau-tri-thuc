@@ -1,0 +1,68 @@
+{
+  "steps": [
+    {
+      "step": "A-home-375",
+      "equipLayers": 7,
+      "innerPx": 73.3,
+      "ratios": {
+        "hat": 0.285,
+        "glasses": 0.226,
+        "shirt": 0.285,
+        "backpack": 0.226,
+        "pet": 0.226,
+        "background": 0.442,
+        "frame": 0.187
+      }
+    },
+    {
+      "step": "B-shop-vs-home",
+      "homeInnerPx": 73.3,
+      "shopInnerPx": 104,
+      "sameLabel": true
+    },
+    {
+      "step": "C-empty",
+      "layers": 0,
+      "ariaLabel": "Cú Thông Thái"
+    },
+    {
+      "step": "D-accessible-name",
+      "role": "img",
+      "parts": 8
+    }
+  ],
+  "errors": [],
+  "facts": {
+    "homeInnerPx": 73.3,
+    "homeLayerRatios": {
+      "hat": 0.285,
+      "glasses": 0.226,
+      "shirt": 0.285,
+      "backpack": 0.226,
+      "pet": 0.226,
+      "background": 0.442,
+      "frame": 0.187
+    },
+    "homeEquipLayers": 7,
+    "shopScrollVsViewport": "375/375",
+    "shopInnerPx": 104,
+    "shopLayerRatios": {
+      "hat": 0.29,
+      "glasses": 0.23,
+      "shirt": 0.29,
+      "backpack": 0.23,
+      "pet": 0.23,
+      "background": 0.45,
+      "frame": 0.19
+    },
+    "ariaLabel": "Cú Thông Thái · Nền Biển Xanh Rì Rào · Mũ Lưỡi Trai Năng Động · Kính Tròn Tri Thức · Áo Thun Vàng Nắng · Balo Khủng Long Xanh · Mèo Miu Miu Đồng Hành · Khung Vàng Lấp Lánh",
+    "labelParts": 8
+  },
+  "failedAt": null,
+  "shots": [
+    "01-home-375-du-7-lop.png",
+    "02-tu-do-du-7-lop.png",
+    "03-home-khong-mac-gi.png"
+  ]
+}
+QA PASS — 4 step(s), 0 errors

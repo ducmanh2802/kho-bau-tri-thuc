@@ -1,0 +1,37 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t51-avatar-preview-shared-layers.test.ts (7 tests | 1 failed) 152ms
+   ❯ T51 — một preview avatar chung ghép đủ lớp trang bị (DEF-022b) (7)
+     ✓ v1: hồ sơ mặc đủ 7 ô thì **màn Home** vẽ đủ 7 lớp đúng emoji của món 29ms
+     ✓ v2: Home và tủ đồ render **cùng một tập lớp** cho cùng một hồ sơ ⇒ một nguồn duy nhất 50ms
+     ✓ v3: chống đỏ do dựng sẵn — hồ sơ không mặc gì thì **cả hai** màn không có lớp nào, mascot vẫn nguyên 25ms
+     ✓ v4: mọi type trong catalogue có **một quy tắc CSS** riêng ⇒ type mới không lọt qua lưới 1ms
+     ✓ v5: lớp định vị bằng đơn vị **theo ô** (cqi), không px ⇒ ô Home nhỏ hơn ô tủ đồ vẫn đúng tỉ lệ 1ms
+     ✓ v6: hai màn không tự viết lớp riêng — cùng dùng một component preview 0ms
+     × v7: bé dùng màn đọc vẫn biết mình mặc gì — preview có tên, còn lớp trang trí thì im 42ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t51-avatar-preview-shared-layers.test.ts > T51 — một preview avatar chung ghép đủ lớp trang bị (DEF-022b) > v7: bé dùng màn đọc vẫn biết mình mặc gì — preview có tên, còn lớp trang trí thì im
+AssertionError: Home: background mặc thật nhưng màn đọc không nói ⇒ bé mù không biết mình mặc gì: expected 'Cú Thông Thái · Mũ Lưỡi Trai Năng Độn…' to contain 'Nền Biển Xanh Rì Rào'
+
+Expected: "Nền Biển Xanh Rì Rào"
+Received: "Cú Thông Thái · Mũ Lưỡi Trai Năng Động · Kính Râm Siêu Ngầu · Áo Choàng Siêu Nhân · Balo Khủng Long Xanh · Mèo Miu Miu Đồng Hành · Khung Vàng Lấp Lánh"
+
+ ❯ tests/t51-avatar-preview-shared-layers.test.ts:198:106
+    196|       expect(label, `${screen}: tên preview phải nói bé đang dùng bạn …
+    197|       for (const t of TYPES) {
+    198|         expect(label, `${screen}: ${t} mặc thật nhưng màn đọc không nó…
+       |                                                                                                          ^
+    199|           nameOf(equipped[t])
+    200|         );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  17:20:01
+   Duration  1.17s (transform 41%, import 36%, tests 22%, worker 2%)
+
