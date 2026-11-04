@@ -15,9 +15,22 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1521 test / 122 file,
-   213.6 kB entry + 427.9 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
-   ngay sau **T48B cộng merge `487cddb`** (nội dung `origin/main` `d6771f5` vào thêm `src/services/sound.ts` +
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1534 test / 123 file,
+   213.7 kB entry + 428.0 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
+   ngay sau **T49A** `f4a7c21` (đóng `DEF-020(b)`: cùng khuôn với máy gắp nhưng **nặng hơn** vì bé mất tài
+   nguyên — `grep -rn "^\s*StorageService\.save[A-Za-z]*(" src --include=*.ts --include=*.tsx | wc -l`
+   in ra **72** lời gọi ghi kiểu câu lệnh, tức **không đọc** giá trị `false` mà `writeJSON`
+   (`storage.ts:302`) trả về khi `setItem` ném; `claimLevelRewards` và `buyShopItem` nằm trong số đó,
+   nên hộp "Chúc mừng bé lên cấp" vẫn bật và biên lai "Quà cấp độ" vẫn ghi được (biên lai nằm ở key
+   `kho_bau_parent_settings`, key không bị chặn) trong khi sao không nằm xuống máy, còn nút "Mua" bắn
+   confetti dù sao chưa trừ và món chưa mở khoá. `claimLevelRewards` nay ghi hồ sơ **trước** và trả
+   `claimed: []` khi bản ghi hỏng; `buyShopItem` trả `reason: 'storage-unavailable'` và
+   `AvatarShopScreen` có nhánh nói thẳng đó là lỗi *của máy*. **1** file test mới
+   `tests/t49a-reward-write-honest.test.ts` (13) ⇒ +13 test; probe chặn `Storage.prototype.setItem`
+   trên `dist/` đặt trong `evidence/2026-11-04-T49A/` (4 ảnh, 5 bước) ⇒ vẫn **30** probe QA, vẫn **42**
+   service module; `src/` đổi nên entry **đổi cả hash lẫn kB** (`B-vz_G_Z` → `chzUu7ig`,
+   213.6 → **213.7**),
+   đợt **T48B cộng merge `487cddb`** liền trước (nội dung `origin/main` `d6771f5` vào thêm `src/services/sound.ts` +
    2 component cờ tướng ⇒ `src/` đổi nên entry **đổi cả hash lẫn kB**: `BO_jehy4` → `B-vz_G_Z`,
    211.1 → **213.6**, component `.tsx` **95 → 97**, trong khi **test / service / probe / game không đổi**;
    cũng merge đó **xoá `package-lock.json`** — lần thứ ba (`3727f04`, `fd3e7da`, `d6771f5` — nên khôi phục ở

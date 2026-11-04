@@ -1,0 +1,13 @@
+Commit code T49A: f4a7c21999e8a8b31dd3325305f9a63bfac20df8 (`f4a7c21`)
+Lệnh đo (2026-11-04):
+  curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/f4a7c21/check-runs
+
+total_count: 3
+
+126307932187 | typecheck + tests          | completed | success | 2026-11-04T00:41:42Z
+126307932013 | build + bundle budget      | completed | success | 2026-11-04T00:41:26Z
+126307931818 | golden path trên Chromium  | completed | success | 2026-11-04T00:42:11Z
+
+⇒ Ba run trên commit CODE đều `completed success`. Điều kiện (1) của `RISK-16` đã đạt, nên
+  commit docs-sync của đợt này được push sau dòng này. Không có run nào `failure` hay
+  `cancelled` trên `f4a7c21` — tức lượt này không cần chạy lại probe trên CI.

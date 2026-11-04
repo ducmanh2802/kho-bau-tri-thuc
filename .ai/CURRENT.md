@@ -568,5 +568,49 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug 
 
 
 
+## T49A — lát cắt thứ 15: quà cấp độ và phòng thay đồ chỉ ăn mừng bản ghi thật (2026-11-04, lane này)
+
+- **T49A `DEF-020(b)`** — đúng khuôn `drawGacha` nhưng **nặng hơn vì bé đã mất tài nguyên**:
+  `claimLevelRewards()` bật hộp "Chúc mừng bé lên cấp" + ghi biên lai "Quà cấp độ" trong khi sao
+  không nằm xuống máy; `buyShopItem()` bắn confetti và đọc *"Chúc mừng bé đã mở khóa …"* trong khi
+  **sao không trừ, món không mở khoá**. `writeJSON` (`storage.ts:302`) cố ý trả `false` khi `setItem`
+  ném. Phép đo: `grep -rn "^\s*StorageService\.save[A-Za-z]*(" src --include=*.ts --include=*.tsx | wc -l`
+  = **72** lời gọi ghi không đọc kết quả (sau khi sửa **vẫn 72** — phần lớn thuộc đường không hứa với bé).
+  Sửa: hồ sơ ghi **trước**, hỏng ⇒ `claimLevelRewards` trả `claimed: []` (công tắc duy nhất của `App.tsx`
+  và `shouldCelebrateLevelUp`) và không đụng `saveMotivationState`/`checkAchievements`/biên lai;
+  `buyShopItem` ⇒ `reason: 'storage-unavailable'` + `AvatarShopScreen` có nhánh riêng nói thẳng với bé.
+  Hai quyết định có lý do: chặn key động lực ⇒ chọn rủi ro *nhận trùng* (nhìn thấy được) thay vì
+  *mất quà* (âm thầm); `shopBoughtTotal` **chủ đích** vẫn bỏ qua kết quả ghi vì bộ đếm thành tựu không
+  được phép lật ngược giao dịch đã thành — test chót của `tests/t49a-reward-write-honest.test.ts` (13)
+  khoá đúng **một** ngoại lệ đó. RED `9 failed | 4 passed` (4 test xanh ngay từ đầu là characterization).
+- **Bằng chứng UI thật:** probe `evidence/2026-11-04-T49A/probe-t49a-reward-write-honest.mjs` (đặt ngoài
+  `qa/` ⇒ vẫn **30** probe) ném `setItem` trên `kho_bau_child_profile` qua `addInitScript`, chạy trên
+  `dist/` ⇒ `QA PASS — 5 step(s), 0 errors`. **Ablation**: khôi phục hành vi cũ ⇒ `QA FAIL — 6 error(s)`,
+  `failedAt: B` (hứa đã mua · lời đọc không nói máy hỏng · biên lai "Mua" ảo · hộp lên cấp ảo · 2 biên lai
+  "Quà cấp độ" ảo · dấu "đã nhận cấp 6" ghi được còn sao thì không) + unit `8 failed | 5 passed`; hoàn tác
+  bằng bản sao `/c/tmp/t49a-backup/` (không `git checkout --` vì bản sửa chưa vào HEAD). **Bước D** (cùng
+  XP, không chặn ghi, đòi hộp **phải** bật) chống "xanh rỗng". Đo ngoài dự tính: bước A món 5 sao làm tổng
+  sao 100 → **97** vì boot award còn tự nhận +2 "Quà cấp độ 2" ⇒ probe chốt ba điều, không chốt hiệu số giá món.
+- **Cổng:** `npm run verify` **EXIT=0** · **123 file / 1534 test** · `Duration 27.99s` · entry **đổi cả hash
+  lẫn kB** `index-chzUu7ig.js` **213.7 kB** · boot graph `438305 total` = **428.0 kB**; vẫn 42 service /
+  97 `.tsx` / 105 file `src/data/*.ts` / 30 probe / 31 trò chơi. Commit code `f4a7c21` (16 file, +1667/−4)
+  ⇒ CI `total_count: 3`, cả ba `completed success` (`126307932187` typecheck+tests 00:41:42Z,
+  `126307932013` build+budget 00:41:26Z, `126307931818` golden path Chromium 00:42:11Z) — `evidence/2026-11-04-T49A/ci-checkruns.txt`.
+  **Lockfile còn nguyên** (`package-lock.json`, 110314 byte) ở thời điểm đo; lane dùng chung đã làm mất 3 lần.
+- **Sổ:** `DEF-020` **ĐÓNG** (a = T48B, b = T49A). **`DEF-021` MỞ — phát hiện khi viết probe**:
+  `grep -c "id: '" src/data/shopCatalog.ts` = **41** món (chú thích đầu file vẫn ghi "43" — lệch,
+  `shopCatalog.ts:2` và `storage.ts:343`), chia theo `type` hat 8 · pet 7 · shirt 6 · background 6 ·
+  frame 5 · glasses 5 · backpack 4, nhưng tab của `AvatarShopScreen` chỉ nhận `mascot|hat|glasses|backpack|pet`
+  (`:19`) và màn render bằng `filter(i => i.type === activeTab)` (`:97`) ⇒ **17** món áo/nền/khung
+  **không xuất hiện ở tab nào** — bé không mua được dù `buyShopItem` vẫn nhận id của chúng. Điều kiện đóng:
+  một test nguồn chứng minh mọi `AVATAR_SHOP_ITEMS` thuộc tab hợp lệ. **Việc của lane sau:** nhãn
+  "máy không lưu được" của phòng thay đồ **chỉ có tiếng, chưa có chữ**; `handleSelectMascot` + đường mặc
+  đồ (`AvatarShopScreen.tsx:33`, `:55`, `:76`) vẫn bỏ qua kết quả `saveChildProfile`; 70 chỗ ghi còn lại
+  cần một quyết định chính sách "chỗ nào phải đọc kết quả" chứ không sửa tuần tự; `DEF-019(a)(b)(c)(e)`,
+  `DEF-011`, Ô 13 CI vẫn mở. **Không** stage `docs/step-by-step-guidance.md` và 6 ảnh
+  `docs/opencode/reports/img/*.png` — đó là lane khác.
+
+---
+
 P36, P38, P39 sessions share this working tree concurrently. Each lane left its
 changes uncommitted. Do not sweep other lanes' files into a single commit.

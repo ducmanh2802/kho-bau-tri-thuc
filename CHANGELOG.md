@@ -156,6 +156,41 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T49A — quà cấp độ và tủ đồ ăn mừng những gì chưa nằm xuống máy (`DEF-020(b)`).**
+  Cùng khuôn với `drawGacha` đã đóng ở T48B nhưng **nặng hơn vì bé mất tài nguyên thật**.
+  `StorageService.claimLevelRewards()` cộng sao/vé/sticker vào `profile` + `motivation` rồi **bỏ qua**
+  giá trị trả về của cả hai lượt ghi, mà `writeJSON` (`src/services/storage.ts:302`) cố ý trả `false`
+  khi `setItem` ném ⇒ hộp "Chúc mừng bé lên cấp" vẫn bật và **biên lai "Quà cấp độ" vẫn ghi được**
+  (biên lai nằm ở `kho_bau_parent_settings`, một key không bị chặn), còn sao thì không — mỗi lần bé
+  kiếm thêm XP là một lần nhận ảo mới. `buyShopItem()` còn trừ sao *trước* rồi mới ghi, nên khi ghi
+  hỏng bé đã tin mình tiêu sao mà món không mở khoá. Phép đo trước khi sửa:
+  `grep -rn "^\s*StorageService\.save[A-Za-z]*(" src --include=*.ts --include=*.tsx | wc -l` = **72**
+  lời gọi ghi kiểu câu lệnh, tức **không đọc** kết quả. Sửa trong **2** file `src/`:
+  `claimLevelRewards` ghi **hồ sơ trước**, hỏng ⇒ trả `claimed: []` (công tắc duy nhất của hiệu ứng
+  `App.tsx` và của `shouldCelebrateLevelUp`) và **không** viết biên lai, **không** `checkAchievements`;
+  hỏng một nửa thì thà để bé **có nguy cơ nhận trùng** (nhìn thấy được, tự khép khi máy lưu lại) còn hơn
+  mất quà âm thầm. `buyShopItem` hỏng ⇒ `reason: 'storage-unavailable'` và `AvatarShopScreen.tsx` có
+  **nhánh riêng** — *"Máy không lưu được món quà này…"* — vì im lặng hoặc gộp vào nhãn "thiếu sao" đều
+  nói dối bé lần thứ hai. Bộ đếm `shopBoughtTotal` là **ngoại lệ chủ đích** (chỉ nuôi thành tựu, không
+  phải thứ bé nhận được) và bị khoá ngược bởi một test bất biến đếm số lượt `save` không đọc kết quả
+  trong hai hàm này. Test mới `tests/t49a-reward-write-honest.test.ts` (**13**, RED `9 failed | 4 passed`
+  khi cắt cả ba guard, `8 failed | 5 passed` khi chỉ cắt `storage.ts` — test chuỗi UI vẫn xanh vì đó là
+  phạm vi của lát cắt UI); probe `evidence/2026-11-04-T49A/probe-t49a-reward-write-honest.mjs` chặn
+  `Storage.prototype.setItem` theo danh sách đặt trong `sessionStorage` (danh sách nằm ở `window` sẽ bị
+  `addInitScript` xoá sạch sau mỗi lần tải trang), dựng `speechSynthesis` giả để đọc được lời hứa của
+  nút "Mua", chạy trên `dist/`: **`QA PASS — 5 step(s), 0 errors`** kèm **4 ảnh**; ablation cắt guard ⇒
+  **`QA FAIL — 6 error(s)`** đúng bước B với bằng chứng `{celebrated: true, claimed: [2,3,4,5,6],
+  receiptsQuaCapDoMoi: 2}`. `npm run verify` **EXIT=0** · **123 file / 1534 test** · `Duration 27.99s` ·
+  entry `index-chzUu7ig.js` **213.7 kB** · boot graph `438305 total` byte = **428.0 kB**; vẫn **42**
+  service module / **97** component `.tsx` / **30** probe QA / **31** trò chơi. Hồi quy chạy lại trên
+  `dist/` của lượt này: `qa/parent-controls.mjs` và `qa/gacha-machine.mjs` đều `QA PASS`.
+  **Defect mới đo được trong lúc viết probe (`DEF-021`, MỞ):** `AvatarShopScreen.tsx:97` lọc
+  `AVATAR_SHOP_ITEMS.filter((i) => i.type === activeTab)` trong khi `activeTab`
+  (`:19`) chỉ có `mascot` · `hat` · `glasses` · `backpack` · `pet`, còn `src/data/shopCatalog.ts` đếm
+  theo `type` ra `hat` 8 · `pet` 7 · `glasses` 5 · `backpack` 4 · **`shirt` 6 · `background` 6 ·
+  `frame` 5** = **41** món ⇒ **17 món không có tab, bé có sao cũng không bấm "Mở khóa" được**
+  (`mascot` lại không khớp `type` nào, nó render `MASCOTS` riêng). Chú thích đầu
+  `src/data/shopCatalog.ts:2` và `src/services/storage.ts:343` còn ghi "**43** món".
 - **T48B — máy gắp báo "Đã lưu vào Bộ Sưu Tập!" trong khi trình duyệt chưa nhận byte nào (`DEF-020(a)`).**
   `StorageService.drawGacha()` gọi `saveChildProfile` + `saveMotivationState` rồi **bỏ qua** giá trị trả về,
   mà `writeJSON` (`src/services/storage.ts:302`) cố ý trả `false` khi `setItem` ném (Safari private mode,

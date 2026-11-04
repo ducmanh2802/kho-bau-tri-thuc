@@ -69,6 +69,7 @@ trong đường đổi sao/mở khoá phải đọc kết quả, kèm **đúng m
 | `npm run build && node qa/run-one.mjs evidence/2026-11-04-T49A/probe-t49a-reward-write-honest.mjs` | **`QA PASS — 5 step(s), 0 errors`** — `probe-GREEN.txt`, `probe-result.json`, 4 ảnh |
 | `node qa/run-one.mjs qa/parent-controls.mjs` | EXIT=0 — `probe-regression-parent-controls.txt` |
 | `node qa/run-one.mjs qa/gacha-machine.mjs` | EXIT=0 — `probe-regression-gacha.txt` |
+| `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/f4a7c21/check-runs` | `total_count: 3` — `typecheck + tests` · `build + bundle budget` · `golden path trên Chromium` đều **`completed success`** (id `126307932187` / `126307932013` / `126307931818`) — `ci-checkruns.txt` |
 
 Probe **không** đặt trong `qa/` ⇒ tổng probe vẫn **30**.
 
