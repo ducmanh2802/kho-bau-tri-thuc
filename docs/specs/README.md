@@ -15,9 +15,23 @@ của sản phẩm, từ nghiệp vụ tới từng test. Đọc theo thứ tự
 
 ## Quy ước chung của bộ tài liệu
 
-1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1534 test / 123 file,
+1. **Chỉ số liệu đo được.** Mọi con số (31 trò chơi, 475 câu thi, 1542 test / 124 file,
    213.7 kB entry + 428.0 kB boot graph, 8 dependency runtime, 19 key…) đo ngày **2026-11-04** — lần cuối
-   ngay sau **T49A** `f4a7c21` (đóng `DEF-020(b)`: cùng khuôn với máy gắp nhưng **nặng hơn** vì bé mất tài
+   ngay sau **T49B** `e969f1c` (đóng `DEF-021`: **hai nửa của cùng một lời hứa**. Nửa đường vào —
+   `grep -c "id: '" src/data/shopCatalog.ts` = **41** món chia theo 7 `type` (mũ 8 · thú 7 · áo 6 · nền 6 ·
+   khung 5 · kính 5 · ba lô 4) trong khi tab của `AvatarShopScreen` chỉ khai 5 nhánh
+   `mascot|hat|glasses|backpack|pet` ⇒ **17** món (áo 6 + nền 6 + khung 5) không thuộc tab nào, bé không
+   bao giờ thấy thẻ lẫn nút "Mở khóa" dù `buyShopItem()` vẫn nhận id của chúng. Nửa thứ hai nặng hơn vì
+   bé **đã trả sao**: ô preview chỉ ghép 4 lớp, nên nếu chỉ thêm tab thì mặc áo/nền/khung vào nhân vật vẫn
+   đứng nguyên. `SHOP_TABS` (8 tab, id kiểu `'mascot' | ShopItemType`) + `EQUIP_LAYER` khai là
+   `Record<ShopItemType, string>` chứ không phải mảng — thêm một `type` mới mà chưa có lớp thì `tsc` đỏ,
+   không chờ ai nhớ; **1** file test mới `tests/t49b-shop-tabs-cover-catalog.test.ts` (8) ⇒ +8 test; probe
+   trên `dist/` **QA PASS 5 bước** (sao trừ thật `284→278→263→253`, preview lớn dần `🦊` → `🦊👕` →
+   `🌊🦊👕` → `🌊🦊👕⭐`) và **QA FAIL 6 lỗi ở `failedAt: A`** khi đột biến về bản cũ, đặt cùng 3 log đột
+   biến trong `evidence/2026-11-04-T49B/` (5 ảnh) ⇒ vẫn **30** probe QA, vẫn **42** service module; `src/`
+   đổi nên entry **đổi hash** (`chzUu7ig` → `vYzkzZ5R`) còn **kB và boot graph đứng nguyên**
+   (213.7 kB · `438305` byte),
+   đợt **T49A** `f4a7c21` liền trước (đóng `DEF-020(b)`: cùng khuôn với máy gắp nhưng **nặng hơn** vì bé mất tài
    nguyên — `grep -rn "^\s*StorageService\.save[A-Za-z]*(" src --include=*.ts --include=*.tsx | wc -l`
    in ra **72** lời gọi ghi kiểu câu lệnh, tức **không đọc** giá trị `false` mà `writeJSON`
    (`storage.ts:302`) trả về khi `setItem` ném; `claimLevelRewards` và `buyShopItem` nằm trong số đó,

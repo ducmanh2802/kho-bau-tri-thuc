@@ -156,6 +156,36 @@ và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERA
   lẫn kB đứng nguyên). **Lượt thứ hai không còn lưới cũng xanh:** push docs `6e30794` · run 41526285381 · job 125554732285 `success` sau **72 s** (bước 7 "QA probe" `success`, bước 8 `skipped`; `1. Quality` run 41526285257 và `2. Build + artifact` run 41526285281 cũng success) ⇒ tỷ lệ hiện trạng **6/12 lượt xanh, năm lượt cuối liên tiếp**; một push thuần tài liệu đi qua đủ ba cổng chặn merge nên kết quả xanh không đến từ sửa code. Cổng máy trên working tree docs: `npm run verify` EXIT=0 · 90 file / **1287** test · `Duration 22.26s` (pre-push hook: `22.24s`). **Lượt thứ ba không còn lưới cũng xanh:** `e961815` · run 41527657645 · job 125559437705 `success` `21:21:54Z`→`21:22:51Z` = **57 s**, bước 7 "QA probe" `success`, bước 8 `skipped` ⇒ **7/13 lượt xanh** *tính tới `e961815`* (sáu lượt cuối liên tiếp, **ba** lượt cuối chạy không còn cờ). Vì **mọi** push vào `main` đều thêm một mẫu mới, tỷ lệ từ đây ghi **kèm mốc commit đã đo** — quy tắc dừng ở §13 `ci-gate-race.txt`.
 
 ### Fixed
+- **T49B — 17 món quà trong catalogue không có tab nào, và ba món "Đang mặc" mà nhân vật không đổi (`DEF-021`).**
+  Lời hứa "tủ đồ có N món" hỏng ở **hai** đầu. Đầu tab: `AvatarShopScreen.tsx:19` khai báo `activeTab`
+  chỉ `mascot` · `hat` · `glasses` · `backpack` · `pet` rồi `:97` lọc `AVATAR_SHOP_ITEMS.filter((i) => i.type === activeTab)`,
+  còn `src/data/shopCatalog.ts` đếm theo `type` ra `hat` 8 · `pet` 7 · `shirt` 6 · `background` 6 · `frame` 5 ·
+  `glasses` 5 · `backpack` 4 = **41** món ⇒ **áo 6 + nền 6 + khung 5 = 17 món mồ côi**; bé đủ sao và đủ cấp cũng
+  không bao giờ thấy nút "Mở khóa", dù `buyShopItem()` vẫn nhận id của chúng (một cách **tiêu sao không đổi được gì**).
+  Đầu preview: `:130-152` chỉ ghép `hat` · `glasses` · `backpack` · `pet`, nên nếu chỉ thêm tab thì bé bấm
+  "Áo Choàng Siêu Nhân", nút đổi thành "Đang mặc" mà **nhân vật đứng nguyên** — một lời dối khác thay chỗ lời dối cũ.
+  Sửa trong **3** file `src/`: `SHOP_TABS` sinh từ `ShopItemType` (**8** tab, `mascot` giữ tab riêng vì
+  `MASCOTS` không phải `ShopItem`), `EQUIP_LAYER: Record<ShopItemType, string>` bắt TypeScript kiểm mọi `type`
+  có một lớp, `EQUIP_OVERLAYS` (export để test đếm được số lớp thật) và `equippedItem(type)` so cả `id` **lẫn** `type`
+  — ô trang bị cũ chỉ so `id` nên một id dùng hai `type` sẽ mặc nhầm chỗ; chú thích "43 món" ở `shopCatalog.ts:2`
+  và `storage.ts:343` sửa thành số đo được **41**. Test mới `tests/t49b-shop-tabs-cover-catalog.test.ts`
+  (**8**, RED **4 failed | 3 passed (7)** trên code cũ vì đúng hai nửa: b2/b3 mồ côi + b6 preview + b7 chú thích;
+  b8 "mọi type có một lớp preview" viết thêm ở lượt review và được ablation chứng minh nó **có cắn** — cắt `glasses`
+  khỏi `EQUIP_OVERLAYS` thì `tsc` vẫn xanh mà test đỏ `1 failed | 7 passed (8)`). **Ba** mutation cấp test ghi trong
+  `evidence/2026-11-04-T49B/mutation-*.txt`; mỗi lần đều hoàn tác ngay sau khi chụp log, nên cổng `verify.txt` chạy
+  **sau** các mutation là bằng chứng `src/` sạch (`git status --short -- src/` rỗng) và 1542 test xanh. Ablation cấp
+  probe là `probe-RED-no-guard.txt`.
+  Probe mới `evidence/2026-11-04-T49B/probe-t49b-shop-tabs.mjs` (đặt **ngoài** `qa/` nên tổng probe vẫn **30**) chạy
+  trên `dist/`: trước sửa **`QA FAIL — 6 error(s) at A`** với `errors[]` + `failedAt` (tab "Áo & Trang Phục" không tồn tại),
+  sau sửa **`QA PASS — 5 step(s), 0 errors`** + 5 ảnh, đo thật **sao giảm đúng giá món** và **`localStorage` ghi thật**,
+  kèm bước E chống xanh rỗng (không mặc gì ⇒ preview sạch `🦊`) để ba bước B/C/D không so emoji với nhãn tab.
+  Hồi quy cùng `dist/`: `qa/gacha-machine.mjs` QA PASS 4 bước, `qa/parent-controls.mjs` 7 bước, `qa/golden-path.mjs` 28 bước
+  (`probe-regression.txt`). `npm run verify` **EXIT=0** · **124 file / 1542 test** · `Duration 28.39s` ·
+  entry `index-vYzkzZ5R.js` **213.7 kB** · boot graph `438305 total` byte = **428.0 kB**; vẫn **42** service module /
+  **97** component `.tsx` / **30** probe QA / **31** trò chơi. Commit `e969f1c` (code + test + evidence).
+  **Defect mới đo được trong lúc viết probe (`DEF-022`, MỞ):** `src/components/home/HomeScreen.tsx:254` render 🐰
+  cho **cả** `rabbit` **lẫn** `owl` và không ghép lớp trang bị nào, nên mascot khác nhau không phân biệt được bằng hình
+  và mọi món bé mặc chỉ hiện ở tủ đồ.
 - **T49A — quà cấp độ và tủ đồ ăn mừng những gì chưa nằm xuống máy (`DEF-020(b)`).**
   Cùng khuôn với `drawGacha` đã đóng ở T48B nhưng **nặng hơn vì bé mất tài nguyên thật**.
   `StorageService.claimLevelRewards()` cộng sao/vé/sticker vào `profile` + `motivation` rồi **bỏ qua**

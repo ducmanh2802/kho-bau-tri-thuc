@@ -77,6 +77,7 @@ món nên một ô bị gỡ (đo bằng `mutation-C`) lọt qua cả `tsc` lẫ
 | Lệnh | Kết quả |
 |---|---|
 | `npm run verify` | **EXIT=0** · **124 file / 1542 test** pass · `Duration 28.39s` · `Main chunk: index-vYzkzZ5R.js = 213.7 kB → PASS (meets 450 kB goal)` — `verify.txt` |
+| `npm run verify` **sau** lượt docs | **EXIT=0** · **124 file / 1542 test** · `Duration 28.33s` · entry vẫn `index-vYzkzZ5R.js` **213.7 kB** (lượt docs không đụng `src/`) — `verify-postdocs.txt` |
 | boot graph | `grep -o 'assets/[A-Za-z0-9_.-]*\.js' dist/index.html \| sed 's#^#dist/#' \| sort -u \| xargs wc -c \| tail -1` ⇒ `438305 total` byte = **428.0 kB** — `src/` đổi nên entry **đổi hash** (`index-chzUu7ig` → `index-vYzkzZ5R`), **kB và boot graph đứng nguyên** |
 | `npm run build && node qa/run-one.mjs evidence/2026-11-04-T49B/probe-t49b-shop-tabs.mjs` | **`QA PASS — 5 step(s), 0 errors`** — `probe-GREEN.txt`, 5 ảnh |
 | `node qa/run-one.mjs qa/gacha-machine.mjs` | `QA PASS — 4 step(s), 0 errors` — `probe-regression.txt` |

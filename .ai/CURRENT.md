@@ -610,6 +610,42 @@ Người dùng: "push code và check bug tiếp" (lát cắt thứ 10 của bug 
   `DEF-011`, Ô 13 CI vẫn mở. **Không** stage `docs/step-by-step-guidance.md` và 6 ảnh
   `docs/opencode/reports/img/*.png` — đó là lane khác.
 
+## T49B — lát cắt thứ 16: tủ đồ bán đủ 41 món và preview mặc thật (2026-11-04, lane này)
+
+- **Việc đã làm (1 lát cắt, 2 file `src/` + 1 test + 1 probe):** đóng `DEF-021` — defect do chính
+  probe T49A đo ra, gồm **hai nửa của cùng một lời hứa**: (1) `AvatarShopScreen` khai báo 5 tab trong khi
+  catalogue có 7 `type` / 41 món ⇒ 17 món áo-nền-khung mồ côi, `buyShopItem()` vẫn nhận id nên bé **tiêu sao
+  không đổi được gì**; (2) preview chỉ ghép 4 lớp ⇒ nếu chỉ thêm tab thì nút đổi "Đang mặc" mà nhân vật đứng nguyên.
+- **Sửa:** `SHOP_TABS` **8** tab sinh từ `ShopItemType` (`mascot` giữ riêng vì `SHOP_MASCOTS` không phải `ShopItem`),
+  `EQUIP_LAYER: Record<ShopItemType, string>` để **thiếu một `type` là `tsc` đỏ**, `EQUIP_OVERLAYS` export cho test,
+  `equippedItem(type)` so cả `id` **lẫn** `type`, chú thích "43 món" → **41** (`shopCatalog.ts:2`, `storage.ts:343`).
+- **RED đúng nguyên nhân:** `tests/t49b-shop-tabs-cover-catalog.test.ts` (**8**) chạy trên code cũ ⇒
+  `4 failed | 3 passed (7)` (b2 mồ côi · b3 `covered 35 ≠ 41` · b6 preview · b7 chú thích).
+  **b8 thêm ở lượt review** (mọi `type` phải có một **lớp preview**), ablation chứng minh nó cắn:
+  cắt `'glasses'` khỏi `EQUIP_OVERLAYS` ⇒ `tsc` vẫn xanh, b8 đỏ `1 failed | 7 passed (8)`.
+- **Bằng chứng nhìn thấy được:** `evidence/2026-11-04-T49B/probe-t49b-shop-tabs.mjs` chạy trên `dist/` —
+  trước sửa `QA FAIL — 6 error(s) at A` (tab "Áo & Trang Phục" không tồn tại), sau sửa
+  `QA PASS — 5 step(s), 0 errors` + 5 ảnh, đo **sao giảm thật** (`284→278`, `278→263`, `263→253`) và
+  `unlockedItems` có mặt trong `kho_bau_child_profile`; bước E chống xanh rỗng (không mặc gì ⇒ preview `🦊`).
+  Probe đặt **ngoài** `qa/` ⇒ tổng probe vẫn **30**. Hồi quy: `qa/gacha-machine.mjs` (4) +
+  `qa/parent-controls.mjs` (7) + `qa/golden-path.mjs` (28) đều `QA PASS`.
+- **Cổng:** `npm run verify` **EXIT=0** · **124 file / 1542 test** · `Duration 28.39s` ·
+  entry `index-vYzkzZ5R.js` **213.7 kB** (hash đổi, kB nguyên) · boot graph `438305 total` = **428.0 kB**;
+  vẫn **42** service / **97** `.tsx` / **30** probe / **31** trò chơi. Commit code **`e969f1c`** (19 file, +1534/−44).
+  `curl -s https://api.github.com/repos/ducmanh2802/kho-bau-tri-thuc/commits/e969f1c/check-runs`
+  ⇒ `total_count: 3`, cả ba `completed success` (job `126331438892` / `126331438719` / `126331438052`) — `evidence/2026-11-04-T49B/ci-checkruns.txt`.
+  **Lockfile còn nguyên** (`package-lock.json`, 110314 byte) ở thời điểm đo.
+- **Sổ:** `DEF-021` **ĐÓNG**. **`DEF-022` MỞ — đo khi viết probe:** `HomeScreen.tsx:254` dựng avatar bằng ternary
+  **3** nhánh (`bear`→🐻, `fox`→🦊, còn lại→🐰) trong khi `types/index.ts:133` cho phép **4** (`+rabbit`, `+owl`) và
+  tủ đồ bán `owl` bằng 🦉 (`AvatarShopScreen.tsx:181` ternary 4 nhánh) ⇒ chọn "Cú Thông Thái" xong về Home thì cú hóa thỏ;
+  `grep -c "equipped" src/components/home/HomeScreen.tsx` = **0** nên mọi món bé mặc chỉ hiện trong tủ đồ.
+  **Việc còn của lane sau (nguyên văn từ T49A, chưa làm):** nhãn "máy không lưu được" của phòng thay đồ
+  **chỉ có tiếng, chưa có chữ**; `handleSelectMascot` (`:74`) và hai đường mặc/buy (`:96`, `:117`) vẫn **bỏ qua**
+  kết quả `saveChildProfile`; ~70 chỗ ghi còn lại cần một **quyết định chính sách** "chỗ nào phải đọc kết quả"
+  chứ không sửa tuần tự; `DEF-019(a)(b)(c)(e)`, `DEF-011`, Ô 13 CI vẫn mở.
+- **Không** stage `docs/step-by-step-guidance.md` và 6 ảnh `docs/opencode/reports/img/*.png` — đó là lane khác.
+
+
 ---
 
 P36, P38, P39 sessions share this working tree concurrently. Each lane left its
