@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AvatarItem, ChildProfile } from '../../types';
 import { ShopItemType } from '../../types/motivation';
 import { AVATAR_SHOP_ITEMS, StorageService } from '../../services/storage';
+import { MASCOT_EMOJI, SHOP_MASCOTS } from '../../data/shopCatalog';
 import { xpToLevel } from '../../services/levelEngine';
 import { sound } from '../../services/sound';
 import { fireCelebrationConfetti } from '../../services/confetti';
@@ -11,13 +12,6 @@ interface AvatarShopScreenProps {
   onBack: () => void;
   onProfileUpdate: () => void;
 }
-
-export const SHOP_MASCOTS = [
-  { id: 'bear', name: 'Gấu Bút Chì', emoji: '🐻', desc: 'Chăm chỉ & Thân thiện' },
-  { id: 'fox', name: 'Cáo Toán Học', emoji: '🦊', desc: 'Thông minh & Tinh anh' },
-  { id: 'rabbit', name: 'Thỏ Tiếng Anh', emoji: '🐰', desc: 'Nhanh nhẹn & Đáng yêu' },
-  { id: 'owl', name: 'Cú Thông Thái', emoji: '🦉', desc: 'Uyên bác & Điềm đạm' },
-] as const;
 
 export interface ShopTab {
   id: 'mascot' | ShopItemType;
@@ -66,7 +60,7 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
   const [profile, setProfile] = useState<ChildProfile>(StorageService.getChildProfile());
   const [activeTab, setActiveTab] = useState<'mascot' | ShopItemType>('mascot');
 
-  const handleSelectMascot = (mId: 'bear' | 'fox' | 'rabbit' | 'owl') => {
+  const handleSelectMascot = (mId: ChildProfile['avatarBase']) => {
     sound.playClick();
     const fresh = StorageService.getChildProfile();
     const updated = { ...fresh, avatarBase: mId };
@@ -177,9 +171,7 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
               </span>
             )}
 
-            <span className="relative">
-              {profile.avatarBase === 'bear' ? '🐻' : profile.avatarBase === 'fox' ? '🦊' : profile.avatarBase === 'rabbit' ? '🐰' : '🦉'}
-            </span>
+            <span className="relative">{MASCOT_EMOJI[profile.avatarBase]}</span>
 
             {EQUIP_OVERLAYS.map((type) => {
               const item = equippedItem(type);
@@ -240,14 +232,14 @@ export const AvatarShopScreen: React.FC<AvatarShopScreenProps> = ({
               return (
                 <button
                   key={m.id}
-                  onClick={() => handleSelectMascot(m.id as typeof profile.avatarBase)}
+                  onClick={() => handleSelectMascot(m.id)}
                   className={`p-5 rounded-3xl border-3 flex flex-col items-center text-center transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-amber-50 border-amber-500 shadow-md scale-102'
                       : 'bg-white border-slate-200 hover:border-amber-300'
                   }`}
                 >
-                  <span className="text-6xl mb-2 animate-pulse-subtle">{m.emoji}</span>
+                  <span className="text-6xl mb-2 animate-pulse-subtle">{MASCOT_EMOJI[m.id]}</span>
                   <h3 className="text-base font-black text-slate-900 font-display">{m.name}</h3>
                   <p className="text-xs text-slate-500 font-medium mt-1">{m.desc}</p>
                   <span

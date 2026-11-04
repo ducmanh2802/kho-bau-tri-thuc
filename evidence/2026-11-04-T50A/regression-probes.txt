@@ -1,0 +1,8 @@
+
+# T50A — probe hồi quy trên dist/ (sau npm run build, code ĐÃ sửa)
+# lệnh: for p in golden-path mobile-home parent-controls responsive-a11y; do node qa/run-one.mjs qa/$p.mjs; done
+# (chạy 2026-11-04; EXIT ghi theo từng probe)
+qa/golden-path.mjs -> QA PASS — 28 step(s), 0 errors
+qa/mobile-home.mjs -> QA PASS — 0 step(s), 0 errors
+qa/parent-controls.mjs -> QA PASS — 7 step(s), 0 errors
+qa/responsive-a11y.mjs -> QA PASS — 0 step(s), 0 errors

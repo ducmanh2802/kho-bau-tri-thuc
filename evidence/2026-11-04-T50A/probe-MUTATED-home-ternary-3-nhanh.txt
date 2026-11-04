@@ -1,0 +1,74 @@
+Lệnh: npm run build && node qa/run-one.mjs evidence/2026-11-04-T50A/probe-t50a-home-mascot.mjs
+Trạng thái mã: ĐỘT BIẾN — HomeScreen trở lại ternary 3 nhánh (bản mang bệnh DEF-022a)
+Verdict: QA FAIL — 4 error(s) at A-owl ⇒ probe bắt đúng symptom (cú hóa thỏ), không bắt mọi thay đổi. Ảnh của lần chạy này đã xoá để hồ sơ chỉ giữ ảnh của bản xanh.
+{
+  "steps": [
+    {
+      "step": "AB-home-vs-shop",
+      "home": {
+        "bear": "🐻",
+        "fox": "🦊",
+        "rabbit": "🐰",
+        "owl": "🐰"
+      },
+      "shop": {
+        "bear": "🐻",
+        "fox": "🦊",
+        "rabbit": "🐰",
+        "owl": "🦉"
+      },
+      "expect": {
+        "bear": "🐻",
+        "fox": "🦊",
+        "rabbit": "🐰",
+        "owl": "🦉"
+      }
+    },
+    {
+      "step": "C-distinct",
+      "distinct": [
+        "🐻",
+        "🦊",
+        "🐰"
+      ],
+      "home": {
+        "bear": "🐻",
+        "fox": "🦊",
+        "rabbit": "🐰",
+        "owl": "🐰"
+      }
+    },
+    {
+      "step": "D-equipped-fact",
+      "innerHTML": "🐰",
+      "mascotText": "🐰",
+      "equipLayers": 0
+    }
+  ],
+  "errors": [
+    "A-owl: Home vẽ \"🐰\" cho avatarBase=\"owl\", mong \"🦉\"",
+    "B-owl: Home \"🐰\" ≠ tủ đồ \"🦉\" với cùng hồ sơ owl",
+    "C: Home vẽ trùng hình cho nhiều bạn (🐻 🦊 🐰), hoặc bước nào đó không đo được",
+    "C: cú vẫn hóa thỏ trên Home ⇒ ternary cũ còn sống"
+  ],
+  "facts": {
+    "homeSeen": "bear=🐻 fox=🦊 rabbit=🐰 owl=🐰",
+    "shopSeen": "bear=🐻 fox=🦊 rabbit=🐰 owl=🦉",
+    "distinctHomeShapes": 3,
+    "homeWithEquipped": {
+      "innerHTML": "🐰",
+      "mascotText": "🐰",
+      "equipLayers": 0
+    },
+    "def022b": "MỞ — Home chỉ vẽ mascot: equipped có 7 ô mà Home không ghép lớp nào (DEF-022b)"
+  },
+  "failedAt": "A-owl",
+  "shots": [
+    "01-home-owl.png",
+    "02-shop-owl.png",
+    "03-cuoi-vong-lap-o-tu-do.png",
+    "04-home-with-equipped.png"
+  ],
+  "ok": false
+}
+QA FAIL — 4 error(s) at A-owl

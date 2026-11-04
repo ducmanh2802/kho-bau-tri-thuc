@@ -1,0 +1,8 @@
+Lệnh: npm run typecheck (sau khi xoá khoá owl khỏi MASCOT_EMOJI trong src/data/shopCatalog.ts)
+Verdict: ĐỎ ở cấp BIÊN DỊCH — Record<ChildProfile["avatarBase"], string> không cho phép thiếu bạn nào (TS2741). Đây là guard mà một mảng runtime không thể có.
+
+
+> kho-bau-tri-thuc-lop-1@1.1.0 typecheck
+> tsc --noEmit
+
+src/data/shopCatalog.ts(70,14): error TS2741: Property 'owl' is missing in type '{ bear: string; fox: string; rabbit: string; }' but required in type 'Record<"bear" | "fox" | "owl" | "rabbit", string>'.

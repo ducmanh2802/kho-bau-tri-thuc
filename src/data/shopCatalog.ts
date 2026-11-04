@@ -4,6 +4,7 @@
  * máy gắp sticker. 12 món đầu giữ nguyên id/giá/trạng thái như trước
  * P42 để không mất đồ bé đã mở.
  */
+import type { ChildProfile } from '../types';
 import type { ShopItem } from '../types/motivation';
 
 export const SHOP_CATALOG: readonly ShopItem[] = [
@@ -59,3 +60,29 @@ export const SHOP_CATALOG: readonly ShopItem[] = [
 ];
 
 export const SHOP_MAP: ReadonlyMap<string, ShopItem> = new Map(SHOP_CATALOG.map((i) => [i.id, i]));
+
+/**
+ * T50A — hình của bốn bạn mascot, **một nguồn duy nhất** cho màn Home lẫn tủ đồ.
+ * `Record<ChildProfile['avatarBase'], string>` buộc `avatarBase` mới phải có chỗ:
+ * `DEF-022` là ternary **3** nhánh trong ô avatar của `HomeScreen` (màn Home) trong khi hồ sơ
+ * cho phép **4** giá trị ⇒ bé chọn "Cú Thông Thái" (🦉) xong về Home thì cú hóa thỏ (🐰).
+ */
+export const MASCOT_EMOJI: Record<ChildProfile['avatarBase'], string> = {
+  bear: '🐻',
+  fox: '🦊',
+  rabbit: '🐰',
+  owl: '🦉',
+};
+
+export interface ShopMascot {
+  id: ChildProfile['avatarBase'];
+  name: string;
+  desc: string;
+}
+
+export const SHOP_MASCOTS: readonly ShopMascot[] = [
+  { id: 'bear', name: 'Gấu Bút Chì', desc: 'Chăm chỉ & Thân thiện' },
+  { id: 'fox', name: 'Cáo Toán Học', desc: 'Thông minh & Tinh anh' },
+  { id: 'rabbit', name: 'Thỏ Tiếng Anh', desc: 'Nhanh nhẹn & Đáng yêu' },
+  { id: 'owl', name: 'Cú Thông Thái', desc: 'Uyên bác & Điềm đạm' },
+];

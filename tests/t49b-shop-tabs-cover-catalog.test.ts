@@ -48,10 +48,9 @@ if (typeof (globalThis as Record<string, unknown>).localStorage === 'undefined')
 const ls = globalThis.localStorage;
 
 import { AVATAR_SHOP_ITEMS, STORAGE_KEYS } from '../src/services/storage';
-import { SHOP_CATALOG } from '../src/data/shopCatalog';
+import { SHOP_CATALOG, SHOP_MASCOTS } from '../src/data/shopCatalog';
 import {
   SHOP_TABS,
-  SHOP_MASCOTS,
   EQUIP_OVERLAYS,
   AvatarShopScreen,
 } from '../src/components/shop/AvatarShopScreen';

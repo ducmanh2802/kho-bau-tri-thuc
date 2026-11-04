@@ -1,0 +1,70 @@
+Lệnh: npm run build && node qa/run-one.mjs evidence/2026-11-04-T50A/probe-t50a-home-mascot.mjs
+Trạng thái mã: bản SAU sửa (Home và tủ đồ cùng đọc MASCOT_EMOJI)
+Verdict: QA PASS — 3 step(s), 0 errors + 4 ảnh (01-home-owl chụp lúc đang ở Home, 02-shop-owl lúc ở tủ đồ)
+{
+  "steps": [
+    {
+      "step": "AB-home-vs-shop",
+      "home": {
+        "bear": "🐻",
+        "fox": "🦊",
+        "rabbit": "🐰",
+        "owl": "🦉"
+      },
+      "shop": {
+        "bear": "🐻",
+        "fox": "🦊",
+        "rabbit": "🐰",
+        "owl": "🦉"
+      },
+      "expect": {
+        "bear": "🐻",
+        "fox": "🦊",
+        "rabbit": "🐰",
+        "owl": "🦉"
+      }
+    },
+    {
+      "step": "C-distinct",
+      "distinct": [
+        "🐻",
+        "🦊",
+        "🐰",
+        "🦉"
+      ],
+      "home": {
+        "bear": "🐻",
+        "fox": "🦊",
+        "rabbit": "🐰",
+        "owl": "🦉"
+      }
+    },
+    {
+      "step": "D-equipped-fact",
+      "innerHTML": "🦉",
+      "mascotText": "🦉",
+      "equipLayers": 0
+    }
+  ],
+  "errors": [],
+  "facts": {
+    "homeSeen": "bear=🐻 fox=🦊 rabbit=🐰 owl=🦉",
+    "shopSeen": "bear=🐻 fox=🦊 rabbit=🐰 owl=🦉",
+    "distinctHomeShapes": 4,
+    "homeWithEquipped": {
+      "innerHTML": "🦉",
+      "mascotText": "🦉",
+      "equipLayers": 0
+    },
+    "def022b": "MỞ — Home chỉ vẽ mascot: equipped có 7 ô mà Home không ghép lớp nào (DEF-022b)"
+  },
+  "failedAt": null,
+  "shots": [
+    "01-home-owl.png",
+    "02-shop-owl.png",
+    "03-cuoi-vong-lap-o-tu-do.png",
+    "04-home-with-equipped.png"
+  ],
+  "ok": true
+}
+QA PASS — 3 step(s), 0 errors

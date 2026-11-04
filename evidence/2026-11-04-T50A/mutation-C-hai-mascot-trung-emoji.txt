@@ -1,0 +1,76 @@
+Lệnh: npx vitest run tests/t50a-home-mascot-single-source.test.ts (sau khi đặt owl = thỏ = cùng một emoji 🐰)
+Verdict: ĐỎ — a1 bắt "emoji trùng nhau" ngay cả khi tsc vẫn xanh; a3/a4 bắt symptom Home≠tủ đồ. Chứng minh guard a1 có cắn (message: emoji trùng nhau: 🐻 🦊 🐰 🐰: expected 3 to be 4).
+
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t50a-home-mascot-single-source.test.ts (5 tests | 3 failed) 114ms
+   ❯ T50A — một nguồn duy nhất cho hình mascot (DEF-022a) (5)
+     × a1: MASCOT_EMOJI phủ đúng union avatarBase và bốn hình **đôi một khác nhau** 11ms
+     ✓ a2: danh sách chọn bạn và bản đồ hình khớp nhau ⇒ không id nào không có hình 1ms
+     × a3: bé chọn Cú Thông Thái thì màn Home vẽ con cú, không phải con thỏ 15ms
+     × a4: màn Home và tủ đồ hiển thị **cùng một hình** cho cả bốn bạn 85ms
+     ✓ a5: Home không còn tự viết bản đồ emoji riêng (nguồn là MASCOT_EMOJI) 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t50a-home-mascot-single-source.test.ts > T50A — một nguồn duy nhất cho hình mascot (DEF-022a) > a1: MASCOT_EMOJI phủ đúng union avatarBase và bốn hình **đôi một khác nhau**
+AssertionError: emoji trùng nhau: 🐻 🦊 🐰 🐰: expected 3 to be 4 // Object.is equality
+
+- Expected
++ Received
+
+- 4
++ 3
+
+ ❯ tests/t50a-home-mascot-single-source.test.ts:119:75
+    117|     // `DEF-022` đúng là hai bạn trùng hình nhau trên Home ⇒ tiêu chí …
+    118|     // phải đo ở đây, không chỉ đo "Home có vẽ giống tủ đồ không".
+    119|     expect(new Set(emojis).size, `emoji trùng nhau: ${emojis.join(' ')…
+       |                                                                           ^
+    120|   });
+    121|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/t50a-home-mascot-single-source.test.ts > T50A — một nguồn duy nhất cho hình mascot (DEF-022a) > a3: bé chọn Cú Thông Thái thì màn Home vẽ con cú, không phải con thỏ
+AssertionError: expected '🐰' to be '🦉' // Object.is equality
+
+Expected: "🦉"
+Received: "🐰"
+
+ ❯ tests/t50a-home-mascot-single-source.test.ts:130:46
+    128|
+    129|   it('a3: bé chọn Cú Thông Thái thì màn Home vẽ con cú, không phải con…
+    130|     expect(shopAvatarEmoji(shopHtml('owl'))).toBe('🦉');
+       |                                              ^
+    131|     expect(homeAvatarEmoji(homeHtml('owl'))).toBe(MASCOT_EMOJI.owl);
+    132|     expect(homeAvatarEmoji(homeHtml('owl'))).not.toBe(MASCOT_EMOJI.rab…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/t50a-home-mascot-single-source.test.ts > T50A — một nguồn duy nhất cho hình mascot (DEF-022a) > a4: màn Home và tủ đồ hiển thị **cùng một hình** cho cả bốn bạn
+AssertionError: bạn nào cũng giống nhau thì bé không phân biệt được: expected 3 to be 4 // Object.is equality
+
+- Expected
++ Received
+
+- 4
++ 3
+
+ ❯ tests/t50a-home-mascot-single-source.test.ts:142:114
+    140|     }));
+    141|     for (const p of pairs) expect(p.home, `${p.base}: Home ${p.home} ≠…
+    142|     expect([...new Set(pairs.map((p) => p.home))].length, 'bạn nào cũn…
+       |                                                                                                                  ^
+    143|   });
+    144|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 2 passed (5)
+   Start at  09:12:49
+   Duration  1.07s (import 47%, transform 35%, tests 16%, worker 2%)
+
