@@ -38,6 +38,10 @@ interface Chess3DCanvasProps {
   className?: string;
   /** Máy không có WebGL (tablet cũ, chế độ tiết kiệm pin) → bàn 2D. */
   onUnsupported?: () => void;
+  /** Bộ quân cờ: cổ điển gỗ hoặc vui nhộn (con vật/đồ dùng). */
+  pieceSet?: 'classic' | 'fun';
+  /** Màu vua đang bị chiếu (để rung sợ). */
+  checkedColor?: 'w' | 'b' | null;
 }
 
 export type CameraPreset = 'iso' | 'pov' | 'top';
@@ -88,6 +92,8 @@ export const Chess3DCanvas: React.FC<Chess3DCanvasProps> = ({
   onSquareClick,
   className = '',
   onUnsupported,
+  pieceSet = 'classic',
+  checkedColor = null,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
@@ -326,9 +332,28 @@ export const Chess3DCanvas: React.FC<Chess3DCanvasProps> = ({
           // Nhấc quân vừa phải như tay bé cầm cờ thật
           const arcHeight = Math.sin(t * Math.PI) * 0.3;
           anim.mesh.position.y = anim.fromPos.y + arcHeight;
+           // Hiệu ứng xoay nhẹ khi di chuyển
+           anim.mesh.rotation.y += delta * 6;
         }
       }
 
+      // Vua sợ hãi khi bị chiếu: rung nhẹ
+      if (checkedColor) {
+        pieceMeshes.current.forEach((mesh) => {
+          if (mesh.name === `piece_${checkedColor}_k` || mesh.name === `piece_${checkedColor}_k_fun`) {
+            mesh.rotation.z = Math.sin(performance.now() / 120) * 0.2;
+            const s = 1 + Math.sin(performance.now() / 200) * 0.06;
+            mesh.scale.set(s, s, s);
+          }
+        });
+      } else {
+        pieceMeshes.current.forEach((mesh) => {
+          if (mesh.name.endsWith('_k') || mesh.name.endsWith('_k_fun')) {
+            mesh.rotation.z = 0;
+            mesh.scale.set(1, 1, 1);
+          }
+        });
+      }
       renderer.render(scene, camera);
     };
 
@@ -398,7 +423,7 @@ export const Chess3DCanvas: React.FC<Chess3DCanvasProps> = ({
       row.forEach((piece, c) => {
         if (!piece) return;
 
-        const pieceMesh = createPieceMesh(piece.type, piece.color);
+        const pieceMesh = createPieceMesh(piece.type, piece.color, pieceSet);
         const targetX = (c - 3.5) * tileSize;
         const targetZ = (r - 3.5) * tileSize;
 
@@ -442,7 +467,7 @@ export const Chess3DCanvas: React.FC<Chess3DCanvasProps> = ({
 
     clickableObjects.current = newClickables;
     previousBoard.current = board.map((row) => [...row]);
-  }, [board, selected, lastMove]);
+  }, [board, selected, lastMove, pieceSet]);
 
   // Update Board Highlights (selected, legal moves, check, last move, hint)
   useEffect(() => {

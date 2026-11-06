@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, lazy, useMemo, Suspense } from 'react';
 import { ActiveScreen, ChildProfile, DailyQuest, ReadingProfile, SubjectType } from '../../types';
 import { sound } from '../../services/sound';
 import { localDateKey } from '../../services/dateUtils';
@@ -38,7 +38,6 @@ interface SubjectCard {
   icon: string;
   gradient: string;
   border: string;
-  progressColor: string;
   variant: 'subject-viet' | 'subject-math' | 'subject-english' | 'subject-life';
   locked?: boolean;
   subjectType?: SubjectType; // Only for unlocked subjects
@@ -61,7 +60,6 @@ const SUBJECT_CARDS: readonly SubjectCard[] = [
     icon: '📚',
     gradient: 'from-amber-500 to-orange-500',
     border: 'border-amber-300',
-    progressColor: 'amber',
     variant: 'subject-viet',
     subjectType: 'tieng-viet',
   },
@@ -72,7 +70,6 @@ const SUBJECT_CARDS: readonly SubjectCard[] = [
     icon: '🔢',
     gradient: 'from-blue-500 to-cyan-500',
     border: 'border-blue-300',
-    progressColor: 'blue',
     variant: 'subject-math',
     subjectType: 'toan',
   },
@@ -83,7 +80,6 @@ const SUBJECT_CARDS: readonly SubjectCard[] = [
     icon: '🇬🇧',
     gradient: 'from-emerald-500 to-teal-500',
     border: 'border-emerald-300',
-    progressColor: 'emerald',
     variant: 'subject-english',
     subjectType: 'english',
   },
@@ -94,7 +90,6 @@ const SUBJECT_CARDS: readonly SubjectCard[] = [
     icon: '💜',
     gradient: 'from-purple-500 to-violet-500',
     border: 'border-purple-300',
-    progressColor: 'purple',
     variant: 'subject-life',
     locked: false,
     subjectType: 'cuoc-song',
@@ -144,6 +139,18 @@ const SHORTCUT_CARDS: readonly ShortcutCard[] = [
   },
 ];
 
+/**
+ * T53 — thẻ môn từng vẽ vòng tròn "50%" cứng cho cả bốn môn, kể cả hồ sơ trắng.
+ * `completedLessons` chỉ chứa id bài, nên đếm theo tiền tố id của từng môn; nhờ vậy
+ * không phải nạp `src/data/curriculum.ts` (nặng, cố ý ngoài entry từ T39) vào màn Home.
+ */
+const LESSON_ID_PREFIX: Record<SubjectType, string> = {
+  'tieng-viet': 'vn-',
+  toan: 'math-',
+  english: 'eng-',
+  'cuoc-song': 'life-',
+};
+
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   profile,
   onNavigate,
@@ -165,6 +172,24 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const completedQuestsCount = quests.filter((q) => q.completed).length;
   const canClaimChest = completedQuestsCount >= 3 && !chestClaimed;
+
+  const lessonsDoneBySubject = useMemo(() => {
+    const counts: Record<SubjectType, number> = {
+      'tieng-viet': 0,
+      toan: 0,
+      english: 0,
+      'cuoc-song': 0,
+    };
+    for (const lessonId of profile.completedLessons ?? []) {
+      for (const subject of Object.keys(LESSON_ID_PREFIX) as SubjectType[]) {
+        if (lessonId.startsWith(LESSON_ID_PREFIX[subject])) {
+          counts[subject] += 1;
+          break;
+        }
+      }
+    }
+    return counts;
+  }, [profile.completedLessons]);
 
   const handleClaimChest = useCallback(() => {
     if (!canClaimChest) return;
@@ -363,7 +388,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* Cloud Sync & Google Account Banner (prominent on Home Screen) */}
       <CloudSyncBanner profile={profile} />
 
-      {/* 2. 4 SUBJECT CARDS with progress rings */}
+      {/* 2. 4 SUBJECT CARDS with lesson counts */}
       <div>
         <SectionTitle icon="🎯" size="lg">
           Hôm Nay Bé Học Gì?
@@ -375,7 +400,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             375px) and content stretched to the card width instead of centred,
             so nothing can spill over both edges into the neighbouring card. */}
         <div className="grid grid-cols-2 gap-3 md:gap-4">
-          {SUBJECT_CARDS.map((subject) => (
+          {SUBJECT_CARDS.map((subject) => {
+            const done = subject.subjectType ? lessonsDoneBySubject[subject.subjectType] : 0;
+            return (
             <KidButton
               key={subject.id}
               variant={subject.variant}
@@ -408,49 +435,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
               <div className="mt-auto pt-2">
                 <p className="text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]">{subject.subtitle}</p>
-                {/* Progress ring placeholder */}
-                <div className="flex items-center gap-2">
-                  <div className="relative w-11 h-11 sm:w-14 sm:h-14 flex-shrink-0" aria-hidden="true">
-                    <svg className="w-11 h-11 sm:w-14 sm:h-14 transform -rotate-90" viewBox="0 0 28 28">
-                      <circle
-                        cx="14"
-                        cy="14"
-                        r="12"
-                        fill="none"
-                        stroke="white"
-                        strokeWidth="2.5"
-                        strokeOpacity="0.2"
-                      />
-                      <circle
-                        cx="14"
-                        cy="14"
-                        r="12"
-                        fill="none"
-                        stroke="white"
-                        strokeWidth="2.5"
-                        strokeDasharray="75.4"
-                        strokeDashoffset="37.7"
-                        strokeLinecap="round"
-                        className="text-white"
-                      />
-                    </svg>
-                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">
-                      50%
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-white rounded-full transition-all duration-500"
-                        style={{ width: '50%' }}
-                      />
-                    </div>
-                    <p className="text-[10px] leading-tight text-white/80 font-bold mt-1">Tiến độ: 50%</p>
-                  </div>
-                </div>
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 text-[11px] font-black text-white">
+                  {done === 0 ? 'Chưa học bài nào' : `${done} bài đã học`}
+                </span>
               </div>
             </KidButton>
-          ))}
+            );
+          })}
         </div>
       </div>
 

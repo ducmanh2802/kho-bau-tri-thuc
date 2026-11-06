@@ -170,8 +170,154 @@ function createKnightHead(baseR: number, height: number, mat: THREE.Material): T
   return mesh;
 }
 
+/** Quân "vui nhộn": các con vật / đồ dùng hàng ngày thay cho quân cờ gỗ. */
+function createFunPieceMesh(type: PieceType, color: Color): THREE.Group {
+  const isWhite = color === 'w';
+  const baseColor = isWhite ? 0x7fb3ff : 0x8b5a2b;
+  const accent = isWhite ? 0xffe08a : 0x3b2412;
+  const mat = (hex: number) =>
+    new THREE.MeshStandardMaterial({ color: hex, roughness: 0.5, metalness: 0.0 });
+
+  const spec = PIECE_SPECS[type];
+  const H = spec.height;
+  const R = spec.baseDiameter / 2;
+  const group = new THREE.Group();
+  group.name = `piece_${color}_${type}_fun`;
+
+  // Đế tròn chung
+  const platform = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.95, R * 0.95, H * 0.06, 24), mat(0x555555));
+  platform.position.y = H * 0.03;
+  group.add(platform);
+
+  switch (type) {
+    case 'p': {
+      // Anh lính: thân trụ + đầu + mũ sắt
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.35, R * 0.45, H * 0.55, 16), mat(baseColor));
+      body.position.y = H * 0.33;
+      group.add(body);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(R * 0.32, 16, 12), mat(0xf1c27d));
+      head.position.y = H * 0.72;
+      group.add(head);
+      const helmet = new THREE.Mesh(new THREE.ConeGeometry(R * 0.4, H * 0.2, 16), mat(0x4b5563));
+      helmet.position.y = H * 0.85;
+      group.add(helmet);
+      break;
+    }
+    case 'r': {
+      // Xe G63: thân hộp + bánh + kính
+      const body = new THREE.Mesh(new THREE.BoxGeometry(R * 1.7, H * 0.45, R * 1.1), mat(baseColor));
+      body.position.y = H * 0.35;
+      group.add(body);
+      const cabin = new THREE.Mesh(new THREE.BoxGeometry(R * 1.0, H * 0.35, R * 1.0), mat(0x93c5fd));
+      cabin.position.set(0, H * 0.68, -R * 0.05);
+      group.add(cabin);
+      for (const [wx, wz] of [
+        [-R * 0.6, R * 0.45],
+        [R * 0.6, R * 0.45],
+        [-R * 0.6, -R * 0.45],
+        [R * 0.6, -R * 0.45],
+      ]) {
+        const wheel = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.22, R * 0.22, R * 0.2, 16), mat(0x111111));
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(wx, H * 0.12, wz);
+        group.add(wheel);
+      }
+      break;
+    }
+    case 'n': {
+      // Con ngựa: thân + cổ + đầu + tai
+      const body = new THREE.Mesh(new THREE.BoxGeometry(R * 1.0, H * 0.35, R * 0.6), mat(baseColor));
+      body.position.y = H * 0.3;
+      group.add(body);
+      const neck = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.22, R * 0.3, H * 0.35, 12), mat(baseColor));
+      neck.position.set(0, H * 0.55, -R * 0.15);
+      neck.rotation.x = -0.4;
+      group.add(neck);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(R * 0.32, 16, 12), mat(baseColor));
+      head.position.set(0, H * 0.78, -R * 0.35);
+      group.add(head);
+      const earL = new THREE.Mesh(new THREE.ConeGeometry(R * 0.12, H * 0.18, 8), mat(baseColor));
+      earL.position.set(-R * 0.2, H * 0.9, -R * 0.35);
+      group.add(earL);
+      const earR = earL.clone();
+      earR.position.x = R * 0.2;
+      group.add(earR);
+      break;
+    }
+    case 'b': {
+      // Con voi: thân lớn + đầu + vòi + tai
+      const body = new THREE.Mesh(new THREE.SphereGeometry(R * 0.55, 20, 16), mat(baseColor));
+      body.position.y = H * 0.45;
+      body.scale.y = 0.8;
+      group.add(body);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(R * 0.4, 16, 12), mat(baseColor));
+      head.position.set(0, H * 0.62, -R * 0.35);
+      group.add(head);
+      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.12, R * 0.08, H * 0.45, 10), mat(baseColor));
+      trunk.position.set(0, H * 0.35, -R * 0.7);
+      trunk.rotation.x = Math.PI / 2.2;
+      group.add(trunk);
+      const earL = new THREE.Mesh(new THREE.CircleGeometry(R * 0.35, 16), mat(baseColor));
+      earL.position.set(-R * 0.5, H * 0.62, -R * 0.1);
+      earL.rotation.y = -1.2;
+      group.add(earL);
+      const earR = earL.clone();
+      earR.position.x = R * 0.5;
+      earR.rotation.y = 1.2;
+      group.add(earR);
+      break;
+    }
+    case 'q': {
+      // Hoàng hậu: váy nón + đầu + vương miện
+      const dress = new THREE.Mesh(new THREE.ConeGeometry(R * 0.7, H * 0.7, 16), mat(accent));
+      dress.position.y = H * 0.35;
+      group.add(dress);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(R * 0.3, 16, 12), mat(0xf1c27d));
+      head.position.y = H * 0.8;
+      group.add(head);
+      const crown = new THREE.Mesh(new THREE.TorusGeometry(R * 0.32, R * 0.06, 8, 16), mat(0xffd700));
+      crown.position.y = H * 0.88;
+      crown.rotation.x = Math.PI / 2;
+      group.add(crown);
+      break;
+    }
+    case 'k': {
+      // Ông vua: áo choàng + đầu + vương miện chữ thập
+      const robe = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.6, R * 0.75, H * 0.75, 16), mat(baseColor));
+      robe.position.y = H * 0.38;
+      group.add(robe);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(R * 0.3, 16, 12), mat(0xf1c27d));
+      head.position.y = H * 0.82;
+      group.add(head);
+      const crossV = new THREE.Mesh(new THREE.BoxGeometry(R * 0.12, H * 0.22, R * 0.12), mat(0xffd700));
+      crossV.position.y = H * 0.95;
+      group.add(crossV);
+      const crossH = new THREE.Mesh(new THREE.BoxGeometry(R * 0.35, R * 0.1, R * 0.1), mat(0xffd700));
+      crossH.position.y = H * 0.98;
+      group.add(crossH);
+      break;
+    }
+  }
+
+  // Quân đen quay mặt về phía quân trắng
+  if (color === 'b') group.rotation.y = Math.PI;
+  group.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      child.castShadow = true;
+      child.receiveShadow = true;
+    }
+  });
+  return group;
+}
+
+
 /** Tạo một quân composite theo tỉ lệ bộ cờ gỗ Staunton. */
-export function createPieceMesh(type: PieceType, color: Color): THREE.Group {
+export function createPieceMesh(
+  type: PieceType,
+  color: Color,
+  pieceSet: 'classic' | 'fun' = 'classic'
+): THREE.Group {
+  if (pieceSet === 'fun') return createFunPieceMesh(type, color);
   const { lightWoodMat, darkWoodMat, lightCarveMat, darkCarveMat, feltMat } = getPieceMaterials();
   const wood = color === 'w' ? lightWoodMat : darkWoodMat;
   const carve = color === 'w' ? lightCarveMat : darkCarveMat;

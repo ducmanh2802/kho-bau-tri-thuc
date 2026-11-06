@@ -48,6 +48,7 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [capturedW, setCapturedW] = useState<CapturedPiece[]>([]);
   const [capturedB, setCapturedB] = useState<CapturedPiece[]>([]);
   const [boardTheme, setBoardTheme] = useState<'emerald' | 'walnut' | 'midnight'>('emerald');
+  const [pieceSet, setPieceSet] = useState<'classic' | 'fun'>('classic');
   const [viewMode, setViewMode] = useState<'3d' | '2d'>('3d');
   // Máy không dựng được WebGL → bé đang chơi bàn 2D vì bắt buộc, không phải vì
   // ba mẹ chọn; phải nói rõ kẻo họ tưởng ứng dụng hỏng.
@@ -233,6 +234,9 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const a = status ? analysis() : null;
 
+  const checkedColor = E.inCheck(board, 'w') ? 'w' : E.inCheck(board, 'b') ? 'b' : null;
+
+
   return (
     <div className="max-w-6xl mx-auto px-2 sm:px-4 py-3 sm:py-5 space-y-3.5 text-slate-800">
       {/* Top Header Bar */}
@@ -287,6 +291,25 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <span>2D Cổ Điển</span>
             </button>
           </div>
+        {/* Chọn bộ quân cờ */}
+        <div className="bg-slate-100 p-1 rounded-2xl border border-slate-200 flex items-center gap-1 shadow-xs">
+          <button
+            onClick={() => { sound.playClick(); setPieceSet('classic'); }}
+            className={`px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer ${
+              pieceSet === 'classic' ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>Cổ Điển</span>
+          </button>
+          <button
+            onClick={() => { sound.playClick(); setPieceSet('fun'); }}
+            className={`px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm flex items-center gap-1.5 transition-all cursor-pointer ${
+              pieceSet === 'fun' ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>Con Vật & Đồ Dùng</span>
+          </button>
+        </div>
         </div>
       </div>
 
@@ -380,6 +403,8 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               setViewMode('2d');
               setGlFallback(true);
             }}
+            pieceSet={pieceSet}
+            checkedColor={checkedColor}
           />
         ) : (
           /* 2D Fallback Board — khung gỗ óc chó, ô cờ hai tông phong/gụ */
@@ -426,6 +451,7 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                               <ChessPieceSvg
                                 type={p.type}
                                 color={p.color}
+                                pieceSet={pieceSet}
                                 className="w-[88%] h-[88%] drop-shadow-sm select-none"
                               />
                             </div>
@@ -493,7 +519,7 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                       className="w-7 h-7 p-0.5 rounded-lg bg-white border border-amber-200 shadow-2xs flex items-center justify-center"
                       title={`Quân Đen - ${PIECE_NAMES[cp.type]}`}
                     >
-                      <ChessPieceSvg type={cp.type} color={cp.color} className="w-full h-full" />
+                      <ChessPieceSvg type={cp.type} color={cp.color} pieceSet={pieceSet} className="w-full h-full" />
                     </div>
                   ))
                 ) : (
@@ -511,7 +537,7 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                       className="w-7 h-7 p-0.5 rounded-lg bg-white border border-slate-200 shadow-2xs flex items-center justify-center"
                       title={`Quân Trắng - ${PIECE_NAMES[cp.type]}`}
                     >
-                      <ChessPieceSvg type={cp.type} color={cp.color} className="w-full h-full" />
+                      <ChessPieceSvg type={cp.type} color={cp.color} pieceSet={pieceSet} className="w-full h-full" />
                     </div>
                   ))
                 ) : (
@@ -548,7 +574,7 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-slate-500 w-6">#{i + 1}</span>
                     <div className="w-5 h-5 flex items-center justify-center">
-                      <ChessPieceSvg type={m.pieceType} color={m.pieceColor} className="w-full h-full" />
+                      <ChessPieceSvg type={m.pieceType} color={m.pieceColor} pieceSet={pieceSet} className="w-full h-full" />
                     </div>
                     <span className="font-extrabold text-slate-800">
                       {PIECE_NAMES[m.pieceType]} {String.fromCharCode(97 + m.from[1])}

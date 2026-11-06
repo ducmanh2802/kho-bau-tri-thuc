@@ -1,0 +1,990 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ❯ tests/t53-home-subject-progress-honest.test.ts (4 tests | 4 failed) 61ms
+   ❯ T53 — thẻ môn trên Home không báo tiến độ giả (4)
+     × đếm bài đã xong theo từng môn thay vì in 50% cho tất cả 35ms
+     × mỗi môn chỉ đếm bài của chính nó 11ms
+     × hồ sơ trống nói thật là chưa học bài nào 11ms
+     × mã nguồn không còn vòng tiến độ giả 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/t53-home-subject-progress-honest.test.ts > T53 — thẻ môn trên Home không báo tiến độ giả > đếm bài đã xong theo từng môn thay vì in 50% cho tất cả
+AssertionError: expected '<div class="w-full max-w-5xl mx-auto …' to contain '3 bài đã học'
+
+- Expected
++ Received
+
+- 3 bài đã học
++ <div class="w-full max-w-5xl mx-auto px-3 sm:px-4 py-3 md:py-5 space-y-3.5 sm:space-y-4 overflow-x-clip"><div class="relative kb-hero-pattern bg-gradient-to-r from-amber-700 via-orange-700 to-rose-700 rounded-3xl p-3.5 sm:p-4 md:p-5 shadow-xl text-white overflow-hidden border-4 border-amber-200"><div class="absolute top-2 right-4 text-6xl opacity-20 pointer-events-none">✨</div><div class="absolute -bottom-4 -left-4 text-8xl opacity-15 pointer-events-none">⭐</div><div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-5"><div class="min-w-0 flex-1 flex flex-col min-[340px]:flex-row items-center gap-4 md:gap-5 text-center min-[340px]:text-left md:text-left"><div class="relative shrink-0"><div data-avatar-preview="true" role="img" aria-label="Gấu Bút Chì" class="kb-avatar-preview w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white/95 rounded-3xl shadow-xl text-5xl sm:text-6xl md:text-7xl border-4 border-amber-200 animate-float"><span data-avatar-mascot="true" aria-hidden="true" class="relative">🐻</span></div><span class="absolute -bottom-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs animate-bounce" aria-hidden="true">👋</span><span class="absolute -top-1 -left-1 px-2 py-0.5 bg-amber-900 text-amber-100 text-[9px] font-black rounded-full shadow-sm">Lớp 1</span></div><div class="min-w-0"><div class="flex items-center gap-2 justify-center md:justify-start"><h1 class="min-w-0 text-2xl md:text-3xl leading-tight font-black font-display tracking-tight text-white drop-shadow-sm [overflow-wrap:anywhere]">Chào <!-- -->Bé Test<!-- -->! 👋</h1><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     
++    bg-white hover:bg-amber-50 text-amber-950 border-3 border-amber-300 shadow-sm items-center justify-center min-h-[44px] min-w-[44px] p-2.5 text-base shrink-0" aria-label="Nghe lời chào"><span aria-hidden="true">🔊</span><span class="min-w-0"></span></button></div><p class="text-amber-50 text-xs md:text-sm font-bold mt-1 max-w-md">Hôm nay mình tìm kho báu nào nào?</p><div class="flex flex-wrap items-center gap-2 mt-3 justify-center md:justify-start"><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-amber-50 text-amber-900 border-2 border-amber-200
++         px-2.5 py-1 text-[11px] gap-1
++         
++       "><span aria-hidden="true">⭐</span><span class="whitespace-nowrap"><span class="tabular-nums">0</span> Sao</span></span><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-orange-50 text-orange-900 border-2 border-orange-200
++         px-2.5 py-1 text-[11px] gap-1
++         
++       "><span aria-hidden="true">🔥</span><span class="whitespace-nowrap">Chuỗi <span class="tabular-nums">1</span> ngày</span></span><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-purple-50 text-purple-900 border-2 border-purple-200
++         px-2.5 py-1 text-[11px] gap-1
++         
++       "><span aria-hidden="true">🎟️</span><span class="whitespace-nowrap"><span class="tabular-nums">0</span> Vé</span></span></div></div></div><div class="w-full lg:w-auto shrink-0 flex flex-col items-stretch lg:items-end gap-2"><button disabled="" class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 items-center justify-center min-h-[68px] px-6 sm:px-10 py-4 sm:py-5 text-lg sm:text-xl min-h-[56px] md:min-h-[60px] min-w-[200px] text-base md:text-lg font-black gap-2 animate-pulse-subtle" aria-label="Đang tải gợi ý..."><span class="min-w-0"><span class="flex items-center gap-2"><span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true"></span>Đang tải...</span></span><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right w-6 h-6" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></button><p class="text-amber-50 text-[11px] font-medium text-center lg:text-right">Đang tìm hoạt động tốt nhất cho bé...</p></div></div></div><div class="w-full p-3.5 sm:p-4 rounded-3xl border-2 transition-all cursor-pointer shadow-xs bg-gradient-to-r from-amber-50 via-orange-50/80 to-yellow-50 border-amber-300 hover:border-amber-400 hover:shadow-md"><div class="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap"><div class="flex items-center gap-3 min-w-0"><div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 text-2xl shadow-xs border bg-amber-100 border-amber-300">🔐</div><div class="min-w-0"><div class="flex items-center gap-1.5 flex-wrap"><h3 class="text-sm sm:text-base font-black text-slate-900 font-display">Lưu Kết Quả &amp; Điểm Số Lên Google</h3></div><p class="text-xs text-slate-600 font-medium truncate mt-0.5">Đăng nhập Google để lưu trữ vĩnh viễn tiến độ học của bé khi đổi máy</p></div></div><div class="shrink-0 flex items-center gap-2 w-full sm:w-auto justify-end"><button class="w-full sm:w-auto px-4 py-2 bg-white hover:bg-amber-50 active:scale-95 border-2 border-amber-400 hover:border-amber-500 text-amber-950 font-black text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"><svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"></path><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"></path></svg><span>Đăng nhập Google</span></button></div></div></div><div><div class="font-display font-black text-amber-950 "><div class="flex items-center gap-2 "><span class="w-8 h-8 md:w-9 md:h-9" aria-hidden="true">🎯</span><h2 class="text-2xl md:text-3xl">Hôm Nay Bé Học Gì?</h2></div></div><div class="grid grid-cols-2 gap-3 md:gap-4"><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-4 border-amber-300 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[120px] md:min-h-[132px] text-left "><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex items-start justify-between gap-2"><span class="min-w-0 text-[10px] sm:text-[11px] uppercase font-black tracking-wide sm:tracking-widest text-white/80">Môn Học Lớp 1</span><span class="text-3xl sm:text-4xl md:text-5xl leading-none group-hover:scale-110 transition-transform shrink-0" aria-hidden="true">📚</span></div><h3 class="text-lg sm:text-xl leading-tight font-black font-display mt-1 [overflow-wrap:anywhere]">Tiếng Việt</h3><div class="mt-auto pt-2"><p class="text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]">Chữ cái · Dấu thanh · Vần ghép · Đọc truyện</p><div class="flex items-center gap-2" aria-hidden="true"><div class="relative w-11 h-11 flex-shrink-0"><svg class="w-11 h-11 transform -rotate-90" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="75.4" stroke-dashoffset="37.7" stroke-linecap="round"></circle></svg><span class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">50%</span></div><div class="flex-1 min-w-0"><div class="h-2 bg-white/20 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full" style="width:50%"></div></div><p class="text-[10px] leading-tight text-white/80 font-bold mt-1">Tiến độ: 50%</p></div></div></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/40 border-4 border-blue-300 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[120px] md:min-h-[132px] text-left "><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex items-start justify-between gap-2"><span class="min-w-0 text-[10px] sm:text-[11px] uppercase font-black tracking-wide sm:tracking-widest text-white/80">Môn Học Lớp 1</span><span class="text-3xl sm:text-4xl md:text-5xl leading-none group-hover:scale-110 transition-transform shrink-0" aria-hidden="true">🔢</span></div><h3 class="text-lg sm:text-xl leading-tight font-black font-display mt-1 [overflow-wrap:anywhere]">Toán Học</h3><div class="mt-auto pt-2"><p class="text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]">Đếm số 0–100 · Cộng trừ · Hình học · Đo lường</p><div class="flex items-center gap-2" aria-hidden="true"><div class="relative w-11 h-11 flex-shrink-0"><svg class="w-11 h-11 transform -rotate-90" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="75.4" stroke-dashoffset="37.7" stroke-linecap="round"></circle></svg><span class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">50%</span></div><div class="flex-1 min-w-0"><div class="h-2 bg-white/20 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full" style="width:50%"></div></div><p class="text-[10px] leading-tight text-white/80 font-bold mt-1">Tiến độ: 50%</p></div></div></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/40 border-4 border-emerald-300 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[120px] md:min-h-[132px] text-left "><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex items-start justify-between gap-2"><span class="min-w-0 text-[10px] sm:text-[11px] uppercase font-black tracking-wide sm:tracking-widest text-white/80">Môn Học Lớp 1</span><span class="text-3xl sm:text-4xl md:text-5xl leading-none group-hover:scale-110 transition-transform shrink-0" aria-hidden="true">🇬🇧</span></div><h3 class="text-lg sm:text-xl leading-tight font-black font-display mt-1 [overflow-wrap:anywhere]">Tiếng Anh</h3><div class="mt-auto pt-2"><p class="text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]">Chữ cái · Số đếm · Màu sắc · Động vật</p><div class="flex items-center gap-2" aria-hidden="true"><div class="relative w-11 h-11 flex-shrink-0"><svg class="w-11 h-11 transform -rotate-90" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="75.4" stroke-dashoffset="37.7" stroke-linecap="round"></circle></svg><span class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">50%</span></div><div class="flex-1 min-w-0"><div class="h-2 bg-white/20 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full" style="width:50%"></div></div><p class="text-[10px] leading-tight text-white/80 font-bold mt-1">Tiến độ: 50%</p></div></div></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white shadow-lg shadow-purple-500/40 border-4 border-purple-300 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[120px] md:min-h-[132px] text-left " aria-disabled="false"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex items-start justify-between gap-2"><span class="min-w-0 text-[10px] sm:text-[11px] uppercase font-black tracking-wide sm:tracking-widest text-white/80">Môn Học Lớp 1</span><span class="text-3xl sm:text-4xl md:text-5xl leading-none group-hover:scale-110 transition-transform shrink-0" aria-hidden="true">💜</span></div><h3 class="text-lg sm:text-xl leading-tight font-black font-display mt-1 [overflow-wrap:anywhere]">Em &amp; Cuộc Sống</h3><div class="mt-auto pt-2"><p class="text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]">Cảm xúc · An toàn · Kỹ năng sống · Nghệ thuật</p><div class="flex items-center gap-2" aria-hidden="true"><div class="relative w-11 h-11 flex-shrink-0"><svg class="w-11 h-11 transform -rotate-90" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="75.4" stroke-dashoffset="37.7" stroke-linecap="round"></circle></svg><span class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">50%</span></div><div class="flex-1 min-w-0"><div class="h-2 bg-white/20 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full" style="width:50%"></div></div><p class="text-[10px] leading-tight text-white/80 font-bold mt-1">Tiến độ: 50%</p></div></div></div></span></button></div></div><div class="
++     bg-[var(--color-kb-card)]
++     rounded-3xl
++     shadow-[var(--shadow-soft)]
++     transition-all duration-300
++     border-2 border-amber-200
++     
++     p-5 md:p-6
++     
++     space-y-2.5
++   "><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><div class="font-display font-black text-amber-950 mb-0"><div class="flex items-center gap-2 "><span class="w-6 h-6 md:w-7 md:h-7" aria-hidden="true">🎯</span><h2 class="text-xl md:text-2xl">Nhiệm Vụ Hôm Nay</h2></div></div><p class="text-xs text-slate-500 font-bold">Hoàn thành 3 nhiệm vụ để mở Rương Kho Báu (+10 Sao, +50 XP)!</p></div><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     
++    bg-white hover:bg-amber-50 text-amber-950 border-3 border-amber-300 shadow-sm items-center justify-center min-h-[52px] px-4 sm:px-6 py-3 text-base min-h-[44px] opacity-60 cursor-not-allowed"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gift w-5 h-5" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg></span><span class="truncate">Mở Rương (0/3)</span></button></div><div class="grid grid-cols-4 gap-2 sm:gap-3 md:gap-4 max-w-md mx-auto"><button class="relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all bg-amber-50 border-amber-200 text-slate-700 hover:border-amber-400 hover:shadow-md cursor-pointer" aria-label="Nhiệm vụ 1: Học 2 bài Tiếng Việt thật hay"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">📚</span><span class="max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 line-clamp-2 [overflow-wrap:anywhere]">Học 2 bài Tiếng Việt thật hay</span><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-amber-50 text-amber-900 border-2 border-amber-200
++         px-2 py-0.5 text-[9px] gap-0.5
++         absolute -top-1 -right-1
++       "><span class="whitespace-nowrap"><span class="text-[9px]">+<!-- -->4</span></span></span></button><button class="relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all bg-amber-50 border-amber-200 text-slate-700 hover:border-amber-400 hover:shadow-md cursor-pointer" aria-label="Nhiệm vụ 2: Học 2 bài Em &amp; Cuộc sống"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🎮</span><span class="max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 line-clamp-2 [overflow-wrap:anywhere]">Học 2 bài Em &amp; Cuộc sống</span><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-amber-50 text-amber-900 border-2 border-amber-200
++         px-2 py-0.5 text-[9px] gap-0.5
++         absolute -top-1 -right-1
++       "><span class="whitespace-nowrap"><span class="text-[9px]">+<!-- -->4</span></span></span></button><button class="relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all bg-amber-50 border-amber-200 text-slate-700 hover:border-amber-400 hover:shadow-md cursor-pointer" aria-label="Nhiệm vụ 3: Đọc 1 truyện thật hay"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">📖</span><span class="max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 line-clamp-2 [overflow-wrap:anywhere]">Đọc 1 truyện thật hay</span><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-amber-50 text-amber-900 border-2 border-amber-200
++         px-2 py-0.5 text-[9px] gap-0.5
++         absolute -top-1 -right-1
++       "><span class="whitespace-nowrap"><span class="text-[9px]">+<!-- -->3</span></span></span></button><button disabled="" class="relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all bg-amber-50 border-amber-200 text-slate-400 cursor-not-allowed opacity-60" aria-label="Rương kho báu - cần 3 nhiệm vụ nữa"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🔒</span><span class="max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 [overflow-wrap:anywhere]">Rương</span></button></div></div><div><div class="font-display font-black text-amber-950 "><div class="flex items-center gap-2 "><span class="w-6 h-6 md:w-7 md:h-7" aria-hidden="true">⚡</span><h2 class="text-xl md:text-2xl">Lối Tắt Nhanh</h2></div></div><div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-2.5 mt-2"><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-purple-500 to-indigo-600 border-purple-300 border-3 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🎮</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Trò Chơi</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">31 trò vui</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-sky-500 to-cyan-600 border-sky-300 border-3 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">📖</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Luyện Đọc</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Đọc trôi chảy</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-emerald-500 to-teal-600 border-emerald-300 border-3 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🇬🇧</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Tiếng Anh IOE</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Luyện IOE lớp 1</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-amber-600 to-yellow-600 border-amber-300 border-3 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">♟</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Cờ Vua 3D</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Đấu trí 3D siêu đẹp</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-red-500 to-orange-600 border-red-300 border-3 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🪖</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Cờ Tướng</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Vương quốc cờ tướng</p></div></span></button></div></div><div><div class="font-display font-black text-amber-950 "><div class="flex items-center gap-2 "><span class="w-6 h-6 md:w-7 md:h-7" aria-hidden="true">🎁</span><h2 class="text-xl md:text-2xl">Hệ Thống Động Lực</h2></div></div><div class="grid grid-cols-3 gap-2 mt-2"><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-amber-500 to-orange-500 border-3 border-amber-300 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">📚</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Bộ Sưu Tập Sticker</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Sưu tầm 60 sticker</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-rose-500 to-pink-500 border-3 border-rose-300 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🎰</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Máy Gắp</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Dùng vé quay sticker</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-emerald-500 to-teal-500 border-3 border-emerald-300 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">📅</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Lịch Chuỗi</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Dấu chân Gấu Bút Chì</p></div></span></button></div></div><!--$!--><template data-msg="Switched to client rendering because the server rendering aborted due to:
++
++ The server used &quot;renderToString&quot; which does not support Suspense. If you intended for this Suspense boundary to render the fallback content on the server consider throwing an Error somewhere within the Suspense boundary. If you intended to have the server wait for the suspended component please switch to &quot;renderToPipeableStream&quot; which supports Suspense on the server" data-cstck="
++     at Lazy (&lt;anonymous&gt;)
++     at Suspense (&lt;anonymous&gt;)
++     at div (&lt;anonymous&gt;)
++     at HomeScreen (D:/trithuc/kho-bau-tri-thuc/src/components/home/HomeScreen.tsx:125:23)"></template><!--/$--></div>
+
+ ❯ tests/t53-home-subject-progress-honest.test.ts:89:18
+     87|   it('đếm bài đã xong theo từng môn thay vì in 50% cho tất cả', () => {
+     88|     const html = homeHtml(['vn-les-1', 'vn-les-2', 'vn-les-3', 'math-l…
+     89|     expect(html).toContain('3 bài đã học');
+       |                  ^
+     90|     expect(html).toContain('1 bài đã học');
+     91|     expect(html).not.toContain('50%');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/t53-home-subject-progress-honest.test.ts > T53 — thẻ môn trên Home không báo tiến độ giả > mỗi môn chỉ đếm bài của chính nó
+AssertionError: expected +0 to be 4 // Object.is equality
+
+- Expected
++ Received
+
+- 4
++ 0
+
+ ❯ tests/t53-home-subject-progress-honest.test.ts:98:28
+     96|     const html = homeHtml(['vn-les-1', 'math-les-1', 'eng-les-1', 'lif…
+     97|     const singles = html.match(/1 bài đã học/g) ?? [];
+     98|     expect(singles.length).toBe(4);
+       |                            ^
+     99|   });
+    100|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/t53-home-subject-progress-honest.test.ts > T53 — thẻ môn trên Home không báo tiến độ giả > hồ sơ trống nói thật là chưa học bài nào
+AssertionError: expected '<div class="w-full max-w-5xl mx-auto …' to contain 'Chưa học bài nào'
+
+- Expected
++ Received
+
+- Chưa học bài nào
++ <div class="w-full max-w-5xl mx-auto px-3 sm:px-4 py-3 md:py-5 space-y-3.5 sm:space-y-4 overflow-x-clip"><div class="relative kb-hero-pattern bg-gradient-to-r from-amber-700 via-orange-700 to-rose-700 rounded-3xl p-3.5 sm:p-4 md:p-5 shadow-xl text-white overflow-hidden border-4 border-amber-200"><div class="absolute top-2 right-4 text-6xl opacity-20 pointer-events-none">✨</div><div class="absolute -bottom-4 -left-4 text-8xl opacity-15 pointer-events-none">⭐</div><div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-5"><div class="min-w-0 flex-1 flex flex-col min-[340px]:flex-row items-center gap-4 md:gap-5 text-center min-[340px]:text-left md:text-left"><div class="relative shrink-0"><div data-avatar-preview="true" role="img" aria-label="Gấu Bút Chì" class="kb-avatar-preview w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white/95 rounded-3xl shadow-xl text-5xl sm:text-6xl md:text-7xl border-4 border-amber-200 animate-float"><span data-avatar-mascot="true" aria-hidden="true" class="relative">🐻</span></div><span class="absolute -bottom-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs animate-bounce" aria-hidden="true">👋</span><span class="absolute -top-1 -left-1 px-2 py-0.5 bg-amber-900 text-amber-100 text-[9px] font-black rounded-full shadow-sm">Lớp 1</span></div><div class="min-w-0"><div class="flex items-center gap-2 justify-center md:justify-start"><h1 class="min-w-0 text-2xl md:text-3xl leading-tight font-black font-display tracking-tight text-white drop-shadow-sm [overflow-wrap:anywhere]">Chào <!-- -->Bé Test<!-- -->! 👋</h1><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     
++    bg-white hover:bg-amber-50 text-amber-950 border-3 border-amber-300 shadow-sm items-center justify-center min-h-[44px] min-w-[44px] p-2.5 text-base shrink-0" aria-label="Nghe lời chào"><span aria-hidden="true">🔊</span><span class="min-w-0"></span></button></div><p class="text-amber-50 text-xs md:text-sm font-bold mt-1 max-w-md">Hôm nay mình tìm kho báu nào nào?</p><div class="flex flex-wrap items-center gap-2 mt-3 justify-center md:justify-start"><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-amber-50 text-amber-900 border-2 border-amber-200
++         px-2.5 py-1 text-[11px] gap-1
++         
++       "><span aria-hidden="true">⭐</span><span class="whitespace-nowrap"><span class="tabular-nums">0</span> Sao</span></span><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-orange-50 text-orange-900 border-2 border-orange-200
++         px-2.5 py-1 text-[11px] gap-1
++         
++       "><span aria-hidden="true">🔥</span><span class="whitespace-nowrap">Chuỗi <span class="tabular-nums">1</span> ngày</span></span><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-purple-50 text-purple-900 border-2 border-purple-200
++         px-2.5 py-1 text-[11px] gap-1
++         
++       "><span aria-hidden="true">🎟️</span><span class="whitespace-nowrap"><span class="tabular-nums">0</span> Vé</span></span></div></div></div><div class="w-full lg:w-auto shrink-0 flex flex-col items-stretch lg:items-end gap-2"><button disabled="" class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 items-center justify-center min-h-[68px] px-6 sm:px-10 py-4 sm:py-5 text-lg sm:text-xl min-h-[56px] md:min-h-[60px] min-w-[200px] text-base md:text-lg font-black gap-2 animate-pulse-subtle" aria-label="Đang tải gợi ý..."><span class="min-w-0"><span class="flex items-center gap-2"><span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true"></span>Đang tải...</span></span><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right w-6 h-6" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></button><p class="text-amber-50 text-[11px] font-medium text-center lg:text-right">Đang tìm hoạt động tốt nhất cho bé...</p></div></div></div><div class="w-full p-3.5 sm:p-4 rounded-3xl border-2 transition-all cursor-pointer shadow-xs bg-gradient-to-r from-amber-50 via-orange-50/80 to-yellow-50 border-amber-300 hover:border-amber-400 hover:shadow-md"><div class="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap"><div class="flex items-center gap-3 min-w-0"><div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 text-2xl shadow-xs border bg-amber-100 border-amber-300">🔐</div><div class="min-w-0"><div class="flex items-center gap-1.5 flex-wrap"><h3 class="text-sm sm:text-base font-black text-slate-900 font-display">Lưu Kết Quả &amp; Điểm Số Lên Google</h3></div><p class="text-xs text-slate-600 font-medium truncate mt-0.5">Đăng nhập Google để lưu trữ vĩnh viễn tiến độ học của bé khi đổi máy</p></div></div><div class="shrink-0 flex items-center gap-2 w-full sm:w-auto justify-end"><button class="w-full sm:w-auto px-4 py-2 bg-white hover:bg-amber-50 active:scale-95 border-2 border-amber-400 hover:border-amber-500 text-amber-950 font-black text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"><svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"></path><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"></path></svg><span>Đăng nhập Google</span></button></div></div></div><div><div class="font-display font-black text-amber-950 "><div class="flex items-center gap-2 "><span class="w-8 h-8 md:w-9 md:h-9" aria-hidden="true">🎯</span><h2 class="text-2xl md:text-3xl">Hôm Nay Bé Học Gì?</h2></div></div><div class="grid grid-cols-2 gap-3 md:gap-4"><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-4 border-amber-300 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[120px] md:min-h-[132px] text-left "><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex items-start justify-between gap-2"><span class="min-w-0 text-[10px] sm:text-[11px] uppercase font-black tracking-wide sm:tracking-widest text-white/80">Môn Học Lớp 1</span><span class="text-3xl sm:text-4xl md:text-5xl leading-none group-hover:scale-110 transition-transform shrink-0" aria-hidden="true">📚</span></div><h3 class="text-lg sm:text-xl leading-tight font-black font-display mt-1 [overflow-wrap:anywhere]">Tiếng Việt</h3><div class="mt-auto pt-2"><p class="text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]">Chữ cái · Dấu thanh · Vần ghép · Đọc truyện</p><div class="flex items-center gap-2" aria-hidden="true"><div class="relative w-11 h-11 flex-shrink-0"><svg class="w-11 h-11 transform -rotate-90" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="75.4" stroke-dashoffset="37.7" stroke-linecap="round"></circle></svg><span class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">50%</span></div><div class="flex-1 min-w-0"><div class="h-2 bg-white/20 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full" style="width:50%"></div></div><p class="text-[10px] leading-tight text-white/80 font-bold mt-1">Tiến độ: 50%</p></div></div></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/40 border-4 border-blue-300 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[120px] md:min-h-[132px] text-left "><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex items-start justify-between gap-2"><span class="min-w-0 text-[10px] sm:text-[11px] uppercase font-black tracking-wide sm:tracking-widest text-white/80">Môn Học Lớp 1</span><span class="text-3xl sm:text-4xl md:text-5xl leading-none group-hover:scale-110 transition-transform shrink-0" aria-hidden="true">🔢</span></div><h3 class="text-lg sm:text-xl leading-tight font-black font-display mt-1 [overflow-wrap:anywhere]">Toán Học</h3><div class="mt-auto pt-2"><p class="text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]">Đếm số 0–100 · Cộng trừ · Hình học · Đo lường</p><div class="flex items-center gap-2" aria-hidden="true"><div class="relative w-11 h-11 flex-shrink-0"><svg class="w-11 h-11 transform -rotate-90" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="75.4" stroke-dashoffset="37.7" stroke-linecap="round"></circle></svg><span class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">50%</span></div><div class="flex-1 min-w-0"><div class="h-2 bg-white/20 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full" style="width:50%"></div></div><p class="text-[10px] leading-tight text-white/80 font-bold mt-1">Tiến độ: 50%</p></div></div></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/40 border-4 border-emerald-300 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[120px] md:min-h-[132px] text-left "><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex items-start justify-between gap-2"><span class="min-w-0 text-[10px] sm:text-[11px] uppercase font-black tracking-wide sm:tracking-widest text-white/80">Môn Học Lớp 1</span><span class="text-3xl sm:text-4xl md:text-5xl leading-none group-hover:scale-110 transition-transform shrink-0" aria-hidden="true">🇬🇧</span></div><h3 class="text-lg sm:text-xl leading-tight font-black font-display mt-1 [overflow-wrap:anywhere]">Tiếng Anh</h3><div class="mt-auto pt-2"><p class="text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]">Chữ cái · Số đếm · Màu sắc · Động vật</p><div class="flex items-center gap-2" aria-hidden="true"><div class="relative w-11 h-11 flex-shrink-0"><svg class="w-11 h-11 transform -rotate-90" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="75.4" stroke-dashoffset="37.7" stroke-linecap="round"></circle></svg><span class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">50%</span></div><div class="flex-1 min-w-0"><div class="h-2 bg-white/20 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full" style="width:50%"></div></div><p class="text-[10px] leading-tight text-white/80 font-bold mt-1">Tiến độ: 50%</p></div></div></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white shadow-lg shadow-purple-500/40 border-4 border-purple-300 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[120px] md:min-h-[132px] text-left " aria-disabled="false"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex items-start justify-between gap-2"><span class="min-w-0 text-[10px] sm:text-[11px] uppercase font-black tracking-wide sm:tracking-widest text-white/80">Môn Học Lớp 1</span><span class="text-3xl sm:text-4xl md:text-5xl leading-none group-hover:scale-110 transition-transform shrink-0" aria-hidden="true">💜</span></div><h3 class="text-lg sm:text-xl leading-tight font-black font-display mt-1 [overflow-wrap:anywhere]">Em &amp; Cuộc Sống</h3><div class="mt-auto pt-2"><p class="text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]">Cảm xúc · An toàn · Kỹ năng sống · Nghệ thuật</p><div class="flex items-center gap-2" aria-hidden="true"><div class="relative w-11 h-11 flex-shrink-0"><svg class="w-11 h-11 transform -rotate-90" viewBox="0 0 28 28"><circle cx="14" cy="14" r="12" fill="none" stroke="white" stroke-width="2.5" stroke-dasharray="75.4" stroke-dashoffset="37.7" stroke-linecap="round"></circle></svg><span class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-white">50%</span></div><div class="flex-1 min-w-0"><div class="h-2 bg-white/20 rounded-full overflow-hidden"><div class="h-full bg-white rounded-full" style="width:50%"></div></div><p class="text-[10px] leading-tight text-white/80 font-bold mt-1">Tiến độ: 50%</p></div></div></div></span></button></div></div><div class="
++     bg-[var(--color-kb-card)]
++     rounded-3xl
++     shadow-[var(--shadow-soft)]
++     transition-all duration-300
++     border-2 border-amber-200
++     
++     p-5 md:p-6
++     
++     space-y-2.5
++   "><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><div class="font-display font-black text-amber-950 mb-0"><div class="flex items-center gap-2 "><span class="w-6 h-6 md:w-7 md:h-7" aria-hidden="true">🎯</span><h2 class="text-xl md:text-2xl">Nhiệm Vụ Hôm Nay</h2></div></div><p class="text-xs text-slate-500 font-bold">Hoàn thành 3 nhiệm vụ để mở Rương Kho Báu (+10 Sao, +50 XP)!</p></div><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     
++    bg-white hover:bg-amber-50 text-amber-950 border-3 border-amber-300 shadow-sm items-center justify-center min-h-[52px] px-4 sm:px-6 py-3 text-base min-h-[44px] opacity-60 cursor-not-allowed"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gift w-5 h-5" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"></path></svg></span><span class="truncate">Mở Rương (0/3)</span></button></div><div class="grid grid-cols-4 gap-2 sm:gap-3 md:gap-4 max-w-md mx-auto"><button class="relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all bg-amber-50 border-amber-200 text-slate-700 hover:border-amber-400 hover:shadow-md cursor-pointer" aria-label="Nhiệm vụ 1: Học 2 bài Tiếng Việt thật hay"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">📚</span><span class="max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 line-clamp-2 [overflow-wrap:anywhere]">Học 2 bài Tiếng Việt thật hay</span><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-amber-50 text-amber-900 border-2 border-amber-200
++         px-2 py-0.5 text-[9px] gap-0.5
++         absolute -top-1 -right-1
++       "><span class="whitespace-nowrap"><span class="text-[9px]">+<!-- -->4</span></span></span></button><button class="relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all bg-amber-50 border-amber-200 text-slate-700 hover:border-amber-400 hover:shadow-md cursor-pointer" aria-label="Nhiệm vụ 2: Học 2 bài Em &amp; Cuộc sống"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🎮</span><span class="max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 line-clamp-2 [overflow-wrap:anywhere]">Học 2 bài Em &amp; Cuộc sống</span><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-amber-50 text-amber-900 border-2 border-amber-200
++         px-2 py-0.5 text-[9px] gap-0.5
++         absolute -top-1 -right-1
++       "><span class="whitespace-nowrap"><span class="text-[9px]">+<!-- -->4</span></span></span></button><button class="relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all bg-amber-50 border-amber-200 text-slate-700 hover:border-amber-400 hover:shadow-md cursor-pointer" aria-label="Nhiệm vụ 3: Đọc 1 truyện thật hay"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">📖</span><span class="max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 line-clamp-2 [overflow-wrap:anywhere]">Đọc 1 truyện thật hay</span><span class="
++         inline-flex items-center font-black rounded-full border
++         bg-amber-50 text-amber-900 border-2 border-amber-200
++         px-2 py-0.5 text-[9px] gap-0.5
++         absolute -top-1 -right-1
++       "><span class="whitespace-nowrap"><span class="text-[9px]">+<!-- -->3</span></span></span></button><button disabled="" class="relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all bg-amber-50 border-amber-200 text-slate-400 cursor-not-allowed opacity-60" aria-label="Rương kho báu - cần 3 nhiệm vụ nữa"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🔒</span><span class="max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 [overflow-wrap:anywhere]">Rương</span></button></div></div><div><div class="font-display font-black text-amber-950 "><div class="flex items-center gap-2 "><span class="w-6 h-6 md:w-7 md:h-7" aria-hidden="true">⚡</span><h2 class="text-xl md:text-2xl">Lối Tắt Nhanh</h2></div></div><div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-2.5 mt-2"><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-purple-500 to-indigo-600 border-purple-300 border-3 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🎮</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Trò Chơi</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">31 trò vui</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-sky-500 to-cyan-600 border-sky-300 border-3 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">📖</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Luyện Đọc</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Đọc trôi chảy</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-emerald-500 to-teal-600 border-emerald-300 border-3 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🇬🇧</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Tiếng Anh IOE</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Luyện IOE lớp 1</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-amber-600 to-yellow-600 border-amber-300 border-3 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">♟</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Cờ Vua 3D</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Đấu trí 3D siêu đẹp</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-red-500 to-orange-600 border-red-300 border-3 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🪖</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Cờ Tướng</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Vương quốc cờ tướng</p></div></span></button></div></div><div><div class="font-display font-black text-amber-950 "><div class="flex items-center gap-2 "><span class="w-6 h-6 md:w-7 md:h-7" aria-hidden="true">🎁</span><h2 class="text-xl md:text-2xl">Hệ Thống Động Lực</h2></div></div><div class="grid grid-cols-3 gap-2 mt-2"><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-amber-500 to-orange-500 border-3 border-amber-300 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">📚</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Bộ Sưu Tập Sticker</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Sưu tầm 60 sticker</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-rose-500 to-pink-500 border-3 border-rose-300 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">🎰</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Máy Gắp</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Dùng vé quay sticker</p></div></span></button><button class="
++     kb-btn font-black rounded-2xl flex gap-2
++     cursor-pointer
++     focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-amber-400
++     disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
++     w-full
++    bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-amber-500/40 border-0 flex-col items-stretch min-w-0 p-3 sm:p-4 text-base min-h-[88px] text-center bg-gradient-to-br from-emerald-500 to-teal-500 border-3 border-emerald-300 hover:scale-[1.02] active:scale-95 text-white"><span class="min-w-0 w-full flex-1 flex flex-col"><div class="flex-1 flex flex-col items-center justify-center gap-1 min-w-0"><span class="text-2xl min-[400px]:text-3xl md:text-4xl leading-none" aria-hidden="true">📅</span><h4 class="font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]">Lịch Chuỗi</h4><p class="text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]">Dấu chân Gấu Bút Chì</p></div></span></button></div></div><!--$!--><template data-msg="Switched to client rendering because the server rendering aborted due to:
++
++ The server used &quot;renderToString&quot; which does not support Suspense. If you intended for this Suspense boundary to render the fallback content on the server consider throwing an Error somewhere within the Suspense boundary. If you intended to have the server wait for the suspended component please switch to &quot;renderToPipeableStream&quot; which supports Suspense on the server" data-cstck="
++     at Lazy (&lt;anonymous&gt;)
++     at Suspense (&lt;anonymous&gt;)
++     at div (&lt;anonymous&gt;)
++     at HomeScreen (D:/trithuc/kho-bau-tri-thuc/src/components/home/HomeScreen.tsx:125:23)"></template><!--/$--></div>
+
+ ❯ tests/t53-home-subject-progress-honest.test.ts:103:18
+    101|   it('hồ sơ trống nói thật là chưa học bài nào', () => {
+    102|     const html = homeHtml([]);
+    103|     expect(html).toContain('Chưa học bài nào');
+       |                  ^
+    104|     expect(html).not.toContain('0 bài đã học');
+    105|     expect(html).not.toContain('50%');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/t53-home-subject-progress-honest.test.ts > T53 — thẻ môn trên Home không báo tiến độ giả > mã nguồn không còn vòng tiến độ giả
+AssertionError: expected 'import React, { useState, useEffect, …' not to match /Tiến độ: 50%/
+
+- Expected:
+/Tiến độ: 50%/
+
++ Received:
+"import React, { useState, useEffect, useCallback, lazy, useMemo, Suspense } from 'react';
+import { ActiveScreen, ChildProfile, DailyQuest, ReadingProfile, SubjectType } from '../../types';
+import { sound } from '../../services/sound';
+import { localDateKey } from '../../services/dateUtils';
+import { StorageService } from '../../services/storage';
+import { GAMES_CATALOG } from '../../data/gamesCatalog';
+import { AvatarPreview } from '../common/AvatarPreview';
+import { Gift, ArrowRight } from 'lucide-react';
+import { KidButton, KidCard, Pill, SectionTitle } from '../ui';
+import { CloudSyncBanner } from '../auth/CloudSyncBanner';
+import type { DecisionRecommendation } from '../../types/decisionEngine';
+
+/**
+ * T52 — thẻ \"nên học gì tiếp theo\" nằm dưới màn hình đầu trên cả điện thoại lẫn
+ * desktop, lại tự dựng skeleton trong lúc chờ DecisionEngine. Tách khỏi entry thì
+ * lần vẽ đầu không phải tải/nạp/parse nó; phần chờ vẫn là skeleton nên không nhảy layout.
+ */
+const NextBestActionCard = lazy(() =>
+  import('../learning/NextBestActionCard').then((m) => ({ default: m.NextBestActionCard }))
+);
+
+interface HomeScreenProps {
+  profile: ChildProfile;
+  onNavigate: (screen: ActiveScreen) => void;
+  onSelectSubject: (sub: SubjectType) => void;
+  onOpenGames: () => void;
+  onOpenDailyReview: () => void;
+  onOpenWeeklyChallenge: () => void;
+  onProfileUpdate: () => void;
+  onOpenParent: (tab?: 'progress' | 'reading' | 'insights' | 'competition' | 'kidbox' | 'settings') => void;
+  onOpenLesson: (subject: SubjectType, lessonId: string) => void;
+}
+
+interface SubjectCard {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: string;
+  gradient: string;
+  border: string;
+  variant: 'subject-viet' | 'subject-math' | 'subject-english' | 'subject-life';
+  locked?: boolean;
+  subjectType?: SubjectType; // Only for unlocked subjects
+}
+
+interface ShortcutCard {
+  screen: ActiveScreen;
+  label: string;
+  icon: string;
+  desc: string;
+  gradient: string;
+  border: string;
+}
+
+const SUBJECT_CARDS: readonly SubjectCard[] = [
+  {
+    id: 'tieng-viet',
+    title: 'Tiếng Việt',
+    subtitle: 'Chữ cái · Dấu thanh · Vần ghép · Đọc truyện',
+    icon: '📚',
+    gradient: 'from-amber-500 to-orange-500',
+    border: 'border-amber-300',
+    variant: 'subject-viet',
+    subjectType: 'tieng-viet',
+  },
+  {
+    id: 'toan',
+    title: 'Toán Học',
+    subtitle: 'Đếm số 0–100 · Cộng trừ · Hình học · Đo lường',
+    icon: '🔢',
+    gradient: 'from-blue-500 to-cyan-500',
+    border: 'border-blue-300',
+    variant: 'subject-math',
+    subjectType: 'toan',
+  },
+  {
+    id: 'english',
+    title: 'Tiếng Anh',
+    subtitle: 'Chữ cái · Số đếm · Màu sắc · Động vật',
+    icon: '🇬🇧',
+    gradient: 'from-emerald-500 to-teal-500',
+    border: 'border-emerald-300',
+    variant: 'subject-english',
+    subjectType: 'english',
+  },
+  {
+    id: 'em-cuoc-song',
+    title: 'Em & Cuộc Sống',
+    subtitle: 'Cảm xúc · An toàn · Kỹ năng sống · Nghệ thuật',
+    icon: '💜',
+    gradient: 'from-purple-500 to-violet-500',
+    border: 'border-purple-300',
+    variant: 'subject-life',
+    locked: false,
+    subjectType: 'cuoc-song',
+  },
+];
+
+const SHORTCUT_CARDS: readonly ShortcutCard[] = [
+  {
+    screen: 'games',
+    label: 'Trò Chơi',
+    icon: '🎮',
+    desc: `${GAMES_CATALOG.length} trò vui`,
+    gradient: 'from-purple-500 to-indigo-600',
+    border: 'border-purple-300',
+  },
+  {
+    screen: 'reading_fluency',
+    label: 'Luyện Đọc',
+    icon: '📖',
+    desc: 'Đọc trôi chảy',
+    gradient: 'from-sky-500 to-cyan-600',
+    border: 'border-sky-300',
+  },
+  {
+    screen: 'english_ioe',
+    label: 'Tiếng Anh IOE',
+    icon: '🇬🇧',
+    desc: 'Luyện IOE lớp 1',
+    gradient: 'from-emerald-500 to-teal-600',
+    border: 'border-emerald-300',
+  },
+  {
+    screen: 'chess',
+    label: 'Cờ Vua 3D',
+    icon: '♟',
+    desc: 'Đấu trí 3D siêu đẹp',
+    gradient: 'from-amber-600 to-yellow-600',
+    border: 'border-amber-300',
+  },
+  {
+    screen: 'cotuong',
+    label: 'Cờ Tướng',
+    icon: '🪖',
+    desc: 'Vương quốc cờ tướng',
+    gradient: 'from-red-500 to-orange-600',
+    border: 'border-red-300',
+  },
+];
+
+/**
+ * T53 — thẻ môn từng vẽ vòng tròn \"50%\" cứng cho cả bốn môn, kể cả hồ sơ trắng.
+ * `completedLessons` chỉ chứa id bài, nên đếm theo tiền tố id của từng môn; nhờ vậy
+ * không phải nạp `src/data/curriculum.ts` (nặng, cố ý ngoài entry từ T39) vào màn Home.
+ */
+const LESSON_ID_PREFIX: Record<SubjectType, string> = {
+  'tieng-viet': 'vn-',
+  toan: 'math-',
+  english: 'eng-',
+  'cuoc-song': 'life-',
+};
+
+export const HomeScreen: React.FC<HomeScreenProps> = ({
+  profile,
+  onNavigate,
+  onSelectSubject,
+  onOpenGames,
+  onOpenDailyReview,
+  onOpenWeeklyChallenge,
+  onProfileUpdate,
+  onOpenParent,
+  onOpenLesson,
+}) => {
+  const [quests, setQuests] = useState<DailyQuest[]>(StorageService.getDailyQuests());
+  const [reading, setReading] = useState<ReadingProfile>(() => StorageService.getReadingProfile());
+  const [chestClaimed, setChestClaimed] = useState(
+    profile.dailyChestClaimedDate === localDateKey()
+  );
+  const [nextBestAction, setNextBestAction] = useState<DecisionRecommendation | null>(null);
+  const [decisionLoading, setDecisionLoading] = useState(true);
+
+  const completedQuestsCount = quests.filter((q) => q.completed).length;
+  const canClaimChest = completedQuestsCount >= 3 && !chestClaimed;
+
+  const lessonsDoneBySubject = useMemo(() => {
+    const counts: Record<SubjectType, number> = {
+      'tieng-viet': 0,
+      toan: 0,
+      english: 0,
+      'cuoc-song': 0,
+    };
+    for (const lessonId of profile.completedLessons ?? []) {
+      for (const subject of Object.keys(LESSON_ID_PREFIX) as SubjectType[]) {
+        if (lessonId.startsWith(LESSON_ID_PREFIX[subject])) {
+          counts[subject] += 1;
+          break;
+        }
+      }
+    }
+    return counts;
+  }, [profile.completedLessons]);
+
+  const handleClaimChest = useCallback(() => {
+    if (!canClaimChest) return;
+    // T41 — claimDailyChest từ chối khi ba mẹ tắt quỹ thưởng; nếu chỉ `return`
+    // thì bé bấm rương mà không có phản hồi nào (app có vẻ bị lì).
+    if (!StorageService.areRewardsEnabled()) {
+      sound.playWrong();
+      sound.speak('Ba mẹ đang tắt phần thưởng nên rương hôm nay chưa mở được. Bé nhờ ba mẹ bật lại trong mục Ba Mẹ nhé!');
+      return;
+    }
+    // T18A — rương ngày qua storage chung (+10 sao, +50 XP, đếm rương + quest vui).
+    if (!StorageService.claimDailyChest()) return;
+    sound.playLevelUp();
+    // T52 — confetti chỉ chạy khi bé **mở được** rương (một lần mỗi ngày); nhập tĩnh
+    // nó vào entry bắt mọi lượt tải trang trả tiền cho hiệu ứng hiếm dùng.
+    void import('../../services/confetti').then((m) => m.fireCelebrationConfetti());
+    setChestClaimed(true);
+    onProfileUpdate();
+    sound.speak('Bé đã mở rương kho báu thành công! Nhận thêm mười sao vàng!');
+  }, [canClaimChest, onProfileUpdate]);
+
+  const playWelcomeVoice = useCallback(() => {
+    sound.speak(`Xin chào ${profile.name}! Hôm nay mình tìm kho báu nào nào?`);
+  }, [profile.name]);
+
+  // Load next best action from DecisionEngine (async, non-blocking)
+  useEffect(() => {
+    let live = true;
+    import('../../services/decisionEngine')
+      .then((m) => {
+        if (!live) return;
+        try {
+          const decision = m.DecisionEngine.decide();
+          if (decision.nextBestAction) {
+            setNextBestAction(decision.nextBestAction);
+          }
+        } catch {
+          // Silently fail — the card is a recommendation, never a blocker
+        } finally {
+          setDecisionLoading(false);
+        }
+      })
+      .catch(() => {
+        if (live) setDecisionLoading(false);
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const handleNextBestAction = useCallback(() => {
+    if (!nextBestAction?.launchRoute) return;
+    sound.playClick();
+    if (nextBestAction.type === 'LEARN' && nextBestAction.lessonId) {
+      onOpenLesson(nextBestAction.subject, nextBestAction.lessonId);
+      return;
+    }
+    if (nextBestAction.launchRoute === 'subject') {
+      onSelectSubject(nextBestAction.subject);
+      return;
+    }
+    onNavigate(nextBestAction.launchRoute);
+  }, [nextBestAction, onNavigate, onOpenLesson, onSelectSubject]);
+
+  const handleShortcutClick = useCallback((screen: ActiveScreen) => {
+    sound.playClick();
+    onNavigate(screen);
+  }, [onNavigate]);
+
+  const handleSubjectClick = useCallback((subject: SubjectCard) => {
+    if (subject.locked || !subject.subjectType) {
+      sound.speak('Môn học này sắp mở. Bé hãy kiên nhẫn chờ nhé!');
+      return;
+    }
+    sound.playClick();
+    onSelectSubject(subject.subjectType);
+  }, [onSelectSubject]);
+
+  return (
+    <div className=\"w-full max-w-5xl mx-auto px-3 sm:px-4 py-3 md:py-5 space-y-3.5 sm:space-y-4 overflow-x-clip\">
+      {/* 1. HERO: Gấu Bút Chì (wave) + greeting bubble + 3 pills */}
+      {/* T52 — bỏ `animate-gradient`: nền gradient chạy vô hạn trên một khối lớn là
+          animation đắt nhất trang, trong khi bé không cần nó để biết đây là màn chính. */}
+      <div className=\"relative kb-hero-pattern bg-gradient-to-r from-amber-700 via-orange-700 to-rose-700 rounded-3xl p-3.5 sm:p-4 md:p-5 shadow-xl text-white overflow-hidden border-4 border-amber-200\">
+        {/* Background decorative shapes */}
+        <div className=\"absolute top-2 right-4 text-6xl opacity-20 pointer-events-none\">✨</div>
+        <div className=\"absolute -bottom-4 -left-4 text-8xl opacity-15 pointer-events-none\">⭐</div>
+
+        {/* Side by side only from lg: at md (768px) the \"Học tiếp\" button cannot
+            shrink (~360px), which left ~170px for the greeting (one word per line). */}
+        <div className=\"relative z-10 flex flex-col lg:flex-row items-center justify-between gap-5\">
+          {/* Left: Mascot + Greeting + Stats */}
+          {/* min-w-0 flex-1: next to the \"Học tiếp\" button (lg+) this block takes
+              the remaining width instead of being squeezed. */}
+          <div className=\"min-w-0 flex-1 flex flex-col min-[340px]:flex-row items-center gap-4 md:gap-5 text-center min-[340px]:text-left md:text-left\">
+            {/* Mascot Avatar with wave pose */}
+            <div className=\"relative shrink-0\">
+              <AvatarPreview
+                profile={profile}
+                frameClassName=\"w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white/95 rounded-3xl shadow-xl text-5xl sm:text-6xl md:text-7xl border-4 border-amber-200 animate-float\"
+              />
+              {/* Wave animation indicator */}
+              <span className=\"absolute -bottom-1 -right-1 w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs animate-bounce\" aria-hidden=\"true\">👋</span>
+              <span className=\"absolute -top-1 -left-1 px-2 py-0.5 bg-amber-900 text-amber-100 text-[9px] font-black rounded-full shadow-sm\">
+                Lớp 1
+              </span>
+            </div>
+
+            {/* min-w-0: the greeting column may shrink next to the mascot; the
+                speaker is a fixed 44px icon button (size \"md\" carried 24px side
+                padding and squeezed \"Chào Bé Minh!\" to one word per line). */}
+            <div className=\"min-w-0\">
+              <div className=\"flex items-center gap-2 justify-center md:justify-start\">
+                <h1 className=\"min-w-0 text-2xl md:text-3xl leading-tight font-black font-display tracking-tight text-white drop-shadow-sm [overflow-wrap:anywhere]\">
+                  Chào {profile.name}! 👋
+                </h1>
+                <KidButton
+                  variant=\"secondary\"
+                  size=\"icon\"
+                  className=\"shrink-0\"
+                  onClick={playWelcomeVoice}
+                  aria-label=\"Nghe lời chào\"
+                  leftIcon=\"🔊\"
+                />
+              </div>
+
+              <p className=\"text-amber-50 text-xs md:text-sm font-bold mt-1 max-w-md\">
+                Hôm nay mình tìm kho báu nào nào?
+              </p>
+
+              {/* Stats pills */}
+              <div className=\"flex flex-wrap items-center gap-2 mt-3 justify-center md:justify-start\">
+                <Pill variant=\"star\" size=\"sm\" icon=\"⭐\">
+                  <span className=\"tabular-nums\">{profile.stars}</span> Sao
+                </Pill>
+                <Pill variant=\"streak\" size=\"sm\" icon=\"🔥\">
+                  Chuỗi <span className=\"tabular-nums\">{profile.streak}</span> ngày
+                </Pill>
+                <Pill variant=\"ticket\" size=\"sm\" icon=\"🎟️\">
+                  <span className=\"tabular-nums\">{profile.tickets}</span> Vé
+                </Pill>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Giant \"Học tiếp\" button */}
+          <div className=\"w-full lg:w-auto shrink-0 flex flex-col items-stretch lg:items-end gap-2\">
+            <KidButton
+              variant=\"primary\"
+              size=\"xl\"
+              fullWidth={false}
+              className=\"min-h-[56px] md:min-h-[60px] min-w-[200px] text-base md:text-lg font-black gap-2 animate-pulse-subtle\"
+              onClick={handleNextBestAction}
+              disabled={decisionLoading || !nextBestAction?.launchRoute}
+              rightIcon={<ArrowRight className=\"w-6 h-6\" />}
+              aria-label={nextBestAction ? `Bắt đầu: ${nextBestAction.title}` : 'Đang tải gợi ý...'}
+            >
+              {decisionLoading ? (
+                <span className=\"flex items-center gap-2\">
+                  <span className=\"w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin\" aria-hidden=\"true\" />
+                  Đang tải...
+                </span>
+              ) : nextBestAction ? (
+                <>
+                  ▶ {nextBestAction.title}
+                </>
+              ) : (
+                'Học tiếp'
+              )}
+            </KidButton>
+            {/* \"Vì sao?\" link to Parent Dashboard */}
+            {nextBestAction && (
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  onOpenParent('insights');
+                }}
+                // T20A / B-07 — 00_RULES §7: every tappable target ≥ 44px.
+                // This text link was 16px tall (min-w/44 + py-1 keeps the
+                // inline look while giving the finger a real target).
+                className=\"min-h-[44px] px-1 py-2 inline-flex items-center text-xs md:text-sm font-bold text-amber-100 hover:text-white underline underline-offset-2\"
+                aria-label=\"Xem lý do gợi ý này ở Bảng Phụ Huynh\"
+              >
+                Vì sao gợi ý này?
+              </button>
+            )}
+            {decisionLoading && (
+              <p className=\"text-amber-50 text-[11px] font-medium text-center lg:text-right\">
+                Đang tìm hoạt động tốt nhất cho bé...
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Cloud Sync & Google Account Banner (prominent on Home Screen) */}
+      <CloudSyncBanner profile={profile} />
+
+      {/* 2. 4 SUBJECT CARDS with lesson counts */}
+      <div>
+        <SectionTitle icon=\"🎯\" size=\"lg\">
+          Hôm Nay Bé Học Gì?
+        </SectionTitle>
+
+        {/* Mobile: 2 equal columns (grid-cols-2 = repeat(2, minmax(0, 1fr))).
+            Cards use KidButton size \"tile\": explicit 12px padding on phones
+            (size \"lg\" forced 32px side padding, leaving ~90px for content at
+            375px) and content stretched to the card width instead of centred,
+            so nothing can spill over both edges into the neighbouring card. */}
+        <div className=\"grid grid-cols-2 gap-3 md:gap-4\">
+          {SUBJECT_CARDS.map((subject) => {
+            const done = subject.subjectType ? lessonsDoneBySubject[subject.subjectType] : 0;
+            return (
+            <KidButton
+              key={subject.id}
+              variant={subject.variant}
+              size=\"tile\"
+              fullWidth
+              className={`min-h-[120px] md:min-h-[132px] text-left ${
+                subject.locked ? 'opacity-60 cursor-not-allowed' : ''
+              }`}
+              onClick={() => handleSubjectClick(subject)}
+              disabled={subject.locked}
+              aria-disabled={subject.locked}
+            >
+              {/* Label + icon share the first row; the title gets the full card
+                  width below them, so \"Tiếng Việt\" / \"Toán Học\" stay on one line
+                  on a 360px phone instead of being squeezed next to the icon.
+                  T20A / B-08 — `min-w-0` lets the label shrink below its
+                  longest word (it used to push the cards wider than 360px). */}
+              <div className=\"flex items-start justify-between gap-2\">
+                <span className=\"min-w-0 text-[10px] sm:text-[11px] uppercase font-black tracking-wide sm:tracking-widest text-white/80\">
+                  Môn Học Lớp 1
+                </span>
+                <span className=\"text-3xl sm:text-4xl md:text-5xl leading-none group-hover:scale-110 transition-transform shrink-0\" aria-hidden=\"true\">{subject.icon}</span>
+              </div>
+              <h3 className=\"text-lg sm:text-xl leading-tight font-black font-display mt-1 [overflow-wrap:anywhere]\">
+                {subject.title}
+                {subject.locked && (
+                  <span className=\"inline-block ml-1 text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full\">🔒 Sắp mở</span>
+                )}
+              </h3>
+
+              <div className=\"mt-auto pt-2\">
+                <p className=\"text-xs leading-snug text-white/90 font-bold mb-2 line-clamp-3 sm:line-clamp-none [overflow-wrap:anywhere]\">{subject.subtitle}</p>
+                <div className=\"flex items-center gap-2\" aria-hidden=\"true\">
+                  <div className=\"relative w-11 h-11 flex-shrink-0\">
+                    <svg className=\"w-11 h-11 transform -rotate-90\" viewBox=\"0 0 28 28\">
+                      <circle cx=\"14\" cy=\"14\" r=\"12\" fill=\"none\" stroke=\"white\" strokeWidth=\"2.5\" strokeDasharray=\"75.4\" strokeDashoffset=\"37.7\" strokeLinecap=\"round\" />
+                    </svg>
+                    <span className=\"absolute inset-0 flex items-center justify-center text-[10px] font-black text-white\">50%</span>
+                  </div>
+                  <div className=\"flex-1 min-w-0\">
+                    <div className=\"h-2 bg-white/20 rounded-full overflow-hidden\">
+                      <div className=\"h-full bg-white rounded-full\" style={{ width: '50%' }} />
+                    </div>
+                    <p className=\"text-[10px] leading-tight text-white/80 font-bold mt-1\">Tiến độ: 50%</p>
+                  </div>
+                </div>
+              </div>
+            </KidButton>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 3. \"NHIỆM VỤ HÔM NAY\" - 3 round quest icons + treasure chest */}
+      <KidCard subjectBorder=\"none\" className=\"space-y-2.5\">
+        <div className=\"flex flex-col sm:flex-row sm:items-center justify-between gap-3\">
+          <div>
+            <SectionTitle icon=\"🎯\" size=\"md\" className=\"mb-0\">
+              Nhiệm Vụ Hôm Nay
+            </SectionTitle>
+            <p className=\"text-xs text-slate-500 font-bold\">
+              Hoàn thành 3 nhiệm vụ để mở Rương Kho Báu (+10 Sao, +50 XP)!
+            </p>
+          </div>
+
+          {/* Treasure chest button */}
+          <KidButton
+            variant={chestClaimed ? 'secondary' : canClaimChest ? 'primary' : 'secondary'}
+            size=\"md\"
+            disabled={!canClaimChest && chestClaimed}
+            className={`min-h-[44px] ${chestClaimed ? '' : canClaimChest ? 'animate-bounce' : 'opacity-60 cursor-not-allowed'}`}
+            leftIcon={<Gift className=\"w-5 h-5\" />}
+            onClick={handleClaimChest}
+          >
+            {chestClaimed
+              ? 'Đã Nhận Rương'
+              : canClaimChest
+              ? 'Mở Rương Kho Báu!'
+              : `Mở Rương (${completedQuestsCount}/3)`}
+          </KidButton>
+        </div>
+
+        {/* Quest icons row - exactly 3 round icons + chest. A 4-column grid of
+            square cells (max 96px): four fixed 80px tiles + gaps (356px) were
+            wider than the card on a 360px phone and spilled out on both sides. */}
+        <div className=\"grid grid-cols-4 gap-2 sm:gap-3 md:gap-4 max-w-md mx-auto\">
+          {quests.slice(0, 3).map((q, idx) => (
+            <button
+              key={q.id}
+              onClick={() => {}}
+              disabled={q.completed}
+              className={`relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all ${
+                q.completed
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-950 cursor-default'
+                  : 'bg-amber-50 border-amber-200 text-slate-700 hover:border-amber-400 hover:shadow-md cursor-pointer'
+              }`}
+              aria-label={q.completed ? `Nhiệm vụ ${idx + 1}: ${q.title} - đã hoàn thành` : `Nhiệm vụ ${idx + 1}: ${q.title}`}
+            >
+              <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">
+                {q.completed ? '✅' : idx === 0 ? '📚' : idx === 1 ? '🎮' : '📖'}
+              </span>
+              {/* T52 — hiện **đủ** tên việc trong 2 dòng thay vì cắt ở 10 ký tự + \"…\":
+                  khối \"Danh Sách Nhiệm Vụ\" lặp lại bên dưới đã bỏ, nên đây là chỗ duy nhất
+                  bé đọc được tên việc. */}
+              <span className=\"max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 line-clamp-2 [overflow-wrap:anywhere]\">
+                {q.title}
+              </span>
+              <Pill variant=\"star\" size=\"xs\" className=\"absolute -top-1 -right-1\">
+                <span className=\"text-[9px]\">+{q.rewardStars}</span>
+              </Pill>
+            </button>
+          ))}
+          {/* Treasure chest as 4th item when all 3 done or always show */}
+          <button
+            onClick={handleClaimChest}
+            disabled={!canClaimChest || chestClaimed}
+            className={`relative w-full max-w-24 aspect-square mx-auto min-w-0 flex flex-col items-center justify-center gap-1 rounded-2xl border-3 transition-all ${
+              chestClaimed
+                ? 'bg-amber-50 border-amber-200 text-slate-500 cursor-default'
+                : canClaimChest
+                ? 'bg-gradient-to-br from-amber-400 to-amber-600 border-amber-300 text-white animate-bounce cursor-pointer shadow-lg hover:shadow-xl'
+                : 'bg-amber-50 border-amber-200 text-slate-400 cursor-not-allowed opacity-60'
+            }`}
+            aria-label={chestClaimed ? 'Rương kho báu đã nhận hôm nay' : canClaimChest ? 'Mở rương kho báu nhận thưởng' : `Rương kho báu - cần ${3 - completedQuestsCount} nhiệm vụ nữa`}
+          >
+            <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">
+              {chestClaimed ? '🎁' : canClaimChest ? '🧨' : '🔒'}
+            </span>
+            <span className=\"max-w-full text-[10px] md:text-[11px] font-black text-center leading-tight px-1 [overflow-wrap:anywhere]\">
+              {chestClaimed ? 'Đã mở' : 'Rương'}
+            </span>
+            {!chestClaimed && canClaimChest && (
+              <span className=\"absolute -top-1 -right-1 w-5 h-5 bg-rose-500 rounded-full flex items-center justify-center text-white text-[9px] font-black animate-pulse\">
+                +
+              </span>
+            )}
+          </button>
+        </div>
+      </KidCard>
+
+      {/* 4. HORIZONTAL 3 SHORTCUTS: Trò chơi · Luyện đọc · Thử thách tuần */}
+      <div>
+        <SectionTitle icon=\"⚡\" size=\"md\">
+          Lối Tắt Nhanh
+        </SectionTitle>
+        <div className=\"grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-2.5 mt-2\">
+          {SHORTCUT_CARDS.map((shortcut) => (
+            <KidButton
+              key={shortcut.screen}
+              variant=\"primary\"
+              size=\"tile\"
+              fullWidth
+              className={`min-h-[88px] text-center bg-gradient-to-br ${shortcut.gradient} ${shortcut.border} border-3 hover:scale-[1.02] active:scale-95 text-white`}
+              onClick={() => handleShortcutClick(shortcut.screen)}
+            >
+              <div className=\"flex-1 flex flex-col items-center justify-center gap-1 min-w-0\">
+                <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">{shortcut.icon}</span>
+                <h4 className=\"font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]\">{shortcut.label}</h4>
+                <p className=\"text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]\">{shortcut.desc}</p>
+              </div>
+            </KidButton>
+          ))}
+        </div>
+      </div>
+
+      {/* 5. HỆ THỐNG ĐỘNG LỨC: Album · Máy Gắp · Lịch Chuỗi */}
+      <div>
+        <SectionTitle icon=\"🎁\" size=\"md\">
+          Hệ Thống Động Lực
+        </SectionTitle>
+        <div className=\"grid grid-cols-3 gap-2 mt-2\">
+          <KidButton
+            variant=\"primary\"
+            size=\"tile\"
+            fullWidth
+            className=\"min-h-[88px] text-center bg-gradient-to-br from-amber-500 to-orange-500 border-3 border-amber-300 hover:scale-[1.02] active:scale-95 text-white\"
+            onClick={() => onNavigate('sticker_album')}
+          >
+            <div className=\"flex-1 flex flex-col items-center justify-center gap-1 min-w-0\">
+              <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">📚</span>
+              <h4 className=\"font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]\">Bộ Sưu Tập Sticker</h4>
+              <p className=\"text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]\">Sưu tầm 60 sticker</p>
+            </div>
+          </KidButton>
+          <KidButton
+            variant=\"primary\"
+            size=\"tile\"
+            fullWidth
+            className=\"min-h-[88px] text-center bg-gradient-to-br from-rose-500 to-pink-500 border-3 border-rose-300 hover:scale-[1.02] active:scale-95 text-white\"
+            onClick={() => onNavigate('gacha_machine')}
+          >
+            <div className=\"flex-1 flex flex-col items-center justify-center gap-1 min-w-0\">
+              <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">🎰</span>
+              <h4 className=\"font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]\">Máy Gắp</h4>
+              <p className=\"text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]\">Dùng vé quay sticker</p>
+            </div>
+          </KidButton>
+          <KidButton
+            variant=\"primary\"
+            size=\"tile\"
+            fullWidth
+            className=\"min-h-[88px] text-center bg-gradient-to-br from-emerald-500 to-teal-500 border-3 border-emerald-300 hover:scale-[1.02] active:scale-95 text-white\"
+            onClick={() => onNavigate('streak_calendar')}
+          >
+            <div className=\"flex-1 flex flex-col items-center justify-center gap-1 min-w-0\">
+              <span className=\"text-2xl min-[400px]:text-3xl md:text-4xl leading-none\" aria-hidden=\"true\">📅</span>
+              <h4 className=\"font-black text-sm md:text-base leading-tight font-display [overflow-wrap:anywhere]\">Lịch Chuỗi</h4>
+              <p className=\"text-[11px] leading-snug font-semibold opacity-90 [overflow-wrap:anywhere]\">Dấu chân Gấu Bút Chì</p>
+            </div>
+          </KidButton>
+        </div>
+      </div>
+
+      {/* 6. NEXT BEST ACTION CARD (from DecisionEngine) - compact version for Home */}
+      <Suspense fallback={null}>
+        <NextBestActionCard onNavigate={onNavigate} />
+      </Suspense>
+    </div>
+  );
+};"
+
+ ❯ tests/t53-home-subject-progress-honest.test.ts:109:25
+    107|
+    108|   it('mã nguồn không còn vòng tiến độ giả', () => {
+    109|     expect(homeSrc).not.toMatch(/Tiến độ: 50%/);
+       |                         ^
+    110|     expect(homeSrc).not.toMatch(/width:\s*'50%'/);
+    111|     expect(homeSrc).not.toMatch(/strokeDashoffset="37\.7"/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  17:56:34
+   Duration  889ms (import 45%, transform 41%, tests 12%, worker 2%)
+

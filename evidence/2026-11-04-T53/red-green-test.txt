@@ -1,0 +1,10 @@
+
+ RUN  v5.0.5 D:/trithuc/kho-bau-tri-thuc
+
+ ✓ tests/t53-home-subject-progress-honest.test.ts (4 tests) 89ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  17:56:13
+   Duration  1.08s (import 42%, transform 41%, tests 15%, worker 2%)
+
