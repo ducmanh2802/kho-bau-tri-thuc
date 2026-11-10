@@ -113,7 +113,7 @@ export const LessonPlayerModal: React.FC<LessonPlayerModalProps> = ({
   const [lastSpoken, setLastSpoken] = useState<string | null>(null);
   const [praise, setPraise] = useState<PraiseResult | null>(null);
   const praiseAttemptRef = useRef(0);
-  const [difficultyMode, setDifficultyMode] = useState<'standard' | 'challenge'>('standard');
+  const [difficultyMode, setDifficultyMode] = useState<'standard' | 'challenge' | 'expert'>('challenge');
   // T27 — combo, đồng hồ, danh sách câu sai và chế độ ôn lại câu sai.
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
@@ -135,14 +135,25 @@ export const LessonPlayerModal: React.FC<LessonPlayerModalProps> = ({
 
   const activeQuestions = React.useMemo(() => {
     const base = (() => {
+      if (difficultyMode === 'expert') {
+        // Chế độ Chuyên sâu: Ưu tiên tối đa câu độ khó 3 (bài toán đố, tư duy nâng cao)
+        const hardOnly = lesson.questions.filter((q) => q.difficulty === 3);
+        if (hardOnly.length >= 3) return hardOnly;
+        const level2Plus = lesson.questions.filter((q) => q.difficulty >= 2);
+        if (level2Plus.length >= 3) return level2Plus;
+        return [...lesson.questions].sort((a, b) => b.difficulty - a.difficulty);
+      }
       if (difficultyMode === 'challenge') {
+        // Chế độ Nâng cao (mặc định): Bỏ level 1 cơ bản, chỉ lấy câu hỏi độ khó 2 và 3
         const hardOnly = lesson.questions.filter((q) => q.difficulty >= 2);
         if (hardOnly.length >= 3) {
           return hardOnly;
         }
         return [...lesson.questions].sort((a, b) => b.difficulty - a.difficulty);
       }
-      return lesson.questions;
+      // Khi chọn standard: vẫn ưu tiên lọc bỏ câu cơ bản nếu bài có đủ câu khó
+      const hardOnly = lesson.questions.filter((q) => q.difficulty >= 2);
+      return hardOnly.length >= 3 ? hardOnly : lesson.questions;
     })();
     if (!reviewIds) return base;
     const reviewSet = new Set(reviewIds);
@@ -323,7 +334,12 @@ export const LessonPlayerModal: React.FC<LessonPlayerModalProps> = ({
       finishedRef.current = true;
       sound.playLevelUp();
       fireCelebrationConfetti();
-      const earnedXp = difficultyMode === 'challenge' ? Math.round(lesson.xpReward * 1.5) : lesson.xpReward;
+      const earnedXp =
+        difficultyMode === 'expert'
+          ? Math.round(lesson.xpReward * 2)
+          : difficultyMode === 'challenge'
+          ? Math.round(lesson.xpReward * 1.5)
+          : lesson.xpReward;
       setLastAward(StorageService.completeLesson(lesson.id, lesson.subject, earnedXp, lesson.starReward));
     }
   };
@@ -337,7 +353,7 @@ export const LessonPlayerModal: React.FC<LessonPlayerModalProps> = ({
   // Bắt đầu một lượt mới (đổi độ khó, học lại, ôn câu sai): xoá sạch trạng thái
   // của lượt trước. Nếu chỉ reset điểm như trước, bấm đổi độ khó ở màn kết quả
   // sẽ để bé kẹt ở màn kết quả với "0 / N" và 1 sao (T27).
-  const startRun = (mode: 'standard' | 'challenge', review: string[] | null = null) => {
+  const startRun = (mode: 'standard' | 'challenge' | 'expert' = difficultyMode, review: string[] | null = null) => {
     setDifficultyMode(mode);
     setReviewIds(review);
     setCurrentIdx(0);
@@ -635,39 +651,47 @@ return (
           </div>
 
           <div className="mt-1.5 flex items-center justify-between gap-2">
-            {/* Difficulty Toggle Pill */}
-            <div className="flex items-center bg-amber-200/70 p-0.5 rounded-full border border-amber-300 text-[11px] font-black">
-              <button
-                type="button"
-                onClick={() => {
-                  sound.playClick();
-                  startRun('standard');
-                }}
-                title="Chế độ học bình thường"
-                className={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${
-                  difficultyMode === 'standard'
-                    ? 'bg-white text-amber-950 shadow-2xs font-extrabold'
-                    : 'text-amber-800 hover:text-amber-950'
-                }`}
-              >
-                Chuẩn
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  sound.playClick();
-                  startRun('challenge');
-                }}
-                title="Chế độ Thử thách Nâng cao: Đề khó hơn và tặng thêm +50% XP"
-                className={`px-2 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-0.5 ${
-                  difficultyMode === 'challenge'
-                    ? 'bg-rose-500 text-white shadow-2xs font-extrabold'
-                    : 'text-amber-800 hover:text-amber-950'
-                }`}
-              >
-                <span>Nâng cao</span>
-                <span className="text-[10px]">🔥</span>
-              </button>
+            {/* Difficulty Toggle Pill: Bỏ mức cơ bản, nâng độ khó lên Nâng cao & Chuyên sâu */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="flex items-center bg-amber-200/70 p-0.5 rounded-full border border-amber-300 text-[11px] font-black">
+                {/* Fallback nội bộ để tương thích: startRun('standard') */}
+                <span className="sr-only" onClick={() => startRun('standard')}>Chuẩn</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    startRun('challenge');
+                  }}
+                  title="Chế độ Thử thách Nâng cao: Bỏ câu cơ bản, đề khó hơn và tặng thêm +50% XP"
+                  className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-0.5 ${
+                    difficultyMode === 'challenge'
+                      ? 'bg-rose-500 text-white shadow-2xs font-extrabold'
+                      : 'text-amber-800 hover:text-amber-950'
+                  }`}
+                >
+                  <span>Nâng cao</span>
+                  <span className="text-[10px]">🔥</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    startRun('expert');
+                  }}
+                  title="Chế độ Chuyên sâu: Đề khó nhất và nhân đôi +100% XP"
+                  className={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer flex items-center gap-0.5 ${
+                    difficultyMode === 'expert'
+                      ? 'bg-purple-600 text-white shadow-2xs font-extrabold'
+                      : 'text-amber-800 hover:text-amber-950'
+                  }`}
+                >
+                  <span>Chuyên sâu</span>
+                  <span className="text-[10px]">⚡</span>
+                </button>
+              </div>
+              <span className="hidden sm:inline-block text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-full">
+                Đã bỏ mức cơ bản
+              </span>
             </div>
 
             <div className="flex items-center gap-1 px-2.5 py-1 bg-amber-200/80 rounded-full text-[11px] font-black text-amber-900">
@@ -725,6 +749,18 @@ return (
 
               {/* T11C/T11B — hình trực quan (TenFrame/NumberLine/PlaceValueBlocks/Ruler/ClockFace). Single render via dispatcher (avoids double SVG); QuestionVisualForQuestion delegates to QuestionVisual. */}
               <QuestionVisualForQuestion question={question} />
+
+              <div className="mb-2">
+                <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-flex items-center gap-1 shadow-2xs ${
+                  question.difficulty === 3
+                    ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                    : question.difficulty === 2
+                    ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                    : 'bg-amber-100 text-amber-800 border border-amber-200'
+                }`}>
+                  {question.difficulty === 3 ? '⚡ Thử thách Chuyên sâu' : question.difficulty === 2 ? '🔥 Nâng cao Vận dụng' : '💡 Tư duy'}
+                </span>
+              </div>
 
               <div className="flex items-center justify-center gap-2 mb-1">
                 <h4 className="text-lg md:text-xl font-black text-slate-800 font-display">
@@ -838,6 +874,11 @@ return (
               {activeQuestions.length} {reviewIds ? 'câu ôn tập' : 'câu hỏi của bài học'}:
               <br />
               <span className="text-slate-900 font-bold [overflow-wrap:anywhere]">{lesson.title}</span>
+              {difficultyMode === 'expert' && !reviewIds && (
+                <span className="block mt-1 text-xs font-black text-purple-700 bg-purple-50 border border-purple-200 py-1 px-3 rounded-full inline-block">
+                  ⚡ Đỉnh Cao Chuyên Sâu Đã Chinh Phục! (+100% XP)
+                </span>
+              )}
               {difficultyMode === 'challenge' && !reviewIds && (
                 <span className="block mt-1 text-xs font-black text-rose-600 bg-rose-50 border border-rose-200 py-1 px-3 rounded-full inline-block">
                   🔥 Thử Thách Nâng Cao Đã Chinh Phục!
@@ -931,6 +972,9 @@ return (
                   <span>+{lastAward.xpAwarded} XP</span>
                   {lastAward.firstTime && difficultyMode === 'challenge' && (
                     <span className="text-xs bg-rose-200 text-rose-800 px-1.5 py-0.5 rounded-md font-extrabold">+50% Thử thách</span>
+                  )}
+                  {lastAward.firstTime && difficultyMode === 'expert' && (
+                    <span className="text-xs bg-purple-200 text-purple-800 px-1.5 py-0.5 rounded-md font-extrabold">+100% Chuyên sâu</span>
                   )}
                 </div>
               )}

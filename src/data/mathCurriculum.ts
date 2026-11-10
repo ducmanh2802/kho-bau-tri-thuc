@@ -11,6 +11,7 @@ import {
 } from './math/numbers-11-100';
 import { MATH_LES18, MATH_LES19, MATH_LES20, TOPIC_CONG_TRU_100 } from './math/add-sub-100';
 import { MATH_LES10_EXTRA, MATH_LES21 } from './math/word-problems-100';
+import { TOPIC_TU_DUY } from './math/logic';
 
 const MATH_TOPICS_BASE: Topic[] = [
   {
@@ -2324,7 +2325,7 @@ const T11C_TOPIC_EXTRA_LESSONS: Record<string, Lesson[]> = {
   'math-loi-van': [MATH_LES21],
 };
 
-const T11C_NEW_TOPICS: Topic[] = [TOPIC_SO_21_100, TOPIC_CONG_TRU_100];
+const T11C_NEW_TOPICS: Topic[] = [TOPIC_SO_21_100, TOPIC_CONG_TRU_100, TOPIC_TU_DUY];
 
 function applyT11CUnits(base: Topic[]): Topic[] {
   return [

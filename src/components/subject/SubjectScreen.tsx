@@ -589,6 +589,14 @@ export const SubjectScreen: React.FC<SubjectScreenProps> = ({
             <div className="flex items-center gap-3 mb-4 p-3 bg-amber-50 rounded-2xl border border-amber-200">
               <span className="text-2xl">{subjectInfo.mascotEmoji}</span>
               <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300">
+                    Độ khó: Nâng cao 🔥
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-500">
+                    Đã bỏ mức cơ bản
+                  </span>
+                </div>
                 <p className="text-xs font-bold text-amber-800">Số câu hỏi: <span className="font-black text-amber-600">{showLessonPopup.questions.length}</span></p>
                 <p className="text-xs font-bold text-amber-800">Thưởng: <span className="font-black text-amber-600">+{showLessonPopup.starReward} Sao, +{showLessonPopup.xpReward} XP</span></p>
               </div>

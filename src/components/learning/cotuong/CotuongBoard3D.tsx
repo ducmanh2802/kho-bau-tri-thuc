@@ -1,5 +1,6 @@
 import React from 'react';
 import * as E from './cotuongEngine';
+import { CotuongCartoonPieceSvg } from './CotuongCartoonPieceSvg';
 
 /**
  * CSS-3D cờ tướng board. No WebGL: a single perspective plane with layered
@@ -48,7 +49,7 @@ const PIECE_NAME: Record<E.PieceType, string> = {
   p: 'Tốt',
 };
 
-export type CotuongLabelMode = 'dual' | 'viet' | 'han';
+export type CotuongLabelMode = 'cartoon' | 'dual' | 'viet' | 'han';
 export type CotuongTheme = 'rosewood' | 'ebony' | 'bamboo';
 
 export const PIECE_VIET_NAME: Record<string, string> = {
@@ -190,7 +191,7 @@ export const CotuongBoard3D: React.FC<Props> = ({
   flat,
   disabled,
   gameKey,
-  labelMode = 'dual',
+  labelMode = 'cartoon',
   boardTheme = 'rosewood',
   hintMove,
   onSquareClick,
@@ -346,7 +347,11 @@ export const CotuongBoard3D: React.FC<Props> = ({
                 <span className="ct-piece__shadow" />
                 <span className="ct-piece__base" />
                 <span className="ct-piece__face">
-                  {labelMode === 'viet' ? (
+                  {labelMode === 'cartoon' ? (
+                    <div className="w-full h-full flex items-center justify-center p-[2%] select-none" style={{ transform: 'translateZ(0.8px)' }}>
+                      <CotuongCartoonPieceSvg type={piece.type} color={piece.color} />
+                    </div>
+                  ) : labelMode === 'viet' ? (
                     <span className="ct-piece__viet-only">
                       {PIECE_VIET_NAME[`${piece.color}-${piece.type}`]}
                     </span>

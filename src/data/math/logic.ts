@@ -1,4 +1,4 @@
-import type { Lesson } from '../../types';
+import type { Lesson, Topic } from '../../types';
 import { mathLesson, mathQ } from './factory';
 
 /**
@@ -481,3 +481,15 @@ export const LESSONS: Lesson[] = [
     3
   ),
 ];
+
+export const TOPIC_TU_DUY: Topic = {
+  id: TOPIC,
+  subject: 'toan',
+  title: 'Toán Tư Duy & Quy Luật',
+  subtitle: 'Quy luật dãy số, chuỗi hình và tìm số còn thiếu',
+  iconEmoji: '🧩',
+  color: 'from-purple-500 to-indigo-600',
+  skills: SKILLS,
+  lessons: LESSONS,
+};
+

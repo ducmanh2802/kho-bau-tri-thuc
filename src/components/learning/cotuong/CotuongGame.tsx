@@ -4,6 +4,7 @@ import { sound } from '../../../services/sound';
 import { fireCelebrationConfetti } from '../../../services/confetti';
 import * as E from './cotuongEngine';
 import { CotuongBoard3D, PIECE_CHAR, type CaptureFx, type CotuongLabelMode, type CotuongTheme } from './CotuongBoard3D';
+import { CotuongCartoonPieceSvg } from './CotuongCartoonPieceSvg';
 
 const DEPTH: Record<string, number> = { easy: 2, medium: 3, hard: 4, expert: 5, master: 6 };
 const BOT: Record<string, E.BotOptions> = {
@@ -56,18 +57,28 @@ function missingPieces(board: E.Board): Record<E.Color, E.PieceType[]> {
   return out;
 }
 
-const MiniDiscs: React.FC<{ pieces: E.PieceType[]; color: E.Color }> = ({ pieces, color }) => {
+const MiniDiscs: React.FC<{ pieces: E.PieceType[]; color: E.Color; labelMode?: CotuongLabelMode }> = ({
+  pieces,
+  color,
+  labelMode = 'cartoon',
+}) => {
   if (pieces.length === 0) {
     return <span className="text-xs font-bold text-slate-400">Chưa bắt được quân nào</span>;
   }
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="flex flex-wrap gap-1 items-center">
       {pieces.map((type, i) => (
         <span
           key={`${type}-${i}`}
           className={`ct-mini-disc ${color === 'red' ? 'ct-mini-disc--red' : 'ct-mini-disc--black'}`}
         >
-          {PIECE_CHAR[`${color}-${type}`]}
+          {labelMode === 'cartoon' ? (
+            <span className="w-5 h-5 flex items-center justify-center p-0.5">
+              <CotuongCartoonPieceSvg type={type} color={color} size={18} />
+            </span>
+          ) : (
+            PIECE_CHAR[`${color}-${type}`]
+          )}
         </span>
       ))}
     </div>
@@ -94,7 +105,7 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
   const [result, setResult] = useState<{ winner: E.Color; text: string } | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [flat, setFlat] = useState(false);
-  const [labelMode, setLabelMode] = useState<CotuongLabelMode>('dual');
+  const [labelMode, setLabelMode] = useState<CotuongLabelMode>('cartoon');
   const [boardTheme, setBoardTheme] = useState<CotuongTheme>('rosewood');
   const [gameKey, setGameKey] = useState(0);
   const [captureFx, setCaptureFx] = useState<CaptureFx | null>(null);
@@ -378,9 +389,20 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
         {/* Board Customization Bar: Label Mode & Wood Theme */}
         <div className="pt-2 border-t border-amber-200/60 flex items-center justify-between gap-2 flex-wrap text-xs">
           {/* Label Mode Switcher */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span className="font-bold text-slate-600">Mặt quân:</span>
-            <div className="flex bg-amber-100/80 p-0.5 rounded-xl border border-amber-200">
+            <div className="flex bg-amber-100/80 p-0.5 rounded-xl border border-amber-200 flex-wrap gap-0.5">
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setLabelMode('cartoon');
+                }}
+                className={`px-2 py-0.5 rounded-lg font-bold transition-all cursor-pointer ${
+                  labelMode === 'cartoon' ? 'bg-amber-500 text-white shadow-2xs font-extrabold' : 'text-amber-900 hover:text-black'
+                }`}
+              >
+                Hoạt hình 3D 🐘🐴
+              </button>
               <button
                 onClick={() => {
                   sound.playClick();
@@ -576,13 +598,13 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
                 <p className="text-[11px] font-black uppercase tracking-wide text-red-600 mb-1">
                   Đỏ bắt được
                 </p>
-                <MiniDiscs pieces={captured.black} color="black" />
+                <MiniDiscs pieces={captured.black} color="black" labelMode={labelMode} />
               </div>
               <div>
                 <p className="text-[11px] font-black uppercase tracking-wide text-slate-600 mb-1">
                   Đen bắt được
                 </p>
-                <MiniDiscs pieces={captured.red} color="red" />
+                <MiniDiscs pieces={captured.red} color="red" labelMode={labelMode} />
               </div>
             </div>
           </div>
