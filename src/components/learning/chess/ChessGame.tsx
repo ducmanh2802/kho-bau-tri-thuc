@@ -4,6 +4,7 @@ import { sound } from '../../../services/sound';
 import * as E from './chessEngine';
 import { Chess3DCanvas } from './chess3d/Chess3DCanvas';
 import { ChessPieceSvg } from './ChessPieceSvg';
+import { KingCheckOverlay } from './KingCheckOverlay';
 
 const PIECE_NAMES: Record<string, string> = {
   p: 'Tốt', n: 'Mã', b: 'Tượng', r: 'Xe', q: 'Hậu', k: 'Vua',
@@ -55,6 +56,7 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [glFallback, setGlFallback] = useState(false);
   const [hintMove, setHintMove] = useState<E.Move | null>(null);
   const [history, setHistory] = useState<HistorySnap[]>([]);
+  const [dismissedCheck, setDismissedCheck] = useState(false);
   const startedAt = useRef(Date.now());
 
   const reset = () => {
@@ -67,6 +69,7 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     setMoves([]);
     setLastMove(null);
     setHintMove(null);
+    setDismissedCheck(false);
     setCapturedW([]);
     setCapturedB([]);
     setHistory([]);
@@ -136,17 +139,27 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     setTurn(turn === 'w' ? 'b' : 'w');
   };
 
-  // Bot AI Move Trigger
+  // Bot AI Move Trigger với cơ chế tránh đi lặp lại 1 nước
   useEffect(() => {
     if (turn !== 'b' || status) return;
     setThinking(true);
     const t = setTimeout(() => {
-      const mv = E.getBestMove(board, 'b', DEPTH[difficulty]);
+      const recentMoves = moves.map((m) => ({ from: m.from, to: m.to }));
+      const mv = E.getBestMove(board, 'b', DEPTH[difficulty], 400, recentMoves);
       if (mv) doMove(mv);
       setThinking(false);
     }, 420);
     return () => clearTimeout(t);
-  }, [turn, board, status, difficulty]);
+  }, [turn, board, status, difficulty, moves]);
+
+  const checkedColor = E.inCheck(board, 'w') ? 'w' : E.inCheck(board, 'b') ? 'b' : null;
+
+  // Tự động hồi phục trạng thái cảnh báo khi thoát khỏi thế bị chiếu
+  useEffect(() => {
+    if (checkedColor !== 'w') {
+      setDismissedCheck(false);
+    }
+  }, [checkedColor]);
 
   // Handle Square/Piece click
   const onSquareClick = (r: number, c: number) => {
@@ -234,8 +247,6 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const a = status ? analysis() : null;
 
-  const checkedColor = E.inCheck(board, 'w') ? 'w' : E.inCheck(board, 'b') ? 'b' : null;
-
 
   return (
     <div className="max-w-6xl mx-auto px-2 sm:px-4 py-3 sm:py-5 space-y-3.5 text-slate-800">
@@ -299,7 +310,7 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               pieceSet === 'classic' ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span>Cổ Điển</span>
+            <span>Cổ Điển 🪵</span>
           </button>
           <button
             onClick={() => { sound.playClick(); setPieceSet('fun'); }}
@@ -307,7 +318,7 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               pieceSet === 'fun' ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span>Con Vật & Đồ Dùng</span>
+            <span>Con Vật Hoạt Hình 🚙🐴</span>
           </button>
         </div>
         </div>
@@ -387,6 +398,19 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </span>
         </div>
       )}
+      {pieceSet === 'fun' && (
+        <div className="w-full max-w-[520px] mb-2 px-3 py-1.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 text-xs font-bold flex items-center justify-between gap-1 overflow-x-auto shadow-2xs">
+          <span className="shrink-0 font-extrabold text-amber-700">Bộ Hoạt Hình:</span>
+          <div className="flex items-center gap-2 text-xs font-semibold whitespace-nowrap">
+            <span>🚙 Xe G63</span>
+            <span>🐴 Ngựa con</span>
+            <span>🐘 Voi</span>
+            <span>👸 Hoàng hậu</span>
+            <span>👑 Vua {checkedColor ? '😱 Sợ hãi' : ''}</span>
+            <span>💂 Chú lính</span>
+          </div>
+        </div>
+      )}
       <div className="w-full flex flex-col items-center">
         {viewMode === '3d' ? (
           <Chess3DCanvas
@@ -432,6 +456,12 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         lastMove &&
                         ((lastMove.from[0] === r && lastMove.from[1] === c) ||
                           (lastMove.to[0] === r && lastMove.to[1] === c));
+                      const isHint =
+                        hintMove &&
+                        ((hintMove.from[0] === r && hintMove.from[1] === c) ||
+                          (hintMove.to[0] === r && hintMove.to[1] === c));
+                      const isKingInCheck = p && p.type === 'k' && checkedColor === p.color;
+
                       return (
                         <button
                           key={`${r}-${c}`}
@@ -440,11 +470,21 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                             dark ? 'bg-[#7b4a26]' : 'bg-[#f5e6c8]'
                           } ${sel ? 'z-10' : ''}`}
                         >
+                          {/* Nước đi gần nhất */}
                           {isLast && (
                             <span className="absolute inset-[1px] rounded-[2px] bg-[#7fb069]/55 ring-2 ring-inset ring-[#4e8b4a] pointer-events-none" />
                           )}
+                          {/* Nước đi gợi ý */}
+                          {isHint && (
+                            <span className="absolute inset-[1px] rounded-[2px] bg-amber-400/35 ring-3 ring-amber-400 animate-pulse pointer-events-none" />
+                          )}
+                          {/* Vua bị chiếu - hào quang nguy hiểm */}
+                          {isKingInCheck && (
+                            <span className="absolute inset-0 z-0 bg-radial from-rose-600/70 via-red-500/35 to-transparent animate-pulse pointer-events-none" />
+                          )}
+                          {/* Ô được chọn */}
                           {sel && (
-                            <span className="absolute inset-[1px] rounded-[2px] ring-4 ring-inset ring-sky-500 pointer-events-none" />
+                            <span className="absolute inset-[1px] rounded-[2px] ring-4 ring-inset ring-sky-500 bg-sky-400/20 shadow-[0_0_12px_rgba(14,165,233,0.5)] pointer-events-none" />
                           )}
                           {p ? (
                             <div className="relative z-[1] w-full h-full flex items-center justify-center">
@@ -452,14 +492,17 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                                 type={p.type}
                                 color={p.color}
                                 pieceSet={pieceSet}
-                                className="w-[88%] h-[88%] drop-shadow-sm select-none"
+                                isScared={p.type === 'k' && checkedColor === p.color}
+                                className={`w-[90%] h-[90%] drop-shadow-sm select-none transition-all duration-200 ${
+                                  sel ? 'scale-115 -translate-y-1' : ''
+                                }`}
                               />
                             </div>
                           ) : target ? (
-                            <span className="relative z-[1] w-4 h-4 rounded-full bg-emerald-600/80 shadow-xs" />
+                            <span className="relative z-[1] w-4.5 h-4.5 rounded-full bg-emerald-500 ring-4 ring-emerald-300/70 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse" />
                           ) : null}
                           {target && p && (
-                            <span className="absolute inset-0 z-[2] border-4 border-rose-500/80 rounded-sm pointer-events-none" />
+                            <span className="absolute inset-1 z-[2] rounded-md border-2 border-dashed border-rose-500 bg-rose-500/25 ring-2 ring-rose-400/60 shadow-[0_0_12px_rgba(244,63,94,0.6)] animate-pulse pointer-events-none" />
                           )}
                         </button>
                       );
@@ -483,7 +526,7 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         )}
 
         {/* Turn Pill Bar */}
-        <div className="mt-3 flex items-center gap-3 px-5 py-2 rounded-full bg-white border-2 border-slate-200 shadow-xs text-xs sm:text-sm font-black">
+        <div className="mt-3 flex items-center gap-3 px-5 py-2 rounded-full bg-white border-2 border-slate-200 shadow-xs text-xs sm:text-sm font-black flex-wrap justify-center">
           <span
             className={`w-3.5 h-3.5 rounded-full ${
               turn === 'w' ? 'bg-[#f5e6c8] ring-4 ring-[#f7ecd6]' : 'bg-[#5b3a21]'
@@ -492,6 +535,19 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <span>
             {turn === 'w' ? 'Lượt của bạn (Quân Trắng)' : 'Lượt của máy (Quân Đen)'}
           </span>
+          {checkedColor === 'w' && (
+            <button
+              onClick={() => {
+                sound.playClick();
+                setDismissedCheck(false);
+              }}
+              className="px-2.5 py-0.5 rounded-full bg-rose-500 hover:bg-rose-600 text-white text-xs font-black shadow-xs transition-all cursor-pointer animate-pulse flex items-center gap-1"
+              title="Bấm để xem lại lời kêu cứu của Vua"
+            >
+              <span>👑 Vua bị chiếu!</span>
+              <span className="underline text-[10px] text-rose-100">Xem 😱</span>
+            </button>
+          )}
           {hintMove && (
             <span className="px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 text-xs font-black">
               Đang hiện gợi ý
@@ -625,6 +681,15 @@ export const ChessGame: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </button>
         </div>
       )}
+
+      {/* Lớp phủ hoạt hình Vua hoảng sợ khi bị chiếu tướng */}
+      <KingCheckOverlay
+        show={turn === 'w' && checkedColor === 'w' && !status && !dismissedCheck}
+        onDismiss={() => {
+          sound.playClick();
+          setDismissedCheck(true);
+        }}
+      />
     </div>
   );
 };

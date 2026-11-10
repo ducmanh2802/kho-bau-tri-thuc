@@ -16,6 +16,13 @@ asset `kho-bau-tri-thuc-1.1.0.zip` 1 369 166 byte, 0 lượt tải). Tag hiện 
 `77d90ce`; tag đầu `6687667` ở `7d92246` đã xoá vì CI đỏ ở Install. Chữ ký Go/No-Go của người giữ repo
 và UAT người đọc to vẫn chưa có, xem `docs/lifecycle/07_RELEASE_OPERATIONS.md` §3.)*
 
+### Added
+- **T55 — Lớp phủ Vua bị chiếu tướng hoạt hình, làm đẹp ô cờ & cơ chế chống đối thủ lặp nước đi.**
+  - Thêm lớp phủ `KingCheckOverlay` hiện khuôn mặt ông Vua hoảng sợ tột độ (vương miện lệch, mắt trợn tròn, miệng há hét toát mồ hôi, hai tay ôm má kinh ngạc, hiệu ứng `animate-bounce`) cùng lời kêu cứu ngộ nghĩnh và nút hành động "Giải Cứu Vua Mau! 🛡️" khi quân Vua bị chiếu tướng.
+  - Làm đẹp hệ thống ô cờ 2D: chấm tròn mục tiêu phát sáng với viền emerald đa tầng, khung ngắm mục tiêu ăn quân màu đỏ viền nét đứt giật nhịp, hào quang đỏ cảnh báo nguy hiểm tỏa sáng dưới chân Vua khi bị chiếu, ô chọn phát sáng xanh lam và ô gợi ý màu hổ phách.
+  - Khắc phục triệt để tình trạng máy bị kẹt và đánh đi đánh lại 1 nước (anti-repetition penalty): truyền lịch sử nước đi gần nhất vào thuật toán tìm kiếm (`getBestMove`) ở cả Cờ Vua (`chessEngine.ts`) và Cờ Tướng (`cotuongEngine.ts`), phạt nặng các nước đi đảo ngược trực tiếp hoặc xoay vòng cùng một nước đi trong 6 lượt gần nhất. Test mới `tests/t55-chess-check-overlay-anti-repetition.test.ts` (6/6).
+- **T54 — Cờ Vua bộ quân hoạt hình sinh động & Cờ Tướng giới hạn 3 lượt gợi ý mỗi ván.** Thêm lựa chọn bộ quân "Con Vật Hoạt Hình 🚙🐴" trong Cờ Vua 2D/3D (Xe là siêu xe G63 gầm cao đèn tròn, Mã là chú ngựa con mắt to bờm bay, Tượng là chú voi tai to vòi cong, Hậu là nữ hoàng vương miện ngọc, Vua uy nghiêm và hoảng sợ nhảy rung toát mồ hôi khi bị chiếu tướng, Tốt là chú lính nhỏ dũng cảm). Quân di chuyển có hiệu ứng nhảy vòng cung và xoay nhẹ. Trong Cờ Tướng, bổ sung giới hạn tối đa 3 lần sử dụng nút "Gợi ý" mỗi ván đấu với nút đếm ngược `Gợi ý (X/3)` và tự động khoá khi hết lượt. Test mới `tests/t54-cotuong-hint-limit.test.ts` (6/6).
+
 ### Changed
 - **T52 — trang chủ gọn hơn 11.4 % và entry nhẹ hơn 18.9 kB (yêu cầu "tối ưu trang chủ cho gọn và
   load nhanh").** Đo trên `dist/` thật, probe `evidence/2026-11-04-T52/probe-home-compact-load.mjs`

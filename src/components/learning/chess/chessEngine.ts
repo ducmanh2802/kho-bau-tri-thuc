@@ -366,13 +366,51 @@ function minimax(
   }
 }
 
-export function getBestMove(b: Board, color: Color, depth: number, maxMs: number = 400): Move | null {
+export function getBestMove(
+  b: Board,
+  color: Color,
+  depth: number,
+  maxMs: number = 400,
+  recentMoves: Array<{ from: [number, number]; to: [number, number] }> = []
+): Move | null {
   const rootMoves = allLegalMoves(b, color);
   if (rootMoves.length === 0) return null;
   if (depth <= 0) return rootMoves[0];
 
   const deadline = Date.now() + maxMs;
   const maximizing = color === 'w';
+
+  // Tính phạt nước đi lặp lại để đối thủ không đi đi lại lại 1 nước / kẹt quân
+  const getRepetitionPenalty = (m: Move): number => {
+    if (recentMoves.length === 0) return 0;
+    const isCap = !!b[m.to[0]][m.to[1]];
+    if (isCap) return 0; // Ăn quân là nước đi tiến triển, không phạt
+    let pen = 0;
+    const len = recentMoves.length;
+    // Xét các nước đi gần nhất của bên này (lùi 2, 4, 6 nửa nước)
+    for (let i = len - 2; i >= 0 && i >= len - 6; i -= 2) {
+      const prev = recentMoves[i];
+      // Đảo ngược nước vừa đi (từ A sang B rồi quay lại A)
+      if (
+        m.from[0] === prev.to[0] &&
+        m.from[1] === prev.to[1] &&
+        m.to[0] === prev.from[0] &&
+        m.to[1] === prev.from[1]
+      ) {
+        pen += 950;
+      }
+      // Đi lặp lại cùng một nước đi trong vài lượt gần nhất
+      if (
+        m.from[0] === prev.from[0] &&
+        m.from[1] === prev.from[1] &&
+        m.to[0] === prev.to[0] &&
+        m.to[1] === prev.to[1]
+      ) {
+        pen += 650;
+      }
+    }
+    return pen;
+  };
 
   orderMoves(b, rootMoves);
 
@@ -408,12 +446,15 @@ export function getBestMove(b: Board, color: Color, depth: number, maxMs: number
       b[tr][tc] = m.promotion ? { type: m.promotion, color: p.color } : p;
       b[fr][fc] = null;
 
-      const sc = minimax(b, d - 1, alpha, beta, !maximizing, deadline, state);
+      const rawSc = minimax(b, d - 1, alpha, beta, !maximizing, deadline, state);
 
       b[fr][fc] = p;
       b[tr][tc] = cap;
 
       if (state.aborted) break;
+
+      const penalty = getRepetitionPenalty(m);
+      const sc = maximizing ? rawSc - penalty : rawSc + penalty;
 
       if (maximizing) {
         if (sc > bestScore) {

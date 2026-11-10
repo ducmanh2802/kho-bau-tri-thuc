@@ -95,4 +95,19 @@ describe('Chess 3D Component & Geometry Tests', () => {
     expect(nextBoard[6][4]).toBeNull();
     expect(nextBoard[4][4]).toEqual({ type: 'p', color: 'w' });
   });
+
+  it('creates fun cartoon piece meshes for all piece types with shadows and custom models', () => {
+    const pieceTypes: E.PieceType[] = ['p', 'r', 'n', 'b', 'q', 'k'];
+    pieceTypes.forEach((type) => {
+      const meshW = createPieceMesh(type, 'w', 'fun');
+      expect(meshW).toBeInstanceOf(THREE.Group);
+      expect(meshW.name).toBe(`piece_w_${type}_fun`);
+      expect(meshW.children.length).toBeGreaterThanOrEqual(2);
+
+      const meshB = createPieceMesh(type, 'b', 'fun');
+      expect(meshB).toBeInstanceOf(THREE.Group);
+      expect(meshB.name).toBe(`piece_b_${type}_fun`);
+    });
+  });
 });
+

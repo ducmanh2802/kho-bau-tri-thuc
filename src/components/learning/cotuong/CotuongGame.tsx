@@ -5,19 +5,21 @@ import { fireCelebrationConfetti } from '../../../services/confetti';
 import * as E from './cotuongEngine';
 import { CotuongBoard3D, PIECE_CHAR, type CaptureFx, type CotuongLabelMode, type CotuongTheme } from './CotuongBoard3D';
 
-const DEPTH: Record<string, number> = { easy: 2, medium: 3, hard: 4, expert: 4 };
+const DEPTH: Record<string, number> = { easy: 2, medium: 3, hard: 4, expert: 5, master: 6 };
 const BOT: Record<string, E.BotOptions> = {
-  easy: { maxNodes: 20000, softness: 150 },
-  medium: { maxNodes: 60000, softness: 30 },
-  hard: { maxNodes: 220000 },
-  expert: { maxNodes: 420000 },
+  easy: { maxNodes: 18000, softness: 140 },
+  medium: { maxNodes: 50000, softness: 25 },
+  hard: { maxNodes: 160000 },
+  expert: { maxNodes: 280000 },
+  master: { maxNodes: 480000 },
 };
 
 const DIFFICULTY_LABEL: Record<string, string> = {
   easy: 'Dễ',
   medium: 'Thường',
   hard: 'Khó',
-  expert: 'Siêu khó',
+  expert: 'Cao thủ',
+  master: 'Kiện tướng 🏆',
 };
 
 const INITIAL_COUNTS: Record<E.PieceType, number> = { k: 1, a: 2, e: 2, h: 2, r: 2, c: 2, p: 5 };
@@ -72,6 +74,8 @@ const MiniDiscs: React.FC<{ pieces: E.PieceType[]; color: E.Color }> = ({ pieces
   );
 };
 
+const MAX_HINTS = 3;
+
 export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> = ({
   onBack,
   embedded = false,
@@ -85,6 +89,7 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
   const [moves, setMoves] = useState<MoveRec[]>([]);
   const [lastMove, setLastMove] = useState<E.Move | null>(null);
   const [hintMove, setHintMove] = useState<E.Move | null>(null);
+  const [hintsLeft, setHintsLeft] = useState(MAX_HINTS);
   const [history, setHistory] = useState<Snapshot[]>([]);
   const [result, setResult] = useState<{ winner: E.Color; text: string } | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -168,7 +173,11 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
     if (turn !== 'black' || result) return;
     setThinking(true);
     const timer = window.setTimeout(() => {
-      const mv = E.getBestMove(board, 'black', DEPTH[difficulty], BOT[difficulty]);
+      const recentMoves = moves.map((m) => ({ from: m.from, to: m.to }));
+      const mv = E.getBestMove(board, 'black', DEPTH[difficulty], {
+        ...BOT[difficulty],
+        recentMoves,
+      });
       if (mv) doMove(mv);
       setThinking(false);
     }, 260);
@@ -187,6 +196,7 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
     setMoves([]);
     setLastMove(null);
     setHintMove(null);
+    setHintsLeft(MAX_HINTS);
     setHistory([]);
     setResult(null);
     setShowResult(false);
@@ -220,9 +230,10 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
   };
 
   const hint = () => {
-    if (result || thinking || turn !== 'red') return;
+    if (result || thinking || turn !== 'red' || hintsLeft <= 0) return;
     const mv = E.getBestMove(board, 'red', 2, { maxNodes: 40000 });
     if (!mv) return;
+    setHintsLeft((prev) => prev - 1);
     setHintMove(mv);
     setSelected(mv.from);
     setLegal([mv]);
@@ -303,7 +314,7 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
           {/* Difficulty Selector */}
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-xs sm:text-sm font-black text-slate-500 mr-0.5">Độ khó:</span>
-            {(['easy', 'medium', 'hard', 'expert'] as const).map((d) => (
+            {(['easy', 'medium', 'hard', 'expert', 'master'] as const).map((d) => (
               <button
                 key={d}
                 onClick={() => changeDifficulty(d)}
@@ -322,11 +333,15 @@ export const CotuongGame: React.FC<{ onBack: () => void; embedded?: boolean }> =
           <div className="flex items-center gap-1.5 flex-wrap ml-auto">
             <button
               onClick={hint}
-              disabled={!!result || thinking || turn !== 'red'}
-              title="Xem gợi ý nước đi tối ưu"
+              disabled={!!result || thinking || turn !== 'red' || hintsLeft <= 0}
+              title={
+                hintsLeft > 0
+                  ? `Xem gợi ý nước đi tối ưu (còn ${hintsLeft}/${MAX_HINTS} lần)`
+                  : 'Đã hết lượt gợi ý trong ván này'
+              }
               className="px-2.5 py-1.5 rounded-xl font-bold text-xs sm:text-sm bg-violet-50 text-violet-700 border border-violet-200 hover:bg-violet-100 disabled:opacity-40 flex items-center gap-1 cursor-pointer"
             >
-              <Lightbulb className="w-3.5 h-3.5 text-violet-600" /> Gợi ý
+              <Lightbulb className="w-3.5 h-3.5 text-violet-600" /> Gợi ý ({hintsLeft}/{MAX_HINTS})
             </button>
             <button
               onClick={undo}

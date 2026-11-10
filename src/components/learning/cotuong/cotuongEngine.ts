@@ -361,29 +361,121 @@ export function isGameOver(
 
 // ---------------------------------------------------------------- evaluation
 
-const VAL: Record<PieceType, number> = { k: 30000, r: 900, c: 450, h: 400, e: 200, a: 220, p: 100 };
+const VAL: Record<PieceType, number> = { k: 30000, r: 900, c: 450, h: 400, e: 220, a: 220, p: 100 };
 
-/** Static evaluation, positive = good for red. Deliberately allocation-free. */
+/**
+ * Advanced Xiangqi heuristic evaluation:
+ * - Material values
+ * - Central control for Cannons (Pháo đầu & Pháo sườn)
+ * - Open files and enemy territory penetration for Chariots (Xe chiếm lộ thoáng)
+ * - Mobility and unblocked legs for Horses (Mã thông thoáng)
+ * - Infiltration depth and central palace threats for crossed Pawns (Tốt qua sông)
+ * - Palace guard connectivity (Sĩ Tượng liên hoàn)
+ */
 export function evaluate(b: Board): number {
   let score = 0;
+  // Pre-calculate column pawn occupancy to detect open files for Chariots
+  const redPawnCols = new Uint8Array(COLS);
+  const blackPawnCols = new Uint8Array(COLS);
+  let redAdvisors = 0;
+  let blackAdvisors = 0;
+  let redElephants = 0;
+  let blackElephants = 0;
+
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       const p = b[r][c];
       if (!p) continue;
-      const sign = p.color === 'red' ? 1 : -1;
-      let v = VAL[p.type];
       if (p.type === 'p') {
-        const crossed = p.color === 'red' ? r <= 4 : r >= 5;
-        v += crossed ? 40 + (p.color === 'red' ? 9 - r : r) * 6 : (p.color === 'red' ? 9 - r : r) * 4;
-      } else if (p.type === 'h' || p.type === 'r') {
-        v += (4 - Math.abs(c - 4)) * 4;
-        v += (p.color === 'red' ? 9 - r : r) * 2;
-      } else if (p.type === 'c') {
-        v += (4 - Math.abs(c - 4)) * 2;
+        if (p.color === 'red') redPawnCols[c] = 1;
+        else blackPawnCols[c] = 1;
+      } else if (p.type === 'a') {
+        if (p.color === 'red') redAdvisors++;
+        else blackAdvisors++;
+      } else if (p.type === 'e') {
+        if (p.color === 'red') redElephants++;
+        else blackElephants++;
       }
+    }
+  }
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const p = b[r][c];
+      if (!p) continue;
+      const isRed = p.color === 'red';
+      const sign = isRed ? 1 : -1;
+      let v = VAL[p.type];
+
+      switch (p.type) {
+        case 'p': {
+          const crossed = isRed ? r <= 4 : r >= 5;
+          if (crossed) {
+            const forward = isRed ? 9 - r : r;
+            // Crossed pawn: becomes increasingly lethal near enemy palace
+            v += 45 + forward * 8;
+            if (c >= 3 && c <= 5) v += 20; // Palace corridor
+          } else {
+            const forward = isRed ? 9 - r : r;
+            v += forward * 4;
+            if (c === 4) v += 10; // Central pawn advance
+          }
+          break;
+        }
+        case 'h': {
+          // Central activity
+          v += (4 - Math.abs(c - 4)) * 6;
+          v += (isRed ? 9 - r : r) * 2;
+          // Penalize when horse leg is hobbled
+          for (const [dr, dc] of HORSE) {
+            const legR = r + (Math.abs(dr) === 2 ? dr / 2 : 0);
+            const legC = c + (Math.abs(dc) === 2 ? dc / 2 : 0);
+            if (!inBounds(legR, legC) || b[legR][legC]) {
+              v -= 4; // slight drag for blocked legs
+            }
+          }
+          break;
+        }
+        case 'r': {
+          // Central rib control
+          v += (4 - Math.abs(c - 4)) * 4;
+          // Open or semi-open file bonus
+          const oppPawns = isRed ? blackPawnCols[c] : redPawnCols[c];
+          const ownPawns = isRed ? redPawnCols[c] : blackPawnCols[c];
+          if (!oppPawns && !ownPawns) v += 24; // fully open file
+          else if (!ownPawns) v += 14; // semi-open file
+          // Throat or river patrol rank
+          if (isRed && (r === 1 || r === 2 || r === 5)) v += 16;
+          if (!isRed && (r === 8 || r === 7 || r === 4)) v += 16;
+          break;
+        }
+        case 'c': {
+          // Central Cannon (Pháo đầu) or Rib Cannon (Pháo sườn)
+          if (c === 4) v += 32;
+          else if (c === 3 || c === 5) v += 18;
+          v += (4 - Math.abs(c - 4)) * 3;
+          break;
+        }
+        case 'a':
+        case 'e': {
+          v += 10;
+          break;
+        }
+        case 'k': {
+          // King in palace center protection
+          if (c === 4) v += 12;
+          break;
+        }
+      }
+
       score += sign * v;
     }
   }
+
+  // Coordinated palace guard bonus (Sĩ Tượng song toàn)
+  if (redAdvisors >= 2 && redElephants >= 2) score += 35;
+  if (blackAdvisors >= 2 && blackElephants >= 2) score -= 35;
+
   return score;
 }
 
@@ -393,6 +485,26 @@ interface SearchState {
   nodes: number;
   maxNodes: number;
   aborted: boolean;
+  killerMoves: (Move | null)[][];
+  historyTable: number[][][][];
+}
+
+function initSearchState(maxNodes: number): SearchState {
+  // Killer moves: 2 per ply up to depth 32
+  const killerMoves: (Move | null)[][] = Array.from({ length: 32 }, () => [null, null]);
+  // History table: [fromR][fromC][toR][toC]
+  const historyTable: number[][][][] = Array.from({ length: ROWS }, () =>
+    Array.from({ length: COLS }, () =>
+      Array.from({ length: ROWS }, () => Array(COLS).fill(0))
+    )
+  );
+  return {
+    nodes: 0,
+    maxNodes,
+    aborted: false,
+    killerMoves,
+    historyTable,
+  };
 }
 
 function makeMove(b: Board, m: Move): Piece | null {
@@ -412,21 +524,117 @@ function unmakeMove(b: Board, m: Move, captured: Piece | null): void {
   b[tr][tc] = captured;
 }
 
-function orderMoves(b: Board, moves: Move[]): Move[] {
-  return moves.sort((a, c) => scoreMove(b, c) - scoreMove(b, a));
+function movesEqual(a: Move | null, c: Move | null): boolean {
+  if (!a || !c) return false;
+  return (
+    a.from[0] === c.from[0] &&
+    a.from[1] === c.from[1] &&
+    a.to[0] === c.to[0] &&
+    a.to[1] === c.to[1]
+  );
 }
 
-function scoreMove(b: Board, m: Move): number {
+function scoreMove(
+  b: Board,
+  m: Move,
+  ply: number,
+  st: SearchState,
+  pvMove: Move | null
+): number {
+  if (pvMove && movesEqual(m, pvMove)) return 2000000;
+
   const target = b[m.to[0]][m.to[1]];
-  if (!target) return 0;
-  const mover = b[m.from[0]][m.from[1]];
-  // MVV-LVA: prefer valuable victims taken by cheap attackers.
-  return VAL[target.type] * 10 - (mover ? VAL[mover.type] : 0);
+  if (target) {
+    const mover = b[m.from[0]][m.from[1]];
+    // MVV-LVA: prefer high value victim taken by cheap attacker
+    return 100000 + VAL[target.type] * 10 - (mover ? VAL[mover.type] : 0);
+  }
+
+  // Killer move heuristics
+  if (ply < 32) {
+    if (movesEqual(m, st.killerMoves[ply][0])) return 50000;
+    if (movesEqual(m, st.killerMoves[ply][1])) return 40000;
+  }
+
+  // History heuristic for quiet moves
+  return st.historyTable[m.from[0]][m.from[1]][m.to[0]][m.to[1]];
+}
+
+function orderMoves(
+  b: Board,
+  moves: Move[],
+  ply: number = 0,
+  st?: SearchState,
+  pvMove: Move | null = null
+): Move[] {
+  if (!st) {
+    return moves.sort((a, c) => {
+      const targetC = b[c.to[0]][c.to[1]];
+      const targetA = b[a.to[0]][a.to[1]];
+      const scoreC = targetC ? VAL[targetC.type] * 10 : 0;
+      const scoreA = targetA ? VAL[targetA.type] * 10 : 0;
+      return scoreC - scoreA;
+    });
+  }
+
+  return moves.sort(
+    (a, c) =>
+      scoreMove(b, c, ply, st, pvMove) - scoreMove(b, a, ply, st, pvMove)
+  );
 }
 
 function evaluateFor(b: Board, color: Color): number {
   const red = evaluate(b);
   return color === 'red' ? red : -red;
+}
+
+/**
+ * Quiescence search: evaluates tactical sequences (captures) beyond the horizon
+ * to eliminate the horizon effect and prevent hanging critical pieces.
+ */
+function quiesce(
+  b: Board,
+  alpha: number,
+  beta: number,
+  color: Color,
+  st: SearchState,
+  qDepth: number
+): number {
+  st.nodes++;
+  if (st.nodes >= st.maxNodes) {
+    st.aborted = true;
+    return evaluateFor(b, color);
+  }
+
+  const standPat = evaluateFor(b, color);
+  if (qDepth <= 0 || standPat >= beta) return standPat;
+  if (standPat > alpha) alpha = standPat;
+
+  // Generate only captures
+  const allMoves: Move[] = [];
+  collectLegal(b, color, allMoves);
+  const captures = allMoves.filter((m) => b[m.to[0]][m.to[1]] !== null);
+  if (captures.length === 0) return standPat;
+
+  orderMoves(b, captures, 0, st, null);
+
+  for (const m of captures) {
+    const target = b[m.to[0]][m.to[1]];
+    if (!target) continue;
+
+    // Delta pruning: skip captures that can't possibly raise alpha
+    if (standPat + VAL[target.type] + 180 < alpha) continue;
+
+    const cap = makeMove(b, m);
+    const score = -quiesce(b, -beta, -alpha, opp(color), st, qDepth - 1);
+    unmakeMove(b, m, cap);
+
+    if (score >= beta) return beta;
+    if (score > alpha) alpha = score;
+    if (st.aborted) break;
+  }
+
+  return alpha;
 }
 
 function negamax(
@@ -436,28 +644,51 @@ function negamax(
   beta: number,
   color: Color,
   st: SearchState,
-  ply: number
+  ply: number,
+  pvMove: Move | null = null
 ): number {
   st.nodes++;
-  if (st.nodes > st.maxNodes) {
+  if (st.nodes >= st.maxNodes) {
     st.aborted = true;
     return evaluateFor(b, color);
   }
-  if (depth <= 0) return evaluateFor(b, color);
+
+  // Quiescence search at leaf nodes
+  if (depth <= 0) {
+    return quiesce(b, alpha, beta, color, st, 3);
+  }
 
   const moves: Move[] = [];
   collectLegal(b, color, moves);
-  if (moves.length === 0) return -MATE + ply; // mated (or stalemated) — always a loss
+  if (moves.length === 0) return -MATE + ply; // mated or stalemated
 
-  orderMoves(b, moves);
+  orderMoves(b, moves, ply, st, pvMove);
   let best = -Infinity;
+  let bestMoveAtNode: Move | null = null;
+
   for (const m of moves) {
+    const isCapture = b[m.to[0]][m.to[1]] !== null;
     const cap = makeMove(b, m);
-    const score = -negamax(b, depth - 1, -beta, -alpha, opp(color), st, ply + 1);
+    const score = -negamax(b, depth - 1, -beta, -alpha, opp(color), st, ply + 1, null);
     unmakeMove(b, m, cap);
-    if (score > best) best = score;
+
+    if (score > best) {
+      best = score;
+      bestMoveAtNode = m;
+    }
     if (best > alpha) alpha = best;
-    if (alpha >= beta) break;
+
+    if (alpha >= beta) {
+      // Beta cutoff: update killer moves & history table for quiet moves
+      if (!isCapture && ply < 32 && bestMoveAtNode) {
+        if (!movesEqual(st.killerMoves[ply][0], bestMoveAtNode)) {
+          st.killerMoves[ply][1] = st.killerMoves[ply][0];
+          st.killerMoves[ply][0] = bestMoveAtNode;
+        }
+        st.historyTable[bestMoveAtNode.from[0]][bestMoveAtNode.from[1]][bestMoveAtNode.to[0]][bestMoveAtNode.to[1]] += depth * depth;
+      }
+      break;
+    }
     if (st.aborted) break;
   }
   return best;
@@ -468,13 +699,19 @@ export interface BotOptions {
   maxNodes?: number;
   /**
    * Centipawn window: the bot picks randomly among root moves within this
-   * distance of the best one. Used by the "Dễ" level so the child can win.
+   * distance of the best one. Used by easier levels so children can win.
    */
   softness?: number;
   random?: () => number;
+  /** Lịch sử các nước đi gần nhất để tránh tình trạng máy đi đi lại lại 1 nước / kẹt nước. */
+  recentMoves?: Array<{ from: [number, number]; to: [number, number] }>;
 }
 
-/** Best move for `color`, or null when the side has no legal move. */
+/**
+ * Best move for `color` with iterative deepening:
+ * Searches depth 1, 2, ..., depth while respecting node budget.
+ * Guarantees crisp responsiveness and deepest possible tactical foresight.
+ */
 export function getBestMove(
   b: Board,
   color: Color,
@@ -486,32 +723,76 @@ export function getBestMove(
   if (depth <= 0) return rootMoves[0];
 
   const work = cloneBoard(b);
-  const st: SearchState = {
-    nodes: 0,
-    maxNodes: opts.maxNodes ?? (depth >= 4 ? 260000 : 80000),
-    aborted: false,
-  };
-  orderMoves(work, rootMoves);
+  const st = initSearchState(opts.maxNodes ?? (depth >= 5 ? 380000 : depth >= 4 ? 220000 : 70000));
 
-  const scored: { move: Move; score: number }[] = [];
-  let alpha = -Infinity;
-  for (const m of rootMoves) {
-    const cap = makeMove(work, m);
-    const score = -negamax(work, depth - 1, -Infinity, -alpha, opp(color), st, 1);
-    unmakeMove(work, m, cap);
-    scored.push({ move: m, score });
-    if (score > alpha) alpha = score;
-    if (st.aborted) break;
+  // Tính phạt nước đi lặp lại để đối thủ không đi đi lại lại 1 nước / kẹt nước
+  const getRepetitionPenalty = (m: Move): number => {
+    const rm = opts.recentMoves;
+    if (!rm || rm.length === 0) return 0;
+    const isCap = !!b[m.to[0]][m.to[1]];
+    if (isCap) return 0;
+    let pen = 0;
+    const len = rm.length;
+    for (let i = len - 2; i >= 0 && i >= len - 6; i -= 2) {
+      const prev = rm[i];
+      if (
+        m.from[0] === prev.to[0] &&
+        m.from[1] === prev.to[1] &&
+        m.to[0] === prev.from[0] &&
+        m.to[1] === prev.from[1]
+      ) {
+        pen += 950;
+      }
+      if (
+        m.from[0] === prev.from[0] &&
+        m.from[1] === prev.from[1] &&
+        m.to[0] === prev.to[0] &&
+        m.to[1] === prev.to[1]
+      ) {
+        pen += 650;
+      }
+    }
+    return pen;
+  };
+
+  let overallBestMove: Move = rootMoves[0];
+  let lastScored: { move: Move; score: number }[] = [];
+
+  // Iterative deepening from depth 1 up to target depth
+  for (let d = 1; d <= depth; d++) {
+    orderMoves(work, rootMoves, 0, st, overallBestMove);
+    const scored: { move: Move; score: number }[] = [];
+    let alpha = -Infinity;
+
+    for (const m of rootMoves) {
+      const cap = makeMove(work, m);
+      const rawScore = -negamax(work, d - 1, -Infinity, -alpha, opp(color), st, 1, null);
+      unmakeMove(work, m, cap);
+      const penalty = getRepetitionPenalty(m);
+      const score = rawScore - penalty;
+      scored.push({ move: m, score });
+      if (score > alpha) alpha = score;
+      if (st.aborted) break;
+    }
+
+    if (!st.aborted && scored.length > 0) {
+      scored.sort((a, c) => c.score - a.score);
+      overallBestMove = scored[0].move;
+      lastScored = scored;
+    } else {
+      break;
+    }
   }
 
-  scored.sort((a, c) => c.score - a.score);
   const softness = opts.softness ?? 0;
-  if (softness > 0 && scored.length > 1) {
-    const top = scored[0].score;
-    const pool = scored.filter((s) => s.score >= top - softness);
+  if (softness > 0 && lastScored.length > 1) {
+    const top = lastScored[0].score;
+    const pool = lastScored.filter((s) => s.score >= top - softness);
     const rng = opts.random ?? Math.random;
     const pick = pool[Math.min(pool.length - 1, Math.floor(rng() * pool.length))];
     return pick.move;
   }
-  return scored[0].move;
+
+  return overallBestMove;
 }
+

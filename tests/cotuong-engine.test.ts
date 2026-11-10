@@ -172,4 +172,26 @@ describe('cotuong rules extra', () => {
       expect(moves).toContainEqual(pz.expectedMove);
     }
   });
+
+  it('deep alpha-beta search with iterative deepening and quiescence works reliably', () => {
+    const b = E.initialBoard();
+    // Test search at depth 4 with node limit
+    const mv = E.getBestMove(b, 'black', 4, { maxNodes: 80000 });
+    expect(mv).not.toBeNull();
+    const legal = E.legalMoves(b, mv!.from);
+    expect(legal.some((x) => x.to[0] === mv!.to[0] && x.to[1] === mv!.to[1])).toBe(true);
+  });
+
+  it('evaluates strategic Xiangqi features (open files, cannon central, passed pawns)', () => {
+    const b = E.initialBoard();
+    const initialScore = E.evaluate(b);
+    expect(initialScore).toBe(0); // Symmetrical initial board
+
+    // Advance red central pawn
+    b[6][4] = null;
+    b[5][4] = { type: 'p', color: 'red' };
+    const pawnAdvancedScore = E.evaluate(b);
+    expect(pawnAdvancedScore).toBeGreaterThan(0);
+  });
 });
+

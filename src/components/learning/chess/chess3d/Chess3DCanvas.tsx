@@ -323,26 +323,31 @@ export const Chess3DCanvas: React.FC<Chess3DCanvasProps> = ({
 
         if (anim.progress >= 1.0) {
           anim.mesh.position.copy(anim.toPos);
+          anim.mesh.rotation.z = 0;
+          anim.mesh.rotation.x = 0;
           if (anim.onComplete) anim.onComplete();
           activeAnimation.current = null;
         } else {
           const t = anim.progress;
           const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
           anim.mesh.position.lerpVectors(anim.fromPos, anim.toPos, ease);
-          // Nhấc quân vừa phải như tay bé cầm cờ thật
-          const arcHeight = Math.sin(t * Math.PI) * 0.3;
+          // Nhấc quân nhảy vòng cung sống động cho bé thích thú
+          const arcHeight = Math.sin(t * Math.PI) * 0.42;
           anim.mesh.position.y = anim.fromPos.y + arcHeight;
-           // Hiệu ứng xoay nhẹ khi di chuyển
-           anim.mesh.rotation.y += delta * 6;
+          // Hiệu ứng xoay và nghiêng nhẹ khi di chuyển
+          anim.mesh.rotation.y += delta * 7;
+          anim.mesh.rotation.z = Math.sin(t * Math.PI * 2) * 0.14;
         }
       }
 
-      // Vua sợ hãi khi bị chiếu: rung nhẹ
+      // Vua hoảng sợ khi bị chiếu: rung lắc nảy giật thột
       if (checkedColor) {
+        const timeNow = performance.now();
         pieceMeshes.current.forEach((mesh) => {
           if (mesh.name === `piece_${checkedColor}_k` || mesh.name === `piece_${checkedColor}_k_fun`) {
-            mesh.rotation.z = Math.sin(performance.now() / 120) * 0.2;
-            const s = 1 + Math.sin(performance.now() / 200) * 0.06;
+            mesh.rotation.z = Math.sin(timeNow / 70) * 0.22;
+            mesh.rotation.x = Math.cos(timeNow / 90) * 0.14;
+            const s = 1 + Math.abs(Math.sin(timeNow / 120)) * 0.12;
             mesh.scale.set(s, s, s);
           }
         });
@@ -350,6 +355,7 @@ export const Chess3DCanvas: React.FC<Chess3DCanvasProps> = ({
         pieceMeshes.current.forEach((mesh) => {
           if (mesh.name.endsWith('_k') || mesh.name.endsWith('_k_fun')) {
             mesh.rotation.z = 0;
+            mesh.rotation.x = 0;
             mesh.scale.set(1, 1, 1);
           }
         });

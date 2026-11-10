@@ -30,7 +30,10 @@ function swPrecachePlugin() {
   };
 }
 
-export default defineConfig(() => {
+export default defineConfig(({ command }) => {
+  if (command === 'build') {
+    process.env.NODE_ENV = 'production';
+  }
   return {
     plugins: [react(), tailwindcss(), swPrecachePlugin()],
     resolve: {
@@ -41,6 +44,7 @@ export default defineConfig(() => {
       },
     },
     build: {
+      minify: true,
       rolldownOptions: {
         output: {
           // T02C — keep react/react-dom out of the first-load entry chunk so
